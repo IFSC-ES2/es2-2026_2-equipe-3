@@ -1,6 +1,7 @@
 # Sistema de Gestão Centralizada de TCC
 
 ## 1. Equipe
+
 * **DAMARES DO SOCORRO GONCALVES GAIA** (Matrícula: 202510703590) - Papel: Arquiteta de Software
 * **EDUARDO CARDOSO OLIVEIRA** (Matrícula: 202510703625) - Papel: Engenheiro de Requisitos e Scrum Master (Sprint 1)
 * **MARCUS JHUAN EPIFANIO LIMA** (Matrícula: 202320003071) - Papel: Designer de UX/UI
@@ -34,13 +35,15 @@
 O sistema será construído como uma aplicação Web Orientada a Objetos, com foco nas regras de negócio essenciais do fluxo acadêmico.
 
 **O que o MVP fará (Funcionalidades Principais):**
-1.  **Autenticação e Perfis:** Acesso diferenciado para Alunos, Professores e Coordenadores.
-2.  **Catálogo de Orientadores:** Vitrine onde os professores cadastram suas linhas de pesquisa, áreas de interesse e quantidade de vagas disponíveis.
-3.  **Gestão de Documentos e Prazos:** Interface para o aluno fazer o upload das entregas obrigatórias (ex: Projeto de TCC, TCC 1, Versão Final) respeitando o calendário do Coordenador.
-4.  **Gestão de Bancas:** Funcionalidade para o orientador registrar a data, horário, local/link da defesa e os professores convidados para a banca.
-5.  **Acervo Público Acadêmico:** Uma página pública com barra de busca para listar os TCCs concluídos e aprovados, permitindo filtrar por título, autor, orientador ou linha de pesquisa, com acesso ao arquivo final.
+
+1. **Autenticação e Perfis:** Acesso diferenciado para Alunos, Professores e Coordenadores.
+2. **Catálogo de Orientadores:** Vitrine onde os professores cadastram suas linhas de pesquisa, áreas de interesse e quantidade de vagas disponíveis.
+3. **Gestão de Documentos e Prazos:** Interface para o aluno fazer o upload das entregas obrigatórias (ex: Projeto de TCC, TCC 1, Versão Final) respeitando o calendário do Coordenador.
+4. **Gestão de Bancas:** Funcionalidade para o orientador registrar a data, horário, local/link da defesa e os professores convidados para a banca.
+5. **Acervo Público Acadêmico:** Uma página pública com barra de busca para listar os TCCs concluídos e aprovados, permitindo filtrar por título, autor, orientador ou linha de pesquisa, com acesso ao arquivo final.
 
 **O que ficará FORA do escopo neste momento:**
+
 * Aplicativo Mobile.
 * Assinatura digital avançada (gov.br) nas atas de defesa.
 * Geração automática de PDFs complexos (atas e formulários formatados).

@@ -1,4 +1,4 @@
-## Definição de Pronto
+# Definição de Pronto
 
 - [ ] A funcionalidade atende aos requisitos da tarefa e critérios de aceitação
 - [ ] O código foi versionado no repositório
