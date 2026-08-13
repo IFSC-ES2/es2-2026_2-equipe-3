@@ -1,6 +1,6 @@
 # Visão do Produto e Definição do MVP
 
-Este documento consolida a **Visão do Produto** e a **Definição do Produto Mínimo Viável (MVP)** para o **Sistema de Gestão Centralizada de TCC**, elaborado na etapa de *Inception* da disciplina de Engenharia de Software II (IFSC - Câmpus São José).
+Este documento consolida a **Visão do Produto** e a **Definição do Produto Mínimo Viável (MVP)** para o **Sistema de Gestão Centralizada de TCC**.
 
 ---
 
