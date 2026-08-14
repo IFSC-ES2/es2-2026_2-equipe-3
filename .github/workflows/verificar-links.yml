@@ -16,4 +16,4 @@ jobs:
       - name: Executar verificador de links
         uses: lycheeverse/lychee-action@v2
         with:
-          args: "**/*.md"
+          args: './**/*.md'
