@@ -53,7 +53,7 @@ Como meta de desenvolvimento para o semestre letivo, o produto visa atingir os s
 
 ### Objetivo do MVP
 
-Validar o fluxo central de gestão de TCC — do "match" de orientação à publicação no acervo — garantindo um ciclo completo utilizável e auditável pelas três personas principais (Aluno, Professor e Coordenador).
+Validar o fluxo inicial e central de gestão de TCC — focando na resolução do "match" de orientação e na entrega oficial de documentos — garantindo um ciclo enxuto, utilizável e auditável pelas três personas principais (Aluno, Professor e Coordenador).
 
 ### Funcionalidades Essenciais (Escopo do MVP)
 
@@ -69,12 +69,18 @@ O escopo do MVP está estruturado em torno das seguintes entregas funcionais de 
    * Definição do calendário acadêmico pela coordenação, incluindo prazos para Projeto de TCC, TCC I e TCC II.
    * Upload de arquivos PDF pelo aluno.
    * Registro de pareceres pelo orientador.
-4. **Gestão de Bancas de Defesa**:
-   * Agendamento de data, horário, local ou link da defesa.
-   * Definição da composição da banca examinadora pelo orientador.
-5. **Acervo Público de TCCs**:
-   * Consulta pública de trabalhos concluídos com busca por título, autor, orientador ou palavra-chave.
-   * Acesso ao arquivo final em PDF.
+
+### Funcionalidades Fora do Escopo (Entregas Futuras)
+
+As seguintes ideias e recursos foram postergados para focar na validação inicial e não fazem parte do MVP:
+
+* **Gestão de Bancas de Defesa:** Agendamento de data/horário e composição da banca examinadora.
+* **Acervo Público de TCCs:** Consulta pública de trabalhos concluídos pela comunidade externa.
+* Aplicativo mobile nativo (iOS/Android).
+* Integração automatizada de assinatura digital via `gov.br` para atas de defesa.
+* Geração automatizada de PDFs complexos (atas formatadas e certificados de participação em banca).
+* Integração síncrona com sistemas institucionais de lançamento de notas (ex.: SIGAA).
+* Sistema interno de bate-papo em tempo real (chat ao vivo).
 
 ### Funcionalidades Fora do Escopo
 
