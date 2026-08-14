@@ -1,0 +1,26 @@
+name: Verificação de Documentação
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  verificar-arquivos:
+    name: Checar Arquivos Essenciais
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fazer o checkout do código
+        uses: actions/checkout@v4
+
+      - name: Verificar se o README existe
+        run: |
+          echo "Buscando o arquivo README.md..."
+          if [ -f "README.md" ]; then
+            echo "O README.md foi encontrado."
+            exit 0
+          else
+            echo "Erro: O arquivo README.md foi removido ou não existe."
+            exit 1
+          fi
