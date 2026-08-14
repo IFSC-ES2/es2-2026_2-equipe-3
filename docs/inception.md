@@ -70,7 +70,7 @@ O escopo do MVP está estruturado em torno das seguintes entregas funcionais de 
    * Upload de arquivos PDF pelo aluno.
    * Registro de pareceres pelo orientador.
 
-### Funcionalidades Fora do Escopo (Entregas Futuras)
+### Funcionalidades Fora do Escopo
 
 As seguintes ideias e recursos foram postergados para focar na validação inicial e não fazem parte do MVP:
 
@@ -82,15 +82,6 @@ As seguintes ideias e recursos foram postergados para focar na validação inici
 * Integração síncrona com sistemas institucionais de lançamento de notas (ex.: SIGAA).
 * Sistema interno de bate-papo em tempo real (chat ao vivo).
 
-### Funcionalidades Fora do Escopo
-
-As seguintes ideias e recursos foram postergados para versões futuras e não fazem parte do MVP:
-
-* Aplicativo mobile nativo (iOS/Android).
-* Integração automatizada de assinatura digital via `gov.br` para atas de defesa.
-* Geração automatizada de PDFs complexos (atas formatadas e certificados de participação em banca).
-* Integração síncrona com sistemas institucionais de lançamento de notas (ex.: SIGAA).
-* Sistema interno de bate-papo em tempo real (chat ao vivo).
 
 ### Justificativa de Viabilidade para o Semestre
 
