@@ -58,3 +58,19 @@ Durante a etapa de Inception, definimos o escopo técnico e de negócios do proj
 * **[Definition of Done - DoD](docs/dod.md):** Nosso acordo de qualidade e critérios mínimos para considerar uma tarefa concluída.
 * **[Decisões Arquiteturais - ADRs](docs/adrs/):** Registro das escolhas iniciais de stack tecnológica e infraestrutura.
 * **[Declaração de Uso de IA](USO-IA.md):** Registro de uso de ferramentas de Inteligência Artificial durante o desenvolvimento do projeto.
+
+## 5. Entrega 3: Estimativas e Métricas (Baseline)
+
+Nesta etapa, formalizamos as estimativas, a capacidade planejada da equipe e a definição das métricas de produto, processo e projeto:
+
+* **[Planejamento Inicial e Baseline](docs/BASELINE.md):** Recorte do backlog, estimativas, capacidade declarada e premissas do projeto.
+* **[Registro da Abordagem de Estimativa](docs/ESTIMATIVAS.md):** Técnica de Planning Poker, Fibonacci (1, 2, 3, 5, 8, 13), participantes e justificativas.
+* **[Plano de Medição e Métricas](docs/METRICAS.md):** Matriz geral e categorização dos 6 indicadores acompanhados.
+* **Fichas Técnicas de Métricas:**
+  * [`M-01.md`](docs/metricas/M-01.md): Cobertura de Testes de Código (Métrica de Produto)
+  * [`M-02.md`](docs/metricas/M-02.md): Densidade de Defeitos Abertos (Métrica de Produto)
+  * [`M-03.md`](docs/metricas/M-03.md): Velocidade da Equipe em SP (Métrica de Processo)
+  * [`M-04.md`](docs/metricas/M-04.md): Lead Time de Pull Requests (Métrica de Processo)
+  * [`M-05.md`](docs/metricas/M-05.md): Taxa de Conclusão do MVP (Métrica de Projeto)
+  * [`M-06.md`](docs/metricas/M-06.md): Cumprimento da Capacidade (Métrica de Projeto)
+
