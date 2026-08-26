@@ -28,7 +28,7 @@ Para cobrir todas as dimensões relevantes do desenvolvimento, as métricas fora
 └──────────────────┘             └──────────────────┘             └──────────────────┘
 ```
 
-1. **Métricas de Produto**: Avaliam as atributos de qualidade do artefato de software produzido, como cobertura de testes automatizados e densidade de defeitos.
+1. **Métricas de Produto**: Avaliam os atributos de qualidade do artefato de software produzido, como cobertura de testes automatizados e densidade de defeitos.
 2. **Métricas de Processo**: Medem a eficiência e a agilidade do fluxo de trabalho da equipe, focando na velocidade de entregas e no tempo de ciclo dos Pull Requests.
 3. **Métricas de Projeto**: Monitoram a evolução do escopo global do MVP em relação à linha de base (baseline) e o cumprimento da capacidade planejada.
 
@@ -44,8 +44,8 @@ A tabela a seguir consolida os 6 indicadores selecionados pela equipe. Cada indi
 | **M-02** | Densidade de Defeitos Abertos | **Produto** | Monitorar e conter o surgimento de bugs em módulos entregues. | Engenheiro de QA | [`M-02.md`](metricas/M-02.md) |
 | **M-03** | Velocidade da Equipe em SP | **Processo** | Medir a quantidade de Story Points entregues por ciclo/sprint. | Scrum Master | [`M-03.md`](metricas/M-03.md) |
 | **M-04** | Lead Time de Pull Requests | **Processo** | Identificar gargalos no tempo entre a abertura do PR e a mesclagem na branch principal. | Engenheiro de DevOps | [`M-04.md`](metricas/M-04.md) |
-| **M-05** | Taxa de Conclusão do MVP | **Projeto** | Acompanhar o percentual de conclusão do escopo do MVP em relação aos 32 SPs totais. | Scrum Master | [`M-05.md`](metricas/M-05.md) |
-| **M-06** | Cumprimento da Capacidade | **Projeto** | Comparar as horas/esforço realizados contra a capacidade de 40h/semana declarada. | Arquiteta de Software | [`M-06.md`](metricas/M-06.md) |
+| **M-05** | Taxa de Conclusão do MVP | **Projeto** | Acompanhar o percentual de conclusão do escopo do MVP em relação aos Story Points totais planejados. | Designer de UX/UI | [`M-05.md`](metricas/M-05.md) |
+| **M-06** | Cumprimento da Capacidade | **Projeto** | Comparar as horas/esforço realizados contra a capacidade de 28h/semana declarada. | Arquiteta de Software | [`M-06.md`](metricas/M-06.md) |
 
 ---
 
@@ -58,4 +58,4 @@ As métricas serão atualizadas periodicamente ao longo das etapas de execução
 Cada métrica possui um papel responsável pela extração dos dados e atualização da tabela de histórico na respectiva ficha técnica. Os resultados serão compartilhados com toda a equipe durante as reuniões de alinhamento e retrospectivas de final de ciclo.
 
 ### Ações Corretivas e Limiares
-Caso um indicador apresente valor fora da faixa aceitável definida em sua ficha técnica (por exemplo, queda na cobertura de testes abaixo de 75% ou aumento no Lead Time de PRs acima de 48h), o papel responsável convocará uma ação imediata de alinhamento para ajuste do processo ou refatoração.
+Caso um indicador apresente valor fora da faixa aceitável definida em sua ficha técnica (por exemplo, queda na cobertura de testes abaixo de 70% ou aumento no Lead Time de PRs acima de 48h), o papel responsável convocará uma ação imediata de alinhamento para ajuste do processo ou refatoração.
