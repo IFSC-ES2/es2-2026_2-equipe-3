@@ -20,3 +20,13 @@ Em conformidade com o protocolo da disciplina, declaramos que a ferramenta de in
 
 **Validação:**
 Todo o conteúdo e código gerado com o apoio da IA foi lido, compreendido, revisado e adaptado pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
+
+## Entrega 3:
+
+Em conformidade com o protocolo da disciplina, declaramos que a ferramenta de inteligência artificial generativa (Gemini) foi utilizada durante a **Etapa 3 (Estimativas e Métricas - Baseline)** deste projeto para as seguintes finalidades:
+
+* **Estruturação e Padronização das Fichas de Métricas:** Auxílio na redação, formatação em Markdown e estruturação das 6 fichas técnicas individuais (`docs/metricas/M-01.md` a `docs/metricas/M-06.md`), assegurando a formatação matemática em KaTeX.
+* **Harmonização do Plano de Medição (`docs/METRICAS.md`):** Apoio na revisão da matriz geral de métricas, alinhando valores com os documentos `BASELINE.md` e `ESTIMATIVAS.md`.
+
+**Validação:**
+Todo o conteúdo e documentação gerados com o apoio da IA foram lidos, compreendidos, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
