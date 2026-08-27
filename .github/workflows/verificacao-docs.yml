@@ -1,6 +1,10 @@
 name: Verificação de Documentação
 
 on:
+  push:
+    branches:
+      - main
+      - 'entrega-*'
   pull_request:
     branches:
       - main
