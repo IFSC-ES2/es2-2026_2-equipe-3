@@ -44,6 +44,18 @@ Este documento deve ser revisitado e atualizado ao final de cada sprint.
 * **Estratégia de Mitigação:** Priorizar o desenvolvimento das rotas críticas e utilizar mocks de API no frontend enquanto o backend real não estiver concluído.
 * **Responsável pelo Acompanhamento:** DevOps/Infra (`Willian Ferreira`)
 
+### R04 - Crescimento Não Planejado do Escopo (Scope Creep)
+* **Natureza:** Escopo
+* **Identificação:** Inclusão contínua de novas funcionalidades no backlog sem avaliação criteriosa de impacto no prazo.
+* **Descrição:** Novas funcionalidades podem ser sugeridas ao longo do semestre, inflando o escopo além da capacidade real de entrega da equipe e desviando o foco dos requisitos essenciais estabelecidos inicialmente.
+* **Causa:** Entusiasmo natural com a evolução do produto e tentativa de absorver todo tipo de feedback, levando a decisões de adição de escopo sem a devida análise de custo e tempo.
+* **Consequência / Impacto Esperado:** MVP incompleto ao final do semestre, com estouro do prazo e o risco de comprometer as funcionalidades centrais e essenciais do sistema em favor de itens secundários adicionados no meio do caminho.
+* **Probabilidade:** Média (2)
+* **Impacto:** Médio (2)
+* **Prioridade:** Média (4)
+* **Estratégia de Mitigação:** O escopo principal deve ser congelado, utilizando os critérios definidos na documentação do MVP como filtro rigoroso. Ideias não essenciais devem ser obrigatoriamente movidas para um backlog de futuro.
+* **Responsável pelo Acompanhamento:** Scrum Master (`Eduardo Cardoso`) / Product Owner (`Adriano Luiz de Souza`)
+
 ---
 
 ## 2. Análise e Priorização dos Riscos
@@ -75,6 +87,7 @@ A classificação dos riscos utiliza uma matriz baseada em duas dimensões:
 | **R03** | Atraso no cronograma das APIs | Prazo | Alta (3) | Alto (3) | **Crítica (9)** |
 | **R01** | Desistência de membro da equipe | Equipe | Média (2) | Alto (3) | **Alta (6)** |
 | **R02** | Falhas por ausência de testes/CI | Qualidade | Alta (3) | Médio (2) | **Alta (6)** |
+| **R04** | Crescimento do escopo | Escopo | Média (2) | Médio (2) | **Média (4)** |
 
 ### 2.3 Justificativa das Prioridades 
 
@@ -97,5 +110,6 @@ A classificação dos riscos utiliza uma matriz baseada em duas dimensões:
 * **Se R01 ocorrer:** Repriorizar o backlog, cortando funcionalidades não essenciais para adequar o escopo à nova capacidade da equipe.
 * **Se R02 ocorrer:** Paralisar a aprovação de novos Pull Requests. A equipe deve realizar a correção de todos os erros/bugs adicionados na branch *main*, priorizando a estabilidade do sistema antes de continuar o desenvolvimento de novas funcionalidades.
 * **Se R03 ocorrer:** O frontend passa a consumir dados estáticos (mocks) temporariamente para não travar a evolução das telas.
+* **Se R04 ocorrer:** Realizar imediatamente uma reunião de repriorização de emergência. Congelar o desenvolvimento de qualquer funcionalidade secundária, mesmo que já esteja em andamento, e redirecionar 100% da força produtiva da equipe exclusivamente para finalizar os requisitos essenciais do MVP aprovados no planejamento inicial.
 
 ### 3.3 Acompanhamento da Evolução
