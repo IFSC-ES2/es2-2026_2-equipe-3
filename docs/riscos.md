@@ -104,9 +104,11 @@ A classificação dos riscos utiliza uma matriz baseada em duas dimensões:
 
 ### 2.3 Justificativa das Prioridades 
 
-- O risco **R03** é crítico pois paralisa o avanço geral do sistema. 
-
-- O risco **R01** recebe prioridade alta porque a perda de um integrante reduz a capacidade produtiva, o que pode inviabilizar a entrega de todas as funcionalidades dentro do cronograma da disciplina.
+- O risco **R03** é crítico pois paralisa o avanço geral do sistema, criando um gargalo onde o frontend fica totalmente bloqueado aguardando o backend, o que inviabiliza a validação do MVP.
+- O risco **R01** recebe prioridade alta porque a perda de um integrante reduz drasticamente a capacidade produtiva, o que pode inviabilizar a entrega de todas as funcionalidades dentro do cronograma da disciplina.
+- O risco **R02** possui prioridade alta pois a quebra frequente do código na branch principal afeta a estabilidade do produto e gera desperdício de tempo com retrabalho e correção de bugs evitáveis.
+- O risco **R05** também é de alta prioridade pois problemas de infraestrutura local e orquestração consomem tempo útil de desenvolvimento e atrasam o pipeline de integração de toda a equipe.
+- O risco **R04** recebe prioridade média porque, apesar de ameaçar o prazo, é um risco puramente gerencial e controlável, que pode ser contido imediatamente pela aplicação rigorosa do filtro de backlog e congelamento do MVP.
 
 ---
 
@@ -129,3 +131,9 @@ A classificação dos riscos utiliza uma matriz baseada em duas dimensões:
 * **Se R05 ocorrer:** O desenvolvedor afetado deve interromper a codificação e recriar seu ambiente do zero a partir de uma imagem limpa. Caso o erro persista, o responsável por DevOps deve priorizar o pareamento com este membro para corrigir o script de orquestração antes que afete o restante da equipe.
 
 ### 3.3 Acompanhamento da Evolução
+
+O monitoramento dos riscos será contínuo, utilizando os ritos ágeis do projeto para garantir que nenhuma ameaça passe despercebida:
+
+* **Daily Scrum:** Acompanhamento diário para identificar rapidamente bloqueios técnicos ou processuais, como divergências de ambiente (R05), quebras no pipeline de integração (R02) ou dificuldades de comunicação e entrega nas APIs (R03).
+* **Sprint Planning:** Avaliação da disponibilidade e capacidade real da equipe para a sprint (monitorando o R01) e aplicação rigorosa do filtro de requisitos para barrar o crescimento do escopo (R04).
+* **Sprint Retrospective:** Revisão formal e atualização deste documento de Riscos. A equipe debaterá a eficácia das estratégias de mitigação, reavaliará a probabilidade e o impacto dos riscos ativos e registrará novos riscos que possam ter surgido durante a iteração.
