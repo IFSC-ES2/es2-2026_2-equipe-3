@@ -17,7 +17,7 @@ Este documento deve ser revisitado e atualizado ao final de cada sprint.
 * **Probabilidade:** Média (2)
 * **Impacto:** Alto (3)
 * **Prioridade:** Alta (6)
-* **Estratégia de Mitigação:** Adotar pareamento esporádico e garantir que todo o código e infraestrutura estejam devidamente documentados no repositório. Nenhuma parte do sistema deve ser de conhecimento exclusivo de apenas uma pessoa.
+* **Estratégia de Mitigação:** Adotar pareamentos eventuais e garantir que todo o código e infraestrutura estejam devidamente documentados no repositório. Nenhuma parte do sistema deve ser de conhecimento exclusivo de apenas uma pessoa.
 * **Responsável pelo Acompanhamento:** Scrum Master (`Eduardo Cardoso`)
 
 ### R02 - Falhas de Regressão por Ausência de Testes e CI Quebrado
@@ -31,6 +31,18 @@ Este documento deve ser revisitado e atualizado ao final de cada sprint.
 * **Prioridade:** Alta (6)
 * **Estratégia de Mitigação:** Configurar o CI mínimo com bloqueio de merge em caso de falha de lint ou build. Exigir revisão de código obrigatória.
 * **Responsável pelo Acompanhamento:** Responsável por Qualidade (`Talles Souza`)
+
+### R03 - Atraso no Cronograma de Integração das APIs de Backend e Frontend
+* **Natureza:** Prazo
+* **Identificação:** Atraso na disponibilização dos endpoints da API REST, gerando dependência técnica e bloqueando o fluxo de desenvolvimento das interfaces de usuário.
+* **Descrição:** O tempo de implementação do backend pode ultrapassar as estimativas iniciais, criando um efeito cascata que impede a equipe de frontend de integrar, consumir os dados e testar as telas dentro do prazo planejado para a sprint.
+* **Causa:** Subestimativa de esforço na modelagem relacional do banco de dados, tratamento de exceções não previstas ou alta complexidade na implementação das regras de negócio nas rotas.
+* **Consequência / Impacto Esperado:** Sobrecarga da equipe nas vésperas da entrega, integração feita às pressas, aumento considerável no risco de bugs funcionais e potencial comprometimento da validação final do MVP.
+* **Probabilidade:** Alta (3)
+* **Impacto:** Alto (3)
+* **Prioridade:** Crítica (9)
+* **Estratégia de Mitigação:** Priorizar o desenvolvimento das rotas críticas e utilizar mocks de API no frontend enquanto o backend real não estiver concluído.
+* **Responsável pelo Acompanhamento:** DevOps/Infra (`Willian Ferreira`)
 
 ---
 
@@ -60,25 +72,30 @@ A classificação dos riscos utiliza uma matriz baseada em duas dimensões:
 
 | ID | Risco | Natureza | Probabilidade | Impacto | Prioridade |
 |:---|:---|:---|:---:|:---:|:---:|
+| **R03** | Atraso no cronograma das APIs | Prazo | Alta (3) | Alto (3) | **Crítica (9)** |
 | **R01** | Desistência de membro da equipe | Equipe | Média (2) | Alto (3) | **Alta (6)** |
 | **R02** | Falhas por ausência de testes/CI | Qualidade | Alta (3) | Médio (2) | **Alta (6)** |
 
 ### 2.3 Justificativa das Prioridades 
 
-O risco **R01** recebe prioridade alta porque a perda de um integrante reduz a capacidade produtiva, o que pode inviabilizar a entrega de todas as funcionalidades dentro do cronograma da disciplina.
+- O risco **R03** é crítico pois paralisa o avanço geral do sistema. 
+
+- O risco **R01** recebe prioridade alta porque a perda de um integrante reduz a capacidade produtiva, o que pode inviabilizar a entrega de todas as funcionalidades dentro do cronograma da disciplina.
 
 ---
 
 ## 3. Plano de Resposta aos Riscos
 
-### 3.1 Ações Preventivas (Mitigação)
+### 3.1 Ações Preventivas
 
 * **R01:** Compartilhar o conhecimento técnico por meio de programação em pares e documentação constante.
 * **R02:** Configurar a Integração Contínua (CI) com bloqueios antes de escalar o volume de código.
+* **R03:** Estabelecer o contrato de dados no início do ciclo.
 
 ### 3.2 Ações caso o risco ocorra
 
 * **Se R01 ocorrer:** Repriorizar o backlog, cortando funcionalidades não essenciais para adequar o escopo à nova capacidade da equipe.
 * **Se R02 ocorrer:** Paralisar a aprovação de novos Pull Requests. A equipe deve realizar a correção de todos os erros/bugs adicionados na branch *main*, priorizando a estabilidade do sistema antes de continuar o desenvolvimento de novas funcionalidades.
+* **Se R03 ocorrer:** O frontend passa a consumir dados estáticos (mocks) temporariamente para não travar a evolução das telas.
 
 ### 3.3 Acompanhamento da Evolução
