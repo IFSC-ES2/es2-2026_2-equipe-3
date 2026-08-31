@@ -56,6 +56,18 @@ Este documento deve ser revisitado e atualizado ao final de cada sprint.
 * **Estratégia de Mitigação:** O escopo principal deve ser congelado, utilizando os critérios definidos na documentação do MVP como filtro rigoroso. Ideias não essenciais devem ser obrigatoriamente movidas para um backlog de futuro.
 * **Responsável pelo Acompanhamento:** Scrum Master (`Eduardo Cardoso`) / Product Owner (`Adriano Luiz de Souza`)
 
+### R05 - Divergência de Ambientes e Instabilidade na Orquestração (Docker)
+* **Natureza:** Tecnologia
+* **Identificação:** O sistema apresenta comportamentos inesperados ou falhas de execução dependendo da máquina do desenvolvedor ou do ambiente de deploy.
+* **Descrição:** A falta de alinhamento na configuração da infraestrutura local pode fazer com que serviços (como o banco de dados SQL ou a API) rodem perfeitamente para um membro, mas falhem para outro ou no servidor.
+* **Causa:** Uso de versões diferentes de dependências, falta de padronização nas imagens dos contêineres e variáveis de ambiente não versionadas ou mal documentadas.
+* **Consequência / Impacto Esperado:** Perda severa de tempo em sessões de depuração, bloqueio de tarefas de integração e atrasos no pipeline de entrega.
+* **Probabilidade:** Alta (3)
+* **Impacto:** Médio (2)
+* **Prioridade:** Alta (6)
+* **Estratégia de Mitigação:** Padronizar rigorosamente os arquivos `Dockerfile` e `docker-compose.yml`, exigindo que todo o desenvolvimento de rotas e testes seja executado exclusivamente via contêineres padronizados.
+* **Responsável pelo Acompanhamento:** DevOps/Infra (`Willian Ferreira`)
+
 ---
 
 ## 2. Análise e Priorização dos Riscos
@@ -87,6 +99,7 @@ A classificação dos riscos utiliza uma matriz baseada em duas dimensões:
 | **R03** | Atraso no cronograma das APIs | Prazo | Alta (3) | Alto (3) | **Crítica (9)** |
 | **R01** | Desistência de membro da equipe | Equipe | Média (2) | Alto (3) | **Alta (6)** |
 | **R02** | Falhas por ausência de testes/CI | Qualidade | Alta (3) | Médio (2) | **Alta (6)** |
+| **R05** | Divergência de ambientes (Docker) | Tecnologia | Alta (3) | Médio (2) | **Alta (6)** |
 | **R04** | Crescimento do escopo | Escopo | Média (2) | Médio (2) | **Média (4)** |
 
 ### 2.3 Justificativa das Prioridades 
@@ -104,6 +117,8 @@ A classificação dos riscos utiliza uma matriz baseada em duas dimensões:
 * **R01:** Compartilhar o conhecimento técnico por meio de programação em pares e documentação constante.
 * **R02:** Configurar a Integração Contínua (CI) com bloqueios antes de escalar o volume de código.
 * **R03:** Estabelecer o contrato de dados no início do ciclo.
+* **R04:** Congelar o escopo principal do MVP e submeter qualquer sugestão de nova funcionalidade a um filtro rigoroso, movendo ideias não essenciais para um backlog futuro.
+* **R05:** Versionar todas as configurações de infraestrutura e dependências no repositório, garantindo que o setup inicial seja feito com um único comando de orquestração.
 
 ### 3.2 Ações caso o risco ocorra
 
@@ -111,5 +126,6 @@ A classificação dos riscos utiliza uma matriz baseada em duas dimensões:
 * **Se R02 ocorrer:** Paralisar a aprovação de novos Pull Requests. A equipe deve realizar a correção de todos os erros/bugs adicionados na branch *main*, priorizando a estabilidade do sistema antes de continuar o desenvolvimento de novas funcionalidades.
 * **Se R03 ocorrer:** O frontend passa a consumir dados estáticos (mocks) temporariamente para não travar a evolução das telas.
 * **Se R04 ocorrer:** Realizar imediatamente uma reunião de repriorização de emergência. Congelar o desenvolvimento de qualquer funcionalidade secundária, mesmo que já esteja em andamento, e redirecionar 100% da força produtiva da equipe exclusivamente para finalizar os requisitos essenciais do MVP aprovados no planejamento inicial.
+* **Se R05 ocorrer:** O desenvolvedor afetado deve interromper a codificação e recriar seu ambiente do zero a partir de uma imagem limpa. Caso o erro persista, o responsável por DevOps deve priorizar o pareamento com este membro para corrigir o script de orquestração antes que afete o restante da equipe.
 
 ### 3.3 Acompanhamento da Evolução
