@@ -73,3 +73,9 @@ Nesta etapa, formalizamos as estimativas, a capacidade planejada da equipe e a d
   - [`M-04.md`](docs/metricas/M-04.md): Lead Time de Pull Requests (Métrica de Processo)
   - [`M-05.md`](docs/metricas/M-05.md): Taxa de Conclusão do MVP (Métrica de Projeto)
   - [`M-06.md`](docs/metricas/M-06.md): Cumprimento da Capacidade (Métrica de Projeto)
+
+  ## 6. Entrega 4: Riscos e consolidação
+
+  Nesta etapa, estabelecemos o registro e priorização de riscos do projeto, consolidamos o fluxo de trabalho colaborativo via Pull Requests e definimos a base de avaliação da qualidade do software:
+
+  - **[Riscos do Projeto](docs/riscos.md):** Registro inicial dos riscos identificados, contendo análise, priorização e plano de respostas aos ricos.
