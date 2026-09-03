@@ -9,20 +9,22 @@ Este documento descreve as diretrizes, convenções e rotinas adotadas pela equi
 Com base na capacidade estipulada em [`docs/BASELINE.md`](BASELINE.md) (28 horas semanais compartilhadas entre os 5 integrantes), a equipe adota uma abordagem ágil adaptada à rotina de trabalhos no horário comercial e às demandas acadêmicas simultâneas.
 
 ### 1.1 Sprints e Marcos (Milestones)
+
 - **Duração da Sprint:** Sprints com duração de **1 semana** (ou alinhadas aos marcos de entregas da disciplina).
 - **Quadro de Gestão:** Acompanhamento via **GitHub Projects (Board Kanban)**, estruturado nas colunas:
-    - `Product Backlog`: Mapeamento geral de todas as User Stories e tarefas do MVP.
-    - `To-Do`: Tarefas refinadas, estimadas e selecionadas para execução na sprint atual.
-    - `In Progress`: Tarefas em desenvolvimento ativo.
-    - `In Review`: Pull Requests abertos aguardando revisão de código.
-    - `Done`: Itens concluídos que atendem integralmente à [Definição de Pronto (DoD)](dod.md).
-    - `Versões Futuras`: Ideias e funcionalidades identificadas fora do escopo do MVP (utilizada como mecanismo de contenção do Risco R04 - Scope Creep).
+  - `Product Backlog`: Mapeamento geral de todas as User Stories e tarefas do MVP.
+  - `To-Do`: Tarefas refinadas, estimadas e selecionadas para execução na sprint atual.
+  - `In Progress`: Tarefas em desenvolvimento ativo.
+  - `In Review`: Pull Requests abertos aguardando revisão de código.
+  - `Done`: Itens concluídos que atendem integralmente à [Definição de Pronto (DoD)](dod.md).
+  - `Versões Futuras`: Ideias e funcionalidades identificadas fora do escopo do MVP (utilizada como mecanismo de contenção do Risco R04 - Scope Creep).
 
 ### 1.2 Encontros e Cerimônias da equipe
+
 - **Daily Scrum Assíncrona:** Devido às restrições de horário comercial dos integrantes, o alinhamento diário é realizado de forma **assíncrona** no canal de comunicação do grupo. Cada membro reporta brevemente:
-    1. O que foi realizado desde o último reporte;
-    2. O que pretende realizar a seguir;
-    3. Existência de impedimentos, dúvidas de arquitetura ou bloqueios nas APIs.
+  1. O que foi realizado desde o último reporte;
+  2. O que pretende realizar a seguir;
+  3. Existência de impedimentos, dúvidas de arquitetura ou bloqueios nas APIs.
 - **Sprint Planning & Review:** Cerimônias realizadas semanalmente de forma síncrona/híbrida para alinhamento de metas, redistribuição de tarefas e atualização do backlog.
 - **Sprint Retrospective:** Cerimônia dedicada à revisão dos processos e atualização do documento [`docs/riscos.md`](riscos.md) e das Fichas de Métricas (`docs/metricas/`).
 
@@ -31,7 +33,6 @@ Com base na capacidade estipulada em [`docs/BASELINE.md`](BASELINE.md) (28 horas
 ## 2. Estratégia de Versionamento e Regras de Branches
 
 A equipe adota um modelo de ramificação baseado no **GitHub Flow** adaptado para entregas acadêmicas, garantindo isolamento de contexto e estabilidade da branch principal.
-
 
 ```
 
@@ -49,14 +50,15 @@ main (estável / produção)
 ```
 
 ### 2.1 Regras de Branches
+
 - **`entrega-4`:** É a branch base obrigatória para todo o desenvolvimento da etapa atual. Nenhuma `feature` ou `fix` da etapa 4 deve ser apontada direto para a `main`.
 - **Proibição de Envio Direto para a Main:** É **estritamente proibido** fazer `push` direto para o ramo principal (`main`). Todas as alterações devem obrigatoriamente passar por Pull Request.
 - **Branches de Funcionalidade (`feature/`)**: Criadas a partir de `entrega-4` para desenvolvimento de histórias ou tarefas específicas.
-    - *Nomenclatura:* `feature/<codigo-us>-<descricao-curta>` ou `feature/<escopo>`.
+  - _Nomenclatura:_ `feature/<codigo-us>-<descricao-curta>` ou `feature/<escopo>`.
 - **Branches de Correção (`fix/`)**: Criadas para correção de defeitos reportados.
-    - *Nomenclatura:* `fix/<issue-id>-<descricao-curta>`.
+  - _Nomenclatura:_ `fix/<issue-id>-<descricao-curta>`.
 - **Branches de Documentação (`docs/`)**: Dedicadas à elaboração ou atualização de documentos Markdown.
-    - *Nomenclatura:* `docs/<nome-do-documento>`.
+  - _Nomenclatura:_ `docs/<nome-do-documento>`.
 
 ---
 
@@ -68,8 +70,8 @@ A equipe adota o padrão **Conventional Commits** para manter o histórico claro
 
 `<tipo>: <descrição sucinta em português no imperativo>`
 
-
 ### 3.2 Tipos Permitidos
+
 - `feat`: Introdução de uma nova funcionalidade
 - `fix`: Correção de um erro/bug
 - `docs`: Alterações na documentação
@@ -85,21 +87,26 @@ A equipe adota o padrão **Conventional Commits** para manter o histórico claro
 Para mitigar os riscos de regressão (**R02**) e divergência de ambientes (**R05**), todas as integrações de código ocorrem exclusivamente via Pull Requests.
 
 ### 4.1 Regras de Revisão e Aprovação
+
 - **Integração Exclusiva via PR:** Nenhuma mudança entra na branch de entrega ou na `main` sem um PR associado.
 - **Revisores e Aprovação Mínima:** Exige-se o parecer e a aprovação formal de **no mínimo 1 (um) integrante da equipe** (diferente do autor da alteração) para que o PR possa ser integrado.
 - **Integração Apenas por Commit de Mesclagem:** A integração na branch alvo ocorre estritamente por **commit de mesclagem**, mantendo o histórico de ramificação explícito e auditável.
 
 ### 4.2 Template e Checklist Mínimo de Revisão para PRs
+
 Todo Pull Request aberto deve utilizar a seguinte estrutura na descrição:
 
 ```markdown
 ## Descrição da Alteração
+
 [Descreva sucintamente o que foi implementado ou corrigido neste PR]
 
 ## Issue / US Relacionada
+
 Closes #[número da issue]
 
 ## Checklist Mínimo de Revisão
+
 - [ ] O código/documentação atende aos requisitos descritos na tarefa.
 - [ ] Foi desenvolvida e testada a partir da branch `entrega-4`.
 - [ ] Passou com sucesso em todos os checks automatizados de CI (build, lint, formatação Prettier e verificação de links).
@@ -108,8 +115,8 @@ Closes #[número da issue]
 - [ ] A documentação do projeto foi atualizada, se necessário.
 - [ ] Não contém conflitos com a branch de destino.
 - [ ] Recebeu ao menos 1 aprovação de outro membro da equipe.
-
 ```
+
 ---
 
 ## 5. Checks Obrigatórios Executados nos Pull Requests (CI/CD)
@@ -128,11 +135,11 @@ A aceitação de cada entrega é regida pela [Definição de Pronto (DoD)](dod.m
 
 A qualidade é monitorada continuamente através das Fichas de Métricas:
 
-| Métrica | Nome | Meta / Limiar | Papel Responsável |
-| --- | --- | --- | --- |
-| **M-01** | Cobertura de Testes de Código | $\ge 80\%$ no Backend / $\ge 70\%$ no Frontend | Engenheiro de QA |
-| **M-02** | Densidade de Defeitos Abertos | $0$ defeitos críticos e $\le 2$ defeitos médios | Engenheiro de QA |
-| **M-03** | Velocidade da Equipe em SP | Estabilidade em relação aos $13 \text{ SP}$ previstos | Scrum Master |
-| **M-04** | Lead Time de Pull Requests | $\le 24 \text{ horas}$ | Engenheiro de DevOps |
-| **M-05** | Taxa de Conclusão do MVP | Desvio $\le 10\%$ do cronograma | Designer de UX/UI |
-| **M-06** | Cumprimento da Capacidade | $90\%$ a $110\%$ das $28\text{h/semana}$ planejadas | Arquiteta de Software |
+| Métrica  | Nome                          | Meta / Limiar                                         | Papel Responsável     |
+| -------- | ----------------------------- | ----------------------------------------------------- | --------------------- |
+| **M-01** | Cobertura de Testes de Código | $\ge 80\%$ no Backend / $\ge 70\%$ no Frontend        | Engenheiro de QA      |
+| **M-02** | Densidade de Defeitos Abertos | $0$ defeitos críticos e $\le 2$ defeitos médios       | Engenheiro de QA      |
+| **M-03** | Velocidade da Equipe em SP    | Estabilidade em relação aos $13 \text{ SP}$ previstos | Scrum Master          |
+| **M-04** | Lead Time de Pull Requests    | $\le 24 \text{ horas}$                                | Engenheiro de DevOps  |
+| **M-05** | Taxa de Conclusão do MVP      | Desvio $\le 10\%$ do cronograma                       | Designer de UX/UI     |
+| **M-06** | Cumprimento da Capacidade     | $90\%$ a $110\%$ das $28\text{h/semana}$ planejadas   | Arquiteta de Software |
