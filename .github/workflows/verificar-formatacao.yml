@@ -21,4 +21,4 @@ jobs:
           node-version: "20"
 
       - name: Executar Prettier
-        run: npx prettier --check "**/*.{md,json,yml,yaml,js,jsx,ts,tsx,css}"
+        run: npx prettier --check "." --ignore-path .gitignore
