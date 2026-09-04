@@ -82,3 +82,4 @@ Nesta etapa, estabelecemos o registro e priorização de riscos do projeto, cons
 - **[Fluxo de Trabalho e Governança](docs/fluxo-de-trabalho.md):** Regras de branches, padrão de commits, cerimônias ágeis e checklist obrigatório para Pull Requests.
 - **[Integração Contínua (CI)](docs/ci.md):** Configuração do pipeline de Integração Contínua (Github Actions), cobrindo verificação de docs, links e formatação (Prettier).
 - **[Qualidade do Software](docs/qualidade.md):** Mapeamento dos atributos da norma ISO/IEC 25010 priorizados para o MVP.
+- **Evidência de Integração:** O desenvolvimento desta etapa foi consolidado através do [Pull Request #34](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/34), que executou os checks de CI obrigatórios e passou pela revisão da equipe.
