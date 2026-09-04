@@ -39,6 +39,7 @@ Em conformidade com o protocolo da disciplina, declaramos que a ferramenta de in
 
 - **Apoio na elaboração da documentação de Riscos:** Auxílio na redação, organização e formatação em Markdown do registro inicial de riscos, bem como no refinamento da matriz de priorização (Probabilidade × Impacto) e na estruturação do plano de respostas.
 - **Apoio na elaboração da documentação de Fluxo de Trabalho e Governança:** Apoio na redação, formatação em Markdown, revisão do Fluxo de Trabalho, definição das regras de versionamento com Git e padronização do checklist de Pull Requests.
+- **Apoio na infraestrutura de Integração Contínua (CI):** Utilização da IA para auxiliar na formatação e revisão do documento `ci.md`, além de suporte na criação do script `verificacao-formatacao.yml` para automatizar a checagem de estilo via GitHub Actions.
 
 **Validação:**
 Todo o conteúdo e documentação gerados com o apoio da IA foram lidos, compreendidos, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
