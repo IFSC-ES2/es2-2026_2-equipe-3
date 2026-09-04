@@ -1,7 +1,6 @@
 name: Verificação de Formatação (Prettier)
 
 on:
-  push:
   pull_request:
     branches:
       - main
