@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      - 'entrega-*'
+      - "entrega-*"
   pull_request:
     branches:
       - main
