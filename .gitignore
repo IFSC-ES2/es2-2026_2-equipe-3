@@ -212,4 +212,5 @@ $RECYCLE.BIN/
 # Variaveis de Ambiente
 .env
 
+node_modules
 # End of https://www.toptal.com/developers/gitignore/api/intellij,visualstudiocode,macos,windows,linux
