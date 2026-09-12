@@ -36,6 +36,10 @@ O objetivo deste contrato é permitir que as equipes de Frontend, Backend e Qual
 | `POST` | `/api/v1/orientadores` | Cadastra um novo perfil de professor orientador e suas vagas | `201 Created` |
 | `GET` | `/api/v1/orientadores` | Lista todos os orientadores cadastrados e suas vagas disponíveis | `200 OK` |
 | `GET` | `/api/v1/orientadores/{id}` | Recupera os dados detalhados de um orientador específico por ID | `200 OK` |
+| `PATCH` | `/api/v1/orientadores/{id}` | Atualiza dados cadastrais, linhas de pesquisa e número de vagas de um orientador | `200 OK` |
+| `DELETE` | `/api/v1/orientadores/{id}` | Remove ou desativa o cadastro de um orientador no sistema | `204 No Content` |
+
+> **Nota de Escopo do Vertical Slice (Sprint 1):** O contrato de dados especifica a API REST completa do recurso `orientadores`. Para o *vertical slice* funcional demonstrável da Sprint 1, a implementação prioriza o fluxo de cadastro (`POST`) e consulta/vitrine (`GET`), seguindo com a atualização (`PATCH`) e exclusão (`DELETE`) na sequência do backlog.
 
 ---
 
@@ -213,6 +217,60 @@ Retorna o objeto do orientador correspondente ao ID informado.
 
 ---
 
+### 4.4. Atualização de Dados, Linhas de Pesquisa e Vagas de Orientador
+
+- **Método HTTP:** `PATCH`
+- **Rota:** `/api/v1/orientadores/{id}`
+- **Descrição:** Atualiza parcialmente os dados cadastrais, linhas de pesquisa, biografia ou quantidade de vagas de um orientador existente.
+
+#### Cabeçalhos da Requisição
+```http
+Content-Type: application/json
+Accept: application/json
+```
+
+#### Corpo da Requisição (Request Body - Todos os campos são opcionais)
+```json
+{
+  "linhasDePesquisa": [
+    "Engenharia de Software",
+    "Qualidade de Software",
+    "Inteligência Artificial Aplicada"
+  ],
+  "vagasDisponiveis": 5,
+  "biografia": "Atualização das linhas de pesquisa com foco em IA e testes de software."
+}
+```
+
+#### Respostas Possíveis
+
+##### Sucesso: `200 OK`
+Retorna o objeto do orientador com os dados atualizados.
+
+##### Erro de Validação: `400 Bad Request`
+Retornado caso os campos enviados sejam inválidos (ex: vagas negativas).
+
+##### Não Encontrado: `404 Not Found`
+Retornado caso o ID do orientador não exista.
+
+---
+
+### 4.5. Remoção / Desativação de Perfil de Orientador
+
+- **Método HTTP:** `DELETE`
+- **Rota:** `/api/v1/orientadores/{id}`
+- **Descrição:** Remove o cadastro de um orientador do sistema ou altera seu status para inativo (`ativo: false`), impedindo novos vínculos.
+
+#### Respostas Possíveis
+
+##### Sucesso: `204 No Content`
+O cadastro foi removido ou desativado com sucesso (sem corpo de resposta).
+
+##### Não Encontrado: `404 Not Found`
+Retornado caso o orientador com o ID informado não seja encontrado.
+
+---
+
 ## 5. Diretrizes Arquiteturais para Implementação
 
 Para manter a conformidade com as decisões registradas nas ADRs do projeto, os desenvolvedores devem seguir os seguintes padrões estruturais:
@@ -297,11 +355,13 @@ O Engenheiro de Qualidade deve implementar testes de unidade automatizados focad
 1. **Casos de Sucesso:**
    - Cadastro com todos os campos válidos retorna status HTTP 201 e dados preenchidos com ID.
    - Listagem retorna status HTTP 200 com a coleção de orientadores.
+   - Atualização parcial de perfil/vagas (`PATCH`) com dados válidos retorna status HTTP 200 com os campos atualizados.
+   - Remoção/desativação (`DELETE`) de orientador existente retorna status HTTP 204.
 2. **Casos de Falha / Exceção:**
    - Envio de vagas negativas (`-1`) gera erro de validação (HTTP 400).
    - Envio de e-mail inválido ou vazio gera erro de validação (HTTP 400).
    - Envio de lista vazia de linhas de pesquisa gera erro de validação (HTTP 400).
-   - Consulta de orientador com ID inexistente gera HTTP 404.
+   - Consulta ou atualização de orientador com ID inexistente gera HTTP 404.
 
 ---
 
@@ -323,3 +383,15 @@ O Engenheiro de Qualidade deve implementar testes de unidade automatizados focad
 - **Dado** que existem orientadores cadastrados no banco de dados;
 - **Quando** o aluno acessar a página de catálogo de orientadores;
 - **Então** o sistema deve listar todos os orientadores ativos com seus nomes, áreas de pesquisa e total de vagas disponíveis.
+
+### Cenário 4: Atualização de perfil e vagas de orientador
+- **Dado** que um orientador cadastrado deseja atualizar suas vagas disponíveis de 3 para 5 e incluir uma nova linha de pesquisa;
+- **Quando** submeter a requisição de atualização parcial via `PATCH /api/v1/orientadores/{id}`;
+- **Então** o sistema deve atualizar os dados do orientador no banco de dados;
+- **E** retornar o código de status HTTP 200 OK com o objeto atualizado.
+
+### Cenário 5: Remoção ou desativação de orientador
+- **Dado** que um orientador não oferecerá mais vagas de orientação no semestre;
+- **Quando** submeter a requisição de remoção via `DELETE /api/v1/orientadores/{id}`;
+- **Então** o sistema deve desativar ou remover o perfil;
+- **E** retornar o código de status HTTP 204 No Content.
