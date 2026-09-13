@@ -16,6 +16,10 @@ public class Orientador extends Usuario {
     @Column(length = 100)
     private String departamento;
 
+    @Builder.Default
+    @Column(name = "ativo", nullable = false)
+    private Boolean ativo = true;
+
     @OneToOne(mappedBy = "orientador", cascade = CascadeType.ALL)
     private PerfilOrientador perfil;
 }
