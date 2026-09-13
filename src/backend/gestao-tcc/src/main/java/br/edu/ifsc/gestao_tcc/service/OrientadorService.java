@@ -1,5 +1,7 @@
 package br.edu.ifsc.gestao_tcc.service;
 
+import br.edu.ifsc.gestao_tcc.dto.OrientadorRequestDTO;
+import br.edu.ifsc.gestao_tcc.exception.EmailDuplicadoException;
 import br.edu.ifsc.gestao_tcc.dto.OrientadorResponseDTO;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.model.LinhaPesquisa;
@@ -19,6 +21,39 @@ public class OrientadorService {
 
     private final OrientadorRepository orientadorRepository;
 
+    @Transactional
+    public Orientador cadastrar(OrientadorRequestDTO dto) {
+        if (orientadorRepository.existsByEmail(dto.getEmail())) {
+            throw new EmailDuplicadoException("Já existe um orientador cadastrado com o e-mail: " + dto.getEmail());
+        }
+
+        Orientador orientador = new Orientador();
+        orientador.setNome(dto.getNome());
+        orientador.setEmail(dto.getEmail());
+        orientador.setDepartamento(dto.getDepartamento());
+
+        PerfilOrientador perfil = PerfilOrientador.builder()
+                .vagasDisponiveis(dto.getVagasDisponiveis())
+                .biografia(dto.getBiografia())
+                .orientador(orientador)
+                .build();
+
+        if (dto.getLinhasDePesquisa() != null) {
+            List<LinhaPesquisa> linhas = dto.getLinhasDePesquisa().stream()
+                    .map(nomeLinha -> {
+                        LinhaPesquisa linha = new LinhaPesquisa();
+                        linha.setNome(nomeLinha);
+                        linha.setPerfilOrientador(perfil);
+                        return linha;
+                    }).toList();    
+            perfil.setLinhasPesquisa(linhas);
+        }
+
+        orientador.setPerfil(perfil);
+
+        return orientadorRepository.save(orientador);
+    }
+  
     @Transactional(readOnly = true)
     public OrientadorResponseDTO buscarPorId(Long id) {
         Orientador orientador = orientadorRepository.findById(id)

@@ -3,12 +3,16 @@ package br.edu.ifsc.gestao_tcc.controller;
 import br.edu.ifsc.gestao_tcc.dto.OrientadorRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.OrientadorResponseDTO;
 import br.edu.ifsc.gestao_tcc.dto.OrientadorUpdateDTO;
+import br.edu.ifsc.gestao_tcc.model.Orientador;
 import br.edu.ifsc.gestao_tcc.service.OrientadorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/api/v1/orientadores")
@@ -19,7 +23,14 @@ public class OrientadorController {
 
     @PostMapping
     public ResponseEntity<Void> cadastraOrientador(@RequestBody @Valid OrientadorRequestDTO orientadorDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        Orientador orientadorCriado = orientadorService.cadastrar(orientadorDTO);
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(orientadorCriado.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).build();
     }
 
     @GetMapping
@@ -37,7 +48,6 @@ public class OrientadorController {
     public ResponseEntity<Void> atualizaOrientadorID(
             @PathVariable Long id,
             @RequestBody @Valid OrientadorUpdateDTO orientadorDTO) {
-
         return ResponseEntity.ok().build();
     }
 
