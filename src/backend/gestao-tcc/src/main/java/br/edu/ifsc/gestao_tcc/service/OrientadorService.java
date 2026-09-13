@@ -10,8 +10,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import br.edu.ifsc.gestao_tcc.dto.OrientadorUpdateDTO;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +30,56 @@ public class OrientadorService {
                         "Orientador com identificador " + id + " não foi encontrado."));
 
         return toResponseDTO(orientador);
+    }
+
+    @Transactional
+    public OrientadorResponseDTO atualizar(Long id, OrientadorUpdateDTO dto) {
+        Orientador orientador = orientadorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Orientador com identificador " + id + " não foi encontrado."));
+
+        if (dto.nome() != null) {
+            orientador.setNome(dto.nome());
+        }
+        if (dto.email() != null) {
+            orientador.setEmail(dto.email());
+        }
+        if (dto.departamento() != null) {
+            orientador.setDepartamento(dto.departamento());
+        }
+
+        PerfilOrientador perfil = orientador.getPerfil();
+        if (perfil == null) {
+            perfil = PerfilOrientador.builder()
+                    .orientador(orientador)
+                    .build();
+            orientador.setPerfil(perfil);
+        }
+
+        if (dto.vagasDisponiveis() != null) {
+            perfil.setVagasDisponiveis(dto.vagasDisponiveis());
+        }
+        if (dto.biografia() != null) {
+            perfil.setBiografia(dto.biografia());
+        }
+        if (dto.linhasDePesquisa() != null) {
+            if (perfil.getLinhasPesquisa() == null) {
+                perfil.setLinhasPesquisa(new ArrayList<>());
+            } else {
+                perfil.getLinhasPesquisa().clear();
+            }
+            final PerfilOrientador targetPerfil = perfil;
+            List<LinhaPesquisa> novasLinhas = dto.linhasDePesquisa().stream()
+                    .map(nomeLinha -> LinhaPesquisa.builder()
+                            .nome(nomeLinha)
+                            .perfilOrientador(targetPerfil)
+                            .build())
+                    .collect(Collectors.toList());
+            perfil.getLinhasPesquisa().addAll(novasLinhas);
+        }
+
+        Orientador orientadorSalvo = orientadorRepository.save(orientador);
+        return toResponseDTO(orientadorSalvo);
     }
 
     public OrientadorResponseDTO toResponseDTO(Orientador orientador) {

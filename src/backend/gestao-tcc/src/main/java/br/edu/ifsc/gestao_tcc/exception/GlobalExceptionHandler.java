@@ -23,4 +23,23 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
+
+    @ExceptionHandler(org.springframework.web.bind.MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponseDTO> handleMethodArgumentNotValidException(
+            org.springframework.web.bind.MethodArgumentNotValidException ex, HttpServletRequest request) {
+
+        String mensagemErro = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .findFirst()
+                .orElse("Erro de validação nos dados enviados");
+
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+            HttpStatus.BAD_REQUEST.value(),
+            "Erro de validação nos dados enviados",
+            request.getRequestURI(),
+            mensagemErro
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
 }
