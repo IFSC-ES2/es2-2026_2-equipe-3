@@ -28,3 +28,14 @@ jobs:
 
       - name: Dar permissao de execucao ao Gradle Wrapper
         run: chmod +x src/backend/gestao-tcc/gradlew
+
+      - name: Executar testes de unidade
+        working-directory: src/backend/gestao-tcc
+        run: ./gradlew test
+
+      - name: Upload dos relatorios de testes (Artefato)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: relatorio-testes-gradle
+          path: src/backend/gestao-tcc/build/reports/tests/test/
