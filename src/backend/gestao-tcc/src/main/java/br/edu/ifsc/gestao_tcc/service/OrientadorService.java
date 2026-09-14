@@ -49,7 +49,7 @@ public class OrientadorService {
                         linha.setNome(nomeLinha);
                         linha.setPerfilOrientador(perfil);
                         return linha;
-                    }).toList();    
+                    }).toList();
             perfil.setLinhasPesquisa(linhas);
         }
 
@@ -57,7 +57,22 @@ public class OrientadorService {
 
         return orientadorRepository.save(orientador);
     }
-  
+
+    @Transactional(readOnly = true)
+    public List<OrientadorResponseDTO> listarOrientadores(String area) {
+        List<Orientador> orientadores;
+
+        if (area != null && !area.trim().isEmpty()) {
+            orientadores = orientadorRepository.findByLinhasPesquisaNomeContainingIgnoreCase(area);
+        } else {
+            orientadores = orientadorRepository.findAll();
+        }
+
+        return orientadores.stream()
+                .map(this::toResponseDTO)
+                .collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     public OrientadorResponseDTO buscarPorId(Long id) {
         Orientador orientador = orientadorRepository.findById(id)
@@ -109,7 +124,7 @@ public class OrientadorService {
                             .nome(nomeLinha)
                             .perfilOrientador(targetPerfil)
                             .build())
-                    .collect(Collectors.toList());
+                    .toList();
             perfil.getLinhasPesquisa().addAll(novasLinhas);
         }
 
@@ -141,7 +156,7 @@ public class OrientadorService {
                 linhasDePesquisa,
                 vagasDisponiveis,
                 biografia,
-                orientador.getAtivo() != null ? orientador.getAtivo() : true
+                orientador.getAtivo() == null || orientador.getAtivo()
         );
     }
 }
