@@ -57,6 +57,7 @@ public class OrientadorController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletaOrientadorID(@PathVariable Long id) {
+        orientadorService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 }
