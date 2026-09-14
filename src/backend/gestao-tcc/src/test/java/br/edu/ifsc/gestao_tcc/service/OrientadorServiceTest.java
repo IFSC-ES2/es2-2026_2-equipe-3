@@ -85,4 +85,62 @@ class OrientadorServiceTest {
         assertEquals("Orientador com identificador 99 não foi encontrado.", exception.getMessage());
         verify(orientadorRepository, times(1)).findById(id);
     }
+
+    @Test
+    void atualizar_DeveAtualizarCamposEEnviarResponseDTO_QuandoDadosValidos() {
+        Long id = 1L;
+
+        PerfilOrientador perfil = PerfilOrientador.builder()
+                .id(10L)
+                .vagasDisponiveis(3)
+                .biografia("Biografia antiga")
+                .build();
+
+        Orientador orientador = Orientador.builder()
+                .id(id)
+                .nome("Dr. Adriano Lima")
+                .email("adriano.lima@ifsc.edu.br")
+                .departamento("DAE")
+                .ativo(true)
+                .perfil(perfil)
+                .build();
+
+        br.edu.ifsc.gestao_tcc.dto.OrientadorUpdateDTO updateDTO = new br.edu.ifsc.gestao_tcc.dto.OrientadorUpdateDTO(
+                null,
+                null,
+                null,
+                List.of("Engenharia de Software"),
+                5,
+                "Nova biografia"
+        );
+
+        when(orientadorRepository.findById(id)).thenReturn(Optional.of(orientador));
+        when(orientadorRepository.save(any(Orientador.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        OrientadorResponseDTO response = orientadorService.atualizar(id, updateDTO);
+
+        assertNotNull(response);
+        assertEquals(5, response.vagasDisponiveis());
+        assertEquals("Nova biografia", response.biografia());
+        assertEquals(1, response.linhasDePesquisa().size());
+        assertEquals("Engenharia de Software", response.linhasDePesquisa().get(0));
+
+        verify(orientadorRepository, times(1)).findById(id);
+        verify(orientadorRepository, times(1)).save(orientador);
+    }
+
+    @Test
+    void atualizar_DeveLancarResourceNotFoundException_QuandoIdNaoExiste() {
+        Long id = 99L;
+        br.edu.ifsc.gestao_tcc.dto.OrientadorUpdateDTO updateDTO = new br.edu.ifsc.gestao_tcc.dto.OrientadorUpdateDTO(
+                null, null, null, null, 5, null
+        );
+
+        when(orientadorRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> orientadorService.atualizar(id, updateDTO));
+
+        verify(orientadorRepository, times(1)).findById(id);
+        verify(orientadorRepository, never()).save(any());
+    }
 }

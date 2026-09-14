@@ -45,10 +45,12 @@ public class OrientadorController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<Void> atualizaOrientadorID(
+    public ResponseEntity<OrientadorResponseDTO> atualizaOrientadorID(
             @PathVariable Long id,
             @RequestBody @Valid OrientadorUpdateDTO orientadorDTO) {
-        return ResponseEntity.ok().build();
+
+        OrientadorResponseDTO orientadorResponse = orientadorService.atualizar(id, orientadorDTO);
+        return ResponseEntity.ok(orientadorResponse);
     }
 
     @DeleteMapping("/{id}")
