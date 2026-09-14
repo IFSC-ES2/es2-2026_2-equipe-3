@@ -52,7 +52,7 @@ public class GlobalExceptionHandler {
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
                 HttpStatus.BAD_REQUEST.value(),
-                "Erro de validação nos campos informados",
+                "Erro de validação nos dados enviados",
                 request.getRequestURI(),
                 detalhesErros
         );
