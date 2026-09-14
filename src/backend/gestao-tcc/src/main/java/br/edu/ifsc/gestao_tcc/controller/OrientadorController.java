@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/orientadores")
@@ -34,8 +35,9 @@ public class OrientadorController {
     }
 
     @GetMapping
-    public ResponseEntity<Void> listaOrientadores(@RequestParam(required = false) String area) {
-        return ResponseEntity.ok().build();
+    public ResponseEntity<List<OrientadorResponseDTO>> listaOrientadores(@RequestParam(required = false) String area) {
+        List<OrientadorResponseDTO> lista = orientadorService.listarOrientadores(area);
+        return ResponseEntity.ok(lista);
     }
 
     @GetMapping("/{id}")
@@ -55,6 +57,7 @@ public class OrientadorController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletaOrientadorID(@PathVariable Long id) {
+        orientadorService.deletar(id);
         return ResponseEntity.noContent().build();
     }
 }
