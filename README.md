@@ -21,7 +21,8 @@
 
 **Alternativa:**
 Para cumprir o contrato de dados, as seguintes alterações devem ser feitas:
-* **Refatoração do DTO:** Renomear o atributo `vagas` para `vagasDisponiveis` na classe `OrientadorRequestDTO` para garantir que o JSON esteja no padrão definido.
-* **Inclusão de Atributos:** Adicionar os atributos faltantes no DTO: `departamento`, `biografia` e `linhasDePesquisa`.
-* **Bean Validation:** Aplicar as anotações de validação nos novos atributose alterar a validação do campo de vagas de `@Min(value = 1)` para `@Min(value = 0)`, respeitando os limites estipulados no Dicionário de Dados.
-* **Atualização da Camada de Serviço:** Modificar o método cadastrar no `OrientadorService` para que ele leia os novos dados do DTO, instancie o `Orientador` e o `PerfilOrientador` com essas informações, e converta a lista de strings em entidades `LinhaPesquisa`, atrelando tudo antes de chamar o `repository.save()`.
+
+- **Refatoração do DTO:** Renomear o atributo `vagas` para `vagasDisponiveis` na classe `OrientadorRequestDTO` para garantir que o JSON esteja no padrão definido.
+- **Inclusão de Atributos:** Adicionar os atributos faltantes no DTO: `departamento`, `biografia` e `linhasDePesquisa`.
+- **Bean Validation:** Aplicar as anotações de validação nos novos atributose alterar a validação do campo de vagas de `@Min(value = 1)` para `@Min(value = 0)`, respeitando os limites estipulados no Dicionário de Dados.
+- **Atualização da Camada de Serviço:** Modificar o método cadastrar no `OrientadorService` para que ele leia os novos dados do DTO, instancie o `Orientador` e o `PerfilOrientador` com essas informações, e converta a lista de strings em entidades `LinhaPesquisa`, atrelando tudo antes de chamar o `repository.save()`.

@@ -5,6 +5,7 @@ Data da entrega: 17/09/2026
 ## Escopo da Sprint 1
 
 ### Issues planejadas (epic e desdobramentos)
+
 - US02 (epic) - Cadastro de Perfil de Orientador e Vagas
 - #35 - Setup do Repositório, .gitignore e Ambientes de Desenvolvimento
 - #36 - Planejamento inicial e definição do escopo da Sprint 1
@@ -17,6 +18,7 @@ Data da entrega: 17/09/2026
 - #43 - Relatório de Fechamento e Retrospectiva da Sprint 1
 
 ### Status
+
 - Concluídas: [preencher]
 - Parciais/Replanejadas: [preencher]
 
