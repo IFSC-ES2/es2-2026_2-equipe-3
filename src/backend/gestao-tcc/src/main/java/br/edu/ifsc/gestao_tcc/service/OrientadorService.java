@@ -159,4 +159,14 @@ public class OrientadorService {
                 orientador.getAtivo() == null || orientador.getAtivo()
         );
     }
+
+    @Transactional
+    public void deletar(Long id) {
+        Orientador orientador = orientadorRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Orientador com identificador " + id + " não foi encontrado."));
+
+        orientador.setAtivo(false);
+        orientadorRepository.save(orientador);
+    }
 }
