@@ -93,7 +93,7 @@ class OrientadorRepositoryTest {
         salvarOrientadorComPerfil("Ana", "ana@ifsc.edu.br", "Redes de Computadores");
 
         List<Orientador> resultado = orientadorRepository
-                .findByLinhasPesquisaNomeContainingIgnoreCase("Robótica"); //[cite: 14]
+                .findByLinhasPesquisaNomeContainingIgnoreCase("Robótica");
 
         assertThat(resultado).isEmpty();
     }
