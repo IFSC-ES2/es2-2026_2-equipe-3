@@ -4,9 +4,9 @@ export interface ErroValidacaoCampo {
 }
 
 export interface RespostaErroPadrao {
-    timestamp: string;
+    timestamp?: string;
     status: number;
     erro: string;
-    caminho: string;
+    caminho?: string;
     detalhes?: ErroValidacaoCampo[] | string;
 }

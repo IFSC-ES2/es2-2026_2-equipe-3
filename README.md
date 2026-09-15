@@ -83,3 +83,25 @@ Nesta etapa, estabelecemos o registro e priorização de riscos do projeto, cons
 - **[Integração Contínua (CI)](docs/ci.md):** Configuração do pipeline de Integração Contínua (Github Actions), cobrindo verificação de docs, links e formatação (Prettier).
 - **[Qualidade do Software](docs/qualidade.md):** Mapeamento dos atributos da norma ISO/IEC 25010 priorizados para o MVP.
 - **Evidência de Integração:** O desenvolvimento desta etapa foi consolidado através do [Pull Request #34](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/34), que executou os checks de CI obrigatórios e passou pela revisão da equipe.
+
+## 7. Como executar o aplicativo localmente
+
+1. Instale o Node.js 20 ou superior e o Java 21.
+2. Em um terminal, inicie o backend:
+
+  ```terminal
+  cd src/backend/gestao-tcc
+  .\gradlew.bat bootRun
+  ```
+
+  O backend será executado em `http://localhost:8080` usando o banco H2 em memória.
+
+3. Em outro terminal, instale as dependências e inicie o frontend:
+
+  ```terminal
+  cd src/frontend
+  npm install
+  npm run dev
+  ```
+
+4. Acesse `http://localhost:5173` no navegador.
