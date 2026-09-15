@@ -39,7 +39,7 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().status()).isEqualTo(404);
-        assertThat(response.getBody().erro()).isEqualTo("Orientador não encontrado");
+        assertThat(response.getBody().erro()).isEqualTo("Recurso não encontrado");
         assertThat(response.getBody().caminho()).isEqualTo("/api/v1/orientadores");
         assertThat(response.getBody().timestamp()).isNotBlank();
     }
@@ -54,7 +54,7 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().status()).isEqualTo(409);
-        assertThat(response.getBody().erro()).isEqualTo("E-mail já cadastrado");
+        assertThat(response.getBody().erro()).isEqualTo("Conflito de dados");
         assertThat(response.getBody().caminho()).isEqualTo("/api/v1/orientadores");
     }
 
