@@ -17,6 +17,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/orientadores")
+@CrossOrigin(
+    origins = {"http://localhost:5173", "http://127.0.0.1:5173"},
+    exposedHeaders = "Location"
+)
 @RequiredArgsConstructor
 public class OrientadorController {
 
