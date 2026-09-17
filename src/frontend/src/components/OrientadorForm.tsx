@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent, ChangeEvent } from 'react';
 import type { Orientador, OrientadorInput } from '../types/Orientador';
 import { ApiError, atualizarOrientador, cadastrarOrientador } from '../utils/orientadorService';
-import { LinhaPesquisaInput } from './LinhaPesquisaInput';
+import { LinhaPesquisaInput } from './LinhaPesquisa';
 
 interface OrientadorFormProps {
   orientador?: Orientador;
