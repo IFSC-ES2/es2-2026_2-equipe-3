@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { Orientador } from '../types/Orientador';
-import { OrientadorForm } from '../components/OrientadorForm';
+import type { Orientador } from '../../types/Orientador.ts';
+import { OrientadorForm } from '../../components/OrientadorForm';
 
 export function OrientadorCadastroPage() {
   const navigate = useNavigate();
