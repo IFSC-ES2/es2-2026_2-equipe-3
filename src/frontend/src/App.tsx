@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { OrientadorCadastroPage } from './paginas/OrientadorCadastroPage';
-import { OrientadorEdicaoPage } from './paginas/OrientadorEdicaoPage';
-import { OrientadorListagemPage } from './paginas/OrientadorListagemPage';
+import { OrientadorCadastroPage } from './paginas/OrientadorCadastro';
+import { OrientadorEdicaoPage } from './paginas/OrientadorEdicao';
+import { OrientadorListagemPage } from './paginas/Orientadores';
 import './App.css';
 
 function App() {
