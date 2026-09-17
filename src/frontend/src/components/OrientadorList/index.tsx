@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import type { FormEvent } from 'react';
-import type { Orientador } from '../types/Orientador';
-import { listarOrientadores } from '../utils/orientadorService';
-import { OrientadorCard } from './OrientadorCard';
+import type { Orientador } from '../../types/Orientador.ts';
+import { listarOrientadores } from '../../utils/orientadorService.ts';
+import { OrientadorCard } from '../OrientadorCard';
 
 export function OrientadorList() {
   const [orientadores, setOrientadores] = useState<Orientador[]>([]);

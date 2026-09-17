@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import type { KeyboardEvent } from 'react';
-import './LinhaPesquisaInput.css'; 
+import './LinhaPesquisaInput.css';
 
 interface LinhaPesquisaInputProps {
   linhas: string[];
   onChange: (novasLinhas: string[]) => void;
 }
 
-export function LinhaPesquisaInput({ linhas, onChange }: LinhaPesquisaInputProps) {
+export function LinhaPesquisaInput({linhas, onChange}: LinhaPesquisaInputProps) {
   const [inputValue, setInputValue] = useState('');
   const [erro, setErro] = useState('');
 

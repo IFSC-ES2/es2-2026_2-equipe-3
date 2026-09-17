@@ -1,4 +1,4 @@
-import type { Orientador } from '../types/Orientador';
+import type { Orientador } from '../../types/Orientador.ts';
 
 interface OrientadorCardProps {
   orientador: Orientador;
