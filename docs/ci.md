@@ -25,21 +25,21 @@ O pipeline está sendo estruturado de forma incremental. Atualmente, ele garante
   - Garante que os arquivos Markdown cumprem a sintaxe correta.
   - Executa o **Prettier** para garantir que todos os arquivos do repositório sigam um padrão consistente de formatação (espaçamentos, quebras de linha, etc).
 
-### 3.2. Validação do Backend (Planejado para a Entrega 5 - Sprint 1)
+### 3.2. Validação do Backend (Ativa)
 
-A partir do início da codificação (Java 21 / Spring Boot), o CI será expandido para incluir:
+A validação automatizada da API (Java 21 / Spring Boot / MySQL) inclui:
 
 - **Build:** Compilação do projeto via Gradle.
-- **Testes:** Execução da suíte de testes unitários (JUnit).
+- **Testes:** Execução da suíte de testes unitários e de integração (JUnit 5 / Mockito) com container MySQL em ambiente de CI.
 - **Cobertura:** Validação da métrica M-01.
 
-### 3.3. Validação do Frontend (Planejado para a Entrega 5 - Sprint 1)
+### 3.3. Validação do Frontend (Ativa)
 
-Com o início da construção das interfaces (React / TypeScript), o CI passará a avaliar:
+A validação da aplicação web (React / TypeScript / Vite) inclui:
 
 - **Build:** Compilação do Vite para garantir ausência de erros de tipagem estrutural.
 - **Linting de Código:** ESLint para garantir as boas práticas do React.
-- **Testes:** Suíte inicial de testes de interface.
+- **Testes:** Execução de testes de componentes com Vitest e Testing Library.
 
 ## 4. Política de Bloqueio e Quality Gates
 
