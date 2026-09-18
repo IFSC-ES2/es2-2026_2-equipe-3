@@ -167,6 +167,7 @@ describe('OrientadorForm', () => {
     test('deve processar erros de validação vindos do backend (ApiError 400)', async () => {
         const user = userEvent.setup();
         vi.mocked(cadastrarOrientador).mockRejectedValue(
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             new ApiError(400, [{ campo: 'email', mensagem: 'E-mail já cadastrado' }] as any)
         );
 
