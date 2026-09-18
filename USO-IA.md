@@ -55,8 +55,9 @@ Em conformidade com o protocolo da disciplina, declaramos que a ferramenta de in
 - **Resolução de Erros de Lint e Build (TypeScript/ESLint):** Auxílio na resolução de erros de compilação do TypeScript e diretivas de exceção do linter (`@typescript-eslint/no-explicit-any`) na suíte de testes do frontend (`OrientadorForm.test.tsx`), garantindo a execução dos *checks* automatizados.
 - **Configuração de cliente HTTP:** Apoio na criação de um utilitário padronizado para requisições à API (`apiFetch`).
 - **Elaboração do Contrato de Dados:** Auxílio na redação, organização e formatação em Markdown.
-- **Codificação:** Auxílio na escrita, refatoração, resolução de problemas e estruturação de trechos de código.
+- **Codificação e Verificação do Backend:** Auxílio na escrita, refatoração, verificação e estruturação de trechos de código do backend, incluindo a revisão de lógica de negócio e integração entre camadas.
+- **Resolução de Problemas com Comandos e Versionamento (Git):** Apoio na identificação de soluções para problemas relacionados a comandos de terminal e ao versionamento do projeto, incluindo a resolução de conflitos entre commits.
+- **Validação da Modelagem do Banco de Dados e do Diagrama UML:** Auxílio na verificação e validação da consistência da modelagem do banco de dados e do diagrama UML do projeto, conferindo a correspondência entre as entidades, relacionamentos e a arquitetura definida.
 
 **Validação:**
 Todo o conteúdo e documentação gerados com o apoio da IA foram lidos, compreendidos, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
-
