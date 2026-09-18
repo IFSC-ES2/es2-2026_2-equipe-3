@@ -84,24 +84,67 @@ Nesta etapa, estabelecemos o registro e priorização de riscos do projeto, cons
 - **[Qualidade do Software](docs/qualidade.md):** Mapeamento dos atributos da norma ISO/IEC 25010 priorizados para o MVP.
 - **Evidência de Integração:** O desenvolvimento desta etapa foi consolidado através do [Pull Request #34](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/34), que executou os checks de CI obrigatórios e passou pela revisão da equipe.
 
-## 7. Como executar o aplicativo localmente
+## 7. Entrega 5: Primeiro Incremento Funcional (Sprint 1)
 
-1. Instale o Node.js 20 ou superior e o Java 21.
-2. Em um terminal, inicie o backend:
+Nesta etapa, implementamos o primeiro _vertical slice_ funcional do MVP (US02: Cadastro de Perfil de Orientador e Vagas), integrando interface Web em React, lógica de negócio em Spring Boot e persistência relacional com MySQL, além da automação de testes de unidade e pipeline de CI.
 
-  ```terminal
-  cd src/backend/gestao-tcc
-  .\gradlew.bat bootRun
-  ```
+- **[Relatório de Fechamento da Sprint 1](docs/entregas/sprint-1.md):** Escopo planejado vs. executado, retrospectiva e registro detalhado de contribuições individuais.
+- **[Contrato de Dados da API (US02)](docs/contrato-dados-us02.md):** Especificação formal dos endpoints REST e formatos de dados.
+- **[Declaração de Uso de IA](USO-IA.md):** Registro da utilização de ferramentas de IA na Sprint 1.
 
-  O backend será executado em `http://localhost:8080` usando o banco H2 em memória.
+### 7.1. O que já funciona no MVP (US02)
 
-3. Em outro terminal, instale as dependências e inicie o frontend:
+- **Cadastro de Orientador:** Formulário com validações em tempo real (nome, e-mail institucional único, departamento, número de vagas e linhas de pesquisa) via `POST /api/v1/orientadores`.
+- **Vitrine / Catálogo de Orientadores:** Listagem dos orientadores com disponibilidade de vagas e filtragem dinâmica por linha de pesquisa via `GET /api/v1/orientadores?area=...`.
+- **Consulta de Perfil:** Visualização detalhada dos dados de um orientador específico por ID via `GET /api/v1/orientadores/{id}`.
+- **Edição de Perfil:** Atualização de dados cadastrais, biografia e ajuste no quantitativo de vagas ofertadas via `PATCH /api/v1/orientadores/{id}`.
+- **Remoção de Perfil:** Desativação/exclusão de cadastro via `DELETE /api/v1/orientadores/{id}`.
 
-  ```terminal
-  cd src/frontend
-  npm install
-  npm run dev
-  ```
+## 8. Como executar o aplicativo
 
-4. Acesse `http://localhost:5173` no navegador.
+Para facilitar a execução dos ambientes de frontend, backend e banco de dados simultaneamente, o projeto está configurado com Docker Compose.
+
+### Pré-requisitos
+
+Certifique-se de ter instalado em sua máquina:
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Passo a Passo
+
+1. Clone o repositório e acesse a pasta raiz do projeto:
+
+```bash
+git clone https://github.com/IFSC-ES2/es2-2026_2-equipe-3.git
+cd es2-2026_2-equipe-3/SIGTCC
+
+```
+
+2. Construa as imagens e suba os contêineres em segundo plano:
+
+```bash
+docker-compose up
+
+```
+
+3. Acesse a aplicação no seu navegador:
+
+- **Frontend:** [http://localhost:5173](http://localhost:5173)
+- **Backend (API):** [http://localhost:8080](http://localhost:8080)
+
+### Comandos Úteis
+
+Para acompanhar os logs da aplicação em tempo real:
+
+```bash
+docker compose logs -f
+
+```
+
+Para parar a execução e remover os contêineres:
+
+```bash
+docker compose down
+
+```
