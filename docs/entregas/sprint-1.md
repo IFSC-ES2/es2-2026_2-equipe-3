@@ -40,9 +40,9 @@ Data da entrega: 17/09/2026
 ### Status
 
 **Fase Atual:** Em Fechamento
-**Progresso das Issues:** 17 concluídas / 4 abertas
+**Progresso das Issues:** 21 concluídas
 
-- **Concluído:** Todo o desenvolvimento do _vertical slice_ planejado para a sprint, incluindo o esqueleto da API (Backend), endpoints do CRUD de Orientadores, interface de usuário (Frontend), além da configuração do repositório e testes unitários.
+- **Concluído:** Todo o desenvolvimento do _vertical slice_ planejado para a sprint, incluindo o esqueleto da API (Backend), endpoints do CRUD de Orientadores, interface de usuário (Frontend), além da configuração do repositório e testes unitários. Além disso, foi realizada uma expansão do CI para
 - **Em Andamento / Pendente:** Tarefas relacionadas à governança, métricas e DevOps (Issues #40 a #43). O time está focado na expansão do CI para testes automatizados, coleta de métricas, publicação da Release v0.1.0 e no relatório de retrospectiva.
 
 ## Justificativa do vertical slice
@@ -81,6 +81,7 @@ O vertical slice escolhido para a Sprint 1 foi o Cadastro de Perfil de Orientado
   - **Issue #64 Tela de Cadastro de Orientador (POST):** Construção do formulário de cadastro com validações, integração do endpoint POST para a criação do perfil, redirecionamento e tratamento de respostas de erro da API (como 400 Bad Request e 409 Conflict).
   - **Issue #65 Tela de Edição de Perfil (GET e PATCH):** Desenvolvimento da interface de edição, incluindo o preenchimento automático dos dados via GET ao carregar a página e o envio do payload de atualização via PATCH, lidando com cenários de sucesso e mensagens de erro nos campos inválidos.
   - **Issue #66 Tela de Catálogo/Listagem de Orientadores (GET):** Implementação da vitrine de exibição dos perfis cadastrados, criação do componente de _Card_ para os professores e integração da busca por área de atuação (parâmetro `?area=texto`), incluindo as renderizações de fallback em caso de erro ou lista vazia.
+  - **Pull Requests (PRs):** Nenhum
 
 - **Damares do Socorro Goncalves Gaia:**
   - **Atuação principal:** Desenvolvimento Backend (API REST) e Documentação de Arquitetura.
@@ -88,6 +89,7 @@ O vertical slice escolhido para a Sprint 1 foi o Cadastro de Perfil de Orientado
   - **Issue #51 Implementar Endpoint de Consulta por ID (GET /id):** Desenvolvimento da lógica na camada de serviço para buscar os detalhes de um orientador específico, garantindo o retorno de status HTTP 200 OK com o objeto completo para buscas com sucesso, e HTTP 404 Not Found caso o ID seja inválido ou inexistente no banco de dados.
   - **Issue #52 Implementar Endpoint de Atualização Parcial (PATCH /id):** Implementação do endpoint e da regra de negócio para receber alterações opcionais no cadastro do orientador (como linhas de pesquisa e vagas disponíveis), incluindo validações para impedir que as vagas fiquem negativas e tratamento de erros.
   - **PR #46 docs: especifica contrato de dados da api para a us02:** Elaboração do documento de especificação técnica e arquitetura de software da Sprint 1 (`docs/contrato-dados-us02.md`). O artefato estabeleceu a padronização dos endpoints REST, a estrutura dos payloads JSON, o dicionário de dados com regras de _Bean Validation_, códigos HTTP e critérios de aceitação em formato BDD.
+  - **Pull Requests (PRs):** #57, #55 e #46
 
 - **Eduardo Cardoso Oliveira:**
   - **Atuação principal:** Desenvolvimento Fullstack (Backend e Frontend) e Gestão da Sprint (Planejamento e Métricas).
@@ -97,6 +99,7 @@ O vertical slice escolhido para a Sprint 1 foi o Cadastro de Perfil de Orientado
   - **Issue #50 Implementar Endpoint de Listagem de Orientadores (GET):** Construção do endpoint de consulta pública para alimentar o catálogo do frontend, com conversão de dados para DTOs e suporte à filtragem opcional por linha de pesquisa via _query param_.
   - **Issue #63 Componente Dinâmico de "Linhas de Pesquisa":** Criação do componente isolado no React permitindo a adição e remoção de _tags_ (pílulas), com validação ativa de caracteres (2 a 80).
   - **Issues em andamento (#41 e #43):** Responsável por compilar as métricas finais, registrar contribuições, atualizar o README com instruções de execução e redigir o relatório de fechamento e retrospectiva da sprint.
+  - **Pull Requests (PRs):** #63, #62, #56, #47 e #44
 
 - **Talles Souza da Cruz:**
   - **Atuação principal:** Configuração de Arquitetura Base (Setup), Qualidade (Testes Unitários) e Desenvolvimento Fullstack.
@@ -106,10 +109,12 @@ O vertical slice escolhido para a Sprint 1 foi o Cadastro de Perfil de Orientado
   - **Issue #53 Implementar Endpoint de Remoção/Desativação (DELETE /id):** Desenvolvimento do endpoint de exclusão lógica/física com retornos padronizados.
   - **Issue #59 Configuração Base, API e Interfaces:** Fundação do projeto React criando tipagens (`src/types/Orientador.ts`), cliente HTTP apontado para `VITE_API_URL` e estruturando o roteamento primário via React Router DOM.
   - **Issues #39 e #69 Implementação de Testes de Unidade Automatizados:** Desenvolvimento da suíte completa de testes da API, incluindo testes de Controller (MockMvc), Serviço (Mockito), Repositório (`@DataJpaTest`) e tratamentos de erro globais.
+  - **Pull Requests (PRs):** #72, #70, #67, #60 e #54
 
 - **Willian Ferreira dos Santos:**
   - **Atuação principal:** DevOps e Integração Contínua (CI/CD).
   - **Issue em andamento (#40 Expansão do CI para Builds e Testes Automatizados):** Responsável por aprimorar o pipeline de Integração Contínua utilizando GitHub Actions. A tarefa exige a configuração de workflows automatizados para executar a rotina de _build_ do Backend e do Frontend, além de rodar a suíte de testes de unidade a cada novo código submetido, garantindo que os _checks_ sejam obrigatórios nos Pull Requests direcionados às branches `entrega-5` e `main`.
+  - **Pull Requests (PRs):** #73 e #58
 
 ## Release
 
