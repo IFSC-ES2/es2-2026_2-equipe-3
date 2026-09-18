@@ -58,7 +58,7 @@ O vertical slice escolhido para a Sprint 1 foi o Cadastro de Perfil de Orientado
 ## Testes de unidade automatizados
 
 - Testes da camada de serviço e regras de negócio do cadastro cobrindo cenários de sucesso e falha
-- Execução: comandos padrão via CLI (ex: `./mvnw test` para o backend)
+- Execução: comandos padrão via CLI (ex: `./gradlew test` no Linux ou macOS e `.\gradlew test` no Windows para o backend)
 
 ## Backlog e board
 

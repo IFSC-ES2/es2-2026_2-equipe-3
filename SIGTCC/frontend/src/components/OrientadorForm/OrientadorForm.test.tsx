@@ -214,7 +214,7 @@ describe("OrientadorForm", () => {
     vi.mocked(cadastrarOrientador).mockRejectedValue(
       new ApiError(400, [
         { campo: "email", mensagem: "E-mail já cadastrado" },
-      ] as any),
+      ] as unknown as string),
     );
 
     render(<OrientadorForm onSucesso={mockOnSucesso} onErro={mockOnErro} />);
