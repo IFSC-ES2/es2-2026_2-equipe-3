@@ -43,3 +43,21 @@ Em conformidade com o protocolo da disciplina, declaramos que a ferramenta de in
 
 **Validação:**
 Todo o conteúdo e documentação gerados com o apoio da IA foram lidos, compreendidos, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
+
+## Entrega 5:
+
+Em conformidade com o protocolo da disciplina, declaramos que a ferramenta de inteligência artificial generativa (Gemini) foi utilizada durante a **Etapa 5 (Sprint 1)** deste projeto para as seguintes finalidades:
+
+- **Geração e estruturação de testes automatizados:** Auxílio na implementação e organização das suítes de testes unitários tanto para o frontend quanto para o backend, abrangendo a simulação de interações do usuário, mocks de chamadas de API, injeção de dependências e validação das regras de negócio em ambas as camadas da aplicação.
+- **Configuração de Infraestrutura e Conteinerização:** Apoio na elaboração e revisão dos arquivos `Dockerfile` e `docker-compose.yml`, auxiliando na configuração adequada dos ambientes e na orquestração dos serviços para o deploy da aplicação.
+- **Correção da Modelagem de Entidades com JPA:** Apoio na revisão e correção da modelagem das entidades do banco de dados utilizando JPA, auxiliando no mapeamento adequado das tabelas e na configuração correta dos relacionamentos.
+- **Expansão e Resolução de Pipelines de CI/CD:** Auxílio no diagnóstico de erros e na configuração dos workflows do GitHub Actions (`frontend-ci.yml` e `backend-ci.yml`).
+- **Resolução de Erros de Lint e Build (TypeScript/ESLint):** Auxílio na resolução de erros de compilação do TypeScript e diretivas de exceção do linter (`@typescript-eslint/no-explicit-any`) na suíte de testes do frontend (`OrientadorForm.test.tsx`), garantindo a execução dos _checks_ automatizados.
+- **Configuração de cliente HTTP:** Apoio na criação de um utilitário padronizado para requisições à API (`apiFetch`).
+- **Elaboração do Contrato de Dados:** Auxílio na redação, organização e formatação em Markdown.
+- **Codificação e Verificação do Backend:** Auxílio na escrita, refatoração, verificação e estruturação de trechos de código do backend, incluindo a revisão de lógica de negócio e integração entre camadas.
+- **Resolução de Problemas com Comandos e Versionamento (Git):** Apoio na identificação de soluções para problemas relacionados a comandos de terminal e ao versionamento do projeto, incluindo a resolução de conflitos entre commits.
+- **Validação da Modelagem do Banco de Dados e do Diagrama UML:** Auxílio na verificação e validação da consistência da modelagem do banco de dados e do diagrama UML do projeto, conferindo a correspondência entre as entidades, relacionamentos e a arquitetura definida.
+
+**Validação:**
+Todo o conteúdo e documentação gerados com o apoio da IA foram lidos, compreendidos, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.

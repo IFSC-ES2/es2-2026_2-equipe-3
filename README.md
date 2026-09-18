@@ -83,3 +83,124 @@ Nesta etapa, estabelecemos o registro e priorização de riscos do projeto, cons
 - **[Integração Contínua (CI)](docs/ci.md):** Configuração do pipeline de Integração Contínua (Github Actions), cobrindo verificação de docs, links e formatação (Prettier).
 - **[Qualidade do Software](docs/qualidade.md):** Mapeamento dos atributos da norma ISO/IEC 25010 priorizados para o MVP.
 - **Evidência de Integração:** O desenvolvimento desta etapa foi consolidado através do [Pull Request #34](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/34), que executou os checks de CI obrigatórios e passou pela revisão da equipe.
+
+## 7. Entrega 5: Primeiro Incremento Funcional (Sprint 1)
+
+Nesta etapa, implementamos o primeiro _vertical slice_ funcional do MVP (US02: Cadastro de Perfil de Orientador e Vagas), integrando interface Web em React, lógica de negócio em Spring Boot e persistência relacional com MySQL, além da automação de testes de unidade e pipeline de CI.
+
+- **[Relatório de Fechamento da Sprint 1](docs/entregas/sprint-1.md):** Escopo planejado vs. executado, retrospectiva e registro detalhado de contribuições individuais.
+- **[Contrato de Dados da API (US02)](docs/contrato-dados-us02.md):** Especificação formal dos endpoints REST e formatos de dados.
+- **[Declaração de Uso de IA](USO-IA.md):** Registro da utilização de ferramentas de IA na Sprint 1.
+
+### 7.1. O que já funciona no MVP (US02)
+
+- **Cadastro de Orientador:** Formulário com validações em tempo real (nome, e-mail institucional único, departamento, número de vagas e linhas de pesquisa) via `POST /api/v1/orientadores`.
+- **Vitrine / Catálogo de Orientadores:** Listagem dos orientadores com disponibilidade de vagas e filtragem dinâmica por linha de pesquisa via `GET /api/v1/orientadores?area=...`.
+- **Consulta de Perfil:** Visualização detalhada dos dados de um orientador específico por ID via `GET /api/v1/orientadores/{id}`.
+- **Edição de Perfil:** Atualização de dados cadastrais, biografia e ajuste no quantitativo de vagas ofertadas via `PATCH /api/v1/orientadores/{id}`.
+- **Remoção de Perfil:** Desativação/exclusão de cadastro via `DELETE /api/v1/orientadores/{id}`.
+
+## 8. Como executar o aplicativo
+
+Para facilitar a execução dos ambientes de frontend, backend e banco de dados simultaneamente, o projeto está configurado com Docker Compose.
+
+### Pré-requisitos
+
+Certifique-se de ter instalado em sua máquina:
+
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+### Passo a Passo
+
+1. Clone o repositório e acesse a pasta raiz do projeto:
+
+```bash
+git clone https://github.com/IFSC-ES2/es2-2026_2-equipe-3.git
+cd es2-2026_2-equipe-3/SIGTCC
+
+```
+
+2. Construa as imagens e suba os contêineres:
+
+```bash
+docker-compose up
+
+```
+
+3. Acesse a aplicação no seu navegador:
+
+- **Frontend:** [http://localhost:5173](http://localhost:5173)
+- **Backend (API):** [http://localhost:8080](http://localhost:8080)
+
+### Comandos Úteis
+
+Para acompanhar os logs da aplicação em tempo real:
+
+```bash
+docker compose logs -f
+
+```
+
+Para parar a execução e remover os contêineres:
+
+```bash
+docker compose down
+
+```
+
+## 9. Como executar os testes unitários
+
+O projeto possui suítes de testes isoladas para as camadas de frontend e backend. Certifique-se de abrir o terminal e navegar para a pasta correspondente antes de executar os comandos.
+
+### Frontend (React + Vitest)
+
+1. Acesse o diretório do frontend a partir da raiz do projeto:
+
+```bash
+   cd SIGTCC/frontend
+```
+
+2. Instale as dependências locais (caso seja a primeira execução fora do Docker):
+
+```bash
+   npm install
+```
+
+3. Execute a suíte de testes:
+
+```bash
+   npm run test
+```
+
+4. Para gerar o relatório de cobertura de código (Code Coverage):
+
+```bash
+   npm run coverage
+```
+
+> **Nota:** O relatório de cobertura em HTML será gerado na pasta `frontend/coverage`. Você pode abrir o arquivo `index.html` diretamente no seu navegador.
+
+### Backend (Spring Boot + Java)
+
+1. Acesse o diretório base do backend:
+
+```bash
+   cd SIGTCC/backend/gestao-tcc
+```
+
+2. Execute os testes automatizados utilizando o wrapper do Gradle:
+
+- **No Linux / macOS:**
+
+```bash
+     ./gradlew test
+```
+
+- **No Windows (CMD ou PowerShell):**
+
+```cmd
+     .\gradlew test
+```
+
+> **Nota:** Para visualizar a cobertura de código do backend, recomenda-se executar os testes diretamente pela sua IDE (como o IntelliJ IDEA) utilizando a opção "Run with Coverage".
