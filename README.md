@@ -121,7 +121,7 @@ cd es2-2026_2-equipe-3/SIGTCC
 
 ```
 
-2. Construa as imagens e suba os contêineres em segundo plano:
+2. Construa as imagens e suba os contêineres:
 
 ```bash
 docker-compose up
