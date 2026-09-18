@@ -51,6 +51,8 @@ Em conformidade com o protocolo da disciplina, declaramos que a ferramenta de in
 - **Geração e estruturação de testes automatizados:** Auxílio na implementação e organização das suítes de testes unitários tanto para o frontend quanto para o backend, abrangendo a simulação de interações do usuário, mocks de chamadas de API, injeção de dependências e validação das regras de negócio em ambas as camadas da aplicação.
 - **Configuração de Infraestrutura e Conteinerização:** Apoio na elaboração e revisão dos arquivos `Dockerfile` e `docker-compose.yml`, auxiliando na configuração adequada dos ambientes e na orquestração dos serviços para o deploy da aplicação.
 - **Configuração de cliente HTTP:** Apoio na criação de um utilitário padronizado para requisições à API (`apiFetch`).
+- **Elaboração do Contrato de Dados:** Auxílio na redação, organização e formatação em Markdown.
+- **Codificação:** Auxílio na escrita, refatoração, resolução de problemas e estruturação de trechos de código.
 
 **Validação:**
 Todo o conteúdo e documentação gerados com o apoio da IA foram lidos, compreendidos, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
