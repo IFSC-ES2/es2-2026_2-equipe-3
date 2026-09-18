@@ -191,7 +191,7 @@ O projeto possui suítes de testes isoladas para as camadas de frontend e backen
 
 2. Execute os testes automatizados utilizando o wrapper do Gradle:
 
-  - **No Linux / macOS:**
+- **No Linux / macOS:**
 
 ```bash
      ./gradlew test

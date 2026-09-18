@@ -72,7 +72,9 @@
   border-radius: 50%;
   width: 20px;
   height: 20px;
-  transition: background-color 0.2s, color 0.2s;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
 }
 
 .btn-remover-tag:hover {
