@@ -148,3 +148,59 @@ Para parar a execução e remover os contêineres:
 docker compose down
 
 ```
+
+## 9. Como executar os testes unitários
+
+O projeto possui suítes de testes isoladas para as camadas de frontend e backend. Certifique-se de abrir o terminal e navegar para a pasta correspondente antes de executar os comandos.
+
+### Frontend (React + Vitest)
+
+1. Acesse o diretório do frontend a partir da raiz do projeto:
+
+```bash
+   cd SIGTCC/frontend
+```
+
+2. Instale as dependências locais (caso seja a primeira execução fora do Docker):
+
+```bash
+   npm install
+```
+
+3. Execute a suíte de testes:
+
+```bash
+   npm run test
+```
+
+4. Para gerar o relatório de cobertura de código (Code Coverage):
+
+```bash
+   npm run coverage
+```
+
+> **Nota:** O relatório de cobertura em HTML será gerado na pasta `frontend/coverage`. Você pode abrir o arquivo `index.html` diretamente no seu navegador.
+
+### Backend (Spring Boot + Java)
+
+1. Acesse o diretório base do backend:
+
+```bash
+   cd SIGTCC/backend/gestao-tcc
+```
+
+2. Execute os testes automatizados utilizando o wrapper do Gradle:
+
+  - **No Linux / macOS:**
+
+```bash
+     ./gradlew test
+```
+
+- **No Windows (CMD ou PowerShell):**
+
+```cmd
+     .\gradlew test
+```
+
+> **Nota:** Para visualizar a cobertura de código do backend, recomenda-se executar os testes diretamente pela sua IDE (como o IntelliJ IDEA) utilizando a opção "Run with Coverage".
