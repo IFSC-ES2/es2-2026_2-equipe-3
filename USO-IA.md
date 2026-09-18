@@ -50,6 +50,8 @@ Em conformidade com o protocolo da disciplina, declaramos que a ferramenta de in
 
 - **Geração e estruturação de testes automatizados:** Auxílio na implementação e organização das suítes de testes unitários tanto para o frontend quanto para o backend, abrangendo a simulação de interações do usuário, mocks de chamadas de API, injeção de dependências e validação das regras de negócio em ambas as camadas da aplicação.
 - **Configuração de Infraestrutura e Conteinerização:** Apoio na elaboração e revisão dos arquivos `Dockerfile` e `docker-compose.yml`, auxiliando na configuração adequada dos ambientes e na orquestração dos serviços para o deploy da aplicação.
+- **Expansão e Resolução de Pipelines de CI/CD:** Auxílio no diagnóstico de erros e na configuração dos workflows do GitHub Actions (`frontend-ci.yml` e `backend-ci.yml`).
+- **Resolução de Erros de Lint e Build (TypeScript/ESLint):** Auxílio na resolução de erros de compilação do TypeScript e diretivas de exceção do linter (`@typescript-eslint/no-explicit-any`) na suíte de testes do frontend (`OrientadorForm.test.tsx`), garantindo a execução dos *checks* automatizados.
 - **Configuração de cliente HTTP:** Apoio na criação de um utilitário padronizado para requisições à API (`apiFetch`).
 - **Elaboração do Contrato de Dados:** Auxílio na redação, organização e formatação em Markdown.
 - **Codificação:** Auxílio na escrita, refatoração, resolução de problemas e estruturação de trechos de código.
