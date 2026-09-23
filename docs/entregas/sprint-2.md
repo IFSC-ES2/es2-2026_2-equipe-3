@@ -1,40 +1,45 @@
 # Sprint 2 - Entrega 6
 
-- **Data de Início:** 18/09/2026  
-- **Data da Entrega:** 01/10/2026  
-- **Scrum Master da Sprint 2:** Damares do Socorro Gonçalves Gaia  
-- **Marco de Release:** `v0.2.0`  
-- **Branch de Trabalho:** `entrega-6`  
+- **Data de Início:** 18/09/2026
+- **Data da Entrega:** 01/10/2026
+- **Scrum Master da Sprint 2:** Damares do Socorro Gonçalves Gaia
+- **Marco de Release:** `v0.2.0`
+- **Branch de Trabalho:** `entrega-6`
 
 ---
 
 ## 1. Planejamento da Sprint 2
 
 ### 1.1 Meta da Sprint (Sprint Goal)
+
 > **"Implementar o fluxo completo de solicitação e aceite de orientação entre aluno e professor (match), integrando a seleção de orientadores com vagas abertas e aplicando padrões de projeto OO para desacoplamento de regras de elegibilidade e notificações."**
 
 ### 1.2 Seleção dos Itens do Backlog
+
 Para este ciclo, a equipe selecionou o avanço central do fluxo de vinculação do MVP:
 
 1. **US04 - Solicitação e Aceite de Orientação (5 Story Points):**
-   - O aluno pode enviar uma proposta de orientação a um professor disponível (com tema e descrição inicial).
+   - O aluno pode enviar uma proposta de orientação a um professor disponível (informando seus dados cadastrais, curso, tema pretendido e mensagem/descrição inicial).
+   - O envio da solicitação cria ou reaproveita uma entidade `Aluno` (busca prévia por e-mail: se o aluno não existir no banco, cria-se o registro como subtipo de `Usuario` sem credenciais ativas de login, preparando o terreno para a futura US01).
    - O orientador pode consultar as solicitações pendentes recebidas.
-   - O orientador pode **Aprovar** (o que decrementa automaticamente suas vagas ofertadas) ou **Recusar** a solicitação (com registro de justificativa).
-   - O aluno acompanha o status de sua solicitação (`PENDENTE`, `APROVADA`, `RECUSADA`).
+   - O orientador pode **Aceitar** (o que decrementa automaticamente suas vagas ofertadas) ou **Recusar** a solicitação (com registro de justificativa).
+   - O aluno acompanha o status de sua solicitação (`PENDENTE`, `ACEITA`, `RECUSADA`, `CANCELADA`).
 
 2. **Fatia Essencial da US03 - Busca e Filtragem Operacional (Integrada à US04):**
    - Na vitrine de orientadores construída na Sprint 1 (US02), disponibilizar o botão de ação rápida **"Solicitar Orientação"** condicionado à existência de vagas (`vagasDisponiveis > 0`).
    - Indicador visual claro de status de vagas (disponível vs. esgotado) para guiar o fluxo do aluno.
 
 ### 1.3 Justificativa da Escolha do Escopo
+
 A seleção da US04 acompanhada apenas da fatia operacional da US03 fundamenta-se nos seguintes pilares do projeto:
 
 - **Alinhamento com o MVP:** O catálogo estático entregue na Sprint 1 (US02) atua como vitrine. A solicitação e o aceite formalizam a principal proposta de valor inicial do sistema: acabar com o envio informal de solicitações e centralizar o "match" acadêmico de TCC.
 - **Capacidade e Velocidade Histórica (Métrica M-03):** Na Sprint 1, a equipe entregou com sucesso 5 Story Points (US02). Manter a meta em 5 Story Points para a US04 respeita o ritmo sustentável do time e a capacidade declarada de 28 horas semanais ([`docs/BASELINE.md`](../BASELINE.md)).
-- **Mitigação do Risco R01 (Sobrecarga) e R04 (Crescimento de Escopo):** Adiar filtros avançados e buscas combinadas complexas da US03 impede o inchaço do escopo (*scope creep*) e permite que o time foque na qualidade e robustez da regra de negócio central.
+- **Mitigação do Risco R01 (Sobrecarga) e R04 (Crescimento de Escopo):** Adiar filtros avançados e buscas combinadas complexas da US03 impede o inchaço do escopo (_scope creep_) e permite que o time foque na qualidade e robustez da regra de negócio central.
 - **Mitigação do Risco R03 (Atraso de Integração):** O contrato de dados entre backend e frontend é definido no início da sprint, permitindo paralelismo no desenvolvimento das telas e das APIs.
 
 ### 1.4 Status e Histórico de Escopo
+
 - **Concluído na Sprint 1:** US02 - Cadastro de Perfil de Orientador e Vagas (5 SP concluídos integralmente no marco `v0.1.1`).
 - **Planejado para a Sprint 2:** US04 (5 SP) + fatia essencial da US03 (suporte à ação de solicitar no catálogo).
 - **Postergado para Sprints Futuras:** US01 (Autenticação e Perfis com Spring Security/JWT) e filtros avançados combinados da US03, além do fluxo de documentos (US05, US06 e US07).
@@ -46,39 +51,47 @@ A seleção da US04 acompanhada apenas da fatia operacional da US03 fundamenta-s
 A equipe identificou problemas reais de arquitetura na evolução do sistema e planejou a aplicação de pelo menos **dois padrões de projeto OO**:
 
 ### 2.1 Padrão 1: Strategy (Comportamental)
-- **Problema Identificado:** A criação de uma solicitação de orientação exige múltiplas validações de negócio com regras variáveis e expansíveis (ex.: verificar se o orientador possui vagas abertas, verificar se o aluno já possui solicitação pendente ativa, validar formato do tema). Centralizar tudo isso em cadeias de `if/else` no serviço viola o princípio Aberto/Fechado (OCP) e dificulta a escrita de testes de unidade isolados.
-- **Solução com Strategy:** Criação da interface `ValidadorSolicitacaoStrategy` e de estratégias concretas (ex.: `ValidacaoVagasDisponiveisStrategy`, `ValidacaoSolicitacaoDuplicadaStrategy`). O serviço de criação itera sobre uma lista de estratégias injetadas pelo Spring, facilitando a adição de novas regras futuras sem alterar o código do serviço.
+
+- **Problema Identificado:** A criação de uma solicitação de orientação exige múltiplas validações de negócio com regras variáveis e expansíveis (ex.: verificar se o orientador possui vagas abertas, verificar se o aluno já possui solicitação pendente ativa para aquele orientador, validar preenchimento e tamanho do tema). Centralizar tudo isso em cadeias de `if/else` no serviço viola o princípio Aberto/Fechado (OCP) e dificulta a escrita de testes de unidade isolados.
+- **Solução com Strategy:** Criação da interface `ValidadorSolicitacaoStrategy` e de estratégias concretas (ex.: `ValidacaoVagasDisponiveisStrategy`, `ValidacaoSolicitacaoDuplicadaStrategy`). A estratégia `ValidacaoSolicitacaoDuplicadaStrategy` checa duplicidade comparando a chave estrangeira `aluno_id` (FK) e `orientador_id` em status `PENDENTE`, garantindo integridade relacional sem comparações frágeis de strings. O serviço de criação itera sobre a lista de estratégias injetadas pelo Spring, facilitando a adição de novas regras futuras sem alterar o código do serviço.
 - **Classes/Módulos Afetados:** `br.edu.ifsc.gestao_tcc.strategy.*`, `SolicitacaoService`.
 - **Benefícios:** Alta extensibilidade, baixo acoplamento e facilidade de testes unitários.
 - **Trade-off:** Criação de mais interfaces e classes pequenas no backend.
 
 ### 2.2 Padrão 2: Observer (Comportamental)
-- **Problema Identificado:** Quando uma solicitação muda de estado (de `PENDENTE` para `APROVADA` ou `RECUSADA`), ações secundárias distintas precisam ser disparadas: atualizar o quantitativo de vagas do orientador, registrar log de auditoria do TCC e emitir notificações/e-mails ao aluno. Vincular essas chamadas diretamente dentro do método de negócio acopla o serviço de solicitações a múltiplos subsistemas.
+
+- **Problema Identificado:** Quando uma solicitação muda de estado (de `PENDENTE` para `ACEITA` ou `RECUSADA`), ações secundárias distintas precisam ser disparadas: atualizar o quantitativo de vagas do orientador, registrar log de auditoria do TCC e emitir notificações/e-mails ao aluno. Vincular essas chamadas diretamente dentro do método de negócio acopla o serviço de solicitações a múltiplos subsistemas.
 - **Solução com Observer:** A classe de serviço atua como publicadora do evento de transição de status (`SolicitacaoStatusChangedEvent`), notificando observadores desacoplados (ex.: `AtualizadorVagasObserver`, `NotificadorEmailObserver`).
 - **Classes/Módulos Afetados:** `br.edu.ifsc.gestao_tcc.observer.*`, `SolicitacaoService`.
 - **Benefícios:** Desacoplamento do fluxo principal em relação às reações colaterais do sistema.
 - **Trade-off:** Ordem de execução dos observadores não é estritamente garantida e requer atenção ao gerenciamento de transações de banco de dados.
 
-*(A formalização detalhada e as decisões arquiteturais serão consolidadas na `ADR-0007` e no artefato [`docs/PADROES-DE-PROJETO.md`](../PADROES-DE-PROJETO.md)).*
+_(A formalização detalhada dos padrões será consolidada no artefato [`docs/PADROES-DE-PROJETO.md`](../PADROES-DE-PROJETO.md). As decisões arquiteturais correlatas serão formalizadas na `ADR-0007` - Padrões de Projeto na Gestão de Solicitações e na `ADR-0008` - Modelagem da Entidade Aluno sem Autenticação na Sprint 2)._
 
 ---
 
 ## 3. Incremento Funcional Planejado
 
 ### 3.1 Backend (Spring Boot 4 / Java 21)
-- **Nova Entidade e Migração Flyway:** `SolicitacaoOrientacao` com chave primária, relacionamento com `Orientador`, nome e e-mail do aluno, tema proposto, descrição/justificativa, status (`PENDENTE`, `APROVADA`, `RECUSADA`, `CANCELADA`) e data de criação.
+
+- **Novas Entidades e Mapeamento JPA:**
+  - `Aluno`: Subclasse de `Usuario` (mapeada com `@Inheritance(strategy = InheritanceType.JOINED)` e tabela `alunos`), herdando `nome`, `email`, `matricula` e `senha` (com senha nula/não utilizada nesta sprint), adicionando o campo específico `curso` (String).
+  - `SolicitacaoOrientacao`: Entidade com chave primária (`id`), relacionamento `@ManyToOne` com `Aluno` (FK `aluno_id`), relacionamento `@ManyToOne` com `Orientador` (FK `orientador_id`), campos `tema` (String), `mensagem` (String/Text com a proposta/justificativa), status via enum `StatusSolicitacao` (`PENDENTE`, `ACEITA`, `RECUSADA`, `CANCELADA`), justificativa de recusa (opcional) e data de criação (`criadoEm`).
+  - _Decisão de Relacionamento:_ A solicitação referencia diretamente a entidade `Orientador` (Raiz de Agregação / Aggregate Root) e **não** `PerfilOrientador`, preservando o modelo OO e o encapsulamento de domínio (o controle de vagas é acessado via `orientador.getPerfil().getVagasDisponiveis()`).
+  - **Evolução de Esquema do Banco (Migrações Flyway):** Criação das migrações SQL/tabelas para `alunos` e `solicitacoes_orientacao`, assegurando integridade referencial com o schema já existente de `usuarios`, `orientadores` e `perfis_professores`.
 - **Endpoints REST:**
-  - `POST /api/v1/solicitacoes`: Envio de nova solicitação pelo aluno.
+  - `POST /api/v1/solicitacoes`: Envio de nova solicitação pelo aluno. O endpoint implementa a lógica de buscar `Aluno` por e-mail; se não existir, instancia e persiste o registro antes de associá-lo à nova `SolicitacaoOrientacao`.
   - `GET /api/v1/solicitacoes/orientador/{orientadorId}`: Listagem das solicitações recebidas pelo orientador (com filtro opcional por status).
   - `GET /api/v1/solicitacoes/{id}`: Detalhamento de uma solicitação específica.
-  - `PATCH /api/v1/solicitacoes/{id}/status`: Atualização do status pelo orientador (aprovação ou recusa com motivo).
+  - `PATCH /api/v1/solicitacoes/{id}/status`: Atualização do status pelo orientador (`ACEITA` ou `RECUSADA` com motivo). O aceite dispara os observadores para decrementar a vaga no perfil do orientador.
 
 ### 3.2 Frontend (React / Vite / TypeScript)
+
 - **Atualização do Catálogo de Orientadores:**
   - Inclusão do botão "Solicitar Orientação" nos cards de orientadores que possuem vagas disponíveis.
   - Bloqueio ou feedback caso as vagas estejam zeradas.
-- **Fluxo de Envio de Solicitação:** Modal/Formulário para o aluno informar seus dados, tema pretendido e mensagem para o orientador.
-- **Painel de Gestão de Solicitações:** Tela ou seção onde o professor visualiza a fila de solicitações e executa ações de aceite ou recusa com retorno visual em tempo real.
+- **Fluxo de Envio de Solicitação:** Modal/Formulário para o aluno informar seus dados (nome, e-mail, curso), tema pretendido e mensagem/proposta para o orientador.
+- **Painel de Gestão de Solicitações:** Tela ou seção onde o professor visualiza a fila de solicitações e executa ações de aceite (`ACEITA`) ou recusa (`RECUSADA`) com retorno visual em tempo real.
 
 ---
 
@@ -121,4 +134,5 @@ Seguindo o edital da Entrega 6 (itens 3a, 3b, 3c e 3d):
 ---
 
 ## 7. Próximos Passos e Acompanhamento
-*(Esta seção será atualizada continuamente durante a execução da sprint até o fechamento com as métricas observadas, matriz de riscos revisada e registro detalhado de contribuições individuais).*
+
+_(Esta seção será atualizada continuamente durante a execução da sprint até o fechamento com as métricas observadas, matriz de riscos revisada e registro detalhado de contribuições individuais)._
