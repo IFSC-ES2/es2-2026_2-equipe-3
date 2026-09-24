@@ -61,3 +61,14 @@ Em conformidade com o protocolo da disciplina, declaramos que a ferramenta de in
 
 **Validação:**
 Todo o conteúdo e documentação gerados com o apoio da IA foram lidos, compreendidos, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
+
+## Entrega 6:
+
+Em conformidade com o protocolo da disciplina, declaramos que a ferramenta de inteligência artificial generativa (Claude, Anthropic) foi utilizada durante a **Etapa 6 (Sprint 2)** deste projeto para as seguintes finalidades:
+
+- **Planejamento e Revisão do Escopo da Sprint:** Apoio na análise da viabilidade de combinar a US03 (fatia essencial) e a US04 como escopo da Sprint 2, identificando sobreposição com funcionalidades já entregues na US02 e sinalizando a ausência de autenticação (US01 postergada) como decisão técnica a ser formalizada antes da modelagem.
+- **Revisão do Contrato de Dados (`docs/contrato-dados-us04.md`):** Apoio na estruturação e revisão do contrato de dados da US04, incluindo tabela de códigos de erro, máquina de estados da solicitação e identificação de uma divergência já existente no `GlobalExceptionHandler` (formato de `detalhes` do erro `400`).
+- **Organização e Detalhamento de Issues:** Apoio na quebra da US04 em sub-issues técnicas (modelagem, validações, endpoints, frontend e testes) e na elaboração do cronograma inicial de datas por issue.
+
+**Validação:**
+Todo o conteúdo e documentação gerados com o apoio da IA foram lidos, compreendidos, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
