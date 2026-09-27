@@ -130,7 +130,7 @@ public class SolicitacaoService {
 
     private void validarJustificativa(String justificativa) {
         if (justificativa == null) {
-            throw new RegraDeNegocioException(
+            throw new ValidacaoRequisicaoException(
                     "A justificativa é obrigatória para recusar a solicitação."
             );
         }
@@ -139,7 +139,7 @@ public class SolicitacaoService {
 
         if (justificativaTratada.length() < 10
                 || justificativaTratada.length() > 500) {
-            throw new RegraDeNegocioException(
+            throw new ValidacaoRequisicaoException(
                     "A justificativa é obrigatória para recusar a solicitação."
             );
         }
