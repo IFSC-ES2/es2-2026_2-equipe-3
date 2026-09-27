@@ -4,6 +4,7 @@ import br.edu.ifsc.gestao_tcc.dto.AtualizaStatusRequest;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoResponse;
 import br.edu.ifsc.gestao_tcc.event.SolicitacaoStatusChangedEvent;
 import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
+import br.edu.ifsc.gestao_tcc.exception.ValidacaoRequisicaoException;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.exception.SolicitacaoJaRespondidaException;
 import br.edu.ifsc.gestao_tcc.exception.VagasIndisponiveisException;
@@ -76,7 +77,7 @@ public class SolicitacaoService {
         }
 
         if (request == null || request.status() == null) {
-            throw new RegraDeNegocioException(
+            throw new ValidacaoRequisicaoException(
                     "O status é obrigatório."
             );
         }
@@ -150,7 +151,7 @@ public class SolicitacaoService {
                     status.trim().toUpperCase(Locale.ROOT)
             );
         } catch (IllegalArgumentException ex) {
-            throw new RegraDeNegocioException(
+            throw new ValidacaoRequisicaoException(
                     "Status inválido. Valores aceitos: PENDENTE, ACEITA, RECUSADA, CANCELADA."
             );
         }
