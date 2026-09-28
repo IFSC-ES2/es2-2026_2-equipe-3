@@ -29,9 +29,9 @@ jobs:
       - name: Dar permissao de execucao ao Gradle Wrapper
         run: chmod +x SIGTCC/backend/gestao-tcc/gradlew
 
-      - name: Executar testes de unidade
+      - name: Compilar e executar testes
         working-directory: SIGTCC/backend/gestao-tcc
-        run: ./gradlew test
+        run: ./gradlew build
 
       - name: Upload dos relatorios de testes (Artefato)
         if: always()

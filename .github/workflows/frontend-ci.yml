@@ -2,18 +2,26 @@ name: Frontend CI
 
 on:
   push:
-    branches: ["main", "feature/*"]
+    branches:
+      - main
+      - "entrega-*"
+      - "feature/*"
     paths:
       - "SIGTCC/frontend/**"
       - ".github/workflows/frontend-ci.yml"
+
   pull_request:
-    branches: ["main"]
+    branches:
+      - main
+      - "entrega-*"
     paths:
       - "SIGTCC/frontend/**"
       - ".github/workflows/frontend-ci.yml"
 
 jobs:
   build-and-test:
+    name: Compilar, Testar e Gerar Build (Frontend)
+
     runs-on: ubuntu-latest
 
     defaults:
