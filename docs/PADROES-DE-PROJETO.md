@@ -13,7 +13,7 @@
 No ciclo de desenvolvimento da **Sprint 2 (marco da US04 - Solicitação e Aceite de Orientação)**, a equipe de engenharia identificou desafios arquiteturais críticos na modelagem da camada de negócio do backend:
 
 1. **Validações de Elegibilidade Variáveis e Expansíveis:** A criação de uma solicitação de orientação exige múltiplas checagens de negócio (capacidade de vagas do orientador, orientador ativo, ausência de solicitação pendente duplicada para o mesmo discente, consistência de tema e curso). Concentrar essas checagens em cadeias imperativas de `if/else` dentro de um único serviço viola o princípio **Aberto/Fechado (OCP - _Open/Closed Principle_)**, gerando uma classe inflada (_God Class_) de manutenção arriscada.
-2. **Desacoplamento de Reações na Mudança de Estado:** Quando uma solicitação transita para o status `ACEITA` ou `RECUSADA`, ações colaterais distintas precisam ser disparadas (ex.: decremento atômico de vaga do orientador e registro de log de auditoria). Acoplar essas chamadas diretamente no método de transição do serviço viola o princípio da **Responsabilidade Única (SRP - _Single Responsibility Principle_)**.
+2. **Desacoplamento de Reações na Mudança de Estado:** Quando uma solicitação transita para o status `ACEITA`, efeitos colaterais imediatos precisam ser disparados (especificamente o decremento atômico de vaga ofertada pelo orientador). Acoplar essa manipulação diretamente no método de transição do serviço viola o princípio da **Responsabilidade Única (SRP - _Single Responsibility Principle_)**.
 
 Para resolver esses desafios com rigor técnico, foram formalizadas as decisões na [**`ADR-0007`**](file:///c:/Users/damares.gaia/ifsc/es2-2026_2-equipe-3/docs/adrs/ADR-0007.md), adotando dois padrões de projeto clássicos do _Gang of Four (GoF)_: **Strategy** e **Observer**.
 
@@ -290,6 +290,19 @@ class ValidacaoVagasDisponiveisStrategyTest {
 }
 ```
 
+### 2.6 Benefícios do Padrão Strategy
+
+- **Aderência aos princípios OCP e SRP:** Novas regras de validação podem ser introduzidas adicionando novas classes que implementam `ValidadorSolicitacaoStrategy`, sem modificar o código do `SolicitacaoService`.
+- **Alta testabilidade:** Cada regra possui testes unitários isolados, rápidos e sem dependência do contexto Spring.
+- **Orquestração flexível:** A ordem de validação pode ser configurada via `@Order` do Spring.
+
+### 2.7 Trade-offs e Mitigações
+
+- **Proliferação de classes:** Introduz múltiplas classes e interfaces pequenas para regras simples.
+  - _Mitigação Adotada:_ Agrupamento no pacote coeso `br.edu.ifsc.gestao_tcc.strategy` com nomenclatura padronizada e papéis bem definidos.
+- **Sobrecarga de injeção em runtime:** O Spring gerencia a injeção da lista de estratégias.
+  - _Mitigação Adotada:_ Como são componentes leves anotados com `@Component`, a injeção ocorre apenas na inicialização da aplicação, com impacto nulo na latência das requisições.
+
 ---
 
 ## 3. Padrão Observer (Transição de Status e Efeitos Colaterais)
@@ -299,15 +312,15 @@ class ValidacaoVagasDisponiveisStrategyTest {
 No endpoint `PATCH /api/v1/solicitacoes/{id}/status`, o orientador atualiza o estado da solicitação para `ACEITA` ou `RECUSADA`.
 Ao transitar para `ACEITA`:
 
-- A cota de vagas do orientador deve ser decrementada em 1;
-- O registro de auditoria da decisão deve ser persistido;
-- Futuramente, notificações podem ser acopladas.
+- A cota de vagas do orientador deve ser decrementada em 1 no seu perfil associado (`vagasDisponiveis = vagasDisponiveis - 1`).
 
-Se essas operações forem chamadas diretamente no método de negócio (`perfilService.decrementarVaga(id)`), cria-se alto acoplamento e risco de inconsistência caso a persistência da solicitação falhe após o decremento.
+Se essa operação de decremento for acoplada diretamente no fluxo transacional do `SolicitacaoService` (ex.: manipulando diretamente repositórios ou serviços de perfil do professor), cria-se forte acoplamento estrutural entre domínios distintos e violação do princípio da Responsabilidade Única (SRP).
 
-O padrão **Observer** resolve essa questão publicando o evento de domínio `SolicitacaoStatusChangedEvent`. O Spring Boot distribui o evento para os observadores (ouvintes/listeners) cadastrados.
+O padrão **Observer** resolve essa questão publicando o evento de domínio `SolicitacaoStatusChangedEvent` via `ApplicationEventPublisher`. O Spring Boot despacha o evento para o ouvinte cadastrado (`AtualizadorVagasObserver`), mantendo a máquina de estados da solicitação isolada da manipulação das cotas de vagas do orientador.
 
 ### 3.2 Diagrama de Classes e Sequência (Observer)
+
+#### Diagrama de Classes
 
 ```mermaid
 classDiagram
@@ -316,35 +329,29 @@ classDiagram
     class SolicitacaoService {
         -ApplicationEventPublisher eventPublisher
         -SolicitacaoRepository solicitacaoRepository
-        +atualizarStatus(Long id, StatusUpdateDTO dto) SolicitacaoResponseDTO
+        -OrientadorRepository orientadorRepository
+        +atualizarStatus(Long solicitacaoId, AtualizaStatusRequest request) SolicitacaoResponse
     }
 
     class SolicitacaoStatusChangedEvent {
         <<record>>
         -SolicitacaoOrientacao solicitacao
-        -Orientador orientador
         -StatusSolicitacao statusAnterior
         -StatusSolicitacao statusNovo
-        -String justificativa
         +solicitacao() SolicitacaoOrientacao
-        +orientador() Orientador
+        +statusAnterior() StatusSolicitacao
         +statusNovo() StatusSolicitacao
     }
 
     class AtualizadorVagasObserver {
-        -OrientadorRepository orientadorRepository
-        +aoMudarStatus(SolicitacaoStatusChangedEvent evento) void
-    }
-
-    class LogAuditoriaObserver {
-        -Logger log
-        +aoMudarStatus(SolicitacaoStatusChangedEvent evento) void
+        +atualizarVagas(SolicitacaoStatusChangedEvent event) void
     }
 
     SolicitacaoService ..> SolicitacaoStatusChangedEvent : publica via ApplicationEventPublisher
-    AtualizadorVagasObserver ..> SolicitacaoStatusChangedEvent : assina (@EventListener)
-    LogAuditoriaObserver ..> SolicitacaoStatusChangedEvent : assina (@EventListener)
+    AtualizadorVagasObserver ..> SolicitacaoStatusChangedEvent : escuta (@EventListener)
 ```
+
+#### Diagrama de Sequência
 
 ```mermaid
 sequenceDiagram
@@ -354,122 +361,79 @@ sequenceDiagram
     participant Service as SolicitacaoService (Publisher)
     participant Publisher as ApplicationEventPublisher
     participant ObsVagas as AtualizadorVagasObserver
-    participant ObsLog as LogAuditoriaObserver
     participant DB as Banco de Dados (MySQL)
 
     Orientador ->> Controller: PATCH /api/v1/solicitacoes/1/status { status: "ACEITA" }
-    Controller ->> Service: atualizarStatus(1, dto)
+    Controller ->> Service: atualizarStatus(1, request)
 
     rect rgb(240, 253, 244)
         note over Service, DB: Início da Transação (@Transactional)
         Service ->> DB: UPDATE solicitacoes SET status = 'ACEITA'
         Service ->> Publisher: publishEvent(SolicitacaoStatusChangedEvent)
 
-        Publisher ->> ObsVagas: aoMudarStatus(evento)
-        ObsVagas ->> DB: UPDATE perfis_professores SET vagas_disponiveis = vagas - 1
-
-        Publisher ->> ObsLog: aoMudarStatus(evento)
-        ObsLog ->> DB: Persiste log de auditoria / emite log INFO
-        note over Service, DB: Commit Atômico da Transação
+        Publisher ->> ObsVagas: atualizarVagas(event)
+        note over ObsVagas: perfil.setVagasDisponiveis(vagas - 1)
+        note over Service, DB: Commit Atômico da Transação (Dirty Checking / Flush do Perfil)
     end
 
-    Service -->> Controller: SolicitacaoResponseDTO
+    Service -->> Controller: SolicitacaoResponse
     Controller -->> Orientador: HTTP 200 OK
 ```
 
-### 3.3 Estrutura de Pacotes
+### 3.3 Classes e Módulos Afetados (Estrutura de Pacotes)
 
-Os componentes devem ser organizados em:
+Os componentes da solução estão organizados nos seguintes pacotes:
 
 ```
-br.edu.ifsc.gestao_tcc.observer/
-├── SolicitacaoStatusChangedEvent.java   (Record do Evento de Domínio)
-├── AtualizadorVagasObserver.java        (Listener síncrono transacional de vagas)
-└── LogAuditoriaObserver.java            (Listener de auditoria e rastreabilidade)
+br.edu.ifsc.gestao_tcc/
+├── event/
+│   └── SolicitacaoStatusChangedEvent.java   (Record do Evento de Domínio)
+└── observer/
+    └── AtualizadorVagasObserver.java        (Listener síncrono transacional de vagas)
 ```
 
-### 3.4 Contratos e Implementação
+### 3.4 Contratos e Implementação Real
 
 #### Evento de Domínio (`SolicitacaoStatusChangedEvent.java`)
 
 ```java
-package br.edu.ifsc.gestao_tcc.observer;
+package br.edu.ifsc.gestao_tcc.event;
 
-import br.edu.ifsc.gestao_tcc.model.Orientador;
 import br.edu.ifsc.gestao_tcc.model.SolicitacaoOrientacao;
 import br.edu.ifsc.gestao_tcc.model.StatusSolicitacao;
 
 public record SolicitacaoStatusChangedEvent(
     SolicitacaoOrientacao solicitacao,
-    Orientador orientador,
     StatusSolicitacao statusAnterior,
-    StatusSolicitacao statusNovo,
-    String justificativa
+    StatusSolicitacao statusNovo
 ) {}
 ```
 
-#### Observador de Vagas com Transacionalidade Estrita (`AtualizadorVagasObserver.java`)
+#### Observador de Vagas (`AtualizadorVagasObserver.java`)
 
 ```java
 package br.edu.ifsc.gestao_tcc.observer;
 
+import br.edu.ifsc.gestao_tcc.event.SolicitacaoStatusChangedEvent;
+import br.edu.ifsc.gestao_tcc.model.PerfilOrientador;
 import br.edu.ifsc.gestao_tcc.model.StatusSolicitacao;
-import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AtualizadorVagasObserver {
 
-    private final OrientadorRepository orientadorRepository;
-
-    public AtualizadorVagasObserver(OrientadorRepository orientadorRepository) {
-        this.orientadorRepository = orientadorRepository;
-    }
-
-    /**
-     * Executa de forma síncrona dentro da mesma transação do PATCH de status.
-     * Caso o decremento falhe, a transação inteira sofre rollback conjunto.
-     */
     @EventListener
-    public void aoMudarStatus(SolicitacaoStatusChangedEvent evento) {
-        if (evento.statusNovo() == StatusSolicitacao.ACEITA) {
-            var orientador = evento.orientador();
-            var perfil = orientador.getPerfil();
-
-            if (perfil != null && perfil.getVagasDisponiveis() > 0) {
-                perfil.setVagasDisponiveis(perfil.getVagasDisponiveis() - 1);
-                orientadorRepository.save(orientador);
-            }
+    public void atualizarVagas(SolicitacaoStatusChangedEvent event) {
+        if (event.statusNovo() != StatusSolicitacao.ACEITA) {
+            return;
         }
-    }
-}
-```
 
-#### Observador de Auditoria (`LogAuditoriaObserver.java`)
+        PerfilOrientador perfil = event.solicitacao()
+                .getOrientador()
+                .getPerfil();
 
-```java
-package br.edu.ifsc.gestao_tcc.observer;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
-
-@Component
-public class LogAuditoriaObserver {
-
-    private static final Logger log = LoggerFactory.getLogger(LogAuditoriaObserver.class);
-
-    @EventListener
-    public void aoMudarStatus(SolicitacaoStatusChangedEvent evento) {
-        log.info("[AUDITORIA_TCC] Solicitacao ID={} transicionou de {} para {}. Orientador ID={}, Justificativa={}",
-            evento.solicitacao().getId(),
-            evento.statusAnterior(),
-            evento.statusNovo(),
-            evento.orientador().getId(),
-            evento.justificativa() != null ? evento.justificativa() : "N/A"
-        );
+        perfil.setVagasDisponiveis(perfil.getVagasDisponiveis() - 1);
     }
 }
 ```
@@ -478,44 +442,59 @@ public class LogAuditoriaObserver {
 
 ```java
 @Transactional
-public SolicitacaoResponseDTO atualizarStatus(Long id, StatusUpdateDTO dto) {
-    SolicitacaoOrientacao solicitacao = solicitacaoRepository.findById(id)
-        .orElseThrow(() -> new ResourceNotFoundException("Solicitação não encontrada"));
+public SolicitacaoResponse atualizarStatus(Long solicitacaoId, AtualizaStatusRequest request) {
+    SolicitacaoOrientacao solicitacao = solicitacaoRepository.findById(solicitacaoId)
+            .orElseThrow(() -> new ResourceNotFoundException("Solicitação não encontrada"));
 
     if (solicitacao.getStatus() != StatusSolicitacao.PENDENTE) {
-        throw new SolicitacaoJaRespondidaException("A solicitação já foi respondida anteriormente.");
+        throw new SolicitacaoJaRespondidaException("Esta solicitação já foi respondida e não pode ser alterada.");
     }
 
     StatusSolicitacao statusAnterior = solicitacao.getStatus();
-    StatusSolicitacao statusNovo = StatusSolicitacao.valueOf(dto.status());
+    StatusSolicitacao novoStatus = request.status();
 
-    solicitacao.setStatus(statusNovo);
-    if (dto.justificativa() != null) {
-        solicitacao.setJustificativaRecusa(dto.justificativa());
+    if (novoStatus == StatusSolicitacao.ACEITA) {
+        validarVagasDisponiveis(solicitacao.getOrientador());
+        solicitacao.setStatus(StatusSolicitacao.ACEITA);
+    } else {
+        validarJustificativa(request.justificativa());
+        solicitacao.setStatus(StatusSolicitacao.RECUSADA);
+        solicitacao.setJustificativa(request.justificativa().trim());
     }
+
     solicitacaoRepository.save(solicitacao);
 
-    // Dispara evento síncrono para os observers
+    // Dispara evento síncrono para o AtualizadorVagasObserver
     eventPublisher.publishEvent(new SolicitacaoStatusChangedEvent(
-        solicitacao,
-        solicitacao.getOrientador(),
-        statusAnterior,
-        statusNovo,
-        dto.justificativa()
+            solicitacao,
+            statusAnterior,
+            novoStatus
     ));
 
-    return SolicitacaoMapper.toResponseDTO(solicitacao);
+    return toResponse(solicitacao);
 }
 ```
+
+### 3.5 Benefícios do Padrão Observer
+
+- **Desacoplamento de domínio:** O `SolicitacaoService` não manipula as regras de cotas de vagas do perfil docente.
+- **Responsabilidade Única (SRP):** O serviço foca exclusivamente na validação da máquina de estados da solicitação, enquanto o observador reage à transição.
+- **Extensibilidade controlada:** Permite que no futuro outros observadores internos reajam a mudanças de status sem alterar o método transacional.
+
+### 3.6 Trade-offs e Mitigações da Implementação Real
+
+- **Consistência Transacional vs. Execução Assíncrona:** A execução assíncrona (`@Async`) poderia causar inconsistência (ex.: a solicitação é aceita no banco, mas a thread de atualização de vagas falha).
+  - _Mitigação Adotada:_ Utilização de listener **estritamente síncrono** (`@EventListener` padrão do Spring) dentro do mesmo contexto `@Transactional`. Como a entidade `Orientador` e seu `PerfilOrientador` já estão carregados na sessão do Hibernate, a dedução de vagas ocorre em memória e é persistida via _dirty checking_ no _commit_ atômico da transação.
+- **Ausência de Notificações Ativas:** Conforme pactuado na governança da Sprint 2 e na [ADR-0007](file:///c:/Users/damares.gaia/ifsc/es2-2026_2-equipe-3/docs/adrs/ADR-0007.md), **não foram implementadas notificações ativas** (como disparos externos de mensagens ou mensageria assíncrona). O painel do orientador opera exclusivamente por consulta sob demanda (_pull model_ via `GET /api/v1/solicitacoes/orientador/{id}?status=PENDENTE`), eliminando custos de infraestrutura no MVP.
 
 ---
 
 ## 4. Matriz de Trade-offs e Boas Práticas
 
-| Padrão       | Vantagens Arquiteturais                                                                                                                                      | Desvantagens / Trade-offs                                                                            | Mitigação Adotada                                                                                                                                                            |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Strategy** | - Respeito integral ao OCP e SRP.<br>- Adição de regras via novas classes `@Component`.<br>- Testes unitários com JUnit 5 puros.                             | - Maior quantidade de classes e interfaces no pacote.                                                | Organização em pacote coeso (`strategy`) com ordenação clara via `@Order`.                                                                                                   |
-| **Observer** | - Desacoplamento entre o fluxo principal da solicitação e subsistemas secundários.<br>- Facilidade para plugar novos ouvintes no futuro (e-mails, webhooks). | - Risco de perda de atomicidade se os ouvintes rodarem de forma assíncrona desacoplada da transação. | Uso de **`@EventListener` síncrono transacional**, garantindo que a atualização da solicitação e o decremento de vaga ocorram na mesma transação atômica (`@Transactional`). |
+| Padrão       | Vantagens Arquiteturais                                                                                                                                                        | Desvantagens / Trade-offs                                                                            | Mitigação Adotada                                                                                                                                                            |
+| :----------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Strategy** | - Respeito integral ao OCP e SRP.<br>- Adição de regras via novas classes `@Component`.<br>- Testes unitários com JUnit 5 puros.                                               | - Maior quantidade de classes e interfaces no pacote.                                                | Organização em pacote coeso (`strategy`) com ordenação clara via `@Order`.                                                                                                   |
+| **Observer** | - Desacoplamento entre o fluxo principal da solicitação e os efeitos colaterais.<br>- Extensibilidade para plugar novos ouvintes no futuro sem alterar o serviço transacional. | - Risco de perda de atomicidade se os ouvintes rodarem de forma assíncrona desacoplada da transação. | Uso de **`@EventListener` síncrono transacional**, garantindo que a atualização da solicitação e o decremento de vaga ocorram na mesma transação atômica (`@Transactional`). |
 
 ---
 
