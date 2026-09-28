@@ -6,17 +6,11 @@ on:
       - main
       - "entrega-*"
       - "feature/*"
-    paths:
-      - "SIGTCC/frontend/**"
-      - ".github/workflows/frontend-ci.yml"
 
   pull_request:
     branches:
       - main
       - "entrega-*"
-    paths:
-      - "SIGTCC/frontend/**"
-      - ".github/workflows/frontend-ci.yml"
 
 jobs:
   build-and-test:
@@ -32,7 +26,17 @@ jobs:
       - name: Checkout do código
         uses: actions/checkout@v4
 
+      - name: Verificar alterações no frontend
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            frontend:
+              - 'SIGTCC/frontend/**'
+              - '.github/workflows/frontend-ci.yml'
+
       - name: Configurar Node.js
+        if: steps.filter.outputs.frontend == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -40,13 +44,17 @@ jobs:
           cache-dependency-path: "SIGTCC/frontend/package-lock.json"
 
       - name: Instalar dependências
+        if: steps.filter.outputs.frontend == 'true'
         run: npm ci
 
       - name: Executar Linting
+        if: steps.filter.outputs.frontend == 'true'
         run: npm run lint
 
       - name: Executar Testes Unitários (Vitest)
+        if: steps.filter.outputs.frontend == 'true'
         run: npm run test
 
       - name: Executar Build
+        if: steps.filter.outputs.frontend == 'true'
         run: npm run build
