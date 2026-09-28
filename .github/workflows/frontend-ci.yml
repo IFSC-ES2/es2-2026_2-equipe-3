@@ -20,6 +20,8 @@ on:
 
 jobs:
   build-and-test:
+    name: Compilar, Testar e Gerar Build (Frontend)
+
     runs-on: ubuntu-latest
 
     defaults:
