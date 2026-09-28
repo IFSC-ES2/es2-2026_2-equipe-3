@@ -29,3 +29,9 @@ jobs:
             echo "Erro: O arquivo README.md foi removido ou não existe."
             exit 1
           fi
+
+      - name: Validar sintaxe do docker-compose
+        run: |
+          docker compose -f SIGTCC/docker-compose.yml config -q
+          docker compose -f SIGTCC/docker-compose.prod.yml config -q
+          
