@@ -75,4 +75,3 @@ Em conformidade com o protocolo da disciplina, declaramos que as ferramentas de 
 
 **Validação:**
 Todo o conteúdo, código e documentação gerados com o apoio da IA foram lidos, compreendidos, testados, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
-
