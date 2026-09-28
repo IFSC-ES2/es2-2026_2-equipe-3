@@ -34,4 +34,3 @@ jobs:
         run: |
           docker compose -f SIGTCC/docker-compose.yml config -q
           docker compose -f SIGTCC/docker-compose.prod.yml config -q
-          
