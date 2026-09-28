@@ -18,4 +18,4 @@ Descreva de forma clara e objetiva o que este Pull Request adiciona, corrige ou 
 
 - [ ] A lógica implementada faz sentido e cumpre o objetivo.
 - [ ] As regras do projeto e padrões arquiteturais foram respeitados.
-- [ ] Aprovo a integração desta ramificação com a `main`.
+- [ ] Aprovo a integração desta ramificação com a `entrega-6`.
