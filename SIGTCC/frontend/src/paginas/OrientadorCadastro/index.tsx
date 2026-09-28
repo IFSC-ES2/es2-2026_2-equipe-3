@@ -33,7 +33,7 @@ export function OrientadorCadastroPage() {
 }
 
 interface PageShellProps {
-  active: "cadastro" | "catalogo" | "perfil";
+  active: "cadastro" | "catalogo" | "perfil" | "painel";
   mensagem?: string;
   sucesso?: boolean;
   children: ReactNode;
@@ -77,6 +77,13 @@ export function PageShell({
             onClick={() => navigate("/perfil-editar")}
           >
             Meu perfil
+          </button>
+          <button
+            className={active === "painel" ? "active" : ""}
+            type="button"
+            onClick={() => navigate("/painel-orientador")}
+          >
+            Painel do Professor
           </button>
         </nav>
       </header>
