@@ -20,7 +20,7 @@ public class SolicitacaoOrientacaoController {
     private final SolicitacaoOrientacaoService solicitacaoService;
 
     @PostMapping
-    public ResponseEntity<Void> criarSolicitacao(@RequestBody @Valid SolicitacaoRequestDTO dto) {
+    public ResponseEntity<SolicitacaoResponseDTO> criarSolicitacao(@RequestBody @Valid SolicitacaoRequestDTO dto) {
         SolicitacaoResponseDTO resposta = solicitacaoService.criarSolicitacao(dto);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -28,6 +28,6 @@ public class SolicitacaoOrientacaoController {
                 .buildAndExpand(resposta.id())
                 .toUri();
 
-        return ResponseEntity.created(location).build();
+        return ResponseEntity.created(location).body(resposta);
     }
 }

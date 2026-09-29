@@ -31,8 +31,15 @@ public class SolicitacaoOrientacaoService {
         Orientador orientador = orientadorRepository.findById(dto.getOrientadorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Orientador com identificador " + dto.getOrientadorId() + " não foi encontrado."));
 
-        Aluno aluno = alunoRepository.findById(dto.getAlunoId())
-                .orElseThrow(() -> new ResourceNotFoundException("Aluno com identificador " + dto.getAlunoId() + " não foi encontrado."));
+        Aluno aluno = alunoRepository.findByEmail(dto.getAluno().getEmail())
+                .orElseGet(() -> {
+                    Aluno novoAluno = Aluno.builder()
+                            .nome(dto.getAluno().getNome())
+                            .email(dto.getAluno().getEmail())
+                            .curso(dto.getAluno().getCurso())
+                            .build();
+                    return alunoRepository.save(novoAluno);
+                });
 
         validacoes.forEach(validacao -> validacao.validar(dto, aluno, orientador));
 
