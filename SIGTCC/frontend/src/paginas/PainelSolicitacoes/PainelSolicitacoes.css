@@ -1,0 +1,306 @@
+.painel-solicitacoes {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.painel-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: var(--paper);
+  padding: 24px 28px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+}
+
+.painel-titulo-bloco h1 {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 1.6rem;
+  color: var(--teal-dark);
+  margin: 0;
+}
+
+.painel-titulo-bloco p {
+  color: var(--muted);
+  margin: 6px 0 0;
+  font-size: 0.95rem;
+}
+
+.painel-vagas-badge {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--mist);
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+
+.painel-vagas-badge span {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.painel-vagas-badge strong {
+  font-size: 1.25rem;
+  color: var(--teal);
+}
+
+.painel-status-msg {
+  padding: 16px 20px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.painel-carregando {
+  background: var(--mist);
+  color: var(--muted);
+  text-align: center;
+  padding: 40px;
+  border-radius: 12px;
+  border: 1px dashed var(--line);
+}
+
+.painel-vazio {
+  background: var(--paper);
+  color: var(--muted);
+  text-align: center;
+  padding: 48px 24px;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  font-size: 1.05rem;
+}
+
+.solicitacoes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.solicitacao-card {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.02);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.solicitacao-card:hover {
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
+}
+
+.solicitacao-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 12px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 14px;
+}
+
+.solicitacao-aluno h2 {
+  font-size: 1.2rem;
+  color: var(--ink);
+  margin: 0;
+  font-weight: 700;
+}
+
+.solicitacao-aluno-info {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.solicitacao-aluno-info span {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.solicitacao-tag {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.solicitacao-corpo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.solicitacao-tema {
+  font-size: 1rem;
+  color: var(--ink);
+}
+
+.solicitacao-tema strong {
+  color: var(--teal-dark);
+}
+
+.solicitacao-mensagem {
+  background: var(--mist);
+  padding: 14px 16px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  color: #2c3e50;
+  line-height: 1.5;
+  border-left: 4px solid var(--teal);
+}
+
+.solicitacao-acoes {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+  padding-top: 10px;
+}
+
+.btn-aceitar,
+.btn-recusar,
+.btn-cancelar {
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.92rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-aceitar {
+  background: var(--teal);
+  color: white;
+}
+
+.btn-aceitar:hover:not(:disabled) {
+  background: var(--teal-dark);
+}
+
+.btn-aceitar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-recusar {
+  background: transparent;
+  color: #c53030;
+  border: 1px solid #e2a8a8;
+}
+
+.btn-recusar:hover:not(:disabled) {
+  background: #fff5f5;
+  border-color: #c53030;
+}
+
+.btn-recusar:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.recusa-painel {
+  background: #fff9f8;
+  border: 1px solid #fed7d7;
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.recusa-painel label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #9b2c2c;
+}
+
+.recusa-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 0.92rem;
+  resize: vertical;
+}
+
+.recusa-textarea:focus {
+  outline: none;
+  border-color: #e53e3e;
+  box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.15);
+}
+
+.recusa-rodape {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.recusa-contador {
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.recusa-contador.invalido {
+  color: #c53030;
+}
+
+.recusa-botoes {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-confirmar-recusa {
+  background: #c53030;
+  color: white;
+  padding: 9px 16px;
+  border-radius: 7px;
+  font-weight: 600;
+  font-size: 0.88rem;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-confirmar-recusa:hover:not(:disabled) {
+  background: #9b2c2c;
+}
+
+.btn-confirmar-recusa:disabled {
+  background: #cbd5e0;
+  cursor: not-allowed;
+}
+
+.btn-cancelar {
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  padding: 9px 16px;
+}
+
+.btn-cancelar:hover {
+  background: var(--mist);
+  color: var(--ink);
+}
