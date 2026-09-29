@@ -19,7 +19,17 @@ jobs:
       - name: Checkout do codigo
         uses: actions/checkout@v4
 
+      - name: Verificar alterações no backend
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            backend:
+              - 'SIGTCC/backend/**'
+              - '.github/workflows/backend-ci.yml'
+
       - name: Configurar JDK 21
+        if: steps.filter.outputs.backend == 'true'
         uses: actions/setup-java@v4
         with:
           java-version: "21"
@@ -27,14 +37,16 @@ jobs:
           cache: gradle
 
       - name: Dar permissao de execucao ao Gradle Wrapper
+        if: steps.filter.outputs.backend == 'true'
         run: chmod +x SIGTCC/backend/gestao-tcc/gradlew
 
-      - name: Executar testes de unidade
+      - name: Compilar e executar testes
+        if: steps.filter.outputs.backend == 'true'
         working-directory: SIGTCC/backend/gestao-tcc
-        run: ./gradlew test
+        run: ./gradlew build
 
       - name: Upload dos relatorios de testes (Artefato)
-        if: always()
+        if: always() && steps.filter.outputs.backend == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: relatorio-testes-gradle
