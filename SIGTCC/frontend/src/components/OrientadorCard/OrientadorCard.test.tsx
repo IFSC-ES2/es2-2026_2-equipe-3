@@ -1,6 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { OrientadorCard } from "./index.tsx";
 import type { Orientador } from "../../types/Orientador.ts";
+import { MemoryRouter } from "react-router-dom";
 
 describe("OrientadorCard", () => {
   const orientadorCompleto: Orientador = {
@@ -24,7 +25,7 @@ describe("OrientadorCard", () => {
   };
 
   test("deve renderizar todas as informações do orientador corretamente", () => {
-    render(<OrientadorCard orientador={orientadorCompleto} />);
+    render(<MemoryRouter><OrientadorCard orientador={orientadorCompleto} /></MemoryRouter>);
 
     expect(screen.getByText("Orientador")).toBeInTheDocument();
     expect(screen.getByText("Dr. Adriano Lima")).toBeInTheDocument();
@@ -43,7 +44,7 @@ describe("OrientadorCard", () => {
   });
 
   test("não deve renderizar campos de departamento e biografia quando não informados", () => {
-    render(<OrientadorCard orientador={orientadorSemOpcionais} />);
+    render(<MemoryRouter><OrientadorCard orientador={orientadorSemOpcionais} /></MemoryRouter>);
 
     expect(screen.getByText("Dra. Maria Silva")).toBeInTheDocument();
     expect(screen.getByText("0 vagas")).toBeInTheDocument();
@@ -58,12 +59,25 @@ describe("OrientadorCard", () => {
 
   test("deve renderizar corretamente quando a lista de áreas de pesquisa estiver vazia", () => {
     const { container } = render(
-      <OrientadorCard orientador={orientadorSemOpcionais} />,
+      <MemoryRouter><OrientadorCard orientador={orientadorSemOpcionais} /></MemoryRouter>,
     );
 
     expect(screen.getByText("Áreas de pesquisa")).toBeInTheDocument();
 
     const lista = container.querySelector("ul");
     expect(lista?.children.length).toBe(0);
+  });
+
+  test("habilita solicitar orientação somente quando há vagas", () => {
+    const { rerender } = render(
+      <MemoryRouter><OrientadorCard orientador={orientadorCompleto} /></MemoryRouter>,
+    );
+
+    expect(screen.getByRole("button", { name: "Solicitar Orientação" })).toBeEnabled();
+
+    rerender(
+      <MemoryRouter><OrientadorCard orientador={orientadorSemOpcionais} /></MemoryRouter>,
+    );
+    expect(screen.getByRole("button", { name: "Sem vagas disponíveis" })).toBeDisabled();
   });
 });
