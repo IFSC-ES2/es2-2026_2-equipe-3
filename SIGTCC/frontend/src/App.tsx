@@ -14,7 +14,10 @@ function App() {
       <Route path="/orientadores" element={<OrientadorListagemPage />} />
       <Route path="/perfil-editar" element={<OrientadorEdicaoPage />} />
       <Route path="/painel-orientador" element={<PainelSolicitacoesPage />} />
-      <Route path="/solicitar/:orientadorId" element={<SolicitarOrientacaoPage />} />
+      <Route
+        path="/solicitar/:orientadorId"
+        element={<SolicitarOrientacaoPage />}
+      />
       <Route path="/acompanhar/:id" element={<AcompanharSolicitacaoPage />} />
       <Route
         path="/painel-orientador/:orientadorId"

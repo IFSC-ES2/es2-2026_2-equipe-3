@@ -11,7 +11,9 @@ export function SolicitarOrientacaoPage() {
       {Number.isInteger(id) && id > 0 ? (
         <SolicitacaoForm orientadorId={id} />
       ) : (
-        <p className="feedback erro" role="alert">Orientador inválido.</p>
+        <p className="feedback erro" role="alert">
+          Orientador inválido.
+        </p>
       )}
     </PageShell>
   );

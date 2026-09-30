@@ -38,7 +38,11 @@ export function AcompanharSolicitacaoPage() {
         if (falha instanceof ApiError && falha.status === 404) {
           setNaoEncontrada(true);
         } else {
-          setErro(falha instanceof Error ? falha.message : "Não foi possível carregar a solicitação.");
+          setErro(
+            falha instanceof Error
+              ? falha.message
+              : "Não foi possível carregar a solicitação.",
+          );
         }
       })
       .finally(() => {
@@ -55,24 +59,48 @@ export function AcompanharSolicitacaoPage() {
       <section className="orientador-form acompanhamento">
         <p className="section-kicker">Acompanhamento público</p>
         <h2>Status da solicitação</h2>
-        {carregando && <p className="feedback loading">Carregando solicitação...</p>}
+        {carregando && (
+          <p className="feedback loading">Carregando solicitação...</p>
+        )}
         {(naoEncontrada || idInvalido) && (
           <p className="feedback erro" role="alert">
-            Não encontramos uma solicitação com esse código. Confira o link ou o número informado.
+            Não encontramos uma solicitação com esse código. Confira o link ou o
+            número informado.
           </p>
         )}
-        {erro && <p className="feedback erro" role="alert">{erro}</p>}
+        {erro && (
+          <p className="feedback erro" role="alert">
+            {erro}
+          </p>
+        )}
         {solicitacao && (
           <div className="acompanhamento-detalhes">
-            <p className={`status-indicador status-${solicitacao.status.toLowerCase()}`} role="status">
+            <p
+              className={`status-indicador status-${solicitacao.status.toLowerCase()}`}
+              role="status"
+            >
               <span aria-hidden="true" />
               {rotulosStatus[solicitacao.status]}
             </p>
             <dl>
-              <div><dt>Código</dt><dd>#{solicitacao.id}</dd></div>
-              <div><dt>Tema</dt><dd>{solicitacao.tema}</dd></div>
-              <div><dt>Orientador</dt><dd>{solicitacao.orientador.nome}</dd></div>
-              <div><dt>Enviada em</dt><dd>{new Date(solicitacao.criadoEm).toLocaleDateString("pt-BR")}</dd></div>
+              <div>
+                <dt>Código</dt>
+                <dd>#{solicitacao.id}</dd>
+              </div>
+              <div>
+                <dt>Tema</dt>
+                <dd>{solicitacao.tema}</dd>
+              </div>
+              <div>
+                <dt>Orientador</dt>
+                <dd>{solicitacao.orientador.nome}</dd>
+              </div>
+              <div>
+                <dt>Enviada em</dt>
+                <dd>
+                  {new Date(solicitacao.criadoEm).toLocaleDateString("pt-BR")}
+                </dd>
+              </div>
             </dl>
             {solicitacao.status === "RECUSADA" && solicitacao.justificativa && (
               <div className="justificativa-recusa">

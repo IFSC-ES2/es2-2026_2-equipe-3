@@ -11,11 +11,7 @@ interface SolicitacaoFormProps {
 }
 
 type CampoFormulario =
-  | "aluno.nome"
-  | "aluno.email"
-  | "aluno.curso"
-  | "tema"
-  | "mensagem";
+  "aluno.nome" | "aluno.email" | "aluno.curso" | "tema" | "mensagem";
 
 export function SolicitacaoForm({ orientadorId }: SolicitacaoFormProps) {
   const [formulario, setFormulario] = useState({
@@ -51,7 +47,8 @@ export function SolicitacaoForm({ orientadorId }: SolicitacaoFormProps) {
       novosErros["aluno.nome"] = "Informe um nome entre 3 e 100 caracteres.";
     }
     if (email.length > 100 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      novosErros["aluno.email"] = "Informe um e-mail válido (até 100 caracteres).";
+      novosErros["aluno.email"] =
+        "Informe um e-mail válido (até 100 caracteres).";
     }
     if (curso.length < 2 || curso.length > 100) {
       novosErros["aluno.curso"] = "Informe um curso entre 2 e 100 caracteres.";
@@ -88,7 +85,11 @@ export function SolicitacaoForm({ orientadorId }: SolicitacaoFormProps) {
       const solicitacao = await criarSolicitacao(dados);
       setSucessoId(solicitacao.id);
     } catch (erro) {
-      if (erro instanceof ApiError && erro.status === 400 && Array.isArray(erro.detalhes)) {
+      if (
+        erro instanceof ApiError &&
+        erro.status === 400 &&
+        Array.isArray(erro.detalhes)
+      ) {
         const errosDaApi = erro.detalhes.reduce<Record<string, string>>(
           (acumulado, detalhe: ErroValidacaoCampo) => {
             acumulado[detalhe.campo] = detalhe.mensagem;
@@ -102,7 +103,11 @@ export function SolicitacaoForm({ orientadorId }: SolicitacaoFormProps) {
       } else if (erro instanceof ApiError && erro.status === 422) {
         setErroEnvio(`Orientador indisponível: ${erro.message}`);
       } else {
-        setErroEnvio(erro instanceof Error ? erro.message : "Não foi possível enviar a solicitação.");
+        setErroEnvio(
+          erro instanceof Error
+            ? erro.message
+            : "Não foi possível enviar a solicitação.",
+        );
       }
     } finally {
       setEnviando(false);
@@ -111,51 +116,157 @@ export function SolicitacaoForm({ orientadorId }: SolicitacaoFormProps) {
 
   if (sucessoId !== null) {
     return (
-      <section className="orientador-form solicitacao-sucesso" aria-live="polite">
+      <section
+        className="orientador-form solicitacao-sucesso"
+        aria-live="polite"
+      >
         <p className="section-kicker">Solicitação enviada</p>
         <h2>Agora é aguardar o retorno do orientador.</h2>
-        <p>Seu código de acompanhamento é <strong>#{sucessoId}</strong>.</p>
-        <Link className="primary-button success-link" to={`/acompanhar/${sucessoId}`}>
+        <p>
+          Seu código de acompanhamento é <strong>#{sucessoId}</strong>.
+        </p>
+        <Link
+          className="primary-button success-link"
+          to={`/acompanhar/${sucessoId}`}
+        >
           Acompanhar solicitação
         </Link>
       </section>
     );
   }
 
-  const campoComErro = (campo: CampoFormulario) => errosCampo[campo] || undefined;
+  const campoComErro = (campo: CampoFormulario) =>
+    errosCampo[campo] || undefined;
 
   return (
-    <form className="orientador-form solicitacao-form" onSubmit={enviar} noValidate>
+    <form
+      className="orientador-form solicitacao-form"
+      onSubmit={enviar}
+      noValidate
+    >
       <div className="form-title">
         <p className="section-kicker">Solicitação de orientação</p>
         <h2>Conte sua proposta de TCC</h2>
       </div>
-      {erroEnvio && <p className="feedback erro" role="alert">{erroEnvio}</p>}
+      {erroEnvio && (
+        <p className="feedback erro" role="alert">
+          {erroEnvio}
+        </p>
+      )}
       <div className="form-grid">
         <label className="form-group" htmlFor="aluno-nome">
           Nome completo
-          <input id="aluno-nome" required minLength={3} maxLength={100} value={formulario.aluno.nome} onChange={(evento) => atualizarCampo("aluno.nome", evento.target.value)} aria-invalid={Boolean(campoComErro("aluno.nome"))} aria-describedby={campoComErro("aluno.nome") ? "erro-aluno-nome" : undefined} />
-          {campoComErro("aluno.nome") && <span id="erro-aluno-nome" className="erro-texto">{campoComErro("aluno.nome")}</span>}
+          <input
+            id="aluno-nome"
+            required
+            minLength={3}
+            maxLength={100}
+            value={formulario.aluno.nome}
+            onChange={(evento) =>
+              atualizarCampo("aluno.nome", evento.target.value)
+            }
+            aria-invalid={Boolean(campoComErro("aluno.nome"))}
+            aria-describedby={
+              campoComErro("aluno.nome") ? "erro-aluno-nome" : undefined
+            }
+          />
+          {campoComErro("aluno.nome") && (
+            <span id="erro-aluno-nome" className="erro-texto">
+              {campoComErro("aluno.nome")}
+            </span>
+          )}
         </label>
         <label className="form-group" htmlFor="aluno-email">
           E-mail
-          <input id="aluno-email" type="email" required maxLength={100} value={formulario.aluno.email} onChange={(evento) => atualizarCampo("aluno.email", evento.target.value)} aria-invalid={Boolean(campoComErro("aluno.email"))} aria-describedby={campoComErro("aluno.email") ? "erro-aluno-email" : undefined} />
-          {campoComErro("aluno.email") && <span id="erro-aluno-email" className="erro-texto">{campoComErro("aluno.email")}</span>}
+          <input
+            id="aluno-email"
+            type="email"
+            required
+            maxLength={100}
+            value={formulario.aluno.email}
+            onChange={(evento) =>
+              atualizarCampo("aluno.email", evento.target.value)
+            }
+            aria-invalid={Boolean(campoComErro("aluno.email"))}
+            aria-describedby={
+              campoComErro("aluno.email") ? "erro-aluno-email" : undefined
+            }
+          />
+          {campoComErro("aluno.email") && (
+            <span id="erro-aluno-email" className="erro-texto">
+              {campoComErro("aluno.email")}
+            </span>
+          )}
         </label>
         <label className="form-group form-group-wide" htmlFor="aluno-curso">
           Curso
-          <input id="aluno-curso" required minLength={2} maxLength={100} value={formulario.aluno.curso} onChange={(evento) => atualizarCampo("aluno.curso", evento.target.value)} aria-invalid={Boolean(campoComErro("aluno.curso"))} aria-describedby={campoComErro("aluno.curso") ? "erro-aluno-curso" : undefined} />
-          {campoComErro("aluno.curso") && <span id="erro-aluno-curso" className="erro-texto">{campoComErro("aluno.curso")}</span>}
+          <input
+            id="aluno-curso"
+            required
+            minLength={2}
+            maxLength={100}
+            value={formulario.aluno.curso}
+            onChange={(evento) =>
+              atualizarCampo("aluno.curso", evento.target.value)
+            }
+            aria-invalid={Boolean(campoComErro("aluno.curso"))}
+            aria-describedby={
+              campoComErro("aluno.curso") ? "erro-aluno-curso" : undefined
+            }
+          />
+          {campoComErro("aluno.curso") && (
+            <span id="erro-aluno-curso" className="erro-texto">
+              {campoComErro("aluno.curso")}
+            </span>
+          )}
         </label>
-        <label className="form-group form-group-wide" htmlFor="solicitacao-tema">
+        <label
+          className="form-group form-group-wide"
+          htmlFor="solicitacao-tema"
+        >
           Tema pretendido
-          <input id="solicitacao-tema" required minLength={5} maxLength={150} value={formulario.tema} onChange={(evento) => atualizarCampo("tema", evento.target.value)} aria-invalid={Boolean(campoComErro("tema"))} aria-describedby={campoComErro("tema") ? "erro-solicitacao-tema" : undefined} />
-          {campoComErro("tema") && <span id="erro-solicitacao-tema" className="erro-texto">{campoComErro("tema")}</span>}
+          <input
+            id="solicitacao-tema"
+            required
+            minLength={5}
+            maxLength={150}
+            value={formulario.tema}
+            onChange={(evento) => atualizarCampo("tema", evento.target.value)}
+            aria-invalid={Boolean(campoComErro("tema"))}
+            aria-describedby={
+              campoComErro("tema") ? "erro-solicitacao-tema" : undefined
+            }
+          />
+          {campoComErro("tema") && (
+            <span id="erro-solicitacao-tema" className="erro-texto">
+              {campoComErro("tema")}
+            </span>
+          )}
         </label>
-        <label className="form-group form-group-wide" htmlFor="solicitacao-mensagem">
+        <label
+          className="form-group form-group-wide"
+          htmlFor="solicitacao-mensagem"
+        >
           Mensagem para o orientador
-          <textarea id="solicitacao-mensagem" required minLength={10} maxLength={1000} value={formulario.mensagem} onChange={(evento) => atualizarCampo("mensagem", evento.target.value)} aria-invalid={Boolean(campoComErro("mensagem"))} aria-describedby={campoComErro("mensagem") ? "erro-solicitacao-mensagem" : undefined} />
-          {campoComErro("mensagem") && <span id="erro-solicitacao-mensagem" className="erro-texto">{campoComErro("mensagem")}</span>}
+          <textarea
+            id="solicitacao-mensagem"
+            required
+            minLength={10}
+            maxLength={1000}
+            value={formulario.mensagem}
+            onChange={(evento) =>
+              atualizarCampo("mensagem", evento.target.value)
+            }
+            aria-invalid={Boolean(campoComErro("mensagem"))}
+            aria-describedby={
+              campoComErro("mensagem") ? "erro-solicitacao-mensagem" : undefined
+            }
+          />
+          {campoComErro("mensagem") && (
+            <span id="erro-solicitacao-mensagem" className="erro-texto">
+              {campoComErro("mensagem")}
+            </span>
+          )}
         </label>
       </div>
       <button className="primary-button" type="submit" disabled={enviando}>
