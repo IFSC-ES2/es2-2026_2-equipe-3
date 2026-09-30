@@ -139,13 +139,10 @@ public class SolicitacaoService {
 
         String justificativaTratada = justificativa.trim();
 
-        if (justificativaTratada.length() < 10
-                || justificativaTratada.length() > 500) {
-            throw new ValidacaoRequisicaoException(
-                    "justificativa",
-                    "A justificativa é obrigatória para recusar a solicitação."
-            );
-        }
+        if (justificativaTratada.length() < 10 || justificativaTratada.length() > 500) { 
+                throw new ValidacaoRequisicaoException( 
+                        "justificativa", 
+                        "A justificativa deve ter entre 10 e 500 caracteres." ); }
     }
 
     private StatusSolicitacao converterStatus(String status) {
