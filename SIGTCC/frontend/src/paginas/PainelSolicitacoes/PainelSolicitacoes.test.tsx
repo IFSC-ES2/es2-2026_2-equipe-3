@@ -198,9 +198,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
 
     await user.click(botaoRecusar);
 
-    const textarea = screen.getByPlaceholderText(
-      /informe o motivo da recusa/i,
-    );
+    const textarea = screen.getByPlaceholderText(/informe o motivo da recusa/i);
 
     const botaoConfirmar = screen.getByRole("button", {
       name: "Confirmar Recusa",
@@ -251,17 +249,13 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       }),
     );
 
-    const textarea = screen.getByPlaceholderText(
-      /informe o motivo da recusa/i,
-    );
+    const textarea = screen.getByPlaceholderText(/informe o motivo da recusa/i);
 
     await user.type(textarea, "a".repeat(600));
 
     expect(textarea).toHaveValue("a".repeat(500));
 
-    expect(
-      screen.getByText("500 / 500 caracteres"),
-    ).toBeInTheDocument();
+    expect(screen.getByText("500 / 500 caracteres")).toBeInTheDocument();
   });
 
   it("deve recusar uma solicitação com justificativa válida e removê-la da tela", async () => {
@@ -293,14 +287,9 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       }),
     );
 
-    const textarea = screen.getByPlaceholderText(
-      /informe o motivo da recusa/i,
-    );
+    const textarea = screen.getByPlaceholderText(/informe o motivo da recusa/i);
 
-    await user.type(
-      textarea,
-      "Tema fora da minha linha de pesquisa atual.",
-    );
+    await user.type(textarea, "Tema fora da minha linha de pesquisa atual.");
 
     await user.click(
       screen.getByRole("button", {
@@ -311,14 +300,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     await waitFor(() => {
       expect(atualizarStatusSolicitacao).toHaveBeenCalledWith(101, {
         status: "RECUSADA",
-        justificativa:
-          "Tema fora da minha linha de pesquisa atual.",
+        justificativa: "Tema fora da minha linha de pesquisa atual.",
       });
     });
 
-    expect(
-      screen.queryByText("Gabriel Silva"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Gabriel Silva")).not.toBeInTheDocument();
 
     expect(
       screen.getByText("Solicitação recusada com sucesso."),
@@ -387,10 +373,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     ]);
 
     vi.mocked(atualizarStatusSolicitacao).mockRejectedValue(
-      new ApiError(
-        422,
-        "O orientador não possui vagas disponíveis.",
-      ),
+      new ApiError(422, "O orientador não possui vagas disponíveis."),
     );
 
     render(
@@ -411,9 +394,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(
-          "O orientador não possui vagas disponíveis.",
-        ),
+        screen.getByText("O orientador não possui vagas disponíveis."),
       ).toBeInTheDocument();
     });
   });
@@ -468,9 +449,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText(
-          "Nenhuma solicitação pendente no momento.",
-        ),
+        screen.getByText("Nenhuma solicitação pendente no momento."),
       ).toBeInTheDocument();
     });
   });
