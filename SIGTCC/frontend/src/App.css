@@ -264,6 +264,96 @@ h2 {
   border-radius: 12px;
   background: #fbfdfc;
 }
+.card-request-button {
+  width: 100%;
+  margin-top: 18px;
+}
+.card-request-button:disabled {
+  cursor: not-allowed;
+  background: #dce5e3;
+  color: #68757d;
+  opacity: 1;
+  transform: none;
+}
+.success-link {
+  display: inline-block;
+  margin-top: 12px;
+  text-decoration: none;
+}
+.acompanhamento {
+  max-width: 760px;
+}
+.acompanhamento-detalhes {
+  margin-top: 28px;
+}
+.status-indicador {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 24px;
+  padding: 9px 12px;
+  border-radius: 6px;
+  font-weight: 700;
+}
+.status-indicador span {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.status-pendente {
+  color: #855500;
+  background: #fff0c9;
+}
+.status-aceita {
+  color: #17654f;
+  background: #dff1eb;
+}
+.status-recusada {
+  color: #a13d2d;
+  background: #fff1ed;
+}
+.status-cancelada {
+  color: #53616a;
+  background: #e8edef;
+}
+.acompanhamento dl {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin: 0;
+}
+.acompanhamento dl > div {
+  min-width: 0;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.acompanhamento dt {
+  margin-bottom: 5px;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.acompanhamento dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  color: var(--ink);
+}
+.justificativa-recusa {
+  margin-top: 24px;
+  padding: 18px;
+  border-left: 4px solid var(--coral);
+  background: var(--coral-soft);
+}
+.justificativa-recusa h3,
+.justificativa-recusa p {
+  margin: 0;
+}
+.justificativa-recusa p {
+  margin-top: 8px;
+  color: #71382f;
+  line-height: 1.6;
+}
 .card-heading {
   display: flex;
   justify-content: space-between;
@@ -357,5 +447,8 @@ h2 {
   .filter-controls {
     align-items: stretch;
     flex-direction: column;
+  }
+  .acompanhamento dl {
+    grid-template-columns: 1fr;
   }
 }
