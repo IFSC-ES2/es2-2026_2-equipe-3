@@ -135,7 +135,7 @@ public class GlobalExceptionHandler {
             ValidacaoRequisicaoException ex, HttpServletRequest request) {
 
         List<ErroCampoDTO> detalhes = List.of(
-                new ErroCampoDTO("status", ex.getMessage())
+                new ErroCampoDTO(ex.getCampo(), ex.getMessage())
         );
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
