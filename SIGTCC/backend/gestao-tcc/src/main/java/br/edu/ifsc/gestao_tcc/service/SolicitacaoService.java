@@ -2,7 +2,6 @@ package br.edu.ifsc.gestao_tcc.service;
 
 import br.edu.ifsc.gestao_tcc.dto.AtualizaStatusRequest;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoRequestDTO;
-import br.edu.ifsc.gestao_tcc.dto.SolicitacaoResponse;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoResponseDTO;
 import br.edu.ifsc.gestao_tcc.event.SolicitacaoStatusChangedEvent;
 import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
@@ -41,7 +40,7 @@ public class SolicitacaoService {
     public SolicitacaoResponseDTO criarSolicitacao(SolicitacaoRequestDTO dto) {
         Orientador orientador = orientadorRepository.findById(dto.getOrientadorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Orientador com identificador " + dto.getOrientadorId() + " não foi encontrado."));
-        
+
         Aluno aluno = alunoRepository.findByEmail(dto.getAluno().getEmail())
                 .orElseGet(() -> {
                     Aluno novoAluno = Aluno.builder()
@@ -51,9 +50,9 @@ public class SolicitacaoService {
                             .build();
                     return alunoRepository.save(novoAluno);
                 });
-                
+
         validacoes.forEach(validacao -> validacao.validar(dto, aluno, orientador));
-        
+
         SolicitacaoOrientacao solicitacao = SolicitacaoOrientacao.builder()
                 .orientador(orientador)
                 .aluno(aluno)
@@ -61,26 +60,17 @@ public class SolicitacaoService {
                 .mensagem(dto.getMensagem())
                 .status(StatusSolicitacao.PENDENTE)
                 .build();
-                
+
         SolicitacaoOrientacao solicitacaoSalva = solicitacaoRepository.save(solicitacao);
-        
-        return new SolicitacaoResponseDTO(
-                solicitacaoSalva.getId(),
-                solicitacaoSalva.getOrientador().getId(),
-                solicitacaoSalva.getAluno().getId(),
-                solicitacaoSalva.getTema(),
-                solicitacaoSalva.getMensagem(),
-                solicitacaoSalva.getJustificativa(),
-                solicitacaoSalva.getStatus().name(),
-                solicitacaoSalva.getCriadoEm() != null ? solicitacaoSalva.getCriadoEm().toString() : null
-        );
+
+        return toResponse(solicitacaoSalva);
     }
 
     @Transactional(readOnly = true)
-    public List<SolicitacaoResponse> listarPorOrientador(Long orientadorId, String status) {
+    public List<SolicitacaoResponseDTO> listarPorOrientador(Long orientadorId, String status) {
         Orientador orientador = orientadorRepository.findById(orientadorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Orientador com identificador " + orientadorId + " não foi encontrado."));
-                
+
         List<SolicitacaoOrientacao> solicitacoes;
         if (status == null || status.isBlank()) {
             solicitacoes = solicitacaoRepository.findByOrientadorIdOrderByCriadoEmDesc(orientador.getId());
@@ -88,32 +78,32 @@ public class SolicitacaoService {
             StatusSolicitacao statusSolicitacao = converterStatus(status);
             solicitacoes = solicitacaoRepository.findByOrientadorIdAndStatusOrderByCriadoEmDesc(orientador.getId(), statusSolicitacao);
         }
-        
+
         return solicitacoes.stream()
                 .map(this::toResponse)
                 .toList();
     }
 
     @Transactional
-    public SolicitacaoResponse atualizarStatus(Long solicitacaoId, AtualizaStatusRequest request) {
+    public SolicitacaoResponseDTO atualizarStatus(Long solicitacaoId, AtualizaStatusRequest request) {
         SolicitacaoOrientacao solicitacao = solicitacaoRepository.findById(solicitacaoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Solicitação com identificador " + solicitacaoId + " não foi encontrada."));
-                
+
         if (solicitacao.getStatus() != StatusSolicitacao.PENDENTE) {
             throw new SolicitacaoJaRespondidaException("Esta solicitação foi respondida e não pode ser alterada.");
         }
-        
+
         if (request == null || request.status() == null) {
             throw new ValidacaoRequisicaoException("status", "O status é obrigatório.");
         }
-        
+
         StatusSolicitacao novoStatus = request.status();
         if (novoStatus != StatusSolicitacao.ACEITA && novoStatus != StatusSolicitacao.RECUSADA) {
             throw new RegraDeNegocioException("Somente os status ACEITA ou RECUSADA podem ser definidos por este endpoint.");
         }
-        
+
         StatusSolicitacao statusAnterior = solicitacao.getStatus();
-        
+
         if (novoStatus == StatusSolicitacao.ACEITA) {
             validarVagasDisponiveis(solicitacao.getOrientador());
             solicitacao.setStatus(StatusSolicitacao.ACEITA);
@@ -123,11 +113,11 @@ public class SolicitacaoService {
             solicitacao.setStatus(StatusSolicitacao.RECUSADA);
             solicitacao.setJustificativa(request.justificativa().trim());
         }
-        
+
         solicitacaoRepository.save(solicitacao);
-        
+
         eventPublisher.publishEvent(new SolicitacaoStatusChangedEvent(solicitacao, statusAnterior, novoStatus));
-        
+
         return toResponse(solicitacao);
     }
 
@@ -156,29 +146,29 @@ public class SolicitacaoService {
         }
     }
 
-    private SolicitacaoResponse toResponse(SolicitacaoOrientacao solicitacao) {
+    private SolicitacaoResponseDTO toResponse(SolicitacaoOrientacao solicitacao) {
         var aluno = solicitacao.getAluno();
         var orientador = solicitacao.getOrientador();
         int vagasDisponiveis = 0;
-        
+
         if (orientador.getPerfil() != null) {
             vagasDisponiveis = orientador.getPerfil().getVagasDisponiveis();
         }
-        
-        return new SolicitacaoResponse(
+
+        return new SolicitacaoResponseDTO(
                 solicitacao.getId(),
                 solicitacao.getStatus(),
                 solicitacao.getTema(),
                 solicitacao.getMensagem(),
                 solicitacao.getJustificativa(),
                 solicitacao.getCriadoEm(),
-                new SolicitacaoResponse.AlunoResponse(
+                new SolicitacaoResponseDTO.AlunoResponse(
                         aluno.getId(),
                         aluno.getNome(),
                         aluno.getEmail(),
                         aluno.getCurso()
                 ),
-                new SolicitacaoResponse.OrientadorResponse(
+                new SolicitacaoResponseDTO.OrientadorResponse(
                         orientador.getId(),
                         orientador.getNome(),
                         orientador.getEmail(),

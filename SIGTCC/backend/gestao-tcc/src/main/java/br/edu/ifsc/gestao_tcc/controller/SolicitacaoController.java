@@ -2,7 +2,6 @@ package br.edu.ifsc.gestao_tcc.controller;
 
 import br.edu.ifsc.gestao_tcc.dto.AtualizaStatusRequest;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoRequestDTO;
-import br.edu.ifsc.gestao_tcc.dto.SolicitacaoResponse;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoResponseDTO;
 import br.edu.ifsc.gestao_tcc.service.SolicitacaoService;
 import jakarta.validation.Valid;
@@ -33,7 +32,7 @@ public class SolicitacaoController {
     }
 
     @GetMapping("/orientador/{orientadorId}")
-    public ResponseEntity<List<SolicitacaoResponse>> listarPorOrientador(
+    public ResponseEntity<List<SolicitacaoResponseDTO>> listarPorOrientador(
             @PathVariable Long orientadorId,
             @RequestParam(required = false) String status
     ) {
@@ -41,7 +40,7 @@ public class SolicitacaoController {
     }
 
     @PatchMapping("/{id}/status")
-    public ResponseEntity<SolicitacaoResponse> atualizarStatus(
+    public ResponseEntity<SolicitacaoResponseDTO> atualizarStatus(
             @PathVariable Long id,
             @RequestBody AtualizaStatusRequest request
     ) {
