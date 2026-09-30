@@ -78,6 +78,7 @@ public class SolicitacaoService {
 
         if (request == null || request.status() == null) {
             throw new ValidacaoRequisicaoException(
+                    "status",
                     "O status é obrigatório."
             );
         }
@@ -131,6 +132,7 @@ public class SolicitacaoService {
     private void validarJustificativa(String justificativa) {
         if (justificativa == null) {
             throw new ValidacaoRequisicaoException(
+                    "justificativa",
                     "A justificativa é obrigatória para recusar a solicitação."
             );
         }
@@ -140,6 +142,7 @@ public class SolicitacaoService {
         if (justificativaTratada.length() < 10
                 || justificativaTratada.length() > 500) {
             throw new ValidacaoRequisicaoException(
+                    "justificativa",
                     "A justificativa é obrigatória para recusar a solicitação."
             );
         }
@@ -152,6 +155,7 @@ public class SolicitacaoService {
             );
         } catch (IllegalArgumentException ex) {
             throw new ValidacaoRequisicaoException(
+                    "status",
                     "Status inválido. Valores aceitos: PENDENTE, ACEITA, RECUSADA, CANCELADA."
             );
         }
