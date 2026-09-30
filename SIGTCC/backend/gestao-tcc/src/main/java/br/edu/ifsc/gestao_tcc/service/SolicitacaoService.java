@@ -143,7 +143,7 @@ public class SolicitacaoService {
                 || justificativaTratada.length() > 500) {
             throw new ValidacaoRequisicaoException(
                     "justificativa",
-                    "A justificativa deve ter entre 10 e 500 caracteres."
+                    "A justificativa é obrigatória para recusar a solicitação."
             );
         }
     }
