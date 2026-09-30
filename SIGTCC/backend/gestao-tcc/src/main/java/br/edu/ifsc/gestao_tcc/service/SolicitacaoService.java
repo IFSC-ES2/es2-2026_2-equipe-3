@@ -84,6 +84,16 @@ public class SolicitacaoService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public SolicitacaoResponseDTO buscarPorId(Long solicitacaoId) {
+        SolicitacaoOrientacao solicitacao = solicitacaoRepository.findById(solicitacaoId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Solicitação com identificador " + solicitacaoId + " não foi encontrada."
+                ));
+
+        return toResponse(solicitacao);
+    }
+
     @Transactional
     public SolicitacaoResponseDTO atualizarStatus(Long solicitacaoId, AtualizaStatusRequest request) {
         SolicitacaoOrientacao solicitacao = solicitacaoRepository.findById(solicitacaoId)
