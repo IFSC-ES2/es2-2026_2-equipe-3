@@ -71,11 +71,14 @@ export function PainelSolicitacoesPage() {
   const handleAceitar = async (id: number) => {
     setProcessandoId(id);
     setMensagem("");
+
     try {
       const resposta = await atualizarStatusSolicitacao(id, {
         status: "ACEITA",
       });
+
       setSolicitacoes((prev) => prev.filter((item) => item.id !== id));
+
       if (
         resposta.orientador &&
         typeof resposta.orientador.vagasDisponiveis === "number"
@@ -84,10 +87,12 @@ export function PainelSolicitacoesPage() {
       } else if (vagasDisponiveis !== null && vagasDisponiveis > 0) {
         setVagasDisponiveis(vagasDisponiveis - 1);
       }
+
       setSucesso(true);
       setMensagem("Solicitação aceita com sucesso!");
     } catch (erro) {
       setSucesso(false);
+
       if (erro instanceof ApiError) {
         if (erro.status === 422) {
           setMensagem(
@@ -127,21 +132,24 @@ export function PainelSolicitacoesPage() {
 
   const handleConfirmarRecusa = async (id: number) => {
     const textoLimpo = justificativa.trim();
-    if (textoLimpo.length < 10) {
+
+    if (textoLimpo.length < 10 || textoLimpo.length > 500) {
       setSucesso(false);
       setMensagem(
-        "A justificativa é obrigatória e deve ter pelo menos 10 caracteres.",
+        "A justificativa é obrigatória e deve ter entre 10 e 500 caracteres.",
       );
       return;
     }
 
     setProcessandoId(id);
     setMensagem("");
+
     try {
       await atualizarStatusSolicitacao(id, {
         status: "RECUSADA",
         justificativa: textoLimpo,
       });
+
       setSolicitacoes((prev) => prev.filter((item) => item.id !== id));
       setSolicitacaoRecusandoId(null);
       setJustificativa("");
@@ -149,6 +157,7 @@ export function PainelSolicitacoesPage() {
       setMensagem("Solicitação recusada com sucesso.");
     } catch (erro) {
       setSucesso(false);
+
       if (erro instanceof ApiError) {
         if (erro.status === 409) {
           setMensagem(
@@ -173,6 +182,7 @@ export function PainelSolicitacoesPage() {
   const formatarData = (dataIso: string) => {
     try {
       const data = new Date(dataIso);
+
       return data.toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "2-digit",
@@ -217,7 +227,10 @@ export function PainelSolicitacoesPage() {
             {solicitacoes.map((item) => {
               const estaRecusando = solicitacaoRecusandoId === item.id;
               const emProcessamento = processandoId === item.id;
-              const justificativaValida = justificativa.trim().length >= 10;
+
+              const justificativaValida =
+                justificativa.trim().length >= 10 &&
+                justificativa.trim().length <= 500;
 
               return (
                 <article
@@ -228,18 +241,22 @@ export function PainelSolicitacoesPage() {
                   <header className="solicitacao-cabecalho">
                     <div className="solicitacao-aluno">
                       <h2>{item.aluno.nome}</h2>
+
                       <div className="solicitacao-aluno-info">
                         <span>
                           <strong>Curso:</strong> {item.aluno.curso}
                         </span>
+
                         <span>
                           <strong>E-mail:</strong> {item.aluno.email}
                         </span>
+
                         <span>
                           <strong>Data:</strong> {formatarData(item.criadoEm)}
                         </span>
                       </div>
                     </div>
+
                     <span className="solicitacao-tag">Pendente</span>
                   </header>
 
@@ -247,6 +264,7 @@ export function PainelSolicitacoesPage() {
                     <div className="solicitacao-tema">
                       <strong>Tema proposto:</strong> {item.tema}
                     </div>
+
                     <div className="solicitacao-mensagem">
                       <strong>Mensagem do aluno:</strong>
                       <p>{item.mensagem}</p>
@@ -256,26 +274,30 @@ export function PainelSolicitacoesPage() {
                   {estaRecusando ? (
                     <div className="recusa-painel">
                       <label htmlFor={`justificativa-${item.id}`}>
-                        Justificativa da recusa (obrigatória, mínimo 10
+                        Justificativa da recusa (obrigatória, de 10 a 500
                         caracteres):
                       </label>
+
                       <textarea
                         id={`justificativa-${item.id}`}
                         className="recusa-textarea"
                         placeholder="Informe o motivo da recusa para orientar o estudante..."
                         value={justificativa}
                         onChange={(e) => setJustificativa(e.target.value)}
+                        maxLength={500}
                         disabled={emProcessamento}
                         rows={3}
                       />
+
                       <div className="recusa-rodape">
                         <span
                           className={`recusa-contador ${
                             !justificativaValida ? "invalido" : ""
                           }`}
                         >
-                          {justificativa.trim().length} / 10 caracteres mínimos
+                          {justificativa.length} / 500 caracteres
                         </span>
+
                         <div className="recusa-botoes">
                           <button
                             type="button"
@@ -285,6 +307,7 @@ export function PainelSolicitacoesPage() {
                           >
                             Cancelar
                           </button>
+
                           <button
                             type="button"
                             className="btn-confirmar-recusa"
@@ -308,6 +331,7 @@ export function PainelSolicitacoesPage() {
                       >
                         Recusar
                       </button>
+
                       <button
                         type="button"
                         className="btn-aceitar"

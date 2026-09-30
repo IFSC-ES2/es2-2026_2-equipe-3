@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-@ExceptionHandler(RegraDeNegocioException.class)
+    @ExceptionHandler(RegraDeNegocioException.class)
     public ResponseEntity<ErrorResponseDTO> handleRegraDeNegocioException(
             RegraDeNegocioException ex, HttpServletRequest request) {
 
@@ -125,6 +125,24 @@ public class GlobalExceptionHandler {
                 "Parâmetro de requisição inválido",
                 request.getRequestURI(),
                 mensagem
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(ValidacaoRequisicaoException.class)
+    public ResponseEntity<ErrorResponseDTO> handleValidacaoRequisicaoException(
+            ValidacaoRequisicaoException ex, HttpServletRequest request) {
+
+        List<ErroCampoDTO> detalhes = List.of(
+                new ErroCampoDTO(ex.getCampo(), ex.getMessage())
+        );
+
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                HttpStatus.BAD_REQUEST.value(),
+                "Erro de validação nos dados enviados",
+                request.getRequestURI(),
+                detalhes
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);

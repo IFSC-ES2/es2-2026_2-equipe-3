@@ -5,15 +5,15 @@ import br.edu.ifsc.gestao_tcc.exception.SolicitacaoDuplicadaException;
 import br.edu.ifsc.gestao_tcc.model.Aluno;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
 import br.edu.ifsc.gestao_tcc.model.StatusSolicitacao;
-import br.edu.ifsc.gestao_tcc.repository.SolicitacaoOrientacaoRepository;
+import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
 public class ValidacaoSolicitacaoDuplicada implements ValidacaoSolicitacaoOrientacao {
-
-    private final SolicitacaoOrientacaoRepository solicitacaoRepository;
+    
+    private final SolicitacaoRepository solicitacaoRepository;
 
     @Override
     public void validar(SolicitacaoRequestDTO dto, Aluno aluno, Orientador orientador) {
@@ -21,7 +21,7 @@ public class ValidacaoSolicitacaoDuplicada implements ValidacaoSolicitacaoOrient
                 aluno.getId(), orientador.getId(), StatusSolicitacao.PENDENTE);
                 
         if (existeSolicitacaoPendente) {
-            throw new SolicitacaoDuplicadaException("Você já possui uma solicitação pendente para este orientador.");
+            throw new SolicitacaoDuplicadaException("Você possui uma solicitação pendente para este orientador.");
         }
     }
 }
