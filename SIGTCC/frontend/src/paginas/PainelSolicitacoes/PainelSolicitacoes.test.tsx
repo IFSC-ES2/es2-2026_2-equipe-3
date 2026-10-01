@@ -22,7 +22,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       status: "PENDENTE",
       tema: "Arquitetura Hexagonal com Spring Boot",
       mensagem:
-          "Gostaria de desenvolver meu TCC focado em boas práticas de desacoplamento.",
+        "Gostaria de desenvolver meu TCC focado em boas práticas de desacoplamento.",
       justificativa: null,
       criadoEm: "2026-09-28T08:00:00Z",
       aluno: {
@@ -43,7 +43,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       status: "PENDENTE",
       tema: "Microserviços e Resiliência",
       mensagem:
-          "Tenho interesse no estudo de circuit breakers em sistemas distribuídos.",
+        "Tenho interesse no estudo de circuit breakers em sistemas distribuídos.",
       justificativa: null,
       criadoEm: "2026-09-27T14:30:00Z",
       aluno: {
@@ -67,26 +67,26 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
 
   it("deve exibir estado de carregamento inicial e depois a lista de solicitações com indicador de vagas", async () => {
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue(
-        mockSolicitacoes,
+      mockSolicitacoes,
     );
     render(
-        <MemoryRouter>
-          <PainelSolicitacoesPage />
-        </MemoryRouter>,
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
     );
 
     expect(screen.getByText("Carregando solicitações...")).toBeInTheDocument();
 
     await waitFor(() => {
       expect(
-          screen.queryByText("Carregando solicitações..."),
+        screen.queryByText("Carregando solicitações..."),
       ).not.toBeInTheDocument();
     });
 
     expect(screen.getByText("Gabriel Silva")).toBeInTheDocument();
     expect(screen.getByText("Mariana Costa")).toBeInTheDocument();
     expect(
-        screen.getByText("Arquitetura Hexagonal com Spring Boot"),
+      screen.getByText("Arquitetura Hexagonal com Spring Boot"),
     ).toBeInTheDocument();
     expect(screen.getByText("Vagas disponíveis:")).toBeInTheDocument();
     expect(screen.getByText("3")).toBeInTheDocument();
@@ -94,17 +94,17 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
 
   it("deve renderizar botões com rótulos estritos 'Aceitar' e 'Recusar' e não conter o rótulo 'Aprovar'", async () => {
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue(
-        mockSolicitacoes,
+      mockSolicitacoes,
     );
     render(
-        <MemoryRouter>
-          <PainelSolicitacoesPage />
-        </MemoryRouter>,
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
       expect(
-          screen.queryByText("Carregando solicitações..."),
+        screen.queryByText("Carregando solicitações..."),
       ).not.toBeInTheDocument();
     });
 
@@ -118,14 +118,14 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     expect(botoesAceitar).toHaveLength(2);
     expect(botoesRecusar).toHaveLength(2);
     expect(
-        screen.queryByRole("button", { name: /aprovar/i }),
+      screen.queryByRole("button", { name: /aprovar/i }),
     ).not.toBeInTheDocument();
   });
 
   it("deve aceitar uma solicitação, removê-la da tela e atualizar o indicador de vagas com o retorno da API", async () => {
     const user = userEvent.setup();
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue(
-        mockSolicitacoes,
+      mockSolicitacoes,
     );
     vi.mocked(atualizarStatusSolicitacao).mockResolvedValue({
       ...mockSolicitacoes[0],
@@ -137,9 +137,9 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     render(
-        <MemoryRouter>
-          <PainelSolicitacoesPage />
-        </MemoryRouter>,
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -162,7 +162,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     expect(screen.getByText("Mariana Costa")).toBeInTheDocument();
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(
-        screen.getByText("Solicitação aceita com sucesso!"),
+      screen.getByText("Solicitação aceita com sucesso!"),
     ).toBeInTheDocument();
   });
 
@@ -173,9 +173,9 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     ]);
 
     render(
-        <MemoryRouter>
-          <PainelSolicitacoesPage />
-        </MemoryRouter>,
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -215,9 +215,9 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     ]);
 
     render(
-        <MemoryRouter>
-          <PainelSolicitacoesPage />
-        </MemoryRouter>,
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -225,9 +225,9 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     await user.click(
-        screen.getByRole("button", {
-          name: "Recusar",
-        }),
+      screen.getByRole("button", {
+        name: "Recusar",
+      }),
     );
 
     const textarea = screen.getByPlaceholderText(/informe o motivo da recusa/i);
@@ -255,9 +255,9 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     render(
-        <MemoryRouter>
-          <PainelSolicitacoesPage />
-        </MemoryRouter>,
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -265,18 +265,18 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     await user.click(
-        screen.getByRole("button", {
-          name: "Recusar",
-        }),
+      screen.getByRole("button", {
+        name: "Recusar",
+      }),
     );
 
     const textarea = screen.getByPlaceholderText(/informe o motivo da recusa/i);
     await user.type(textarea, "Tema fora da minha linha de pesquisa atual.");
 
     await user.click(
-        screen.getByRole("button", {
-          name: "Confirmar Recusa",
-        }),
+      screen.getByRole("button", {
+        name: "Confirmar Recusa",
+      }),
     );
 
     await waitFor(() => {
@@ -288,7 +288,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
 
     expect(screen.queryByText("Gabriel Silva")).not.toBeInTheDocument();
     expect(
-        screen.getByText("Solicitação recusada com sucesso."),
+      screen.getByText("Solicitação recusada com sucesso."),
     ).toBeInTheDocument();
   });
 
@@ -299,9 +299,9 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     ]);
 
     render(
-        <MemoryRouter>
-          <PainelSolicitacoesPage />
-        </MemoryRouter>,
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -309,39 +309,39 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     await user.click(
-        screen.getByRole("button", {
-          name: "Recusar",
-        }),
+      screen.getByRole("button", {
+        name: "Recusar",
+      }),
     );
 
     expect(
-        screen.getByRole("button", {
-          name: "Confirmar Recusa",
-        }),
+      screen.getByRole("button", {
+        name: "Confirmar Recusa",
+      }),
     ).toBeInTheDocument();
 
     await user.click(
-        screen.getByRole("button", {
-          name: "Cancelar",
-        }),
+      screen.getByRole("button", {
+        name: "Cancelar",
+      }),
     );
 
     expect(
-        screen.queryByRole("button", {
-          name: "Confirmar Recusa",
-        }),
+      screen.queryByRole("button", {
+        name: "Confirmar Recusa",
+      }),
     ).not.toBeInTheDocument();
 
     expect(
-        screen.getByRole("button", {
-          name: "Aceitar",
-        }),
+      screen.getByRole("button", {
+        name: "Aceitar",
+      }),
     ).toBeInTheDocument();
 
     expect(
-        screen.getByRole("button", {
-          name: "Recusar",
-        }),
+      screen.getByRole("button", {
+        name: "Recusar",
+      }),
     ).toBeInTheDocument();
   });
 
@@ -351,13 +351,13 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       mockSolicitacoes[0],
     ]);
     vi.mocked(atualizarStatusSolicitacao).mockRejectedValue(
-        new ApiError(422, "O orientador não possui vagas disponíveis."),
+      new ApiError(422, "O orientador não possui vagas disponíveis."),
     );
 
     render(
-        <MemoryRouter>
-          <PainelSolicitacoesPage />
-        </MemoryRouter>,
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -365,14 +365,14 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     await user.click(
-        screen.getByRole("button", {
-          name: "Aceitar",
-        }),
+      screen.getByRole("button", {
+        name: "Aceitar",
+      }),
     );
 
     await waitFor(() => {
       expect(
-          screen.getByText("O orientador não possui vagas disponíveis."),
+        screen.getByText("O orientador não possui vagas disponíveis."),
       ).toBeInTheDocument();
     });
   });
@@ -383,16 +383,16 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       mockSolicitacoes[0],
     ]);
     vi.mocked(atualizarStatusSolicitacao).mockRejectedValue(
-        new ApiError(
-            409,
-            "Esta solicitação foi respondida e não pode ser alterada.",
-        ),
+      new ApiError(
+        409,
+        "Esta solicitação foi respondida e não pode ser alterada.",
+      ),
     );
 
     render(
-        <MemoryRouter>
-          <PainelSolicitacoesPage />
-        </MemoryRouter>,
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
@@ -400,16 +400,16 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     await user.click(
-        screen.getByRole("button", {
-          name: "Aceitar",
-        }),
+      screen.getByRole("button", {
+        name: "Aceitar",
+      }),
     );
 
     await waitFor(() => {
       expect(
-          screen.getByText(
-              "Esta solicitação foi respondida e não pode ser alterada.",
-          ),
+        screen.getByText(
+          "Esta solicitação foi respondida e não pode ser alterada.",
+        ),
       ).toBeInTheDocument();
     });
   });
@@ -418,14 +418,14 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
 
     render(
-        <MemoryRouter>
-          <PainelSolicitacoesPage />
-        </MemoryRouter>,
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
     );
 
     await waitFor(() => {
       expect(
-          screen.getByText("Nenhuma solicitação pendente no momento."),
+        screen.getByText("Nenhuma solicitação pendente no momento."),
       ).toBeInTheDocument();
     });
   });
