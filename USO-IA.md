@@ -72,6 +72,8 @@ Em conformidade com o protocolo da disciplina, declaramos que as ferramentas de 
 - **Documentação de Padrões de Projeto OO (`docs/PADROES-DE-PROJETO.md` - Issue #92):** Auxílio na redação técnica, elaboração dos diagramas em Mermaid para os padrões Strategy e Observer, detalhamento das classes afetadas e análise de trade-offs arquiteturais.
 - **Implementação do Painel de Gestão do Professor (Issue #87):** Auxílio na escrita do componente React em TypeScript (`SIGTCC/frontend/src/paginas/PainelSolicitacoes/index.tsx`), nos estilos em `PainelSolicitacoes.css`, na tipagem (`Solicitacao.ts`) e no serviço de integração (`solicitacaoService.ts`).
 - **Implementação de Testes Automatizados no Frontend:** Auxílio na criação dos testes unitários de componente com Vitest e React Testing Library (`PainelSolicitacoes.test.tsx`), cobrindo os fluxos de aceite, recusa com justificativa obrigatória e tratamento de erros da API.
+- **Implementação de Testes Automatizados (Frontend e Backend):** Apoio na elaboração e estruturação das suítes de testes para o Frontend (Vitest para componentes e fluxos) e Backend (testes unitários e de integração).
+- **Versionamento de Banco de Dados (Flyway e SQL):** Auxílio na configuração e integração da ferramenta Flyway para o versionamento do banco de dados, bem como nos scripts de migração em SQL para a criação estruturada das novas tabelas.
 
 **Validação:**
 Todo o conteúdo, código e documentação gerados com o apoio da IA foram lidos, compreendidos, testados, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
