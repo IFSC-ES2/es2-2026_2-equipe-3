@@ -30,3 +30,10 @@ export interface AtualizaStatusRequest {
   status: "ACEITA" | "RECUSADA";
   justificativa?: string;
 }
+
+export interface NovaSolicitacao {
+  orientadorId: number;
+  aluno: Omit<AlunoSolicitacao, "id">;
+  tema: string;
+  mensagem: string;
+}

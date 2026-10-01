@@ -4,6 +4,7 @@ import type {
   Solicitacao,
   StatusSolicitacao,
   AtualizaStatusRequest,
+  NovaSolicitacao,
 } from "../types/Solicitacao";
 import type { RespostaErroPadrao } from "../types/Erro";
 
@@ -53,6 +54,30 @@ export async function listarSolicitacoesPorOrientador(
     );
     const respostaValida = await garantirResposta(response, 200);
     return respostaValida.json();
+  } catch (erro) {
+    throw normalizarErro(erro);
+  }
+}
+
+export async function criarSolicitacao(
+  dados: NovaSolicitacao,
+): Promise<Solicitacao> {
+  try {
+    const response = await apiFetch("/solicitacoes", {
+      method: "POST",
+      body: JSON.stringify(dados),
+    });
+    const resposta = await garantirResposta(response, 201);
+    return resposta.json();
+  } catch (erro) {
+    throw normalizarErro(erro);
+  }
+}
+
+export async function obterSolicitacao(id: number): Promise<Solicitacao> {
+  try {
+    const response = await apiFetch(`/solicitacoes/${id}`);
+    return (await garantirResposta(response, 200)).json();
   } catch (erro) {
     throw normalizarErro(erro);
   }

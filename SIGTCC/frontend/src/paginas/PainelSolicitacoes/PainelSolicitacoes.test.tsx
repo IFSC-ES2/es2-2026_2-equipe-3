@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import { vi, describe, it, expect, beforeEach } from "vitest";
@@ -69,7 +69,6 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue(
       mockSolicitacoes,
     );
-
     render(
       <MemoryRouter>
         <PainelSolicitacoesPage />
@@ -97,7 +96,6 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue(
       mockSolicitacoes,
     );
-
     render(
       <MemoryRouter>
         <PainelSolicitacoesPage />
@@ -110,8 +108,12 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       ).not.toBeInTheDocument();
     });
 
-    const botoesAceitar = screen.getAllByRole("button", { name: "Aceitar" });
-    const botoesRecusar = screen.getAllByRole("button", { name: "Recusar" });
+    const botoesAceitar = screen.getAllByRole("button", {
+      name: "Aceitar",
+    });
+    const botoesRecusar = screen.getAllByRole("button", {
+      name: "Recusar",
+    });
 
     expect(botoesAceitar).toHaveLength(2);
     expect(botoesRecusar).toHaveLength(2);
@@ -130,7 +132,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       status: "ACEITA",
       orientador: {
         ...mockSolicitacoes[0].orientador,
-        vagasDisponiveis: 2, // Vaga decrementada após aceite
+        vagasDisponiveis: 2,
       },
     });
 
@@ -144,7 +146,10 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       expect(screen.getByText("Gabriel Silva")).toBeInTheDocument();
     });
 
-    const botoesAceitar = screen.getAllByRole("button", { name: "Aceitar" });
+    const botoesAceitar = screen.getAllByRole("button", {
+      name: "Aceitar",
+    });
+
     await user.click(botoesAceitar[0]);
 
     await waitFor(() => {
@@ -153,11 +158,8 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       });
     });
 
-    // Item aceito deve ser removido da lista pendente
     expect(screen.queryByText("Gabriel Silva")).not.toBeInTheDocument();
-    // O outro item continua
     expect(screen.getByText("Mariana Costa")).toBeInTheDocument();
-    // Vagas atualizadas para 2
     expect(screen.getByText("2")).toBeInTheDocument();
     expect(
       screen.getByText("Solicitação aceita com sucesso!"),
@@ -180,25 +182,65 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       expect(screen.getByText("Gabriel Silva")).toBeInTheDocument();
     });
 
-    const botaoRecusar = screen.getByRole("button", { name: "Recusar" });
+    const botaoRecusar = screen.getByRole("button", {
+      name: "Recusar",
+    });
     await user.click(botaoRecusar);
 
-    // Deve exibir o painel de justificativa
     const textarea = screen.getByPlaceholderText(/informe o motivo da recusa/i);
     const botaoConfirmar = screen.getByRole("button", {
       name: "Confirmar Recusa",
     });
 
-    // Inicialmente vazio: botão desabilitado
+    // Inicialmente vazio.
     expect(botaoConfirmar).toBeDisabled();
+    // Novo contador: quantidade atual / limite máximo.
+    expect(screen.getByText("0 / 500 caracteres")).toBeInTheDocument();
 
-    // Com 5 caracteres: botão continua desabilitado
+    // Com 5 caracteres: botão continua desabilitado.
     await user.type(textarea, "Pouco");
     expect(botaoConfirmar).toBeDisabled();
+    expect(screen.getByText("5 / 500 caracteres")).toBeInTheDocument();
 
-    // Com 10 ou mais caracteres: botão habilitado
+    // Com 10 ou mais caracteres: botão habilitado.
     await user.type(textarea, " motivo detalhado");
     expect(botaoConfirmar).toBeEnabled();
+    expect(screen.getByText("22 / 500 caracteres")).toBeInTheDocument();
+  });
+
+  it("deve limitar a justificativa a 500 caracteres", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([
+      mockSolicitacoes[0],
+    ]);
+
+    render(
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Gabriel Silva")).toBeInTheDocument();
+    });
+
+    await user.click(
+      screen.getByRole("button", {
+        name: "Recusar",
+      }),
+    );
+
+    const textarea = screen.getByPlaceholderText(/informe o motivo da recusa/i);
+
+    // Verifica se a trava nativa do HTML está aplicada
+    expect(textarea).toHaveAttribute("maxLength", "500");
+
+    // Usa o fireEvent.change para injetar 500 caracteres instantaneamente
+    // Assim não causa o erro de timeout (5000ms) que acontece ao simular 600 teclas uma a uma
+    fireEvent.change(textarea, { target: { value: "a".repeat(500) } });
+
+    expect(textarea).toHaveValue("a".repeat(500));
+    expect(screen.getByText("500 / 500 caracteres")).toBeInTheDocument();
   });
 
   it("deve recusar uma solicitação com justificativa válida e removê-la da tela", async () => {
@@ -222,11 +264,20 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       expect(screen.getByText("Gabriel Silva")).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole("button", { name: "Recusar" }));
+    await user.click(
+      screen.getByRole("button", {
+        name: "Recusar",
+      }),
+    );
+
     const textarea = screen.getByPlaceholderText(/informe o motivo da recusa/i);
     await user.type(textarea, "Tema fora da minha linha de pesquisa atual.");
 
-    await user.click(screen.getByRole("button", { name: "Confirmar Recusa" }));
+    await user.click(
+      screen.getByRole("button", {
+        name: "Confirmar Recusa",
+      }),
+    );
 
     await waitFor(() => {
       expect(atualizarStatusSolicitacao).toHaveBeenCalledWith(101, {
@@ -257,17 +308,41 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       expect(screen.getByText("Gabriel Silva")).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole("button", { name: "Recusar" }));
+    await user.click(
+      screen.getByRole("button", {
+        name: "Recusar",
+      }),
+    );
+
     expect(
-      screen.getByRole("button", { name: "Confirmar Recusa" }),
+      screen.getByRole("button", {
+        name: "Confirmar Recusa",
+      }),
     ).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Cancelar" }));
+    await user.click(
+      screen.getByRole("button", {
+        name: "Cancelar",
+      }),
+    );
+
     expect(
-      screen.queryByRole("button", { name: "Confirmar Recusa" }),
+      screen.queryByRole("button", {
+        name: "Confirmar Recusa",
+      }),
     ).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Aceitar" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Recusar" })).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("button", {
+        name: "Aceitar",
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole("button", {
+        name: "Recusar",
+      }),
+    ).toBeInTheDocument();
   });
 
   it("deve exibir mensagem de erro 422 quando o orientador não possuir vagas disponíveis", async () => {
@@ -289,7 +364,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       expect(screen.getByText("Gabriel Silva")).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole("button", { name: "Aceitar" }));
+    await user.click(
+      screen.getByRole("button", {
+        name: "Aceitar",
+      }),
+    );
 
     await waitFor(() => {
       expect(
@@ -298,7 +377,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
   });
 
-  it("deve exibir mensagem de erro 409 quando a solicitação já foi respondida anteriormente", async () => {
+  it("deve exibir mensagem de erro 409 quando a solicitação foi respondida anteriormente", async () => {
     const user = userEvent.setup();
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([
       mockSolicitacoes[0],
@@ -306,7 +385,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     vi.mocked(atualizarStatusSolicitacao).mockRejectedValue(
       new ApiError(
         409,
-        "Esta solicitação já foi respondida e não pode ser alterada.",
+        "Esta solicitação foi respondida e não pode ser alterada.",
       ),
     );
 
@@ -320,12 +399,16 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       expect(screen.getByText("Gabriel Silva")).toBeInTheDocument();
     });
 
-    await user.click(screen.getByRole("button", { name: "Aceitar" }));
+    await user.click(
+      screen.getByRole("button", {
+        name: "Aceitar",
+      }),
+    );
 
     await waitFor(() => {
       expect(
         screen.getByText(
-          "Esta solicitação já foi respondida e não pode ser alterada.",
+          "Esta solicitação foi respondida e não pode ser alterada.",
         ),
       ).toBeInTheDocument();
     });
