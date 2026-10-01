@@ -167,3 +167,21 @@ Portanto, a avaliação preliminar da qualidade será considerada positiva quand
 Os atributos de qualidade escolhidos para o MVP — adequação funcional, confiabilidade, segurança e manutenibilidade — refletem diretamente o contexto do projeto e os riscos identificados. Eles orientam tanto a implementação quanto a validação do produto, assegurando que o sistema entregue seja funcional, estável, controlado e sustentável para evoluir após a fase inicial.
 
 A qualidade não será avaliada apenas como um conjunto de normas técnicas, mas como uma condição necessária para a entrega do valor do produto: um sistema que realmente apoia o fluxo acadêmico de TCC e é capaz de evoluir com segurança no próximo ciclo de desenvolvimento.
+
+## 5. Revisão de Qualidade - Sprint 2 (Entrega 6)
+
+Durante o fechamento da Sprint 2, a equipe revisou os atributos de qualidade priorizados frente às decisões arquiteturais e técnicas aplicadas nesta iteração.
+
+### 5.1 Segurança
+*   **Impacto das Decisões:** A decisão de postergar a US01 (Autenticação e Perfis) para focar na entrega de valor central deixou os endpoints de solicitação temporariamente expostos, sem verificação de identidade.
+*   **Estado Real:** O sistema encontra-se vulnerável ao uso indevido caso exposto publicamente (Risco R06).
+*   **Ação:** A segurança será o foco prioritário da próxima sprint. Até lá, o sistema está restrito ao ambiente de avaliação acadêmica, conforme documentado nos riscos.
+
+### 5.2 Manutenibilidade
+*   **Impacto das Decisões:** A aplicação rigorosa de padrões de projeto Orientados a Objetos (Strategy para regras de validação e Observer para a dedução de vagas, formalizados na ADR-0007) elevou drasticamente a manutenibilidade do sistema.
+*   **Estado Real:** A separação de responsabilidades (SRP) e o princípio Aberto/Fechado (OCP) permitiram testar o núcleo de negócio de forma isolada, resultando em 100% de cobertura de testes nos novos pacotes arquiteturais (`validation` e `observer`). O código tornou-se altamente resiliente a regressões.
+
+### 5.3 Confiabilidade (Consistência de Dados)
+*   **Impacto das Decisões:** Durante a sprint, identificou-se um risco de condição de corrida (Race Condition - R07) em que aceites simultâneos poderiam deixar as vagas de um orientador com valores negativos.
+*   **Estado Real:** O risco foi mapeado e documentado, mas a mitigação estrutural no banco de dados ainda não foi aplicada na versão atual. A consistência dos dados em cenários de alta concorrência encontra-se vulnerável.
+*   **Ação:** A implementação de mecanismos de proteção no acesso a dados (como *Locking* no JPA) e a respetiva validação através de testes de integração concorrentes foram registadas como débito técnico prioritário para a próxima iteração.
