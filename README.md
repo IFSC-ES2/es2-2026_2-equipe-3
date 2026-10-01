@@ -92,7 +92,7 @@ Nesta etapa, implementamos o primeiro _vertical slice_ funcional do MVP (US02: C
 - **[Contrato de Dados da API (US02)](docs/contrato-dados-us02.md):** Especificação formal dos endpoints REST e formatos de dados.
 - **[Declaração de Uso de IA](USO-IA.md):** Registro da utilização de ferramentas de IA na Sprint 1.
 
-### 7.1. O que já funciona no MVP (US02)
+### 7.1. O que já funcionava no MVP ao final da Sprint 1 (US02)
 
 - **Cadastro de Orientador:** Formulário com validações em tempo real (nome, e-mail institucional único, departamento, número de vagas e linhas de pesquisa) via `POST /api/v1/orientadores`.
 - **Vitrine / Catálogo de Orientadores:** Listagem dos orientadores com disponibilidade de vagas e filtragem dinâmica por linha de pesquisa via `GET /api/v1/orientadores?area=...`.
@@ -100,7 +100,47 @@ Nesta etapa, implementamos o primeiro _vertical slice_ funcional do MVP (US02: C
 - **Edição de Perfil:** Atualização de dados cadastrais, biografia e ajuste no quantitativo de vagas ofertadas via `PATCH /api/v1/orientadores/{id}`.
 - **Remoção de Perfil:** Desativação/exclusão de cadastro via `DELETE /api/v1/orientadores/{id}`.
 
-## 8. Como executar o aplicativo
+## 8. Entrega 6: Fluxo de Solicitação e Aceite de Orientação (Sprint 2)
+
+Nesta etapa, implementamos o fluxo completo de "match" entre aluno e orientador (US04 - Solicitação e Aceite de Orientação), integrado à fatia essencial da US03 (botão de ação rápida no catálogo construído na Sprint 1), e aplicamos dois padrões de projeto OO (Strategy e Observer) para desacoplar as regras de elegibilidade e as reações à mudança de status da solicitação.
+
+- **[Relatório de Fechamento da Sprint 2](docs/entregas/sprint-2.md):** Meta da sprint, escopo planejado, justificativa de priorização e papéis da equipe.
+- **[Contrato de Dados da API (US04)](docs/contrato-dados-us04.md):** Especificação formal dos endpoints de solicitação, modelos de dados, códigos de erro e máquina de estados.
+- **[Documento de Padrões de Projeto](docs/PADROES-DE-PROJETO.md):** Detalhamento das implementações de Strategy (validações de elegibilidade) e Observer (atualização de vagas), com diagramas de classes e sequência.
+- **Release:** [`v0.2.0`](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/releases/tag/v0.2.0)
+
+### 8.1. O que já funciona no MVP ao final da Sprint 2
+
+- **Botão "Solicitar Orientação" no Catálogo (US03 - fatia essencial):** Ação habilitada apenas quando o orientador possui vagas disponíveis (`vagasDisponiveis > 0`), com indicador visual claro de disponibilidade.
+- **Envio de Solicitação (Aluno):** Formulário com nome, e-mail, curso, tema pretendido e mensagem/proposta inicial. O backend cria ou reaproveita o cadastro do `Aluno` pelo e-mail (sem exigir login) via `POST /api/v1/solicitacoes`.
+- **Painel de Gestão do Orientador:** Listagem das solicitações recebidas, com filtro por status, via `GET /api/v1/solicitacoes/orientador/{orientadorId}`.
+- **Aceite ou Recusa da Solicitação (Orientador):** O aceite decrementa automaticamente as vagas do orientador; a recusa exige justificativa (10 a 500 caracteres). Atualização via `PATCH /api/v1/solicitacoes/{id}/status`.
+- **Acompanhamento de Status (Aluno):** Consulta do estado atual da solicitação (`PENDENTE`, `ACEITA` ou `RECUSADA`) via `GET /api/v1/solicitacoes/{id}`.
+
+### 8.2. Endpoints da API - Solicitações de Orientação (US04)
+
+| Método  | Rota                                             | Descrição                                                                               | Sucesso       | Quem usa           |
+| :------ | :----------------------------------------------- | :-------------------------------------------------------------------------------------- | :------------ | :----------------- |
+| `POST`  | `/api/v1/solicitacoes`                           | Aluno envia uma solicitação de orientação a um professor com vagas.                     | `201 Created` | Aluno              |
+| `GET`   | `/api/v1/solicitacoes/orientador/{orientadorId}` | Lista as solicitações recebidas por um orientador (filtro opcional por status).         | `200 OK`      | Orientador         |
+| `PATCH` | `/api/v1/solicitacoes/{id}/status`               | Orientador aceita (`ACEITA`) ou recusa (`RECUSADA`, com justificativa) uma solicitação. | `200 OK`      | Orientador         |
+| `GET`   | `/api/v1/solicitacoes/{id}`                      | Detalha uma solicitação específica; também usado pelo aluno para acompanhar o status.   | `200 OK`      | Aluno e Orientador |
+
+Especificação completa de request/response, validações e códigos de erro (`400`, `404`, `409`, `422`) em [`docs/contrato-dados-us04.md`](docs/contrato-dados-us04.md).
+
+### 8.3. Padrões de Projeto Aplicados
+
+- **Strategy:** As regras de elegibilidade para criar uma solicitação (vagas disponíveis, orientador ativo, ausência de solicitação pendente duplicada) foram encapsuladas em estratégias independentes (`ValidadorSolicitacaoStrategy` e implementações), evitando cadeias de `if/else` no serviço e respeitando o princípio Aberto/Fechado.
+- **Observer:** A transição de status da solicitação publica um evento de domínio (`SolicitacaoStatusChangedEvent`), consumido de forma síncrona e transacional pelo `AtualizadorVagasObserver`, que decrementa a vaga do orientador sem acoplar essa lógica ao serviço principal.
+
+Detalhamento completo, diagramas de classes e de sequência em [`docs/PADROES-DE-PROJETO.md`](docs/PADROES-DE-PROJETO.md).
+
+### 8.4. Limitações Conhecidas desta Versão
+
+- **Sem autenticação:** A US01 (Autenticação e Perfis com Spring Security/JWT) foi postergada para uma sprint futura. Todos os endpoints, incluindo os de solicitação e de aceite/recusa, são públicos nesta versão.
+- **Sem notificação por e-mail (ou push/WebSocket):** O painel do orientador funciona por consulta sob demanda (`GET /api/v1/solicitacoes/orientador/{id}?status=PENDENTE`). Não há envio de e-mail, notificação push ou WebSocket quando uma nova solicitação é criada ou respondida.
+
+## 9. Como executar o aplicativo
 
 Para facilitar a execução dos ambientes de frontend, backend e banco de dados simultaneamente, o projeto está configurado com Docker Compose.
 
@@ -149,7 +189,7 @@ docker compose down
 
 ```
 
-## 9. Como executar os testes unitários
+## 10. Como executar os testes unitários
 
 O projeto possui suítes de testes isoladas para as camadas de frontend e backend. Certifique-se de abrir o terminal e navegar para a pasta correspondente antes de executar os comandos.
 
