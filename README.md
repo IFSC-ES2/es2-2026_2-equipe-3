@@ -119,12 +119,12 @@ Nesta etapa, implementamos o fluxo completo de "match" entre aluno e orientador 
 
 ### 8.2. Endpoints da API - Solicitações de Orientação (US04)
 
-| Método  | Rota                                             | Descrição                                                                  | Sucesso       | Quem usa           |
-| :------ | :------------------------------------------------ | :--------------------------------------------------------------------------- | :------------ | :------------------ |
-| `POST`  | `/api/v1/solicitacoes`                           | Aluno envia uma solicitação de orientação a um professor com vagas.        | `201 Created` | Aluno               |
-| `GET`   | `/api/v1/solicitacoes/orientador/{orientadorId}` | Lista as solicitações recebidas por um orientador (filtro opcional por status). | `200 OK`      | Orientador          |
-| `PATCH` | `/api/v1/solicitacoes/{id}/status`               | Orientador aceita (`ACEITA`) ou recusa (`RECUSADA`, com justificativa) uma solicitação. | `200 OK`      | Orientador          |
-| `GET`   | `/api/v1/solicitacoes/{id}`                      | Detalha uma solicitação específica; também usado pelo aluno para acompanhar o status. | `200 OK`      | Aluno e Orientador  |
+| Método  | Rota                                             | Descrição                                                                               | Sucesso       | Quem usa           |
+| :------ | :----------------------------------------------- | :-------------------------------------------------------------------------------------- | :------------ | :----------------- |
+| `POST`  | `/api/v1/solicitacoes`                           | Aluno envia uma solicitação de orientação a um professor com vagas.                     | `201 Created` | Aluno              |
+| `GET`   | `/api/v1/solicitacoes/orientador/{orientadorId}` | Lista as solicitações recebidas por um orientador (filtro opcional por status).         | `200 OK`      | Orientador         |
+| `PATCH` | `/api/v1/solicitacoes/{id}/status`               | Orientador aceita (`ACEITA`) ou recusa (`RECUSADA`, com justificativa) uma solicitação. | `200 OK`      | Orientador         |
+| `GET`   | `/api/v1/solicitacoes/{id}`                      | Detalha uma solicitação específica; também usado pelo aluno para acompanhar o status.   | `200 OK`      | Aluno e Orientador |
 
 Especificação completa de request/response, validações e códigos de erro (`400`, `404`, `409`, `422`) em [`docs/contrato-dados-us04.md`](docs/contrato-dados-us04.md).
 
