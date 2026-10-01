@@ -39,6 +39,13 @@ public class SolicitacaoController {
         return ResponseEntity.ok(solicitacaoService.listarPorOrientador(orientadorId, status));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<SolicitacaoResponseDTO> buscarPorId(
+            @PathVariable Long id
+    )   {
+        return ResponseEntity.ok(solicitacaoService.buscarPorId(id));
+    }
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<SolicitacaoResponseDTO> atualizarStatus(
             @PathVariable Long id,
