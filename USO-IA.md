@@ -61,3 +61,23 @@ Em conformidade com o protocolo da disciplina, declaramos que a ferramenta de in
 
 **Validação:**
 Todo o conteúdo e documentação gerados com o apoio da IA foram lidos, compreendidos, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
+
+## Entrega 6:
+
+Em conformidade com o protocolo da disciplina, declaramos que as ferramentas de inteligência artificial generativa (Claude, Anthropic e Gemini, Google) foram utilizadas durante a **Etapa 6 (Sprint 2)** deste projeto para as seguintes finalidades:
+
+- **Planejamento e Revisão do Escopo da Sprint:** Apoio na análise da viabilidade de combinar a US03 (fatia essencial) e a US04 como escopo da Sprint 2, identificando sobreposição com funcionalidades já entregues na US02 e sinalizando a ausência de autenticação (US01 postergada) como decisão técnica a ser formalizada antes da modelagem.
+- **Revisão do Contrato de Dados (`docs/contrato-dados-us04.md`):** Apoio na estruturação e revisão do contrato de dados da US04, incluindo tabela de códigos de erro, máquina de estados da solicitação e identificação de uma divergência já existente no `GlobalExceptionHandler` (formato de `detalhes` do erro `400`).
+- **Revisão do README.md (`/README.md`):** Foi utilizada inteligência artificial como apoio para construir a tabela de Endpoints da API criadas nesta entrega. Além disso, foi utilizada para verificar erros ortográficos ou correções breves do texto.
+- **Organização e Detalhamento de Issues:** Apoio na quebra da US04 em sub-issues técnicas (modelagem, validações, endpoints, frontend e testes) e na elaboração do cronograma inicial de datas por issue.
+- **Documentação de Padrões de Projeto OO (`docs/PADROES-DE-PROJETO.md` - Issue #92):** Auxílio na redação técnica, elaboração dos diagramas em Mermaid para os padrões Strategy e Observer, detalhamento das classes afetadas e análise de trade-offs arquiteturais.
+- **Implementação do Painel de Gestão do Professor (Issue #87):** Auxílio na escrita do componente React em TypeScript (`SIGTCC/frontend/src/paginas/PainelSolicitacoes/index.tsx`), nos estilos em `PainelSolicitacoes.css`, na tipagem (`Solicitacao.ts`) e no serviço de integração (`solicitacaoService.ts`).
+- **Implementação de Testes Automatizados no Frontend:** Auxílio na criação dos testes unitários de componente com Vitest e React Testing Library (`PainelSolicitacoes.test.tsx`), cobrindo os fluxos de aceite, recusa com justificativa obrigatória e tratamento de erros da API.
+- **Implementação de Testes Automatizados (Frontend e Backend):** Apoio na elaboração e estruturação das suítes de testes para o Frontend (Vitest para componentes e fluxos) e Backend (testes unitários e de integração).
+- **Versionamento de Banco de Dados (Flyway e SQL):** Auxílio na configuração e integração da ferramenta Flyway para o versionamento do banco de dados, bem como nos scripts de migração em SQL para a criação estruturada das novas tabelas.
+- **Implementação do Backend da Solicitação e Aceite de Orientação (Issue #84):** Auxílio na implementação dos endpoints de listagem e atualização de status, incluindo regras de aceite/recusa, validação de vagas, justificativa e padrão Observer para atualização das vagas.
+- **Implementação da Consulta Individual de Solicitação (Issue #85):** Auxílio na implementação do endpoint `GET /api/v1/solicitacoes/{id}`, incluindo retorno dos dados da solicitação, aluno, orientador, vagas disponíveis, justificativa e tratamento de solicitação inexistente.
+- **Apoio na configuração e validação de CI/CD (Issue #99):** Auxílio na análise e revisão dos workflows do GitHub Actions, incluindo a validação da sintaxe do `docker compose`, organização dos checks automatizados e configuração das regras de proteção da branch`entrega-6`.
+
+**Validação:**
+Todo o conteúdo, código e documentação gerados com o apoio da IA foram lidos, compreendidos, testados, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.

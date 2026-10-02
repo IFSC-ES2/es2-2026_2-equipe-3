@@ -92,10 +92,11 @@ class OrientadorControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
                 .andExpect(jsonPath("$.erro").value("Erro de validação nos dados enviados"))
-                .andExpect(jsonPath("$.detalhes.nome").exists())
-                .andExpect(jsonPath("$.detalhes.email").exists())
-                .andExpect(jsonPath("$.detalhes.linhasDePesquisa").exists())
-                .andExpect(jsonPath("$.detalhes.vagasDisponiveis").exists());
+                .andExpect(jsonPath("$.detalhes").isArray())
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'nome')]").exists())
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'email')]").exists())
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'linhasDePesquisa')]").exists())
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'vagasDisponiveis')]").exists());
     }
 
     @Test
@@ -232,7 +233,9 @@ class OrientadorControllerTest {
                         .content(jsonRequestBody))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.erro").value("Erro de validação nos dados enviados"));
+                .andExpect(jsonPath("$.erro").value("Erro de validação nos dados enviados"))
+                .andExpect(jsonPath("$.detalhes").isArray())
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'vagasDisponiveis')]").exists());
     }
 
     @Test

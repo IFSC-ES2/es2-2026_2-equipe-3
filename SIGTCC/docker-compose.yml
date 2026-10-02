@@ -41,8 +41,8 @@ services:
       SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL:-jdbc:mysql://db:3306/gestao_tcc}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-admin}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-senha_secreta}
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
-    command: ./gradlew bootRun
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+    command: sh -c "chmod +x ./gradlew && ./gradlew bootRun"
     depends_on:
       db:
         condition: service_healthy
