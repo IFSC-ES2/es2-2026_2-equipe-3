@@ -42,7 +42,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-admin}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-senha_secreta}
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
-    command: ./gradlew bootRun
+    command: sh -c "chmod +x ./gradlew && ./gradlew bootRun"
     depends_on:
       db:
         condition: service_healthy
