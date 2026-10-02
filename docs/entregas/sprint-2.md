@@ -137,23 +137,25 @@ Seguindo o edital da Entrega 6 (itens 3a, 3b, 3c e 3d):
 
 ### 7.1 Escopo Planejado vs. Entregue
 
-| Item do Backlog / Atividade | Planejado | Entregue | Status | Observações / Justificativa |
-| :--- | :---: | :---: | :---: | :--- |
-| **US04 - Solicitação e Aceite de Orientação (5 SP)** | 5 SP | 5 SP | **Concluído** | Fluxo ponta a ponta implementado (criação de solicitação, aceite/recusa com Observer e acompanhamento pelo aluno). |
-| **US03 (Fatia Essencial) - Ação de Solicitar no Catálogo** | Integrado | Integrado | **Concluído** | Botão "Solicitar Orientação" condicionado à existência de vagas (`vagasDisponiveis > 0`) no card do orientador. |
-| **Padrões de Projeto OO (Strategy + Observer)** | 2 padrões | 2 padrões | **Concluído** | Strategy aplicado na validação de propostas de orientação e Observer aplicado na atualização reativa de vagas. |
-| **Evolução de Esquema e Persistência (Flyway)** | Planejado | Entregue | **Concluído** | Adotado Flyway para versionamento do banco de dados (V1 e V2), com herança `@Inheritance(JOINED)` para `Aluno`. |
-| **US01 - Autenticação e Perfis (Spring Security / JWT)** | Postergado | Postergado | **Replanejado** | Mantido para a Sprint 3 conforme baseline; aluno modelado sem credenciais ativas ([ADR-0008](../adrs/ADR-0008.md)). |
-| **Filtros Avançados Combinados da US03** | Postergado | Postergado | **Replanejado** | Busca avançada por múltiplos critérios mantida no backlog para próximas fases do MVP. |
+| Item do Backlog / Atividade                                | Planejado  |  Entregue  |     Status      | Observações / Justificativa                                                                                         |
+| :--------------------------------------------------------- | :--------: | :--------: | :-------------: | :------------------------------------------------------------------------------------------------------------------ |
+| **US04 - Solicitação e Aceite de Orientação (5 SP)**       |    5 SP    |    5 SP    |  **Concluído**  | Fluxo ponta a ponta implementado (criação de solicitação, aceite/recusa com Observer e acompanhamento pelo aluno).  |
+| **US03 (Fatia Essencial) - Ação de Solicitar no Catálogo** | Integrado  | Integrado  |  **Concluído**  | Botão "Solicitar Orientação" condicionado à existência de vagas (`vagasDisponiveis > 0`) no card do orientador.     |
+| **Padrões de Projeto OO (Strategy + Observer)**            | 2 padrões  | 2 padrões  |  **Concluído**  | Strategy aplicado na validação de propostas de orientação e Observer aplicado na atualização reativa de vagas.      |
+| **Evolução de Esquema e Persistência (Flyway)**            | Planejado  |  Entregue  |  **Concluído**  | Adotado Flyway para versionamento do banco de dados (V1 e V2), com herança `@Inheritance(JOINED)` para `Aluno`.     |
+| **US01 - Autenticação e Perfis (Spring Security / JWT)**   | Postergado | Postergado | **Replanejado** | Mantido para a Sprint 3 conforme baseline; aluno modelado sem credenciais ativas ([ADR-0008](../adrs/ADR-0008.md)). |
+| **Filtros Avançados Combinados da US03**                   | Postergado | Postergado | **Replanejado** | Busca avançada por múltiplos critérios mantida no backlog para próximas fases do MVP.                               |
 
 ### 7.2 Riscos Revisados
 
 A matriz de riscos foi integralmente revisada na Sprint 2 pela equipe de requisitos e arquitetura. Os riscos técnicos e de processo mapeados na Entrega 4 foram atualizados com novos planos de contingência, com destaque para a mitigação bem-sucedida do risco de integração tardia por meio de contratos de dados prévios.
+
 - O detalhamento completo da revisão, status dos riscos ativos, mitigados e ações preventivas está registrado em [`docs/riscos.md`](../riscos.md) (Issue #93).
 
 ### 7.3 Métricas Finais da Sprint
 
 Os indicadores de qualidade de código, fluxo de trabalho e avanço do projeto foram coletados e consolidados ao término da Sprint 2:
+
 - Os relatórios e fichas técnicas com a análise aprofundada dos resultados estão documentados em [`docs/metricas`](../metricas/) ([M-01](../metricas/M-01.md), [M-02](../metricas/M-02.md), [M-03](../metricas/M-03.md), [M-04](../metricas/M-04.md), [M-05](../metricas/M-05.md), [M-06](../metricas/M-06.md)) (Issue #94).
 
 ---
@@ -163,6 +165,7 @@ Os indicadores de qualidade de código, fluxo de trabalho e avanço do projeto f
 A atuação de cada integrante manteve estrita coerência com os papéis declarados no planejamento da Sprint 2:
 
 ### 8.1 Damares do Socorro Gonçalves Gaia
+
 - **Papel:** Scrum Master da Sprint 2, Arquiteta de Software e Desenvolvimento Frontend.
 - **Atividades e Entregas:**
   - **Gestão e Planejamento:** Coordenação das cerimônias da Sprint 2, definição e refinamento da meta da sprint e backlog da US04 (**Issue #79**, **PR #80**).
@@ -174,6 +177,7 @@ A atuação de cada integrante manteve estrita coerência com os papéis declara
   - **Revisão de Código (Code Review):** Revisão e aprovação formal dos PRs #103, #107, #115 e #117.
 
 ### 8.2 Eduardo Cardoso Oliveira
+
 - **Papel:** Engenheiro de Requisitos e Apoio Geral / Fullstack.
 - **Atividades e Entregas:**
   - **Requisitos e Contrato de Dados:** Elaboração técnica e autoria do contrato de dados da US04 e cenários de aceitação em BDD (**Issue #81 / Doc-3**, **PR #103**).
@@ -185,6 +189,7 @@ A atuação de cada integrante manteve estrita coerência com os papéis declara
   - **Revisão de Código (Code Review):** Revisão e aprovação formal dos PRs #80, #106, #108, #109, #110, #113, #118, #119 e #122.
 
 ### 8.3 Marcus Jhuan Epifanio Lima
+
 - **Papel:** Designer UX/UI e Desenvolvimento Frontend.
 - **Atividades e Entregas:**
   - **Design de Interação e Vitrine:** Inclusão do botão de ação rápida "Solicitar Orientação" nos cards do catálogo, com tratamento condicional quando não há vagas disponíveis (**Issue #86**, **PR #115**).
@@ -194,15 +199,17 @@ A atuação de cada integrante manteve estrita coerência com os papéis declara
   - **Revisão de Código (Code Review):** Revisão e aprovação formal do **PR #112**.
 
 ### 8.4 Talles Souza da Cruz
+
 - **Papel:** Engenheiro de Qualidade - QA e Desenvolvimento Backend.
 - **Atividades e Entregas:**
   - **Modelagem de Domínio e Banco:** Criação das entidades `Aluno` (herança JPA JOINED) e `SolicitacaoOrientacao`, além da introdução da biblioteca Flyway com os scripts de migração `V1` e `V2` (**Issue #82**, **PR #106** e **PR #109**).
   - **Decisão Arquitetural Flyway:** Autoria da **ADR-0009** justificando a adoção do Flyway para controle de versão do banco de dados (**PR #106**).
-  - **Testes Automatizados:** Implementação da suíte de testes automatizados unitários e de integração cobrindo a US04 (**Issue #89**, PR #118). 
+  - **Testes Automatizados:** Implementação da suíte de testes automatizados unitários e de integração cobrindo a US04 (**Issue #89**, PR #118).
   - **Revisão de Qualidade:** Atualização do documento [`docs/qualidade.md`](../qualidade.md) frente às normas da ISO/IEC 25010 e decisões técnicas da sprint (**Issue #96 / Doc-7**, PR #119).
   - **Revisão de Código (Code Review):** Revisão e aprovação formal dos PRs #101, #105, #107, #111, #114, #116, #120 e #121.
 
 ### 8.5 Willian Ferreira dos Santos
+
 - **Papel:** DevOps / Infra e Desenvolvimento Backend.
 - **Atividades e Entregas:**
   - **Automação de CI/CD:** Aprimoramento e manutenção dos workflows do GitHub Actions (`backend-ci.yml`, `frontend-ci.yml` e `verificacao-docs.yml`), além do ajuste do template de Pull Request para a branch `entrega-6` (**Issue #99 / CI-1**, **PR #108** e **PR #111**).
@@ -219,4 +226,3 @@ A atuação de cada integrante manteve estrita coerência com os papéis declara
 - **Ramificação Base da Sprint:** `entrega-6`
 - **Branch Principal Integrada:** `main` (via commit de mesclagem)
 - **Descrição da Release:** Publicação no GitHub contendo o resumo executivo das funcionalidades entregues (US03 fatia essencial e US04 completa), arquitetura com padrões OO Strategy e Observer, suíte de testes automatizados, situação do CI e pendências técnicas para os próximos ciclos.
-
