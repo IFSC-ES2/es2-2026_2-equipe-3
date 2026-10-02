@@ -153,8 +153,8 @@ A matriz de riscos foi integralmente revisada na Sprint 2 pela equipe de requisi
 
 ### 7.3 Métricas Finais da Sprint
 
-Os indicadores de qualidade de código, fluxo de trabalho e avanço do projeto foram coletados e consolidados ao término da Sprint 2, comparando os resultados com a Sprint 1 e a linha de base (baseline):
-- Os relatórios e fichas técnicas com a análise aprofundada dos resultados estão documentados em [`docs/METRICAS.md`](../METRICAS.md) (Issue #94).
+Os indicadores de qualidade de código, fluxo de trabalho e avanço do projeto foram coletados e consolidados ao término da Sprint 2:
+- Os relatórios e fichas técnicas com a análise aprofundada dos resultados estão documentados em [`docs/metricas`](../metricas/) ([M-01](../metricas/M-01.md), [M-02](../metricas/M-02.md), [M-03](../metricas/M-03.md), [M-04](../metricas/M-04.md), [M-05](../metricas/M-05.md), [M-06](../metricas/M-06.md)) (Issue #94).
 
 ---
 
