@@ -1,10 +1,13 @@
 import type { Orientador } from "../../types/Orientador.ts";
+import { useNavigate } from "react-router-dom";
 
 interface OrientadorCardProps {
   orientador: Orientador;
 }
 
 export function OrientadorCard({ orientador }: OrientadorCardProps) {
+  const navigate = useNavigate();
+
   return (
     <article className="orientador-card">
       <div className="card-heading">
@@ -29,6 +32,16 @@ export function OrientadorCard({ orientador }: OrientadorCardProps) {
           ))}
         </ul>
       </div>
+      <button
+        className="primary-button card-request-button"
+        type="button"
+        disabled={orientador.vagasDisponiveis <= 0}
+        onClick={() => navigate(`/solicitar/${orientador.id}`)}
+      >
+        {orientador.vagasDisponiveis > 0
+          ? "Solicitar Orientação"
+          : "Sem vagas disponíveis"}
+      </button>
     </article>
   );
 }

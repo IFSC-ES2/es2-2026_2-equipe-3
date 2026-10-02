@@ -1,4 +1,5 @@
 import { render, screen, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import { OrientadorList } from "./index.tsx";
@@ -8,6 +9,13 @@ import type { Orientador } from "../../types/Orientador.ts";
 vi.mock("../../utils/orientadorService.ts", () => ({
   listarOrientadores: vi.fn(),
 }));
+
+const renderOrientadorList = () =>
+  render(
+    <MemoryRouter>
+      <OrientadorList />
+    </MemoryRouter>,
+  );
 
 describe("OrientadorList", () => {
   const mockOrientadores: Orientador[] = [
@@ -36,7 +44,7 @@ describe("OrientadorList", () => {
   test("deve exibir o estado de carregamento inicial", () => {
     vi.mocked(listarOrientadores).mockReturnValue(new Promise(() => {}));
 
-    render(<OrientadorList />);
+    renderOrientadorList();
 
     expect(screen.getByText("Carregando orientadores...")).toBeInTheDocument();
   });
@@ -44,7 +52,7 @@ describe("OrientadorList", () => {
   test("deve carregar e renderizar apenas orientadores ativos na montagem", async () => {
     vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
 
-    render(<OrientadorList />);
+    renderOrientadorList();
 
     await waitFor(() => {
       expect(
@@ -59,7 +67,7 @@ describe("OrientadorList", () => {
   test("deve exibir mensagem de erro se a chamada à API falhar", async () => {
     vi.mocked(listarOrientadores).mockRejectedValue(new Error("Erro de rede"));
 
-    render(<OrientadorList />);
+    renderOrientadorList();
 
     await waitFor(() => {
       expect(
@@ -73,7 +81,7 @@ describe("OrientadorList", () => {
   test("deve exibir empty state quando não houver orientadores ativos retornados", async () => {
     vi.mocked(listarOrientadores).mockResolvedValue([mockOrientadores[1]]);
 
-    render(<OrientadorList />);
+    renderOrientadorList();
 
     await waitFor(() => {
       expect(
@@ -86,7 +94,7 @@ describe("OrientadorList", () => {
     const user = userEvent.setup();
     vi.mocked(listarOrientadores).mockResolvedValue([]);
 
-    render(<OrientadorList />);
+    renderOrientadorList();
 
     await waitFor(() => {
       expect(
