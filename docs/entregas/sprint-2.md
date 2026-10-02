@@ -181,8 +181,8 @@ A atuação de cada integrante manteve estrita coerência com os papéis declara
   - **Gestão de Riscos:** Revisão e atualização completa do plano de riscos do projeto para a Sprint 2 (**Issue #93 / Doc-4**, **PR #107**).
   - **Desenvolvimento Backend:** Implementação das estratégias de validação de propostas de orientação (`ValidacaoOrientadorAtivo`, `ValidacaoSolicitacaoDuplicada`, `ValidacaoVagasDisponiveis`), DTOs e endpoint `POST /api/v1/solicitacoes` (**Issue #83**, **PR #114**).
   - **Integração Backend/Frontend:** Unificação de DTOs, controllers e services para os fluxos de alteração de status com o Observer (**Issue #84**, **PR #116**).
-  - **Documentação do Sistema:** Atualização geral do [`README.md`](../../README.md) com novos endpoints e instruções de execução (**Issue #95 / Doc-6**).
-  - **Revisão de Código (Code Review):** Revisão e aprovação formal dos PRs #80, #106, #108, #109, #110 e #113.
+  - **Documentação do Sistema:** Atualização geral do [`README.md`](../../README.md) com novos endpoints e instruções de execução (**Issue #95 / Doc-6**, PR #120).
+  - **Revisão de Código (Code Review):** Revisão e aprovação formal dos PRs #80, #106, #108, #109, #110, #113, #118, #119 e #122.
 
 ### 8.3 Marcus Jhuan Epifanio Lima
 - **Papel:** Designer UX/UI e Desenvolvimento Frontend.
@@ -198,10 +198,9 @@ A atuação de cada integrante manteve estrita coerência com os papéis declara
 - **Atividades e Entregas:**
   - **Modelagem de Domínio e Banco:** Criação das entidades `Aluno` (herança JPA JOINED) e `SolicitacaoOrientacao`, além da introdução da biblioteca Flyway com os scripts de migração `V1` e `V2` (**Issue #82**, **PR #106** e **PR #109**).
   - **Decisão Arquitetural Flyway:** Autoria da **ADR-0009** justificando a adoção do Flyway para controle de versão do banco de dados (**PR #106**).
-  - **Testes Automatizados:** Implementação da suíte de testes automatizados unitários e de integração cobrindo a US04 (**Issue #89**).
-  - **Acompanhamento de Métricas:** Coleta, consolidação e redação da análise técnica das 6 métricas de qualidade e processo (**Issue #94 / Doc-5**).
-  - **Revisão de Qualidade:** Atualização do documento [`docs/qualidade.md`](../qualidade.md) frente às normas da ISO/IEC 25010 e decisões técnicas da sprint (**Issue #96 / Doc-7**).
-  - **Revisão de Código (Code Review):** Revisão e aprovação formal dos PRs #101, #105, #107, #111, #114 e #116.
+  - **Testes Automatizados:** Implementação da suíte de testes automatizados unitários e de integração cobrindo a US04 (**Issue #89**, PR #118). 
+  - **Revisão de Qualidade:** Atualização do documento [`docs/qualidade.md`](../qualidade.md) frente às normas da ISO/IEC 25010 e decisões técnicas da sprint (**Issue #96 / Doc-7**, PR #119).
+  - **Revisão de Código (Code Review):** Revisão e aprovação formal dos PRs #101, #105, #107, #111, #114, #116, #120 e #121.
 
 ### 8.5 Willian Ferreira dos Santos
 - **Papel:** DevOps / Infra e Desenvolvimento Backend.
