@@ -28,6 +28,26 @@ services:
     volumes:
       - db_data_dev:/var/lib/mysql
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.0
+    container_name: gestao_tcc_keycloak_dev
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME:-admin}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD:-admin}
+      KC_HOSTNAME: http://localhost:8081
+    ports:
+      - "8081:8080"
+    volumes:
+      - keycloak_data_dev:/opt/keycloak/data
+      - ./keycloak:/opt/keycloak/data/import:ro
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
+
   backend:
     image: eclipse-temurin:21-jdk
     container_name: gestao_tcc_backend_dev
@@ -43,8 +63,16 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-senha_secreta}
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
     command: sh -c "chmod +x ./gradlew && ./gradlew bootRun"
+    healthcheck:
+      test: ["CMD", "bash", "-c", "exec 3<>/dev/tcp/localhost/8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+      start_period: 60s
     depends_on:
       db:
+        condition: service_healthy
+      keycloak:
         condition: service_healthy
 
   frontend:
@@ -60,8 +88,10 @@ services:
       VITE_API_URL: http://localhost:8080
     command: sh -c "npm install && npm run dev -- --host"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
 volumes:
   db_data_dev:
+  keycloak_data_dev:
   gradle_cache:
