@@ -6,7 +6,6 @@
 - **Marco de Release:** `v0.3.0`
 - **Branch de Trabalho:** `entrega-7`
 
-
 ---
 
 # Inspeção e replanejamento da Sprint 3
@@ -16,7 +15,7 @@
 ### 1.1 Funcionalidades
 
 | História                                          |  Estimativa   | Estado ao final da Sprint 2 | Observação                                                                                                       |
-| :------------------------------------------------ | :-----------: | :-------------------------- |:-----------------------------------------------------------------------------------------------------------------|
+| :------------------------------------------------ | :-----------: | :-------------------------- | :--------------------------------------------------------------------------------------------------------------- |
 | US01 - Autenticação e Perfis                      |     5 SP      | Não iniciada                | Postergada nas Sprints 1 e 2. Todos os endpoints são públicos.                                                   |
 | US02 - Cadastro de Perfil de Orientador e Vagas   |     5 SP      | Concluída (Sprint 1)        | CRUD de orientadores, catálogo e edição de perfil.                                                               |
 | US03 - Busca e Filtragem de Orientadores          |     3 SP      | Parcial                     | Entregues o filtro textual `?area=` (Sprint 1) e o botão "Solicitar Orientação" condicionado a vagas (Sprint 2). |
@@ -42,16 +41,16 @@ O sistema ao final da Sprint 2 entrega o "match" entre aluno e orientador de pon
 
 Situação registrada em [`docs/riscos.md`](../riscos.md) na revisão da Sprint 2:
 
-| Risco                                       | Prioridade  | Situação ao final da Sprint 2                                                                |
-| :------------------------------------------ | :---------: | :------------------------------------------------------------------------------------------- |
-| R01 - Desistência ou baixa participação     |  Alta (6)   | Concretizado parcialmente, com impacto em prazo de ao menos uma issue.                       |
-| R02 - Regressão por falta de testes/CI      |  Alta (6)   | Ativo, parcialmente mitigado pelo bloqueio de merge com CI vermelho.                         |
-| R03 - Atraso de integração backend/frontend | Crítica (9) | Mitigado pela prática de contrato de dados no início da sprint.                              |
-| R04 - Crescimento do escopo                 |  Média (4)  | Mitigado na Sprint 2; **reabre com o ajuste de escopo da seção 3**.                          |
+| Risco                                       | Prioridade  | Situação ao final da Sprint 2                                                                                             |
+| :------------------------------------------ | :---------: | :------------------------------------------------------------------------------------------------------------------------ |
+| R01 - Desistência ou baixa participação     |  Alta (6)   | Concretizado parcialmente, com impacto em prazo de ao menos uma issue.                                                    |
+| R02 - Regressão por falta de testes/CI      |  Alta (6)   | Ativo, parcialmente mitigado pelo bloqueio de merge com CI vermelho.                                                      |
+| R03 - Atraso de integração backend/frontend | Crítica (9) | Mitigado pela prática de contrato de dados no início da sprint.                                                           |
+| R04 - Crescimento do escopo                 |  Média (4)  | Mitigado na Sprint 2; **reabre com o ajuste de escopo da seção 3**.                                                       |
 | R05 - Divergência de ambientes (Docker)     |  Alta (6)   | Concretizado na Sprint 2 (falha de permissão do `gradlew` em Linux) e resolvido: a correção foi integrada ao repositório. |
-| R06 - Ausência de autenticação              |  Alta (6)   | Ativo. É o principal motivador da priorização da US01.                                       |
-| R07 - Condição de corrida no aceite         |  Média (3)  | Ativo. Sem mecanismo de controle de concorrência no código.                                  |
-| R08 - Mudança de direção do produto (pivot) |  Alta (6)   | Tratado pela equipe por meio do relatório de refatoração de escopo (seção 3).                |
+| R06 - Ausência de autenticação              |  Alta (6)   | Ativo. É o principal motivador da priorização da US01.                                                                    |
+| R07 - Condição de corrida no aceite         |  Média (3)  | Ativo. Sem mecanismo de controle de concorrência no código.                                                               |
+| R08 - Mudança de direção do produto (pivot) |  Alta (6)   | Tratado pela equipe por meio do relatório de refatoração de escopo (seção 3).                                             |
 
 ---
 
@@ -67,7 +66,7 @@ Situação registrada em [`docs/riscos.md`](../riscos.md) na revisão da Sprint 
 ### 2.2 Corrigido
 
 | Correção                                                                                                                                                | Quando                                                           |
-|:--------------------------------------------------------------------------------------------------------------------------------------------------------| :--------------------------------------------------------------- |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------- |
 | Proteger os endpoints e substituir o `localStorage` pela identidade do usuário autenticado.                                                             | Sprint 3 (US01)                                                  |
 | Alinhar README, ADR-0007 e `PADROES-DE-PROJETO.md` ao código real; atualizar `fluxo-de-trabalho.md`, `riscos.md` e o template de PR para a `entrega-7`. | Sprint 3 (ADRs consolidados e documentação)                      |
 | Candidato à refatoração orientada a design da Entrega 7, com métrica antes/depois (duplicação e cobertura de `utils`).                                  | Sprint 3 (reengenharia)                                          |
@@ -100,7 +99,7 @@ Os ajustes abaixo foram aprovados pela equipe . Eles respondem ao risco R08 (pos
 ### 3.1 Resumo dos Ajustes
 
 | Tipo       | Ajuste                                                                                                                                | Impacto                                                                                                 |
-| :--------- | :------------------------------------------------------------------------------------------------------------------------------------ |---------------------------------------------------------------------------------------------------------|
+| :--------- | :------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
 | Alterado   | Perfis reduzidos a `ROLE_ALUNO` e `ROLE_PROFESSOR`. O "Coordenador" passa a ser o professor responsável pela `Turma_TCC` do semestre. | US01 e US05; nova entidade `Turma_TCC`; interface do professor renderizada conforme a responsabilidade. |
 | Alterado   | Submissão de entregas por link de nuvem, em vez de upload de arquivo.                                                                 | US06 e US07; dispensa infraestrutura de armazenamento.                                                  |
 | Adicionado | Autenticação com Spring Security e Keycloak, como prioridade máxima da Sprint 3.                                                      | US01; novo contêiner no `docker-compose`; nova ADR.                                                     |
@@ -167,4 +166,3 @@ A revisão completa será registrada em [`docs/riscos.md`](../riscos.md) no fech
 - **Critérios de merge:** ao menos uma aprovação de outro integrante, pipeline de CI verde e integração por commit de mesclagem.
 - **Rastreabilidade:** cada PR referencia a issue correspondente; o PR da refatoração é específico e identificável.
 - **Integração final:** PR revisado da `entrega-7` para a `main`, seguido da release `v0.3.0`.
-
