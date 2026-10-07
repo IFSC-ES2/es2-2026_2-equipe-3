@@ -1,0 +1,111 @@
+{
+  "realm": "sigtcc",
+  "displayName": "SIGTCC",
+  "enabled": true,
+  "registrationAllowed": false,
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": false,
+  "editUsernameAllowed": false,
+  "internationalizationEnabled": true,
+  "supportedLocales": ["pt-BR"],
+  "defaultLocale": "pt-BR",
+  "roles": {
+    "realm": [
+      {
+        "name": "ROLE_ALUNO",
+        "description": "Aluno de TCC: consulta o catálogo, solicita orientação e acompanha prazos."
+      },
+      {
+        "name": "ROLE_PROFESSOR",
+        "description": "Docente: orienta alunos. A gestão da turma e do calendário não é um papel; é verificada no banco pela responsabilidade sobre a Turma_TCC."
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "sigtcc-frontend",
+      "name": "SIGTCC Frontend (React)",
+      "description": "Cliente público da SPA. Usa Authorization Code com PKCE.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "rootUrl": "http://localhost:5173",
+      "redirectUris": ["http://localhost:5173/*"],
+      "webOrigins": ["http://localhost:5173"],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5173/*"
+      },
+      "protocolMappers": [
+        {
+          "name": "audience-sigtcc-backend",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "sigtcc-backend",
+            "id.token.claim": "false",
+            "access.token.claim": "true",
+            "introspection.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "sigtcc-backend",
+      "name": "SIGTCC Backend (Spring Boot)",
+      "description": "Representa a API como audiência (aud) dos tokens. O backend apenas valida tokens; nenhum fluxo de login está habilitado.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "implicitFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false
+    }
+  ],
+  "users": [
+    {
+      "username": "aluno@example.com",
+      "email": "aluno@example.com",
+      "firstName": "Aluno",
+      "lastName": "de Teste",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "aluno123", "temporary": false }
+      ],
+      "realmRoles": ["ROLE_ALUNO"]
+    },
+    {
+      "username": "professor.orientador@example.com",
+      "email": "professor.orientador@example.com",
+      "firstName": "Professor",
+      "lastName": "Orientador",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "professor123", "temporary": false }
+      ],
+      "realmRoles": ["ROLE_PROFESSOR"]
+    },
+    {
+      "username": "professor.responsavel@example.com",
+      "email": "professor.responsavel@example.com",
+      "firstName": "Professor",
+      "lastName": "Responsável pela Turma",
+      "enabled": true,
+      "emailVerified": true,
+      "credentials": [
+        { "type": "password", "value": "professor123", "temporary": false }
+      ],
+      "realmRoles": ["ROLE_PROFESSOR"]
+    }
+  ]
+}
