@@ -59,14 +59,8 @@ public class OrientadorService {
     }
 
     @Transactional(readOnly = true)
-    public List<OrientadorResponseDTO> listarOrientadores(String area) {
-        List<Orientador> orientadores;
-
-        if (area != null && !area.trim().isEmpty()) {
-            orientadores = orientadorRepository.findByLinhasPesquisaNomeContainingIgnoreCase(area);
-        } else {
-            orientadores = orientadorRepository.findAll();
-        }
+    public List<OrientadorResponseDTO> listarOrientadores(String area, Boolean temVagas) {
+        List<Orientador> orientadores = orientadorRepository.findByFiltros(area, temVagas);
 
         return orientadores.stream()
                 .map(this::toResponseDTO)
