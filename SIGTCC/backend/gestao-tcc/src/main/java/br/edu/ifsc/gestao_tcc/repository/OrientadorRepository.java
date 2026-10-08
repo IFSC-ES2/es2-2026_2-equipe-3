@@ -22,6 +22,4 @@ public interface OrientadorRepository extends JpaRepository<Orientador, Long> {
     """)
     List<Orientador> findByFiltros(@Param("area") String area, @Param("temVagas") Boolean temVagas);
 
-    @Query("SELECT DISTINCT o FROM Orientador o JOIN o.perfil p JOIN p.linhasPesquisa lp WHERE LOWER(lp.nome) LIKE LOWER(CONCAT('%', :area, '%'))")
-    List<Orientador> findByLinhasPesquisaNomeContainingIgnoreCase(@Param("area") String area);
 }
