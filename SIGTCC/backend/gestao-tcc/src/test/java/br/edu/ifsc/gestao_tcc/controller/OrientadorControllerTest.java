@@ -183,6 +183,34 @@ class OrientadorControllerTest {
     }
 
     @Test
+    @DisplayName("GET /orientadores?area=IA&temVagas=true - Deve retornar 200 OK com filtros combinados")
+    void listaOrientadores_DeveRetornar200OK_ComFiltrosCombinados() throws Exception {
+        OrientadorResponseDTO dto = new OrientadorResponseDTO(
+                1L,
+                "Dra. Maria",
+                "maria@ifsc.edu.br",
+                "DAE",
+                List.of("IA"),
+                2,
+                "Bio",
+                true
+        );
+
+        when(orientadorService.listarOrientadores("IA", true))
+                .thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/api/v1/orientadores")
+                        .param("area", "IA")
+                        .param("temVagas", "true")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].linhasDePesquisa[0]").value("IA"))
+                .andExpect(jsonPath("$[0].vagasDisponiveis").value(2));
+    }
+
+    @Test
     @DisplayName("GET /orientadores/{id} - Deve retornar 200 OK quando Id existe")
     void listaOrientadorID_DeveRetornar200OK_QuandoIdExiste() throws Exception {
         OrientadorResponseDTO dto = new OrientadorResponseDTO(
