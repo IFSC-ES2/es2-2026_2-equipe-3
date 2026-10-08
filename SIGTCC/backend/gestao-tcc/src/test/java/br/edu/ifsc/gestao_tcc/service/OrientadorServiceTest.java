@@ -78,6 +78,23 @@ class OrientadorServiceTest {
     }
 
     @Test
+    @DisplayName("Deve retornar todos os orientadores quando não houver filtros")
+    void listarOrientadores_DeveRetornarTodos_QuandoNaoHouverFiltros() {
+        Orientador o1 = criarOrientadorMock(1L, "João");
+        Orientador o2 = criarOrientadorMock(2L, "Maria");
+
+        when(orientadorRepository.findByFiltros(null, null))
+                .thenReturn(List.of(o1, o2));
+
+        List<OrientadorResponseDTO> resultado =
+                orientadorService.listarOrientadores(null, null);
+
+        assertEquals(2, resultado.size());
+        verify(orientadorRepository, times(1))
+                .findByFiltros(null, null);
+    }
+
+    @Test
     @DisplayName("Deve retornar OrientadorResponseDTO quando ID existir")
     void buscarPorId_DeveRetornarOrientadorResponseDTO_QuandoIdExiste() {
         Long id = 1L;
