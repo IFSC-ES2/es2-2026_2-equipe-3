@@ -126,4 +126,40 @@ class OrientadorRepositoryTest {
                 .extracting(Orientador::getNome)
                 .containsExactly("Ana");
     }
+
+    @Test
+    @DisplayName("Deve combinar filtro de linha de pesquisa e vagas disponíveis")
+    void findByFiltros_ComLinhaEComVagas_DeveRetornarSomenteCorrespondentes() {
+        Orientador comLinhaEComVagas = salvarOrientadorComPerfil(
+                "Ana",
+                "ana@ifsc.edu.br",
+                "Inteligência Artificial"
+        );
+
+        Orientador comLinhaSemVagas = salvarOrientadorComPerfil(
+                "Carlos",
+                "carlos@ifsc.edu.br",
+                "Inteligência Artificial"
+        );
+
+        Orientador outraLinhaComVagas = salvarOrientadorComPerfil(
+                "Maria",
+                "maria@ifsc.edu.br",
+                "Desenvolvimento Web"
+        );
+
+        comLinhaEComVagas.getPerfil().setVagasDisponiveis(2);
+        comLinhaSemVagas.getPerfil().setVagasDisponiveis(0);
+        outraLinhaComVagas.getPerfil().setVagasDisponiveis(3);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Orientador> resultado =
+                orientadorRepository.findByFiltros("Inteligência", true);
+
+        assertThat(resultado)
+                .extracting(Orientador::getNome)
+                .containsExactly("Ana");
+    }
 }
