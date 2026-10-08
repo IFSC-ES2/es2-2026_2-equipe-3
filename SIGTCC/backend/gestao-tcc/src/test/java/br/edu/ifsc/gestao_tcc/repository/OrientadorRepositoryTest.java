@@ -97,4 +97,33 @@ class OrientadorRepositoryTest {
 
         assertThat(resultado).isEmpty();
     }
+
+    @Test
+    @DisplayName("Deve retornar somente orientadores com vagas disponíveis")
+    void findByFiltros_ComFiltroDeVagas_DeveRetornarSomenteComVagas() {
+        Orientador comVagas = salvarOrientadorComPerfil(
+                "Ana",
+                "ana@ifsc.edu.br",
+                "Inteligência Artificial"
+        );
+
+        Orientador semVagas = salvarOrientadorComPerfil(
+                "Carlos",
+                "carlos@ifsc.edu.br",
+                "Desenvolvimento Web"
+        );
+
+        comVagas.getPerfil().setVagasDisponiveis(2);
+        semVagas.getPerfil().setVagasDisponiveis(0);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Orientador> resultado =
+                orientadorRepository.findByFiltros(null, true);
+
+        assertThat(resultado)
+                .extracting(Orientador::getNome)
+                .containsExactly("Ana");
+    }
 }
