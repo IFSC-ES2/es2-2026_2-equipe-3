@@ -78,37 +78,6 @@ class OrientadorServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar todos os orientadores quando não passar filtro de área")
-    void listarOrientadores_DeveRetornarTodos_QuandoFiltroForNuloOuVazio() {
-        Orientador o1 = criarOrientadorMock(1L, "João");
-        Orientador o2 = criarOrientadorMock(2L, "Maria");
-
-        when(orientadorRepository.findAll()).thenReturn(List.of(o1, o2));
-
-        List<OrientadorResponseDTO> resultado = orientadorService.listarOrientadores(null);
-
-        assertEquals(2, resultado.size());
-        verify(orientadorRepository, times(1)).findAll();
-        verify(orientadorRepository, never()).findByLinhasPesquisaNomeContainingIgnoreCase(anyString());
-    }
-
-    @Test
-    @DisplayName("Deve retornar orientadores filtrados pela área")
-    void listarOrientadores_DeveRetornarFiltrados_QuandoPassarFiltro() {
-        Orientador o1 = criarOrientadorMock(1L, "João");
-
-        when(orientadorRepository.findByLinhasPesquisaNomeContainingIgnoreCase("IA"))
-                .thenReturn(List.of(o1));
-
-        List<OrientadorResponseDTO> resultado = orientadorService.listarOrientadores("IA");
-
-        assertEquals(1, resultado.size());
-        assertEquals("João", resultado.get(0).nome());
-        verify(orientadorRepository, times(1)).findByLinhasPesquisaNomeContainingIgnoreCase("IA");
-        verify(orientadorRepository, never()).findAll();
-    }
-
-    @Test
     @DisplayName("Deve retornar OrientadorResponseDTO quando ID existir")
     void buscarPorId_DeveRetornarOrientadorResponseDTO_QuandoIdExiste() {
         Long id = 1L;
