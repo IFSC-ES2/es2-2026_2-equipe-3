@@ -15,11 +15,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Sobe a aplicação completa (com H2) para exercitar a cadeia de filtros de
- * segurança real. O jwt() simula um token já validado, então estes testes não
- * dependem de um Keycloak no ar.
- */
 @SpringBootTest
 @AutoConfigureMockMvc
 class SecurityConfigTest {
