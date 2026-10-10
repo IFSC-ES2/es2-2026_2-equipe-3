@@ -13,7 +13,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.util.List;
 
-@CrossOrigin(origins = {"http://localhost:5173", "http://127.0.0.1:5173"}, exposedHeaders = "Location")
 @RestController
 @RequestMapping("/api/v1/solicitacoes")
 @RequiredArgsConstructor
