@@ -39,8 +39,9 @@ public class OrientadorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrientadorResponseDTO>> listaOrientadores(@RequestParam(required = false) String area) {
-        List<OrientadorResponseDTO> lista = orientadorService.listarOrientadores(area);
+    public ResponseEntity<List<OrientadorResponseDTO>> listaOrientadores(@RequestParam(required = false) String area, @RequestParam(required = false) Boolean temVagas) {
+
+        List<OrientadorResponseDTO> lista = orientadorService.listarOrientadores(area, temVagas);
         return ResponseEntity.ok(lista);
     }
 

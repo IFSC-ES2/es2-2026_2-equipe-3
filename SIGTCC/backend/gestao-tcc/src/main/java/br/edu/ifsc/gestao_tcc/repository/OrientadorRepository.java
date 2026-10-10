@@ -12,6 +12,14 @@ import java.util.List;
 public interface OrientadorRepository extends JpaRepository<Orientador, Long> {
     boolean existsByEmail(String email);
 
-    @Query("SELECT DISTINCT o FROM Orientador o JOIN o.perfil p JOIN p.linhasPesquisa lp WHERE LOWER(lp.nome) LIKE LOWER(CONCAT('%', :area, '%'))")
-    List<Orientador> findByLinhasPesquisaNomeContainingIgnoreCase(@Param("area") String area);
+    @Query("""
+        SELECT DISTINCT o
+        FROM Orientador o
+        JOIN o.perfil p
+        LEFT JOIN p.linhasPesquisa lp
+        WHERE (:area IS NULL OR LOWER(lp.nome) LIKE LOWER(CONCAT('%', :area, '%')))
+          AND (:temVagas IS NULL OR :temVagas = false OR p.vagasDisponiveis > 0)
+    """)
+    List<Orientador> findByFiltros(@Param("area") String area, @Param("temVagas") Boolean temVagas);
+
 }

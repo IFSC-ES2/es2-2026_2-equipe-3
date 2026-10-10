@@ -128,7 +128,7 @@ class OrientadorControllerTest {
         OrientadorResponseDTO dto1 = new OrientadorResponseDTO(1L, "Dr. Adriano Lima", "adriano.lima@ifsc.edu.br", "DAE", List.of("Engenharia de Software"), 3, "Bio", true);
         OrientadorResponseDTO dto2 = new OrientadorResponseDTO(2L, "Dra. Maria", "maria@ifsc.edu.br", "DAE", List.of("IA"), 2, "Bio", true);
 
-        when(orientadorService.listarOrientadores(null)).thenReturn(List.of(dto1, dto2));
+        when(orientadorService.listarOrientadores(null, null)).thenReturn(List.of(dto1, dto2));
 
         mockMvc.perform(get("/api/v1/orientadores")
                         .accept(MediaType.APPLICATION_JSON))
@@ -144,7 +144,7 @@ class OrientadorControllerTest {
     void listaOrientadores_DeveRetornar200OK_ComFiltroDeArea() throws Exception {
         OrientadorResponseDTO dto2 = new OrientadorResponseDTO(2L, "Dra. Maria", "maria@ifsc.edu.br", "DAE", List.of("IA"), 2, "Bio", true);
 
-        when(orientadorService.listarOrientadores("IA")).thenReturn(List.of(dto2));
+        when(orientadorService.listarOrientadores("IA", null)).thenReturn(List.of(dto2));
 
         mockMvc.perform(get("/api/v1/orientadores")
                         .param("area", "IA")
@@ -153,6 +153,61 @@ class OrientadorControllerTest {
                 .andExpect(jsonPath("$").isArray())
                 .andExpect(jsonPath("$.length()").value(1))
                 .andExpect(jsonPath("$[0].linhasDePesquisa[0]").value("IA"));
+    }
+
+    @Test
+    @DisplayName("GET /orientadores?temVagas=true - Deve retornar 200 OK com lista filtrada por vagas")
+    void listaOrientadores_DeveRetornar200OK_ComFiltroDeVagas() throws Exception {
+        OrientadorResponseDTO dto = new OrientadorResponseDTO(
+                1L,
+                "Dr. Adriano Lima",
+                "adriano.lima@ifsc.edu.br",
+                "DAE",
+                List.of("Engenharia de Software"),
+                3,
+                "Bio",
+                true
+        );
+
+        when(orientadorService.listarOrientadores(null, true))
+                .thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/api/v1/orientadores")
+                        .param("temVagas", "true")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].nome").value("Dr. Adriano Lima"))
+                .andExpect(jsonPath("$[0].vagasDisponiveis").value(3));
+    }
+
+    @Test
+    @DisplayName("GET /orientadores?area=IA&temVagas=true - Deve retornar 200 OK com filtros combinados")
+    void listaOrientadores_DeveRetornar200OK_ComFiltrosCombinados() throws Exception {
+        OrientadorResponseDTO dto = new OrientadorResponseDTO(
+                1L,
+                "Dra. Maria",
+                "maria@ifsc.edu.br",
+                "DAE",
+                List.of("IA"),
+                2,
+                "Bio",
+                true
+        );
+
+        when(orientadorService.listarOrientadores("IA", true))
+                .thenReturn(List.of(dto));
+
+        mockMvc.perform(get("/api/v1/orientadores")
+                        .param("area", "IA")
+                        .param("temVagas", "true")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].linhasDePesquisa[0]").value("IA"))
+                .andExpect(jsonPath("$[0].vagasDisponiveis").value(2));
     }
 
     @Test

@@ -165,7 +165,11 @@ Accept: application/json
 
 #### Parâmetros de Consulta (Query Params - Opcionais)
 
-- `area`: Filtro textual opcional por linha de pesquisa ou área de interesse (ex: `/api/v1/orientadores?area=Software`).
+- `area`: Filtro textual opcional pelo nome da linha de pesquisa. Exemplo: `/api/v1/orientadores?area=Software`.
+- `temVagas`: Filtro opcional para retornar somente orientadores que possuem vagas disponíveis. Quando `true`, serão retornados apenas orientadores com `vagasDisponiveis > 0`. Quando não informado ou definido como `false`, o filtro de vagas não é aplicado.
+  Exemplo: `/api/v1/orientadores?temVagas=true`.
+- Os filtros podem ser utilizados simultaneamente. Nesse caso, serão retornados somente os orientadores que correspondam à linha de pesquisa informada e possuam vagas disponíveis.
+  Exemplo: `/api/v1/orientadores?area=Software&temVagas=true`.
 
 #### Respostas Possíveis
 

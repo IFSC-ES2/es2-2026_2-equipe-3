@@ -75,12 +75,12 @@ class OrientadorRepositoryTest {
 
     @Test
     @DisplayName("Deve retornar uma lista de orientadores filtrando por um trecho da linha de pesquisa")
-    void findByLinhasPesquisaNomeContainingIgnoreCase_ComMatch_DeveRetornarLista() {
+    void findByFiltros_ComMatchNaLinhaDePesquisa_DeveRetornarLista() {
         salvarOrientadorComPerfil("Ana", "ana@ifsc.edu.br", "Inteligência Artificial");
         salvarOrientadorComPerfil("Carlos", "carlos@ifsc.edu.br", "Desenvolvimento Web");
 
         List<Orientador> resultado = orientadorRepository
-                .findByLinhasPesquisaNomeContainingIgnoreCase("inteligência");
+                .findByFiltros("inteligência", null);
 
         assertThat(resultado).isNotEmpty();
         assertThat(resultado).hasSize(1);
@@ -89,12 +89,77 @@ class OrientadorRepositoryTest {
 
     @Test
     @DisplayName("Deve retornar uma lista vazia quando nenhuma linha de pesquisa corresponder à busca")
-    void findByLinhasPesquisaNomeContainingIgnoreCase_SemMatch_DeveRetornarListaVazia() {
+    void findByFiltros_SemMatchNaLinhaDePesquisa_DeveRetornarListaVazia() {
         salvarOrientadorComPerfil("Ana", "ana@ifsc.edu.br", "Redes de Computadores");
 
         List<Orientador> resultado = orientadorRepository
-                .findByLinhasPesquisaNomeContainingIgnoreCase("Robótica");
+                .findByFiltros("Robótica", null);
 
         assertThat(resultado).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Deve retornar somente orientadores com vagas disponíveis")
+    void findByFiltros_ComFiltroDeVagas_DeveRetornarSomenteComVagas() {
+        Orientador comVagas = salvarOrientadorComPerfil(
+                "Ana",
+                "ana@ifsc.edu.br",
+                "Inteligência Artificial"
+        );
+
+        Orientador semVagas = salvarOrientadorComPerfil(
+                "Carlos",
+                "carlos@ifsc.edu.br",
+                "Desenvolvimento Web"
+        );
+
+        comVagas.getPerfil().setVagasDisponiveis(2);
+        semVagas.getPerfil().setVagasDisponiveis(0);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Orientador> resultado =
+                orientadorRepository.findByFiltros(null, true);
+
+        assertThat(resultado)
+                .extracting(Orientador::getNome)
+                .containsExactly("Ana");
+    }
+
+    @Test
+    @DisplayName("Deve combinar filtro de linha de pesquisa e vagas disponíveis")
+    void findByFiltros_ComLinhaEComVagas_DeveRetornarSomenteCorrespondentes() {
+        Orientador comLinhaEComVagas = salvarOrientadorComPerfil(
+                "Ana",
+                "ana@ifsc.edu.br",
+                "Inteligência Artificial"
+        );
+
+        Orientador comLinhaSemVagas = salvarOrientadorComPerfil(
+                "Carlos",
+                "carlos@ifsc.edu.br",
+                "Inteligência Artificial"
+        );
+
+        Orientador outraLinhaComVagas = salvarOrientadorComPerfil(
+                "Maria",
+                "maria@ifsc.edu.br",
+                "Desenvolvimento Web"
+        );
+
+        comLinhaEComVagas.getPerfil().setVagasDisponiveis(2);
+        comLinhaSemVagas.getPerfil().setVagasDisponiveis(0);
+        outraLinhaComVagas.getPerfil().setVagasDisponiveis(3);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Orientador> resultado =
+                orientadorRepository.findByFiltros("Inteligência", true);
+
+        assertThat(resultado)
+                .extracting(Orientador::getNome)
+                .containsExactly("Ana");
     }
 }
