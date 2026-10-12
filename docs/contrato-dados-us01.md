@@ -2,8 +2,8 @@
 
 - **Versão do Documento:** 1.0.0
 - **Data de Elaboração:** 12/10/2026
-- **História de Usuário Relacionada:** US01 – Autenticação e Perfis de Usuário (Sprint 3)
-- **Issue Relacionada:** #129 – Expor no backend se o professor logado é responsável pela `Turma_TCC` (US01-3)
+- **História de Usuário Relacionada:** US01 - Autenticação e Perfis de Usuário (Sprint 3)
+- **Issue Relacionada:** #129 - Expor no backend se o professor logado é responsável pela `Turma_TCC` (US01-3)
 - **Status:** Aprovado para Implementação
 
 ---
