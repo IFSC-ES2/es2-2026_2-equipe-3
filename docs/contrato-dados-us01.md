@@ -37,13 +37,13 @@ Alteração em relação aos contratos anteriores:
 
 ### 3.1. `PerfilProfessorResponse` (saída)
 
-| Campo              | Tipo             | Descrição                                                                                                       |
-| :----------------- | :--------------- | :-------------------------------------------------------------------------------------------------------------- |
-| `id`               | Long             | Identificador do professor (mesmo `id` usado em `/api/v1/orientadores/{id}`).                                   |
-| `nome`             | String           | Nome do professor.                                                                                              |
-| `email`            | String           | E-mail do professor.                                                                                            |
-| `departamento`     | String ou `null` | Departamento do professor.                                                                                      |
-| `responsavelTurma` | Boolean          | `true` se o professor é o responsável pela `Turma_TCC` vigente; `false` caso contrário. Nunca é `null`.         |
+| Campo              | Tipo             | Descrição                                                                                               |
+| :----------------- | :--------------- | :------------------------------------------------------------------------------------------------------ |
+| `id`               | Long             | Identificador do professor (mesmo `id` usado em `/api/v1/orientadores/{id}`).                           |
+| `nome`             | String           | Nome do professor.                                                                                      |
+| `email`            | String           | E-mail do professor.                                                                                    |
+| `departamento`     | String ou `null` | Departamento do professor.                                                                              |
+| `responsavelTurma` | Boolean          | `true` se o professor é o responsável pela `Turma_TCC` vigente; `false` caso contrário. Nunca é `null`. |
 
 ---
 
@@ -116,12 +116,12 @@ O token não possui a claim `email`, ou nenhum professor cadastrado tem o e-mail
 
 ## 5. Sumário dos Códigos de Status
 
-| Código | Quando ocorre                                                             |
-| :----- | :------------------------------------------------------------------------ |
-| `200`  | Professor identificado; `responsavelTurma` informa a responsabilidade.    |
-| `401`  | Token ausente ou inválido.                                                |
-| `403`  | Token válido, mas sem `ROLE_PROFESSOR`.                                   |
-| `404`  | Professor do token não encontrado no cadastro de orientadores.            |
+| Código | Quando ocorre                                                          |
+| :----- | :--------------------------------------------------------------------- |
+| `200`  | Professor identificado; `responsavelTurma` informa a responsabilidade. |
+| `401`  | Token ausente ou inválido.                                             |
+| `403`  | Token válido, mas sem `ROLE_PROFESSOR`.                                |
+| `404`  | Professor do token não encontrado no cadastro de orientadores.         |
 
 ---
 
@@ -135,9 +135,9 @@ O token não possui a claim `email`, ou nenhum professor cadastrado tem o e-mail
 
 ## 7. Decisões Assumidas
 
-| Decisão                                                              | Justificativa                                                                                                                                                   |
-| :------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Endpoint novo (`/api/v1/professores/me`) em vez de campo extra.      | Não existe endpoint de perfil do usuário autenticado; alterar `OrientadorResponse` afetaria o catálogo (US02/US03), que é público para o aluno.                 |
-| O professor é identificado pelo e-mail do token.                     | O realm usa o e-mail como username e o cadastro de orientadores tem e-mail único; não há vínculo por `sub` do Keycloak no modelo atual.                         |
-| Consulta reaproveitada da US01-2.                                    | `TurmaTCCRepository.existsByProfessorResponsavelIdAndVigenteTrue`, conforme o critério de aceitação da issue.                                                   |
-| Rotas sob `/api/v1/professores/**` exigem `ROLE_PROFESSOR`.          | Um aluno não tem perfil de professor; retornar `403` evita expor um `404` ambíguo.                                                                               |
+| Decisão                                                         | Justificativa                                                                                                                                   |
+| :-------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Endpoint novo (`/api/v1/professores/me`) em vez de campo extra. | Não existe endpoint de perfil do usuário autenticado; alterar `OrientadorResponse` afetaria o catálogo (US02/US03), que é público para o aluno. |
+| O professor é identificado pelo e-mail do token.                | O realm usa o e-mail como username e o cadastro de orientadores tem e-mail único; não há vínculo por `sub` do Keycloak no modelo atual.         |
+| Consulta reaproveitada da US01-2.                               | `TurmaTCCRepository.existsByProfessorResponsavelIdAndVigenteTrue`, conforme o critério de aceitação da issue.                                   |
+| Rotas sob `/api/v1/professores/**` exigem `ROLE_PROFESSOR`.     | Um aluno não tem perfil de professor; retornar `403` evita expor um `404` ambíguo.                                                              |
