@@ -11,6 +11,7 @@ import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -71,6 +72,27 @@ class OrientadorRepositoryTest {
         boolean existe = orientadorRepository.existsByEmail(emailBuscado);
 
         assertFalse(existe);
+    }
+
+    @Test
+    @DisplayName("Deve encontrar o orientador pelo e-mail ignorando maiúsculas e minúsculas")
+    void findByEmailIgnoreCase_QuandoEmailExisteComCaixaDiferente_DeveRetornarOrientador() {
+        salvarOrientadorComPerfil("João", "Joao.Silva@ifsc.edu.br", "Segurança");
+
+        Optional<Orientador> encontrado = orientadorRepository.findByEmailIgnoreCase("joao.silva@ifsc.edu.br");
+
+        assertTrue(encontrado.isPresent());
+        assertThat(encontrado.get().getNome()).isEqualTo("João");
+    }
+
+    @Test
+    @DisplayName("Deve retornar Optional vazio quando o e-mail não pertence a nenhum orientador")
+    void findByEmailIgnoreCase_QuandoEmailNaoExiste_DeveRetornarVazio() {
+        salvarOrientadorComPerfil("João", "joao@ifsc.edu.br", "Segurança");
+
+        Optional<Orientador> encontrado = orientadorRepository.findByEmailIgnoreCase("outro@ifsc.edu.br");
+
+        assertFalse(encontrado.isPresent());
     }
 
     @Test
