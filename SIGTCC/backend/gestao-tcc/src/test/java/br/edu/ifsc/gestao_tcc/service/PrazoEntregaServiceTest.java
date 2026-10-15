@@ -7,6 +7,7 @@ import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.PrazoJaCadastradoException;
 import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
+import br.edu.ifsc.gestao_tcc.exception.ValidacaoRequisicaoException;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
 import br.edu.ifsc.gestao_tcc.model.PrazoEntrega;
 import br.edu.ifsc.gestao_tcc.model.TipoEntrega;
@@ -23,7 +24,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +43,11 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PrazoEntregaServiceTest {
+
+    /** "Hoje" fixo nos testes: 15/10/2026 no fuso de São Paulo. */
+    private static final LocalDate HOJE = LocalDate.of(2026, 10, 15);
+    private static final Clock RELOGIO_FIXO = Clock.fixed(
+            Instant.parse("2026-10-15T12:00:00Z"), ZoneId.of("America/Sao_Paulo"));
 
     private static final String EMAIL_RESPONSAVEL = "responsavel@ifsc.edu.br";
     private static final String EMAIL_ORIENTADOR = "orientador@ifsc.edu.br";
@@ -60,7 +69,7 @@ class PrazoEntregaServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new PrazoEntregaService(prazoEntregaRepository, turmaTCCRepository, orientadorRepository);
+        service = new PrazoEntregaService(prazoEntregaRepository, turmaTCCRepository, orientadorRepository, RELOGIO_FIXO);
 
         responsavel = professor(1L, EMAIL_RESPONSAVEL);
         orientador = professor(2L, EMAIL_ORIENTADOR);
@@ -318,6 +327,157 @@ class PrazoEntregaServiceTest {
 
             assertThat(service.listarPrazosVigentes()).isEmpty();
             verify(prazoEntregaRepository, never()).findByTurmaId(anyLong());
+        }
+    }
+
+    @Nested
+    @DisplayName("Validação de datas (#138)")
+    class ValidacaoDeDatas {
+
+        @Test
+        @DisplayName("Deve rejeitar o cadastro com data limite no passado")
+        void cadastrar_DataNoPassado_DeveLancarValidacao() {
+            autenticadoComoResponsavel();
+            when(prazoEntregaRepository.findByTurmaId(10L)).thenReturn(List.of());
+
+            var dto = new PrazoEntregaRequestDTO(TipoEntrega.PROJETO_TCC, HOJE.minusDays(1));
+
+            ValidacaoRequisicaoException ex = assertThrows(ValidacaoRequisicaoException.class,
+                    () -> service.cadastrar(EMAIL_RESPONSAVEL, dto));
+            assertThat(ex.getCampo()).isEqualTo("dataLimite");
+            assertThat(ex.getMessage()).isEqualTo("A data limite não pode estar no passado.");
+            verify(prazoEntregaRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve aceitar data limite igual a hoje")
+        void cadastrar_DataDeHoje_DevePermitir() {
+            autenticadoComoResponsavel();
+            when(prazoEntregaRepository.findByTurmaId(10L)).thenReturn(List.of());
+            saveDevolveOProprioPrazo();
+
+            PrazoEntregaResponseDTO resposta = service.cadastrar(EMAIL_RESPONSAVEL,
+                    new PrazoEntregaRequestDTO(TipoEntrega.PROJETO_TCC, HOJE));
+
+            assertThat(resposta.dataLimite()).isEqualTo(HOJE);
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar TCC 1 com data anterior ou igual ao prazo do Projeto de TCC")
+        void cadastrar_Tcc1AntesDoProjeto_DeveLancarRegraDeNegocio() {
+            autenticadoComoResponsavel();
+            when(prazoEntregaRepository.findByTurmaId(10L)).thenReturn(List.of(
+                    prazo(1L, turmaVigente, TipoEntrega.PROJETO_TCC, LocalDate.of(2026, 11, 25))));
+
+            var anterior = new PrazoEntregaRequestDTO(TipoEntrega.TCC1, LocalDate.of(2026, 11, 20));
+            var igual = new PrazoEntregaRequestDTO(TipoEntrega.TCC1, LocalDate.of(2026, 11, 25));
+
+            RegraDeNegocioException ex = assertThrows(RegraDeNegocioException.class,
+                    () -> service.cadastrar(EMAIL_RESPONSAVEL, anterior));
+            assertThat(ex.getMessage()).isEqualTo(
+                    "A data limite de TCC 1 (20/11/2026) deve ser posterior à data limite de Projeto de TCC (25/11/2026).");
+            assertThrows(RegraDeNegocioException.class, () -> service.cadastrar(EMAIL_RESPONSAVEL, igual));
+            verify(prazoEntregaRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar TCC 2 com data anterior ao prazo do TCC 1")
+        void cadastrar_Tcc2AntesDoTcc1_DeveLancarRegraDeNegocio() {
+            autenticadoComoResponsavel();
+            when(prazoEntregaRepository.findByTurmaId(10L)).thenReturn(List.of(
+                    prazo(1L, turmaVigente, TipoEntrega.PROJETO_TCC, LocalDate.of(2026, 11, 25)),
+                    prazo(2L, turmaVigente, TipoEntrega.TCC1, LocalDate.of(2027, 3, 15))));
+
+            var dto = new PrazoEntregaRequestDTO(TipoEntrega.TCC2, LocalDate.of(2027, 3, 1));
+
+            RegraDeNegocioException ex = assertThrows(RegraDeNegocioException.class,
+                    () -> service.cadastrar(EMAIL_RESPONSAVEL, dto));
+            assertThat(ex.getMessage()).isEqualTo(
+                    "A data limite de TCC 2 (01/03/2027) deve ser posterior à data limite de TCC 1 (15/03/2027).");
+            verify(prazoEntregaRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar Projeto de TCC com data posterior ao prazo já definido para TCC 1")
+        void cadastrar_ProjetoDepoisDoTcc1_DeveLancarRegraDeNegocio() {
+            autenticadoComoResponsavel();
+            when(prazoEntregaRepository.findByTurmaId(10L)).thenReturn(List.of(
+                    prazo(2L, turmaVigente, TipoEntrega.TCC1, LocalDate.of(2027, 3, 15))));
+
+            var dto = new PrazoEntregaRequestDTO(TipoEntrega.PROJETO_TCC, LocalDate.of(2027, 4, 1));
+
+            RegraDeNegocioException ex = assertThrows(RegraDeNegocioException.class,
+                    () -> service.cadastrar(EMAIL_RESPONSAVEL, dto));
+            assertThat(ex.getMessage()).isEqualTo(
+                    "A data limite de Projeto de TCC (01/04/2027) deve ser anterior à data limite de TCC 1 (15/03/2027).");
+            verify(prazoEntregaRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve aceitar a sequência Projeto de TCC, TCC 1 e TCC 2 em ordem")
+        void cadastrar_SequenciaValida_DevePermitir() {
+            autenticadoComoResponsavel();
+            saveDevolveOProprioPrazo();
+            when(prazoEntregaRepository.findByTurmaId(10L)).thenReturn(List.of(
+                    prazo(1L, turmaVigente, TipoEntrega.PROJETO_TCC, LocalDate.of(2026, 11, 25)),
+                    prazo(3L, turmaVigente, TipoEntrega.TCC2, LocalDate.of(2027, 7, 10))));
+
+            PrazoEntregaResponseDTO resposta = service.cadastrar(EMAIL_RESPONSAVEL,
+                    new PrazoEntregaRequestDTO(TipoEntrega.TCC1, LocalDate.of(2027, 3, 15)));
+
+            assertThat(resposta.tipo()).isEqualTo(TipoEntrega.TCC1);
+            verify(prazoEntregaRepository).save(any(PrazoEntrega.class));
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar a edição para uma data no passado")
+        void atualizar_DataNoPassado_DeveLancarValidacao() {
+            autenticadoComoResponsavel();
+            PrazoEntrega projeto = prazo(1L, turmaVigente, TipoEntrega.PROJETO_TCC, LocalDate.of(2026, 11, 25));
+            when(prazoEntregaRepository.findById(1L)).thenReturn(Optional.of(projeto));
+            when(prazoEntregaRepository.findByTurmaId(10L)).thenReturn(List.of(projeto));
+
+            var dto = new PrazoEntregaUpdateDTO(HOJE.minusDays(3));
+
+            assertThrows(ValidacaoRequisicaoException.class, () -> service.atualizar(EMAIL_RESPONSAVEL, 1L, dto));
+            assertThat(projeto.getDataLimite()).isEqualTo(LocalDate.of(2026, 11, 25));
+            verify(prazoEntregaRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar a edição que coloca TCC 1 depois do prazo de TCC 2")
+        void atualizar_ViolandoSequencia_DeveLancarRegraDeNegocio() {
+            autenticadoComoResponsavel();
+            PrazoEntrega tcc1 = prazo(2L, turmaVigente, TipoEntrega.TCC1, LocalDate.of(2027, 3, 15));
+            when(prazoEntregaRepository.findById(2L)).thenReturn(Optional.of(tcc1));
+            when(prazoEntregaRepository.findByTurmaId(10L)).thenReturn(List.of(
+                    tcc1, prazo(3L, turmaVigente, TipoEntrega.TCC2, LocalDate.of(2027, 7, 10))));
+
+            var dto = new PrazoEntregaUpdateDTO(LocalDate.of(2027, 8, 1));
+
+            RegraDeNegocioException ex = assertThrows(RegraDeNegocioException.class,
+                    () -> service.atualizar(EMAIL_RESPONSAVEL, 2L, dto));
+            assertThat(ex.getMessage()).contains("deve ser anterior à data limite de TCC 2");
+            assertThat(tcc1.getDataLimite()).isEqualTo(LocalDate.of(2027, 3, 15));
+            verify(prazoEntregaRepository, never()).save(any());
+        }
+
+        @Test
+        @DisplayName("Deve ignorar o próprio prazo ao validar a sequência na edição")
+        void atualizar_ComparandoComOProprioPrazo_DevePermitir() {
+            autenticadoComoResponsavel();
+            saveDevolveOProprioPrazo();
+            PrazoEntrega tcc1 = prazo(2L, turmaVigente, TipoEntrega.TCC1, LocalDate.of(2027, 3, 15));
+            when(prazoEntregaRepository.findById(2L)).thenReturn(Optional.of(tcc1));
+            when(prazoEntregaRepository.findByTurmaId(10L)).thenReturn(List.of(
+                    prazo(1L, turmaVigente, TipoEntrega.PROJETO_TCC, LocalDate.of(2026, 11, 25)),
+                    tcc1,
+                    prazo(3L, turmaVigente, TipoEntrega.TCC2, LocalDate.of(2027, 7, 10))));
+
+            PrazoEntregaResponseDTO resposta = service.atualizar(EMAIL_RESPONSAVEL, 2L,
+                    new PrazoEntregaUpdateDTO(LocalDate.of(2027, 3, 10)));
+
+            assertThat(resposta.dataLimite()).isEqualTo(LocalDate.of(2027, 3, 10));
         }
     }
 }

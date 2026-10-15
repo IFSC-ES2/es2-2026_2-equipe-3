@@ -1,5 +1,8 @@
 package br.edu.ifsc.gestao_tcc.model;
 
+import lombok.Getter;
+
+@Getter
 public enum TipoEntrega {
     PROJETO_TCC("Projeto de TCC"),
     TCC1("TCC 1"),
@@ -11,7 +14,7 @@ public enum TipoEntrega {
         this.descricao = descricao;
     }
 
-    public String getDescricao() {
-        return descricao;
+    public boolean vemAntesDe(TipoEntrega outro) {
+        return this.ordinal() < outro.ordinal();
     }
 }
