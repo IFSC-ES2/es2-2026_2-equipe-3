@@ -41,16 +41,16 @@ Herdados dos contratos da [US01](contrato-dados-us01.md), [US02](contrato-dados-
 
 ### 3.2. `PrazoEntregaRequest` (entrada, criação)
 
-| Campo        | Tipo          | Obrigatório | Regras                                                     |
-| :----------- | :------------ | :---------- |:-----------------------------------------------------------|
-| `tipo`       | `TipoEntrega` | Sim         | Um dos valores do `TipoEntrega`.                           |
+| Campo        | Tipo          | Obrigatório | Regras                                                 |
+| :----------- | :------------ | :---------- | :----------------------------------------------------- |
+| `tipo`       | `TipoEntrega` | Sim         | Um dos valores do `TipoEntrega`.                       |
 | `dataLimite` | Data          | Sim         | Não pode estar no passado; deve respeitar a sequência. |
 
 ### 3.3. `PrazoEntregaUpdate` (entrada, edição)
 
-| Campo        | Tipo | Obrigatório | Regras                              |
-| :----------- | :--- | :---------- | :---------------------------------- |
-| `dataLimite` | Data | Sim         | Não pode estar no passado; deve respeitar a sequência.|
+| Campo        | Tipo | Obrigatório | Regras                                                 |
+| :----------- | :--- | :---------- | :----------------------------------------------------- |
+| `dataLimite` | Data | Sim         | Não pode estar no passado; deve respeitar a sequência. |
 
 O `tipo` não é editável: para trocar o tipo, edita-se o prazo do tipo correto.
 
@@ -196,7 +196,7 @@ Corpo `PrazoEntregaResponse` com a nova data e o `diasRestantes` recalculado.
 | Regra                                                                                         | Código | `campo` / mensagem                                                                                     |
 | :-------------------------------------------------------------------------------------------- | :----: | :----------------------------------------------------------------------------------------------------- |
 | `tipo` ou `dataLimite` ausentes                                                               | `400`  | `tipo`: `O tipo de entrega é obrigatório.` / `dataLimite`: `A data limite é obrigatória.`              |
-| `tipo` fora da enumeração ou data mal formatada                                               | `400`  | `Corpo da requisição inválido ou ilegível`                                        |
+| `tipo` fora da enumeração ou data mal formatada                                               | `400`  | `Corpo da requisição inválido ou ilegível`                                                             |
 | `dataLimite` anterior a hoje (fuso `America/Sao_Paulo`). Hoje é aceito.                       | `400`  | `dataLimite`: `A data limite não pode estar no passado.`                                               |
 | `dataLimite` igual ou anterior ao prazo de uma entrega **anterior** do fluxo                  | `422`  | `A data limite de TCC 1 (20/11/2026) deve ser posterior à data limite de Projeto de TCC (25/11/2026).` |
 | `dataLimite` igual ou posterior ao prazo de uma entrega **seguinte** do fluxo (já cadastrada) | `422`  | `A data limite de Projeto de TCC (01/04/2027) deve ser anterior à data limite de TCC 1 (15/03/2027).`  |
@@ -247,7 +247,7 @@ Exemplo de `400`:
 ## 8. Decisões Assumidas
 
 | Decisão                                                                                              | Justificativa                                                                                                                                                    |
-|:-----------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| :--------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | A turma é sempre a atual; o cliente não informa `turmaId`.                                           | Só o responsável pela turma atual pode gerenciar prazos; aceitar `turmaId` abriria a edição de turmas antigas sem regra definida.                                |
 | Um prazo por tipo e turma (restrição única `turma_id` + `tipo`). Cadastro repetido retorna `409`.    | Cenário 4: editar substitui o prazo anterior, nunca cria um segundo.                                                                                             |
 | A sequência é validada nos dois sentidos e de forma estrita (datas iguais são rejeitadas).           | O cenário 5 descreve só "anterior à entrega anterior"; validar também a entrega seguinte impede que a edição do Projeto de TCC deixe o calendário inconsistente. |
