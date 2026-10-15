@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/prazos")
@@ -45,5 +46,10 @@ public class PrazoEntregaController {
             @RequestBody @Valid PrazoEntregaUpdateDTO dto) {
 
         return ResponseEntity.ok(prazoEntregaService.atualizar(jwt.getClaimAsString(CLAIM_EMAIL), id, dto));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PrazoEntregaResponseDTO>> listaPrazosVigentes() {
+        return ResponseEntity.ok(prazoEntregaService.listarPrazosVigentes());
     }
 }

@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -65,6 +67,16 @@ public class PrazoEntregaService {
 
         prazo.setDataLimite(dto.dataLimite());
         return toResponse(prazoEntregaRepository.save(prazo));
+    }
+
+    @Transactional(readOnly = true)
+    public List<PrazoEntregaResponseDTO> listarPrazosVigentes() {
+        return turmaTCCRepository.findByVigenteTrue()
+                .map(turma -> prazoEntregaRepository.findByTurmaId(turma.getId()).stream()
+                        .sorted(Comparator.comparing(PrazoEntrega::getTipo))
+                        .map(this::toResponse)
+                        .toList())
+                .orElse(List.of());
     }
 
     private TurmaTCC buscarTurmaVigenteDoResponsavel(String emailProfessor) {
