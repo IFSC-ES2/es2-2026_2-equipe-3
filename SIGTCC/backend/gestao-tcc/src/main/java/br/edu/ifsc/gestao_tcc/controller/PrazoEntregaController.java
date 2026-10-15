@@ -2,6 +2,7 @@ package br.edu.ifsc.gestao_tcc.controller;
 
 import br.edu.ifsc.gestao_tcc.dto.PrazoEntregaRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.PrazoEntregaResponseDTO;
+import br.edu.ifsc.gestao_tcc.dto.PrazoEntregaUpdateDTO;
 import br.edu.ifsc.gestao_tcc.service.PrazoEntregaService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -35,5 +36,14 @@ public class PrazoEntregaController {
                 .toUri();
 
         return ResponseEntity.created(location).body(prazo);
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity<PrazoEntregaResponseDTO> atualizaPrazo(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long id,
+            @RequestBody @Valid PrazoEntregaUpdateDTO dto) {
+
+        return ResponseEntity.ok(prazoEntregaService.atualizar(jwt.getClaimAsString(CLAIM_EMAIL), id, dto));
     }
 }

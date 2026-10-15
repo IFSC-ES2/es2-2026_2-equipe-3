@@ -2,8 +2,11 @@ package br.edu.ifsc.gestao_tcc.service;
 
 import br.edu.ifsc.gestao_tcc.dto.PrazoEntregaRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.PrazoEntregaResponseDTO;
+import br.edu.ifsc.gestao_tcc.dto.PrazoEntregaUpdateDTO;
 import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.PrazoJaCadastradoException;
+import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
+import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
 import br.edu.ifsc.gestao_tcc.model.PrazoEntrega;
 import br.edu.ifsc.gestao_tcc.model.TurmaTCC;
@@ -45,6 +48,22 @@ public class PrazoEntregaService {
                 .dataLimite(dto.dataLimite())
                 .build();
 
+        return toResponse(prazoEntregaRepository.save(prazo));
+    }
+
+    @Transactional
+    public PrazoEntregaResponseDTO atualizar(String emailProfessor, Long prazoId, PrazoEntregaUpdateDTO dto) {
+        TurmaTCC turma = buscarTurmaVigenteDoResponsavel(emailProfessor);
+
+        PrazoEntrega prazo = prazoEntregaRepository.findById(prazoId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Prazo de entrega com identificador " + prazoId + " não foi encontrado."));
+
+        if (!Objects.equals(prazo.getTurma().getId(), turma.getId())) {
+            throw new RegraDeNegocioException("Somente prazos da Turma_TCC vigente podem ser alterados.");
+        }
+
+        prazo.setDataLimite(dto.dataLimite());
         return toResponse(prazoEntregaRepository.save(prazo));
     }
 
