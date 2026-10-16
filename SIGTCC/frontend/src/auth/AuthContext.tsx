@@ -17,7 +17,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [carregando, setCarregando] = useState(() => sessao === null);
 
   useEffect(() => {
-
     if (sessao !== null) return;
 
     let cancelado = false;

@@ -99,7 +99,6 @@ async function solicitarToken(
       codigoErro === "invalid_client" ||
       codigoErro === "unsupported_grant_type"
     ) {
-
       throw new Error(
         "O client do Keycloak não está autorizado a autenticar por senha " +
           `(erro: ${codigoErro}). Verifique se "directAccessGrantsEnabled" ` +
