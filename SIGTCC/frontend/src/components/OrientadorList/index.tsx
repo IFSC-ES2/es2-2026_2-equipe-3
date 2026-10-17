@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import type { FormEvent } from "react";
 import type { Orientador } from "../../types/Orientador.ts";
 import { listarOrientadores } from "../../utils/orientadorService.ts";
 import { OrientadorCard } from "../OrientadorCard";
@@ -7,31 +6,22 @@ import { OrientadorCard } from "../OrientadorCard";
 export function OrientadorList() {
   const [orientadores, setOrientadores] = useState<Orientador[]>([]);
   const [area, setArea] = useState("");
+  const [somenteComVagas, setSomenteComVagas] = useState(false);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
 
-  const carregar = async (filtro?: string) => {
-    setCarregando(true);
-    setErro("");
-    try {
-      const dados = await listarOrientadores(filtro);
-      setOrientadores(dados.filter((orientador) => orientador.ativo));
-    } catch {
-      setErro("Erro ao carregar orientadores");
-      setOrientadores([]);
-    } finally {
-      setCarregando(false);
-    }
-  };
-
   useEffect(() => {
     let ativo = true;
+    const areaFiltro = area.trim();
 
-    const carregarInicial = async () => {
+    const carregar = async () => {
       setCarregando(true);
       setErro("");
       try {
-        const dados = await listarOrientadores();
+        const dados = await listarOrientadores({
+          area: areaFiltro || undefined,
+          temVagas: somenteComVagas || undefined,
+        });
         if (ativo)
           setOrientadores(dados.filter((orientador) => orientador.ativo));
       } catch {
@@ -44,16 +34,19 @@ export function OrientadorList() {
       }
     };
 
-    void carregarInicial();
+    const temporizador = window.setTimeout(() => void carregar(), 300);
     return () => {
       ativo = false;
+      window.clearTimeout(temporizador);
     };
-  }, []);
+  }, [area, somenteComVagas]);
 
-  const filtrar = (evento: FormEvent<HTMLFormElement>) => {
-    evento.preventDefault();
-    void carregar(area.trim() || undefined);
+  const limparFiltros = () => {
+    setArea("");
+    setSomenteComVagas(false);
   };
+
+  const filtrosAtivos = area.trim() !== "" || somenteComVagas;
 
   return (
     <section className="catalogo">
@@ -67,8 +60,11 @@ export function OrientadorList() {
           </p>
         </div>
       </div>
-      <form className="filtro-form" onSubmit={filtrar}>
-        <label htmlFor="filtro-area">Área de atuação</label>
+      <form
+        className="filtro-form"
+        onSubmit={(evento) => evento.preventDefault()}
+      >
+        <label htmlFor="filtro-area">Linha de pesquisa</label>
         <div className="filter-controls">
           <input
             id="filtro-area"
@@ -76,8 +72,22 @@ export function OrientadorList() {
             onChange={(evento) => setArea(evento.target.value)}
             placeholder="Ex.: Engenharia de Software"
           />
-          <button className="primary-button" type="submit">
-            Filtrar
+          <label className="filtro-toggle" htmlFor="filtro-vagas">
+            <input
+              id="filtro-vagas"
+              type="checkbox"
+              checked={somenteComVagas}
+              onChange={(evento) => setSomenteComVagas(evento.target.checked)}
+            />
+            Somente com vagas disponíveis
+          </label>
+          <button
+            type="button"
+            className="text-button"
+            onClick={limparFiltros}
+            disabled={!filtrosAtivos}
+          >
+            Limpar filtros
           </button>
         </div>
       </form>

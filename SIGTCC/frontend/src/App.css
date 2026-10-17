@@ -77,6 +77,16 @@
   background: rgba(255, 255, 255, 0.1);
   color: white;
 }
+.page-navigation .sair-button {
+  border-color: var(--coral);
+  color: var(--coral);
+  margin-left: 6px;
+}
+.page-navigation .sair-button:hover {
+  background: var(--coral);
+  border-color: var(--coral);
+  color: white;
+}
 .page-content {
   width: min(1120px, calc(100% - 40px));
   margin: 42px auto;
@@ -216,10 +226,35 @@ h2 {
 }
 .filter-controls {
   display: flex;
+  align-items: center;
   gap: 10px;
 }
-.filter-controls input {
+.filter-controls input[type="text"],
+.filter-controls input:not([type]) {
   flex: 1;
+}
+.filtro-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.filtro-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--teal);
+}
+.filter-controls .text-button {
+  margin: 0;
+  white-space: nowrap;
+}
+.filter-controls .text-button:disabled {
+  color: var(--muted);
+  cursor: not-allowed;
+  opacity: 0.6;
 }
 .feedback {
   margin: 20px 0;
