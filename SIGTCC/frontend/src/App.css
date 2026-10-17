@@ -229,9 +229,14 @@ h2 {
   align-items: center;
   gap: 10px;
 }
-.filter-controls input[type="text"],
-.filter-controls input:not([type]) {
+.filter-controls select {
   flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d7e2e0;
+  background: white;
+  color: var(--ink);
+  font-size: 0.9rem;
 }
 .filtro-toggle {
   display: flex;

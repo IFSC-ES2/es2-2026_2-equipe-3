@@ -90,9 +90,28 @@ describe("OrientadorList", () => {
     });
   });
 
-  test("deve chamar a API com a linha de pesquisa digitada, refletindo o filtro automaticamente", async () => {
+  test("deve popular o seletor de linha de pesquisa com as linhas retornadas pela API", async () => {
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Carregando orientadores..."),
+      ).not.toBeInTheDocument();
+    });
+
+    const seletor = screen.getByLabelText("Linha de pesquisa");
+    expect(
+      screen.getByRole("option", { name: "Todas as linhas" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "IA" })).toBeInTheDocument();
+    expect(seletor).toHaveValue("");
+  });
+
+  test("deve chamar a API com a linha de pesquisa selecionada, refletindo o filtro automaticamente", async () => {
     const user = userEvent.setup();
-    vi.mocked(listarOrientadores).mockResolvedValue([]);
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
 
     renderOrientadorList();
 
@@ -103,10 +122,8 @@ describe("OrientadorList", () => {
       });
     });
 
-    const inputArea = screen.getByPlaceholderText(
-      "Ex.: Engenharia de Software",
-    );
-    await user.type(inputArea, "IA");
+    const seletor = screen.getByLabelText("Linha de pesquisa");
+    await user.selectOptions(seletor, "IA");
 
     await waitFor(() => {
       expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
@@ -118,7 +135,7 @@ describe("OrientadorList", () => {
 
   test("deve combinar o filtro de linha de pesquisa com o alternador de vagas disponíveis", async () => {
     const user = userEvent.setup();
-    vi.mocked(listarOrientadores).mockResolvedValue([]);
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
 
     renderOrientadorList();
 
@@ -129,10 +146,8 @@ describe("OrientadorList", () => {
       });
     });
 
-    const inputArea = screen.getByPlaceholderText(
-      "Ex.: Engenharia de Software",
-    );
-    await user.type(inputArea, "IA");
+    const seletor = screen.getByLabelText("Linha de pesquisa");
+    await user.selectOptions(seletor, "IA");
 
     const toggleVagas = screen.getByLabelText("Somente com vagas disponíveis");
     await user.click(toggleVagas);
@@ -147,9 +162,15 @@ describe("OrientadorList", () => {
 
   test("botão 'Limpar filtros' deve estar desabilitado sem filtros e habilitado após aplicá-los", async () => {
     const user = userEvent.setup();
-    vi.mocked(listarOrientadores).mockResolvedValue([]);
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
 
     renderOrientadorList();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Carregando orientadores..."),
+      ).not.toBeInTheDocument();
+    });
 
     const botaoLimpar = screen.getByRole("button", { name: "Limpar filtros" });
     expect(botaoLimpar).toBeDisabled();
@@ -162,14 +183,18 @@ describe("OrientadorList", () => {
 
   test("deve limpar os filtros e voltar a listar todos os orientadores ao clicar em 'Limpar filtros'", async () => {
     const user = userEvent.setup();
-    vi.mocked(listarOrientadores).mockResolvedValue([]);
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
 
     renderOrientadorList();
 
-    const inputArea = screen.getByPlaceholderText(
-      "Ex.: Engenharia de Software",
-    );
-    await user.type(inputArea, "IA");
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Carregando orientadores..."),
+      ).not.toBeInTheDocument();
+    });
+
+    const seletor = screen.getByLabelText("Linha de pesquisa");
+    await user.selectOptions(seletor, "IA");
 
     const toggleVagas = screen.getByLabelText("Somente com vagas disponíveis");
     await user.click(toggleVagas);
@@ -183,7 +208,7 @@ describe("OrientadorList", () => {
 
     await user.click(screen.getByRole("button", { name: "Limpar filtros" }));
 
-    expect(inputArea).toHaveValue("");
+    expect(seletor).toHaveValue("");
     expect(toggleVagas).not.toBeChecked();
 
     await waitFor(() => {

@@ -5,6 +5,7 @@ import { OrientadorCard } from "../OrientadorCard";
 
 export function OrientadorList() {
   const [orientadores, setOrientadores] = useState<Orientador[]>([]);
+  const [linhasDisponiveis, setLinhasDisponiveis] = useState<string[]>([]);
   const [area, setArea] = useState("");
   const [somenteComVagas, setSomenteComVagas] = useState(false);
   const [carregando, setCarregando] = useState(true);
@@ -12,18 +13,30 @@ export function OrientadorList() {
 
   useEffect(() => {
     let ativo = true;
-    const areaFiltro = area.trim();
 
     const carregar = async () => {
       setCarregando(true);
       setErro("");
       try {
         const dados = await listarOrientadores({
-          area: areaFiltro || undefined,
+          area: area || undefined,
           temVagas: somenteComVagas || undefined,
         });
-        if (ativo)
-          setOrientadores(dados.filter((orientador) => orientador.ativo));
+        if (!ativo) return;
+
+        const ativos = dados.filter((orientador) => orientador.ativo);
+        setOrientadores(ativos);
+
+        // Acumula as linhas de pesquisa já vistas, para que o seletor não
+        // perca opções conforme os filtros vão sendo aplicados.
+        setLinhasDisponiveis((atuais) =>
+          Array.from(
+            new Set([
+              ...atuais,
+              ...ativos.flatMap((orientador) => orientador.linhasDePesquisa),
+            ]),
+          ).sort((a, b) => a.localeCompare(b)),
+        );
       } catch {
         if (ativo) {
           setErro("Erro ao carregar orientadores");
@@ -34,10 +47,9 @@ export function OrientadorList() {
       }
     };
 
-    const temporizador = window.setTimeout(() => void carregar(), 300);
+    void carregar();
     return () => {
       ativo = false;
-      window.clearTimeout(temporizador);
     };
   }, [area, somenteComVagas]);
 
@@ -46,7 +58,7 @@ export function OrientadorList() {
     setSomenteComVagas(false);
   };
 
-  const filtrosAtivos = area.trim() !== "" || somenteComVagas;
+  const filtrosAtivos = area !== "" || somenteComVagas;
 
   return (
     <section className="catalogo">
@@ -66,12 +78,18 @@ export function OrientadorList() {
       >
         <label htmlFor="filtro-area">Linha de pesquisa</label>
         <div className="filter-controls">
-          <input
+          <select
             id="filtro-area"
             value={area}
             onChange={(evento) => setArea(evento.target.value)}
-            placeholder="Ex.: Engenharia de Software"
-          />
+          >
+            <option value="">Todas as linhas</option>
+            {linhasDisponiveis.map((linha) => (
+              <option key={linha} value={linha}>
+                {linha}
+              </option>
+            ))}
+          </select>
           <label className="filtro-toggle" htmlFor="filtro-vagas">
             <input
               id="filtro-vagas"
