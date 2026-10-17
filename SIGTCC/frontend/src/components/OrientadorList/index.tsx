@@ -118,7 +118,24 @@ export function OrientadorList() {
         </p>
       )}
       {!carregando && !erro && orientadores.length === 0 && (
-        <p className="empty-state">Nenhum orientador encontrado</p>
+        <div className="empty-state">
+          <p>Nenhum orientador encontrado</p>
+          {filtrosAtivos && (
+            <>
+              <p className="empty-state-sugestao">
+                Tente ajustar a linha de pesquisa ou desmarque “Somente com
+                vagas disponíveis” para ver mais resultados.
+              </p>
+              <button
+                type="button"
+                className="text-button"
+                onClick={limparFiltros}
+              >
+                Limpar filtros
+              </button>
+            </>
+          )}
+        </div>
       )}
       {!carregando && orientadores.length > 0 && (
         <div className="cards-container">
