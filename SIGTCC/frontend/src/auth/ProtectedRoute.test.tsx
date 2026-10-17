@@ -82,7 +82,10 @@ describe("ProtectedRoute", () => {
   });
 
   test("permite o acesso quando o usuário autenticado possui o papel exigido", async () => {
-    armazenarSessaoFake(["ROLE_PROFESSOR"], "professor.responsavel@example.com");
+    armazenarSessaoFake(
+      ["ROLE_PROFESSOR"],
+      "professor.responsavel@example.com",
+    );
 
     renderComRota("/area-protegida", "ROLE_PROFESSOR");
 

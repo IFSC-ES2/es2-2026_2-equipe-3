@@ -81,7 +81,7 @@ describe("LoginPage", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
-    test("deve autenticar um Aluno com sucesso e redirecionar ao catálogo de orientadores", async () => {
+  test("deve autenticar um Aluno com sucesso e redirecionar ao catálogo de orientadores", async () => {
     const tokenFake = criarTokenFake(["ROLE_ALUNO"], "aluno@example.com");
 
     vi.mocked(fetch).mockResolvedValueOnce(
