@@ -1,5 +1,18 @@
-import {useCallback, useEffect, useRef, useState, type ReactNode,} from "react";
-import {login as loginService, logout as logoutService, recuperarSessaoArmazenada, renovarToken, type Papel, type SessaoAutenticada,} from "./authService";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
+import {
+  login as loginService,
+  logout as logoutService,
+  recuperarSessaoArmazenada,
+  renovarToken,
+  type Papel,
+  type SessaoAutenticada,
+} from "./authService";
 import { AuthContext } from "./authContextInstance";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
