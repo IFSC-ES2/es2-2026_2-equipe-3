@@ -90,9 +90,8 @@ describe("OrientadorList", () => {
     });
   });
 
-  test("deve chamar a API com o termo digitado ao submeter o formulário de filtro", async () => {
-    const user = userEvent.setup();
-    vi.mocked(listarOrientadores).mockResolvedValue([]);
+  test("deve popular o seletor de linha de pesquisa com as linhas retornadas pela API", async () => {
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
 
     renderOrientadorList();
 
@@ -102,15 +101,121 @@ describe("OrientadorList", () => {
       ).not.toBeInTheDocument();
     });
 
-    const inputArea = screen.getByPlaceholderText(
-      "Ex.: Engenharia de Software",
-    );
-    await user.type(inputArea, "IA");
+    const seletor = screen.getByLabelText("Linha de pesquisa");
+    expect(
+      screen.getByRole("option", { name: "Todas as linhas" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "IA" })).toBeInTheDocument();
+    expect(seletor).toHaveValue("");
+  });
 
-    const botaoFiltrar = screen.getByRole("button", { name: "Filtrar" });
-    await user.click(botaoFiltrar);
+  test("deve chamar a API com a linha de pesquisa selecionada, refletindo o filtro automaticamente", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
 
-    expect(vi.mocked(listarOrientadores)).toHaveBeenCalledTimes(2);
-    expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith("IA");
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenCalledWith({
+        area: undefined,
+        temVagas: undefined,
+      });
+    });
+
+    const seletor = screen.getByLabelText("Linha de pesquisa");
+    await user.selectOptions(seletor, "IA");
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
+        area: "IA",
+        temVagas: undefined,
+      });
+    });
+  });
+
+  test("deve combinar o filtro de linha de pesquisa com o alternador de vagas disponíveis", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenCalledWith({
+        area: undefined,
+        temVagas: undefined,
+      });
+    });
+
+    const seletor = screen.getByLabelText("Linha de pesquisa");
+    await user.selectOptions(seletor, "IA");
+
+    const toggleVagas = screen.getByLabelText("Somente com vagas disponíveis");
+    await user.click(toggleVagas);
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
+        area: "IA",
+        temVagas: true,
+      });
+    });
+  });
+
+  test("botão 'Limpar filtros' deve estar desabilitado sem filtros e habilitado após aplicá-los", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Carregando orientadores..."),
+      ).not.toBeInTheDocument();
+    });
+
+    const botaoLimpar = screen.getByRole("button", { name: "Limpar filtros" });
+    expect(botaoLimpar).toBeDisabled();
+
+    const toggleVagas = screen.getByLabelText("Somente com vagas disponíveis");
+    await user.click(toggleVagas);
+
+    expect(botaoLimpar).toBeEnabled();
+  });
+
+  test("deve limpar os filtros e voltar a listar todos os orientadores ao clicar em 'Limpar filtros'", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Carregando orientadores..."),
+      ).not.toBeInTheDocument();
+    });
+
+    const seletor = screen.getByLabelText("Linha de pesquisa");
+    await user.selectOptions(seletor, "IA");
+
+    const toggleVagas = screen.getByLabelText("Somente com vagas disponíveis");
+    await user.click(toggleVagas);
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
+        area: "IA",
+        temVagas: true,
+      });
+    });
+
+    await user.click(screen.getByRole("button", { name: "Limpar filtros" }));
+
+    expect(seletor).toHaveValue("");
+    expect(toggleVagas).not.toBeChecked();
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
+        area: undefined,
+        temVagas: undefined,
+      });
+    });
   });
 });

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Orientador } from "../../types/Orientador.ts";
 import { OrientadorForm } from "../../components/OrientadorForm";
+import { useAuth } from "../../auth/useAuth";
 
 export function OrientadorCadastroPage() {
   const navigate = useNavigate();
@@ -46,6 +47,13 @@ export function PageShell({
   children,
 }: PageShellProps) {
   const navigate = useNavigate();
+  const { sair } = useAuth();
+
+  const handleSair = () => {
+    sair();
+    navigate("/login", { replace: true });
+  };
+
   return (
     <div className="orientador-page">
       <header className="page-header">
@@ -84,6 +92,9 @@ export function PageShell({
             onClick={() => navigate("/painel-orientador")}
           >
             Painel do Professor
+          </button>
+          <button type="button" className="sair-button" onClick={handleSair}>
+            Sair
           </button>
         </nav>
       </header>

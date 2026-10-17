@@ -71,9 +71,19 @@ export async function cadastrarOrientador(
   }
 }
 
-export async function listarOrientadores(area?: string): Promise<Orientador[]> {
+export interface FiltroOrientadores {
+  area?: string;
+  temVagas?: boolean;
+}
+
+export async function listarOrientadores(
+  filtro?: FiltroOrientadores,
+): Promise<Orientador[]> {
   try {
-    const query = area ? `?area=${encodeURIComponent(area)}` : "";
+    const params = new URLSearchParams();
+    if (filtro?.area) params.set("area", filtro.area);
+    if (filtro?.temVagas) params.set("temVagas", "true");
+    const query = params.toString() ? `?${params.toString()}` : "";
     const response = await apiFetch(`/orientadores${query}`);
     return (await garantirResposta(response, 200)).json();
   } catch (erro) {
