@@ -521,3 +521,19 @@ h2 {
 .login-form > .primary-button {
   margin-top: 6px;
 }
+.empty-state {
+  padding: 64px 20px;
+  color: var(--muted);
+  text-align: center;
+  font-weight: 600;
+}
+.empty-state-sugestao {
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  font-weight: 400;
+}
+.empty-state .text-button {
+  display: inline-block;
+  margin-top: 14px;
+}
