@@ -81,6 +81,34 @@ describe("LoginPage", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
+    test("deve autenticar um Aluno com sucesso e redirecionar ao catálogo de orientadores", async () => {
+    const tokenFake = criarTokenFake(["ROLE_ALUNO"], "aluno@example.com");
+
+    vi.mocked(fetch).mockResolvedValueOnce(
+      new Response(
+        JSON.stringify({
+          access_token: tokenFake,
+          refresh_token: "refresh-fake",
+          expires_in: 300,
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const usuario = userEvent.setup();
+    renderLoginPage();
+
+    await usuario.type(screen.getByLabelText("E-mail"), "aluno@example.com");
+    await usuario.type(screen.getByLabelText("Senha"), "senha-correta");
+    await usuario.click(screen.getByRole("button", { name: /entrar/i }));
+
+    await waitFor(() => {
+      expect(sessionStorage.getItem(STORAGE_KEY)).not.toBeNull();
+    });
+
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
   test("deve exibir 'Credenciais inválidas' quando a senha estiver incorreta", async () => {
     vi.mocked(fetch).mockResolvedValueOnce(
       new Response(JSON.stringify({ error: "invalid_grant" }), {
