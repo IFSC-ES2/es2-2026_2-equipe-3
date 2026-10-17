@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
@@ -130,8 +130,12 @@ describe("OrientadorList", () => {
     expect(
       screen.getByText(/tente ajustar a linha de pesquisa/i),
     ).toBeInTheDocument();
+
+    const estadoVazio = screen
+      .getByText("Nenhum orientador encontrado")
+      .closest(".empty-state") as HTMLElement;
     expect(
-      screen.getByRole("button", { name: "Limpar filtros" }),
+      within(estadoVazio).getByRole("button", { name: "Limpar filtros" }),
     ).toBeInTheDocument();
   });
 
