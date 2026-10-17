@@ -7,13 +7,27 @@ import {
   listarSolicitacoesPorOrientador,
   atualizarStatusSolicitacao,
 } from "../../utils/solicitacaoService";
+import { obterPerfilProfessor } from "../../utils/professorService";
 import { ApiError } from "../../utils/orientadorService";
 import type { Solicitacao } from "../../types/Solicitacao";
+import type { PerfilProfessor } from "../../types/Professor";
 
 vi.mock("../../utils/solicitacaoService", () => ({
   listarSolicitacoesPorOrientador: vi.fn(),
   atualizarStatusSolicitacao: vi.fn(),
 }));
+
+vi.mock("../../utils/professorService", () => ({
+  obterPerfilProfessor: vi.fn(),
+}));
+
+const perfilBase: PerfilProfessor = {
+  id: 1,
+  nome: "Prof. Dr. Roberto",
+  email: "roberto@ifsc.edu.br",
+  departamento: "DAELN",
+  responsavelTurma: false,
+};
 
 describe("PainelSolicitacoesPage (Issue #87)", () => {
   const mockSolicitacoes: Solicitacao[] = [
@@ -63,6 +77,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(obterPerfilProfessor).mockResolvedValue(perfilBase);
   });
 
   it("deve exibir estado de carregamento inicial e depois a lista de solicitações com indicador de vagas", async () => {
@@ -428,5 +443,47 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
         screen.getByText("Nenhuma solicitação pendente no momento."),
       ).toBeInTheDocument();
     });
+  });
+
+  it("deve exibir a aba 'Gestão da Turma/Calendário' quando o professor for responsável pela turma", async () => {
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      ...perfilBase,
+      responsavelTurma: true,
+    });
+
+    render(
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
+    );
+
+    expect(
+      await screen.findByRole("tab", { name: "Orientandos" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole("tab", { name: "Gestão da Turma/Calendário" }),
+    ).toBeInTheDocument();
+  });
+
+  it("não deve exibir a aba 'Gestão da Turma/Calendário' quando o professor não for responsável pela turma", async () => {
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      ...perfilBase,
+      responsavelTurma: false,
+    });
+
+    render(
+      <MemoryRouter>
+        <PainelSolicitacoesPage />
+      </MemoryRouter>,
+    );
+
+    expect(
+      await screen.findByRole("tab", { name: "Orientandos" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("tab", { name: "Gestão da Turma/Calendário" }),
+    ).not.toBeInTheDocument();
   });
 });
