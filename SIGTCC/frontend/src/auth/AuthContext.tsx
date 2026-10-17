@@ -1,12 +1,5 @@
-import { useCallback, useEffect, useState, type ReactNode } from "react";
-import {
-  login as loginService,
-  logout as logoutService,
-  recuperarSessaoArmazenada,
-  renovarToken,
-  type Papel,
-  type SessaoAutenticada,
-} from "./authService";
+import {useCallback, useEffect, useRef, useState, type ReactNode,} from "react";
+import {login as loginService, logout as logoutService, recuperarSessaoArmazenada, renovarToken, type Papel, type SessaoAutenticada,} from "./authService";
 import { AuthContext } from "./authContextInstance";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -15,9 +8,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const [carregando, setCarregando] = useState(() => sessao === null);
+  const haviaSessaoInicial = useRef(sessao !== null);
 
   useEffect(() => {
-    if (sessao !== null) return;
+    if (haviaSessaoInicial.current) return;
 
     let cancelado = false;
     renovarToken().then((sessaoRenovada) => {
