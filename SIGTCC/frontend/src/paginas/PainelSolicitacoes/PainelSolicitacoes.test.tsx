@@ -8,6 +8,7 @@ import {
   atualizarStatusSolicitacao,
 } from "../../utils/solicitacaoService";
 import { obterPerfilProfessor } from "../../utils/professorService";
+import { AuthProvider } from "../../auth/AuthContext";
 import { ApiError } from "../../utils/orientadorService";
 import type { Solicitacao } from "../../types/Solicitacao";
 import type { PerfilProfessor } from "../../types/Professor";
@@ -85,9 +86,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       mockSolicitacoes,
     );
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     expect(screen.getByText("Carregando solicitações...")).toBeInTheDocument();
@@ -112,9 +115,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       mockSolicitacoes,
     );
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -152,9 +157,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -188,9 +195,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     ]);
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -230,9 +239,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     ]);
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -270,9 +281,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -314,9 +327,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     ]);
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -370,9 +385,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     );
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -405,9 +422,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     );
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -433,9 +452,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -453,9 +474,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     expect(
@@ -474,9 +497,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     expect(
