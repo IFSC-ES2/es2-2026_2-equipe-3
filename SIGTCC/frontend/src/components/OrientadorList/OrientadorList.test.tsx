@@ -224,6 +224,30 @@ describe("OrientadorList", () => {
     });
   });
 
+  test("deve chamar a API filtrando apenas orientadores com vagas disponíveis", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenCalledWith({
+        area: undefined,
+        temVagas: undefined,
+      });
+    });
+
+    const toggleVagas = screen.getByLabelText("Somente com vagas disponíveis");
+    await user.click(toggleVagas);
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
+        area: undefined,
+        temVagas: true,
+      });
+    });
+  });
+
   test("deve combinar o filtro de linha de pesquisa com o alternador de vagas disponíveis", async () => {
     const user = userEvent.setup();
     vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
