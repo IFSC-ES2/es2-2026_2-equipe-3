@@ -167,7 +167,9 @@ export function GestaoCalendario() {
               return (
                 <tr key={valor}>
                   <td>{rotulo}</td>
-                  <td>{prazo ? formatarData(prazo.dataLimite) : "Não cadastrado"}</td>
+                  <td>
+                    {prazo ? formatarData(prazo.dataLimite) : "Não cadastrado"}
+                  </td>
                   <td>
                     <button
                       type="button"

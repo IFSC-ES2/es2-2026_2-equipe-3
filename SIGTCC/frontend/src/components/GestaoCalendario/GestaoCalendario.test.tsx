@@ -144,7 +144,10 @@ describe("GestaoCalendario", () => {
     vi.mocked(listarPrazosVigentes).mockResolvedValue([]);
     vi.mocked(cadastrarPrazo).mockRejectedValue(
       new ApiError(422, "Prazo deve ser posterior ao do Projeto de TCC.", [
-        { campo: "dataLimite", mensagem: "Data inválida para este tipo de entrega." },
+        {
+          campo: "dataLimite",
+          mensagem: "Data inválida para este tipo de entrega.",
+        },
       ]),
     );
 
@@ -162,9 +165,7 @@ describe("GestaoCalendario", () => {
     await user.click(screen.getByRole("button", { name: "Cadastrar prazo" }));
 
     expect(
-      await screen.findByText(
-        "Prazo deve ser posterior ao do Projeto de TCC.",
-      ),
+      await screen.findByText("Prazo deve ser posterior ao do Projeto de TCC."),
     ).toBeInTheDocument();
   });
 
