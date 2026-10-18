@@ -5,7 +5,6 @@ import {
   type PrazoEntrega,
   type TipoEntrega,
 } from "../../types/PrazoEntrega.ts";
-type ItemTipoEntrega = { valor: TipoEntrega; rotulo: string };
 import { ApiError } from "../../utils/orientadorService.ts";
 import {
   atualizarPrazo,
@@ -14,6 +13,7 @@ import {
 } from "../../utils/prazoEntregaService.ts";
 import "./GestaoCalendario.css";
 
+type ItemTipoEntrega = { valor: TipoEntrega; rotulo: string };
 type ErrosCampos = Record<string, string>;
 
 function formatarData(dataIso: string): string {
@@ -37,25 +37,31 @@ export function GestaoCalendario() {
   const [sucesso, setSucesso] = useState("");
   const [salvando, setSalvando] = useState(false);
 
-  const carregarPrazos = async () => {
-    setCarregando(true);
-    setErroCarregamento("");
-    try {
-      const dados = await listarPrazosVigentes();
-      setPrazos(dados);
-    } catch (erro) {
-      setErroCarregamento(
-        erro instanceof Error
-          ? erro.message
-          : "Erro ao carregar os prazos de entrega.",
-      );
-    } finally {
-      setCarregando(false);
-    }
-  };
-
   useEffect(() => {
-    void carregarPrazos();
+    let ativo = true;
+
+    const carregar = async () => {
+      try {
+        const dados = await listarPrazosVigentes();
+        if (!ativo) return;
+        setPrazos(dados);
+        setErroCarregamento("");
+      } catch (erro) {
+        if (!ativo) return;
+        setErroCarregamento(
+          erro instanceof Error
+            ? erro.message
+            : "Erro ao carregar os prazos de entrega.",
+        );
+      } finally {
+        if (ativo) setCarregando(false);
+      }
+    };
+
+    void carregar();
+    return () => {
+      ativo = false;
+    };
   }, []);
 
   const prazoDoTipoSelecionado = prazos.find(
@@ -63,18 +69,22 @@ export function GestaoCalendario() {
   );
   const emEdicao = Boolean(prazoDoTipoSelecionado);
 
-  useEffect(() => {
-    setDataLimite(prazoDoTipoSelecionado?.dataLimite ?? "");
+  // Troca o tipo em edição e já sincroniza o formulário com o prazo
+  // correspondente (se existir), em vez de delegar isso a um effect
+  // separado — evita o antipadrão de "estado derivado via effect" e o
+  // risco de essa sincronização disparar em momentos inesperados (ex.:
+  // logo após salvar, quando `prazos` muda).
+  const trocarTipoSelecionado = (tipo: TipoEntrega) => {
+    setTipoSelecionado(tipo);
+    const prazoExistente = prazos.find((prazo) => prazo.tipo === tipo);
+    setDataLimite(prazoExistente?.dataLimite ?? "");
     setErros({});
     setErroGeral("");
     setSucesso("");
-    // Reagir apenas à troca de tipo/lista de prazos, não a cada nova
-    // referência de `prazoDoTipoSelecionado`.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tipoSelecionado, prazos]);
+  };
 
   const selecionarTipo = (evento: ChangeEvent<HTMLSelectElement>) => {
-    setTipoSelecionado(evento.target.value as TipoEntrega);
+    trocarTipoSelecionado(evento.target.value as TipoEntrega);
   };
 
   const alterarDataLimite = (evento: ChangeEvent<HTMLInputElement>) => {
@@ -174,7 +184,7 @@ export function GestaoCalendario() {
                     <button
                       type="button"
                       className="text-button"
-                      onClick={() => setTipoSelecionado(valor)}
+                      onClick={() => trocarTipoSelecionado(valor)}
                     >
                       {prazo ? "Editar" : "Cadastrar"}
                     </button>
