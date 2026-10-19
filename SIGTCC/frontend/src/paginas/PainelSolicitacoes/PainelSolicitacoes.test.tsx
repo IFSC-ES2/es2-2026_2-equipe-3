@@ -9,7 +9,7 @@ import {
 } from "../../utils/solicitacaoService";
 import { obterPerfilProfessor } from "../../utils/professorService";
 import { AuthProvider } from "../../auth/AuthContext";
-import { ApiError } from "../../utils/orientadorService";
+import { ApiError } from "../../utils/apiErro";
 import type { Solicitacao } from "../../types/Solicitacao";
 import type { PerfilProfessor } from "../../types/Professor";
 

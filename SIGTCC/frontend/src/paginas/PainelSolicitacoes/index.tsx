@@ -9,7 +9,7 @@ import {
   atualizarStatusSolicitacao,
 } from "../../utils/solicitacaoService";
 import { obterPerfilProfessor } from "../../utils/professorService";
-import { ApiError } from "../../utils/orientadorService";
+import { ApiError } from "../../utils/apiErro";
 import "./PainelSolicitacoes.css";
 
 type Aba = "orientandos" | "turma";

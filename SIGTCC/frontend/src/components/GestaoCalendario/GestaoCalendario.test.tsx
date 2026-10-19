@@ -2,7 +2,7 @@ import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
 import { GestaoCalendario } from "./index.tsx";
-import { ApiError } from "../../utils/orientadorService.ts";
+import { ApiError } from "../../utils/apiErro";
 import {
   atualizarPrazo,
   cadastrarPrazo,

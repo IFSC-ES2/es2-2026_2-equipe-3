@@ -1,8 +1,8 @@
 import { useState } from "react";
 import type { FormEvent, ChangeEvent } from "react";
 import type { Orientador, OrientadorInput } from "../../types/Orientador.ts";
+import { ApiError } from "../../utils/apiErro.ts";
 import {
-  ApiError,
   atualizarOrientador,
   cadastrarOrientador,
 } from "../../utils/orientadorService.ts";

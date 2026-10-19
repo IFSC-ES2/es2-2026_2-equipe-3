@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Orientador } from "../../types/Orientador.ts";
-import { ApiError, obterOrientador } from "../../utils/orientadorService.ts";
+import { ApiError } from "../../utils/apiErro.ts";
+import { obterOrientador } from "../../utils/orientadorService.ts";
 import { OrientadorForm } from "../../components/OrientadorForm";
 import { PageShell } from "../OrientadorCadastro";
 
