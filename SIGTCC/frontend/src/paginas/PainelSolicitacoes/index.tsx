@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { PageShell } from "../OrientadorCadastro";
 import type { Solicitacao } from "../../types/Solicitacao";
 import type { PerfilProfessor } from "../../types/Professor";
+import { GestaoCalendario } from "../../components/GestaoCalendario";
 import {
   listarSolicitacoesPorOrientador,
   atualizarStatusSolicitacao,
@@ -259,9 +260,7 @@ export function PainelSolicitacoesPage() {
         </div>
 
         {abaAtiva === "turma" ? (
-          <div className="painel-vazio">
-            Gestão da Turma/Calendário em breve.
-          </div>
+          <GestaoCalendario />
         ) : carregando ? (
           <div className="painel-carregando" role="status">
             Carregando solicitações...
