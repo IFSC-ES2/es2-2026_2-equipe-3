@@ -1,6 +1,6 @@
 # Reengenharia: Tratamento de Erros do Cliente HTTP do Frontend
 
-- **Situação:** problema identificado e métrica definida. A refatoração ainda não foi realizada.
+- **Situação:** refatoração realizada (#146). Ver registro na seção 5.
 - **Código analisado:** estado ao final da Sprint 2 (commit `b5c5a3f`).
 
 ---
@@ -139,60 +139,5 @@ Foram escolhidas duas métricas.
 
 Blocos idênticos encontrados:
 
-| `orientadorService.ts` | `solicitacaoService.ts` | Linhas | Conteúdo                                          |
-| :--------------------: | :---------------------: | :----: | :------------------------------------------------ |
-|         20–46          |          10–36          |   27   | `lerErro` e início de `garantirResposta`          |
-|         69–73          |          57–61          |   5    | Estrutura de `catch`                              |
-|         78–83          |          80–85          |   6    | Retorno da resposta e estrutura de `catch`        |
-|        103–109         |         97–103          |   7    | Estrutura de `catch` e início de `normalizarErro` |
-|        124–134         |         104–114         |   11   | Final de `normalizarErro`                         |
-
-### 3.2 Cobertura de testes da pasta `utils`
-
-- **Definição:** cobertura de instruções, ramificações, funções e linhas dos arquivos de `SIGTCC/frontend/src/utils/`, a mesma medida da métrica [M-01](metricas/M-01.md).
-- **Como é medida:** `npm run coverage` em `SIGTCC/frontend` (Vitest com `@vitest/coverage-v8`).
-- **Valores antes:** relatório de cobertura gerado pela equipe no fechamento da Sprint 2 (01/10/2026).
-
-| Arquivo                 |     Instruções      |    Ramificações     |       Funções       |       Linhas        |
-| :---------------------- | :-----------------: | :-----------------: | :-----------------: | :-----------------: |
-| `api.ts`                |       3 de 5        |       2 de 2        |       0 de 1        |       3 de 5        |
-| `orientadorService.ts`  |       4 de 43       |       1 de 25       |       1 de 8        |       4 de 43       |
-| `solicitacaoService.ts` |       0 de 34       |       0 de 20       |       0 de 7        |       0 de 34       |
-| **Pasta `utils`**       | **8,53%** (7 de 82) | **6,38%** (3 de 47) | **6,25%** (1 de 16) | **8,53%** (7 de 82) |
-
-### 3.3 Resultado esperado
-
-- Linhas duplicadas e definições repetidas das funções auxiliares próximas de zero.
-- Cobertura de `utils` dentro da faixa aceitável da M-01 (70% ou mais), com o tratamento de erros testado diretamente.
-- Mensagens exibidas ao usuário inalteradas, comprovado pelos testes existentes de componentes e páginas.
-
----
-
-## 4. Direção da Refatoração
-
-A refatoração será detalhada e executada em issue e Pull Request próprios. A direção proposta é:
-
-1. **Fixar o comportamento atual com testes.** Antes de alterar o código, escrever testes dos dois serviços simulando `fetch`, cobrindo sucesso, `400` com lista de campos, `404`, `409`, `422` e falha de rede. Esses testes são a evidência de que o comportamento foi preservado.
-2. **Extrair um módulo único de cliente HTTP** em `utils/`, contendo `ApiError`, a leitura do corpo de erro e a verificação da resposta. Os serviços passam a conter apenas os endpoints e as mensagens específicas de cada domínio (por exemplo, o texto de e-mail duplicado do cadastro de orientador).
-3. **Corrigir a ordem de composição dos cabeçalhos** em `api.ts` (seção 1.5), com teste.
-4. **Atualizar as importações** de `ApiError` nos componentes e páginas.
-
-Os valores "antes" deste documento referem-se ao código do final da Sprint 2. Os testes do passo 1 já elevam a cobertura; por isso a comparação final deve usar os valores registrados na seção 3, e não uma nova medição feita no meio da refatoração.
-
----
-
-## 5. Registro da Refatoração
-
-A preencher quando a refatoração for concluída:
-
-| Item                                              | Registro |
-| :------------------------------------------------ | :------- |
-| Issue e Pull Request da refatoração               |          |
-| Linhas duplicadas entre os serviços (antes: 56)   |          |
-| Definições das funções auxiliares (antes: 6)      |          |
-| Cobertura de `utils`, instruções (antes: 8,53%)   |          |
-| Cobertura de `utils`, ramificações (antes: 6,38%) |          |
-| Evidência de comportamento preservado             |          |
-| Houve melhoria, piora ou apenas reorganização?    |          |
-| Limitações e pontos não resolvidos                |          |
-| ADR registrada ou atualizada, se aplicável        |          |
+| `orientadorService.ts` | `solicitacaoService.ts` | Linhas | Conteúdo |
+| :---------------------: |
