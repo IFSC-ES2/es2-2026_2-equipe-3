@@ -150,6 +150,89 @@ class OrientadorRepositoryTest {
     }
 
     @Test
+    @DisplayName("Deve incluir orientador com exatamente 1 vaga e excluir o com 0 (limite de vagasDisponiveis > 0)")
+    void findByFiltros_ComFiltroDeVagas_DeveRespeitarLimiteExatoDeZeroEUmaVaga() {
+        Orientador umaVaga = salvarOrientadorComPerfil(
+                "Bruna",
+                "bruna@ifsc.edu.br",
+                "Inteligência Artificial"
+        );
+
+        Orientador zeroVagas = salvarOrientadorComPerfil(
+                "Diego",
+                "diego@ifsc.edu.br",
+                "Inteligência Artificial"
+        );
+
+        umaVaga.getPerfil().setVagasDisponiveis(1);
+        zeroVagas.getPerfil().setVagasDisponiveis(0);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Orientador> resultado =
+                orientadorRepository.findByFiltros(null, true);
+
+        assertThat(resultado)
+                .extracting(Orientador::getNome)
+                .containsExactly("Bruna");
+    }
+
+    @Test
+    @DisplayName("Com temVagas = false, deve se comportar como se o filtro de vagas não tivesse sido informado")
+    void findByFiltros_ComTemVagasFalse_NaoDeveFiltrarPorVagas() {
+        Orientador comVagas = salvarOrientadorComPerfil(
+                "Elisa",
+                "elisa@ifsc.edu.br",
+                "Inteligência Artificial"
+        );
+
+        Orientador semVagas = salvarOrientadorComPerfil(
+                "Fabio",
+                "fabio@ifsc.edu.br",
+                "Inteligência Artificial"
+        );
+
+        comVagas.getPerfil().setVagasDisponiveis(3);
+        semVagas.getPerfil().setVagasDisponiveis(0);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Orientador> resultado =
+                orientadorRepository.findByFiltros(null, false);
+
+        assertThat(resultado)
+                .extracting(Orientador::getNome)
+                .containsExactlyInAnyOrder("Elisa", "Fabio");
+    }
+
+    @Test
+    @DisplayName("Não deve duplicar orientador com múltiplas linhas de pesquisa quando o filtro bate em apenas uma delas")
+    void findByFiltros_ComMultiplasLinhasDePesquisa_NaoDeveDuplicarResultado() {
+        Orientador orientador = salvarOrientadorComPerfil(
+                "Gustavo",
+                "gustavo@ifsc.edu.br",
+                "Inteligência Artificial"
+        );
+
+        LinhaPesquisa segundaLinha = new LinhaPesquisa();
+        segundaLinha.setNome("Engenharia de Software");
+        segundaLinha.setPerfilOrientador(orientador.getPerfil());
+        orientador.getPerfil().getLinhasPesquisa().add(segundaLinha);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Orientador> resultado =
+                orientadorRepository.findByFiltros("Inteligência", null);
+
+        assertThat(resultado)
+                .extracting(Orientador::getNome)
+                .containsExactly("Gustavo");
+    }
+
+    @Test
     @DisplayName("Deve combinar filtro de linha de pesquisa e vagas disponíveis")
     void findByFiltros_ComLinhaEComVagas_DeveRetornarSomenteCorrespondentes() {
         Orientador comLinhaEComVagas = salvarOrientadorComPerfil(
