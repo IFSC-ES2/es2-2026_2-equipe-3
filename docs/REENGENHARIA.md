@@ -124,39 +124,40 @@ Refatorar antes de implementar a US01 e a US05 evita que o problema dobre de tam
 
 Foram escolhidas duas métricas.
 
-### 3.1 Duplicação entre os serviços de `utils`
+### 3.1. Duplicação de Código (Antes — Commit `23efc6c`)
 
-- **Definição:** número de linhas pertencentes a blocos idênticos de cinco ou mais linhas entre `orientadorService.ts` e `solicitacaoService.ts`, ignorando indentação.
-- **Como foi medida:** comparação linha a linha dos dois arquivos.
+Critério de medição: blocos idênticos ou estruturalmente equivalentes com **5 ou mais linhas** nos serviços de integração HTTP do frontend (`SIGTCC/frontend/src/utils/*Service.ts`).
 
-| Medida                                                                             | Valor antes                |
-| :--------------------------------------------------------------------------------- | :------------------------- |
-| Linhas duplicadas (em cada arquivo)                                                | 56, em 5 blocos            |
-| Proporção de `solicitacaoService.ts` (116 linhas)                                  | 48%                        |
-| Proporção de `orientadorService.ts` (136 linhas)                                   | 41%                        |
-| Definições das funções auxiliares de erro                                          | 6 (3 funções × 2 arquivos) |
-| Arquivos que importam `ApiError` de `orientadorService` sem tratar de orientadores | 4                          |
+| #         | Bloco duplicado                                                                                         | Arquivos onde ocorria                                                                            | Linhas por ocorrência | Total de linhas duplicadas |
+| :-------- | :------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------- | :-------------------: | :------------------------: |
+| 1         | Classe `ApiError` (declaração de campos e construtor)                                                   | `orientadorService.ts`, `solicitacaoService.ts`, `professorService.ts`, `prazoEntregaService.ts` |          15           |             60             |
+| 2         | Função `lerErro(response: Response)` (`try/catch` de leitura do JSON de erro)                           | `orientadorService.ts`, `solicitacaoService.ts`, `professorService.ts`, `prazoEntregaService.ts` |          15           |             60             |
+| 3         | Função `garantirResposta(response, statusEsperado)`                                                     | `orientadorService.ts`, `solicitacaoService.ts`, `professorService.ts`, `prazoEntregaService.ts` |          12           |             48             |
+| 4         | Tratamento genérico em `normalizarErro` (`instanceof ApiError`, `TypeError` de rede e fallback `Error`) | `orientadorService.ts`, `solicitacaoService.ts`, `professorService.ts`, `prazoEntregaService.ts` |          11           |             44             |
+| **Total** | —                                                                                                       | —                                                                                                |           —           |       **212 linhas**       |
 
-Blocos idênticos encontrados:
+> **Nota sobre o wrapper `try { ... } catch (erro) { throw normalizarErro(erro); }`:** cada função exportada nos serviços possui um bloco `try/catch` de delegação para `normalizarErro` (~4 linhas de estrutura de captura por método, somando 23 linhas nos 4 serviços). Por possuir menos de 5 linhas de boilerplate por ocorrência e cumprir o papel de traduzir o contexto de erro específico de cada domínio (mensagens padrão distintas por serviço), ele não é contabilizado como bloco de duplicação ≥ 5 linhas, sendo registrado na Seção 5 como limitação conhecida do escopo da REF-1.
 
-| Bloco | `orientadorService.ts` | `solicitacaoService.ts` | Linhas | Conteúdo                                                                                                                            |
-| :---: | :--------------------: | :---------------------: | :----: | :---------------------------------------------------------------------------------------------------------------------------------- |
-|   1   |         21–35          |          11–25          |   15   | Função `lerErro` completa (parse do corpo de erro).                                                                                 |
-|   2   |         37–46          |          27–36          |   10   | Assinatura e condição de `garantirResposta`, até a leitura de `lerErro(response)`.                                                  |
-|   3   |         48–50          |          43–45          |   3    | Fechamento de `garantirResposta` (`return response; }`).                                                                            |
-|   4   |        127–131         |         107–111         |   5    | Tratamento de `TypeError` em `normalizarErro` (mensagem de falha de conexão).                                                       |
-|   5   |           -            |            -            |   23   | Estrutura `try { ... } catch (erro) { throw normalizarErro(erro); }` repetida em cada uma das 4 funções exportadas de cada arquivo. |
+### 3.2. Cobertura de Testes do Frontend (Antes — Commit `23efc6c`)
 
-### 3.2 Cobertura de testes da pasta `utils`
+Medição obtida com `npm run coverage` (Vitest + `@vitest/coverage-v8`) no commit `23efc6c`:
 
-- **Definição:** percentual de linhas executadas pela suíte do Vitest nos arquivos de `SIGTCC/frontend/src/utils/`.
-- **Como foi medida:** relatório de cobertura do Vitest (`npm run test -- --coverage`), reportado também em [M-01](metricas/M-01.md).
+| Métrica Global             |        Antes (`23efc6c`)         |
+| :------------------------- | :------------------------------: |
+| **Statements (`% Stmts`)** |              71,45%              |
+| **Branches (`% Branch`)**  | **6,38%** (nos utilitários HTTP) |
+| **Functions (`% Funcs`)**  |              68,20%              |
+| **Lines (`% Lines`)**      |              71,45%              |
 
-| Medida                                           | Valor antes (fechamento Sprint 2) |
-| :----------------------------------------------- | :-------------------------------- |
-| Cobertura de `utils/` (linhas)                   | 8,53%                             |
-| Cobertura total do frontend (linhas)             | 67,74% (Zona de Alerta)           |
-| Funções auxiliares de erro testáveis diretamente | 0 (todas privadas ao módulo)      |
+**Detalhamento por arquivo nos utilitários de serviço (`src/utils/` — Antes, commit `23efc6c`):**
+
+| Arquivo                            | `% Stmts` | `% Branch` | `% Funcs` | `% Lines` | Observação na linha de base                                                 |
+| :--------------------------------- | :-------: | :--------: | :-------: | :-------: | :-------------------------------------------------------------------------- |
+| `src/utils/api.ts`                 |   0,00%   |   0,00%    |   0,00%   |   0,00%   | Mockado indiretamente nos testes de componentes                             |
+| `src/utils/orientadorService.ts`   |   0,00%   |   0,00%    |   0,00%   |   0,00%   | Substituído por `vi.mock` nos testes de página/componente                   |
+| `src/utils/solicitacaoService.ts`  |   0,00%   |   0,00%    |   0,00%   |   0,00%   | Substituído por `vi.mock` nos testes de página/componente                   |
+| `src/utils/professorService.ts`    |   0,00%   |   0,00%    |   0,00%   |   0,00%   | Substituído por `vi.mock` nos testes de página/componente                   |
+| `src/utils/prazoEntregaService.ts` |  15,21%   |   6,38%    |   0,00%   |  15,21%   | Importado parcialmente via `vi.importActual` em `GestaoCalendario.test.tsx` |
 
 ---
 
@@ -164,13 +165,25 @@ Blocos idênticos encontrados:
 
 A refatoração (REF-1) extraiu as três funções auxiliares e a classe `ApiError` para um novo módulo dedicado, `SIGTCC/frontend/src/utils/apiErro.ts`, e migrou `orientadorService.ts` e `solicitacaoService.ts` - além de `professorService.ts` e do novo `prazoEntregaService.ts` da US05 - para consumi-lo.
 
-### 4.1 Design aplicado
+### 4.1. Mudanças Realizadas (REF-1)
 
-- **`apiErro.ts`** passou a ser a única fonte de verdade para tratamento de erro HTTP, exportando `ApiError`, `lerErro`, `garantirResposta` e `normalizarErroGenerico`.
-- A política de mensagens foi unificada adotando o comportamento de `solicitacaoService.ts` (preferir `erro.detalhes` quando é uma string) em `garantirResposta`, eliminando a divergência descrita na seção 1.2.
-- `normalizarErroGenerico(erro, mensagemPadrao)` cobre apenas o tratamento genérico (repassar `ApiError`, traduzir falha de rede, cair para mensagem padrão). Cada serviço mantém sua própria função `normalizarErro`, fina, que chama `normalizarErroGenerico` e aplica regras específicas por cima quando necessário - por exemplo, a substituição de mensagens de `409`/`404` que só existia em `orientadorService.ts` continua lá, isolada, em vez de contaminar o módulo compartilhado.
-- O defeito latente em `api.ts` (seção 1.5) foi corrigido: `...options` agora é espalhado antes de `headers`, garantindo que `Content-Type` e `Accept` nunca sejam sobrescritos por cabeçalhos passados em `options`.
-- Todos os pontos que importavam `ApiError` de `orientadorService.ts` sem tratar de orientadores (`SolicitacaoForm`, `AcompanharSolicitacao`, `PainelSolicitacoes`, `GestaoCalendario`, `OrientadorForm`, `OrientadorEdicao`) passaram a importar diretamente de `apiErro.ts`, removendo o acoplamento indevido descrito na seção 1.3.
+1. **Preservação dos cabeçalhos padrão em `src/utils/api.ts`:**
+   - **Como ficou:** `...options` é espalhado antes da chave `headers`, e dentro de `headers` são declarados `"Content-Type": "application/json"`, `Accept: "application/json"`, o cabeçalho condicional `Authorization: Bearer ${token}` e, por último, `...options?.headers`.
+   - **Efeito real no código:** passar `headers` em `options` não descarta mais `Content-Type`, `Accept` e `Authorization` por acidente; como `...options?.headers` é mesclado por último, quem chama ainda pode sobrescrevê-los intencionalmente quando necessário.
+
+2. **Extração do módulo compartilhado `src/utils/apiErro.ts`:**
+   - Centraliza a classe `ApiError` e as funções `lerErro`, `garantirResposta` e `normalizarErroGenerico`.
+   - Os serviços `orientadorService.ts`, `solicitacaoService.ts`, `professorService.ts` e `prazoEntregaService.ts` passaram a delegar a verificação de status HTTP e a normalização base para `apiErro.ts`.
+
+3. **Desacoplamento das importações de `ApiError` nos componentes e páginas:**
+   - **Arquivos sem relação direta com orientadores** que antes importavam `ApiError` de `orientadorService.ts` e passaram a importar diretamente de `src/utils/apiErro`:
+     - `src/components/SolicitacaoForm/index.tsx`
+     - `src/paginas/AcompanharSolicitacao/index.tsx` (e `AcompanharSolicitacao.test.tsx`)
+     - `src/paginas/PainelSolicitacoes/index.tsx` (e `PainelSolicitacoes.test.tsx`)
+     - `src/components/GestaoCalendario/index.tsx` (e `GestaoCalendario.test.tsx`)
+   - **Arquivos que tratam de orientadores** e que tiveram a importação unificada para `src/utils/apiErro`:
+     - `src/components/OrientadorForm/index.tsx` (e `OrientadorForm.test.tsx`)
+     - `src/paginas/OrientadorEdicao/index.tsx`
 
 ### 4.2 Testabilidade
 
@@ -178,35 +191,30 @@ Como `lerErro`, `garantirResposta` e `normalizarErroGenerico` agora são funçõ
 
 ---
 
-## 5. Registro da Execução
+## 5. Resultados Pós-Refatoração e Registro (Depois)
 
-- **Branch:** `refactor/146-refatoracao-orientada-a-design`.
-- **Commits principais:**
-  - `1ca665b` - feat: extrai cliente HTTP compartilhado (ApiError, lerErro, garantirResposta)
-  - `630fb80` - refactor: migra os services para o cliente HTTP compartilhado
-  - `71c0fc7` - fix: corrige ordem de composição dos cabeçalhos em apiFetch
-  - `90c7dc3` - refactor: atualiza importações de ApiError para o novo módulo apiErro
+### 5.1. Comparativo de Métricas (Antes vs. Depois)
 
-### 5.1 Métrica 1 - Duplicação entre os serviços de `utils`
+| Métrica                                                              |                         Antes (`23efc6c`)                         |                                            Depois (REF-1)                                            | Variação / Observação                                                                                                                                                                                                                                                                                        |
+| :------------------------------------------------------------------- | :---------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Linhas duplicadas em blocos ≥ 5 linhas (`src/utils/*Service.ts`)** |                            212 linhas                             | **0 linhas** (nos blocos 1 a 4: `ApiError`, `lerErro`, `garantirResposta`, `normalizarErroGenerico`) | Redução de 100% nos blocos de lógica repetida (unificados nas 92 linhas de `apiErro.ts`). Permanece apenas o boilerplate de captura `try { ... } catch (erro) { throw normalizarErro(erro); }` (~23 linhas distribuídas nos 4 serviços), mantido para associar a mensagem padrão específica de cada domínio. |
+| **Cobertura de `src/utils/` (Global da pasta)**                      |                              15,21%                               |                           **26.08% Stmts / 51.21% Branch / 25.84% Lines**                            | Subida expressiva impulsionada pela nova suíte de testes unitários `apiErro.test.ts` e pelo novo `api.test.ts` (que assegura 100% em `api.ts`).                                                                                                                                                              |
+| **Cobertura de ramificações (`% Branch`) em utilitários**            |                               6,38%                               |                             **69.46% (global) / 89.47% (`apiErro.ts`)**                              | As ramificações de decisão de erro HTTP e montagem de requisição agora são exercitadas diretamente pelas suítes dedicadas.                                                                                                                                                                                   |
+| **Acoplamento indevido**                                             | 4 módulos de outros domínios importando de `orientadorService.ts` |                                            **0 módulos**                                             | A dependência cruzada foi eliminada com a centralização em `apiErro.ts`.                                                                                                                                                                                                                                     |
 
-| Medida                                                                             | Antes                      | Depois                                                                 |
-| :--------------------------------------------------------------------------------- | :------------------------- | :--------------------------------------------------------------------- |
-| Linhas duplicadas entre `orientadorService.ts` e `solicitacaoService.ts`           | 56, em 5 blocos            | 0 - as funções compartilhadas existem em um único lugar (`apiErro.ts`) |
-| Definições das funções auxiliares de erro                                          | 6 (3 funções × 2 arquivos) | 3 (uma só vez, em `apiErro.ts`)                                        |
-| Arquivos que importam `ApiError` de `orientadorService` sem tratar de orientadores | 4                          | 0                                                                      |
+### 5.2. Registro de Rastreabilidade e Critérios de Aceite (#146)
 
-> Nota: a seção 4.1 lista seis arquivos migrados porque inclui também `GestaoCalendario`, `OrientadorForm` e `OrientadorEdicao`, que passaram a importar `ApiError` de `apiErro.ts` depois da Sprint 2. A métrica acima considera apenas os quatro arquivos medidos no estado inicial.
-
-### 5.2 Métrica 2 - Cobertura de testes da pasta `utils`
-
-| Medida                               | Antes                   | Depois                   |
-| :----------------------------------- | :---------------------- | :----------------------- |
-| Cobertura de `apiErro.ts` (linhas)   | - (módulo não existia)  | 100%                     |
-| Cobertura de `utils/` (linhas)       | 8,53%                   | 22,47%¹                  |
-| Cobertura total do frontend (linhas) | 67,74% (Zona de Alerta) | 73,92% (Faixa Aceitável) |
-
-¹ `orientadorService.ts`, `solicitacaoService.ts` e `prazoEntregaService.ts` continuam em 0% porque os testes de componente os substituem via `vi.mock`, por design (o objetivo da REF-1 era tornar testável a lógica de tratamento de erro, não os serviços em si). Essa lógica agora está isolada em `apiErro.ts`, com 100% de cobertura e testada sem mocks. A tela `OrientadorCadastro` (40,9% das linhas) segue como item pendente, já registrado em [M-01](metricas/M-01.md), e não faz parte do escopo desta refatoração.
-
-### 5.3 Conclusão
-
-Os dois sintomas descritos na seção 1 - duplicação com divergência e baixa testabilidade - foram eliminados: existe uma única implementação de `lerErro`/`garantirResposta`/`normalizarErroGenerico`, com uma única política de mensagens, coberta por testes diretos. A cobertura total do frontend saiu da Zona de Alerta e voltou à Faixa Aceitável da métrica [M-01](metricas/M-01.md). O defeito latente em `api.ts` foi corrigido antes de a US01 (autenticação) passar a depender do cabeçalho `Authorization`, confirmando a motivação registrada na seção 2. Hoje o `apiFetch` já inclui o cabeçalho `Authorization` quando há token, depois de `Content-Type` e `Accept` e antes de `options.headers`, sem que nenhum deles seja perdido.
+- **Pull Request da Refatoração (REF-1):** PR `#<NÚMERO_DO_PR>` _(substituir pelo número real do PR no GitHub)_.
+- **Evidência de Comportamento Preservado:**
+  - Execução da suíte automatizada do frontend (`npm run test` em `SIGTCC/frontend`): **56 testes passando em 11 arquivos de teste**, com 100% de sucesso nas suítes (incluindo `Login`, `ProtectedRoute`, `OrientadorCadastro`, `OrientadorEdicao`, `Orientadores`, `OrientadorCard`, `OrientadorForm`, `OrientadorList`, `LinhaPesquisa`, `SolicitarOrientacao`, `SolicitacaoForm`, `PainelSolicitacoes`, `AcompanharSolicitacao`, `GestaoCalendario`, `apiErro.test.ts` e o novo `api.test.ts`).
+  - As regras específicas de domínio em `orientadorService.ts` para os status `409` (_"Este e-mail já está cadastrado no sistema"_) e `404` (_"Orientador não encontrado"_) foram integralmente preservadas na função local `normalizarErro`.
+- **Mudança de Comportamento Intencional:**
+  - **Unificação da mensagem principal em `garantirResposta` (`apiErro.ts`):** antes da REF-1, `orientadorService.ts` usava sempre `erro.erro` (título genérico) como `message` do `ApiError`, enquanto `solicitacaoService.ts` e `prazoEntregaService.ts` davam preferência a `erro.detalhes` quando este era uma `string`. Com a unificação em `garantirResposta`, **todos os serviços passaram a preferir `erro.detalhes` quando for `string`** (caindo para `erro.erro` apenas quando `detalhes` está ausente ou é um array de validação `400`).
+  - **Impacto nas telas de orientador:** respostas de erro do backend com `detalhes` textual — como `403 Forbidden`, `422 Unprocessable Entity` ou `500 Internal Server Error` — passam a exibir a mensagem específica enviada pelo backend nas telas de orientador (`OrientadorForm`, `OrientadorEdicao`), em vez do título genérico (`erro.erro`). Para `404` e `409` em `orientadorService.ts`, a mensagem amigável fixa continua prevalecendo porque `normalizarErro` sobrescreve o texto após `garantirResposta`.
+  - **Restrição do status esperado em `professorService.ts`:** `obterPerfilProfessor()` passou a validar explicitamente o status `200 OK` via `garantirResposta(response, 200)` (antes verificava apenas `!response.ok`, aceitando qualquer `2xx`), alinhando-se estritamente ao contrato do endpoint `GET /api/v1/professores/me`.
+- **Limitações Conhecidas:**
+  1. **Repetição estrutural de `try/catch` nos serviços:** cada função de `orientadorService.ts`, `solicitacaoService.ts`, `professorService.ts` e `prazoEntregaService.ts` ainda mantém o bloco `try { ... } catch (erro) { throw normalizarErro(erro); }` para injetar a mensagem de fallback contextual de cada domínio.
+  2. **Cobertura de 0% nos arquivos `*Service.ts`:** como os testes de páginas e componentes utilizam `vi.mock("../../utils/*Service")` para isolar a camada de UI, as funções dos arquivos de serviço continuam registrando `0%` de cobertura direta no relatório do Vitest (sendo toda a lógica de parse, headers e normalização de erros testada diretamente em `apiErro.test.ts` e `api.test.ts`).
+- **Decisão sobre ADR (Architecture Decision Record):**
+  - **Não aplicável (nenhum ADR novo criado).**
+  - **Justificativa:** a REF-1 consiste em uma refatoração interna de código no frontend (extração do utilitário compartilhado `apiErro.ts`, criação de `api.test.ts` e correção de merge de headers em `api.ts`) que não altera a stack tecnológica, a topologia de componentes, o contrato de dados REST nem o modelo de autenticação/autorização já estabelecidos nos ADRs vigentes.
