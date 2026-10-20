@@ -1,0 +1,78 @@
+.gestao-calendario {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 28px;
+  margin-top: 8px;
+}
+
+.calendario-lista h2,
+.calendario-form h2 {
+  font-size: 1.05rem;
+  margin-bottom: 14px;
+}
+
+.calendario-tabela {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(15, 42, 38, 0.08);
+}
+
+.calendario-tabela th,
+.calendario-tabela td {
+  text-align: left;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #eef2f1;
+}
+
+.calendario-tabela th {
+  color: var(--muted);
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.calendario-tabela tr:last-child td {
+  border-bottom: none;
+}
+
+.calendario-form {
+  background: white;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(15, 42, 38, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  align-self: start;
+}
+
+.calendario-form select,
+.calendario-form input[type="date"] {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d7e2e0;
+  background: white;
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+.calendario-sucesso {
+  color: var(--teal-dark);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.calendario-form > .primary-button {
+  margin-top: 4px;
+}
+
+@media (max-width: 860px) {
+  .gestao-calendario {
+    grid-template-columns: 1fr;
+  }
+}
