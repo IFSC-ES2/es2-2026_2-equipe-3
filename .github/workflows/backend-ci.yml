@@ -45,6 +45,11 @@ jobs:
         working-directory: SIGTCC/backend/gestao-tcc
         run: ./gradlew build
 
+      - name: Executar testes do backend
+        if: steps.filter.outputs.backend == 'true'
+        working-directory: SIGTCC/backend/gestao-tcc
+        run: ./gradlew test
+
       - name: Upload dos relatorios de testes (Artefato)
         if: always() && steps.filter.outputs.backend == 'true'
         uses: actions/upload-artifact@v4
