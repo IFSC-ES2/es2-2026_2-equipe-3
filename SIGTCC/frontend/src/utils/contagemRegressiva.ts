@@ -1,8 +1,5 @@
 export type StatusContagemRegressiva =
-  | "em-dia"
-  | "proximo"
-  | "hoje"
-  | "encerrado";
+  "em-dia" | "proximo" | "hoje" | "encerrado";
 
 export interface ContagemRegressivaInfo {
   diasRestantes: number;

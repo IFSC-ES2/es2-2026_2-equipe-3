@@ -45,9 +45,7 @@ describe("PainelPrazos", () => {
   test("deve exibir os prazos cadastrados com a contagem regressiva e marcar os não definidos", async () => {
     vi.mocked(listarPrazosVigentes).mockResolvedValue(mockPrazos);
 
-    render(
-      <PainelPrazos dataReferencia={new Date("2026-10-10T10:00:00")} />,
-    );
+    render(<PainelPrazos dataReferencia={new Date("2026-10-10T10:00:00")} />);
 
     await waitFor(() => {
       expect(screen.getByText("15/10/2026")).toBeInTheDocument();
