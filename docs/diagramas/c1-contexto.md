@@ -13,27 +13,25 @@ flowchart TB
     classDef external fill:#475569,stroke:#334155,stroke-width:2px,color:#ffffff;
 
     subgraph Atores["Usuários do Sistema"]
-        aluno["👤 <b>Aluno</b><br/>Estudante de graduação"]:::actor
-        professor["👤 <b>Professor / Orientador</b><br/>Docente e responsável por turma"]:::actor
+        aluno["<b>Aluno</b><br/>Estudante de graduação"]:::actor
+        professor["<b>Professor / Orientador</b><br/>Docente e responsável por turma"]:::actor
     end
 
     subgraph Fronteira["Fronteira da Aplicação"]
-        sigtcc["🎓 <b>Sistema SIGTCC</b><br/>Gestão centralizada de orientações, turmas e entregas"]:::system
+        sigtcc["<b>Sistema SIGTCC</b><br/>Gestão centralizada de orientações, turmas e entregas"]:::system
     end
 
     subgraph Externos["Sistemas Externos Integrados"]
-        keycloak["🔐 <b>Keycloak (IAM)</b><br/>Provedor de Identidade e Acesso (OIDC / JWT)"]:::external
-        nuvem["☁️ <b>Plataformas em Nuvem / Repositórios</b><br/>Google Drive, OneDrive, GitHub (Links)"]:::external
+        keycloak["<b>Keycloak (IAM)</b><br/>Provedor de Identidade e Acesso (OIDC / JWT)"]:::external
+        nuvem["<b>Plataformas em Nuvem / Repositórios</b><br/>Google Drive, OneDrive, GitHub (Links)"]:::external
     end
 
-    aluno -->|"Consulta catálogo e envia solicitações [HTTPS]"| sigtcc
-    professor -->|"Gerencia vagas e administra prazos de turma [HTTPS]"| sigtcc
+    aluno -->|"Acessa catálogo, envia solicitações e submete links [HTTPS]"| sigtcc
+    professor -->|"Gerencia vagas, avalia solicitações e define prazos [HTTPS]"| sigtcc
 
-    aluno -.->|"Autentica com credenciais [OIDC / HTTPS]"| keycloak
-    professor -.->|"Autentica com credenciais [OIDC / HTTPS]"| keycloak
-    sigtcc <-->|"Consulta chaves públicas JWKS [HTTP / JSON]"| keycloak
+    sigtcc <-->|"Autentica via Direct Access Grant e valida tokens [HTTPS / JWKS]"| keycloak
 
-    aluno -.->|"Hospeda documento e copia link [HTTPS]"| nuvem
+    aluno -.->|"Hospeda documento ou código e copia link [HTTPS]"| nuvem
     professor -.->|"Acessa link do trabalho para avaliação [HTTPS]"| nuvem
 ```
 
@@ -56,7 +54,7 @@ flowchart TB
 
 ### 2.3 Sistemas Externos Integrados
 
-| Elemento                                | Tipo                   | Descrição e Responsabilidades                                                                                                                                                                                                                                                                                                                                 |
-| :-------------------------------------- | :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Keycloak (IAM)**                      | Provedor de Identidade | Servidor de autenticação independente executado em contêiner Docker dedicado (`gestao_tcc_keycloak_dev`, porta `8081`). Centraliza o armazenamento de credenciais, gerenciamento do realm `sigtcc` e emissão de tokens de acesso JWT com papéis `ROLE_ALUNO` e `ROLE_PROFESSOR` (conforme [ADR-0011](../adrs/ADR-0011.md) e [ADR-0012](../adrs/ADR-0012.md)). |
-| **Plataformas em Nuvem / Repositórios** | Armazenamento Externo  | Serviços como Google Drive, OneDrive ou GitHub onde os alunos mantêm seus artefatos textuais e bases de código. O sistema armazena apenas as URLs validadas, eliminando a custódia de binários no backend (conforme [ADR-0013](../adrs/ADR-0013.md)).                                                                                                         |
+| Elemento                                | Tipo                   | Descrição e Responsabilidades                                                                                                                                                                                                                                                                                                                                                                  |
+| :-------------------------------------- | :--------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Keycloak (IAM)**                      | Provedor de Identidade | Servidor de autenticação independente executado em contêiner Docker dedicado (`gestao_tcc_keycloak_dev`, porta `8081`). Centraliza o armazenamento de credenciais, gerenciamento do realm `sigtcc` e emissão de tokens de acesso JWT com papéis `ROLE_ALUNO` e `ROLE_PROFESSOR` (conforme [ADR-0011](../adrs/ADR-0011.md), [ADR-0012](../adrs/ADR-0012.md) e [ADR-0014](../adrs/ADR-0014.md)). |
+| **Plataformas em Nuvem / Repositórios** | Armazenamento Externo  | Serviços como Google Drive, OneDrive ou GitHub onde os alunos mantêm seus artefatos textuais e bases de código. O sistema armazena apenas as URLs validadas, eliminando a custódia de binários no backend (conforme [ADR-0013](../adrs/ADR-0013.md)).                                                                                                                                          |
