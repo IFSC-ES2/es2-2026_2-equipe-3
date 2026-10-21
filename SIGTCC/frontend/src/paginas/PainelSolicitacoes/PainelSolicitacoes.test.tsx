@@ -8,7 +8,6 @@ import {
   atualizarStatusSolicitacao,
 } from "../../utils/solicitacaoService";
 import { obterPerfilProfessor } from "../../utils/professorService";
-import { listarPrazosVigentes } from "../../utils/prazoEntregaService";
 import { AuthProvider } from "../../auth/AuthContext";
 import { ApiError } from "../../utils/apiErro";
 import type { Solicitacao } from "../../types/Solicitacao";
