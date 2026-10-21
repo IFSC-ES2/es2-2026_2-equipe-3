@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { vi } from "vitest";
-import { ApiError } from "../../utils/orientadorService";
+import { ApiError } from "../../utils/apiErro";
 import { obterSolicitacao } from "../../utils/solicitacaoService";
 import { AcompanharSolicitacaoPage } from "./index";
 import { AuthProvider } from "../../auth/AuthContext";

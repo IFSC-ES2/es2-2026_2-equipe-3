@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Solicitacao } from "../../types/Solicitacao";
-import { ApiError } from "../../utils/orientadorService";
+import { ApiError } from "../../utils/apiErro";
 import { obterSolicitacao } from "../../utils/solicitacaoService";
 import { PageShell } from "../OrientadorCadastro";
 

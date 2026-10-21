@@ -8,13 +8,13 @@ export const apiFetch = async (endpoint: string, options?: RequestInit) => {
   const token = obterAccessTokenAtual();
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
       ...options?.headers,
     },
-    ...options,
   });
 
   return response;
