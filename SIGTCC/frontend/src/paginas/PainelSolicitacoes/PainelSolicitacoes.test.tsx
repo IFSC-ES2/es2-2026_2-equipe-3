@@ -1,13 +1,14 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { PainelSolicitacoesPage } from "./index";
 import {
   listarSolicitacoesPorOrientador,
   atualizarStatusSolicitacao,
 } from "../../utils/solicitacaoService";
 import { obterPerfilProfessor } from "../../utils/professorService";
+import { listarPrazosVigentes } from "../../utils/prazoEntregaService";
 import { AuthProvider } from "../../auth/AuthContext";
 import { ApiError } from "../../utils/apiErro";
 import type { Solicitacao } from "../../types/Solicitacao";
@@ -20,6 +21,12 @@ vi.mock("../../utils/solicitacaoService", () => ({
 
 vi.mock("../../utils/professorService", () => ({
   obterPerfilProfessor: vi.fn(),
+}));
+
+vi.mock("../../utils/prazoEntregaService", () => ({
+  listarPrazosVigentes: vi.fn().mockResolvedValue([]),
+  cadastrarPrazo: vi.fn(),
+  atualizarPrazo: vi.fn(),
 }));
 
 const perfilBase: PerfilProfessor = {
@@ -79,12 +86,18 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(obterPerfilProfessor).mockResolvedValue(perfilBase);
+    vi.mocked(listarPrazosVigentes).mockResolvedValue([]);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("deve exibir estado de carregamento inicial e depois a lista de solicitações com indicador de vagas", async () => {
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue(
       mockSolicitacoes,
     );
+
     render(
       <AuthProvider>
         <MemoryRouter>
@@ -114,6 +127,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue(
       mockSolicitacoes,
     );
+
     render(
       <AuthProvider>
         <MemoryRouter>
@@ -171,7 +185,6 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     const botoesAceitar = screen.getAllByRole("button", {
       name: "Aceitar",
     });
-
     await user.click(botoesAceitar[0]);
 
     await waitFor(() => {
@@ -216,17 +229,13 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       name: "Confirmar Recusa",
     });
 
-    // Inicialmente vazio.
     expect(botaoConfirmar).toBeDisabled();
-    // Novo contador: quantidade atual / limite máximo.
     expect(screen.getByText("0 / 500 caracteres")).toBeInTheDocument();
 
-    // Com 5 caracteres: botão continua desabilitado.
     await user.type(textarea, "Pouco");
     expect(botaoConfirmar).toBeDisabled();
     expect(screen.getByText("5 / 500 caracteres")).toBeInTheDocument();
 
-    // Com 10 ou mais caracteres: botão habilitado.
     await user.type(textarea, " motivo detalhado");
     expect(botaoConfirmar).toBeEnabled();
     expect(screen.getByText("22 / 500 caracteres")).toBeInTheDocument();
@@ -257,12 +266,8 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     );
 
     const textarea = screen.getByPlaceholderText(/informe o motivo da recusa/i);
-
-    // Verifica se a trava nativa do HTML está aplicada
     expect(textarea).toHaveAttribute("maxLength", "500");
 
-    // Usa o fireEvent.change para injetar 500 caracteres instantaneamente
-    // Assim não causa o erro de timeout (5000ms) que acontece ao simular 600 teclas uma a uma
     fireEvent.change(textarea, { target: { value: "a".repeat(500) } });
 
     expect(textarea).toHaveValue("a".repeat(500));
@@ -361,13 +366,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
         name: "Confirmar Recusa",
       }),
     ).not.toBeInTheDocument();
-
     expect(
       screen.getByRole("button", {
         name: "Aceitar",
       }),
     ).toBeInTheDocument();
-
     expect(
       screen.getByRole("button", {
         name: "Recusar",
@@ -409,7 +412,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
   });
 
-  it("deve exibir mensagem de erro 409 quando a solicitação foi respondida anteriormente", async () => {
+  it("deve exibir mensagem de erro 409 quando a solicitação já foi respondida anteriormente", async () => {
     const user = userEvent.setup();
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([
       mockSolicitacoes[0],
@@ -417,7 +420,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     vi.mocked(atualizarStatusSolicitacao).mockRejectedValue(
       new ApiError(
         409,
-        "Esta solicitação foi respondida e não pode ser alterada.",
+        "Esta solicitação já foi respondida e não pode ser alterada.",
       ),
     );
 
@@ -442,7 +445,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          "Esta solicitação foi respondida e não pode ser alterada.",
+          "Esta solicitação já foi respondida e não pode ser alterada.",
         ),
       ).toBeInTheDocument();
     });
@@ -510,5 +513,59 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     expect(
       screen.queryByRole("tab", { name: "Gestão da Turma/Calendário" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("deve exibir os prazos vigentes com contagem regressiva tanto para professor orientador quanto para responsável pela turma", async () => {
+    vi.setSystemTime(new Date("2026-10-10T10:00:00"));
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
+    vi.mocked(listarPrazosVigentes).mockResolvedValue([
+      {
+        id: 1,
+        semestre: "2026/2",
+        tipo: "PROJETO_TCC",
+        descricao: "Projeto de TCC",
+        dataLimite: "2026-10-22",
+      },
+    ]);
+
+    // 1. Professor apenas orientador (responsavelTurma: false)
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      ...perfilBase,
+      responsavelTurma: false,
+    });
+
+    const { unmount } = render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("22/10/2026")).toBeInTheDocument();
+    });
+    expect(screen.getByText("Faltam 12 dias")).toBeInTheDocument();
+
+    unmount();
+
+    // 2. Professor responsável pela turma (responsavelTurma: true)
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      ...perfilBase,
+      responsavelTurma: true,
+    });
+
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("22/10/2026")).toBeInTheDocument();
+    });
+    expect(screen.getByText("Faltam 12 dias")).toBeInTheDocument();
   });
 });
