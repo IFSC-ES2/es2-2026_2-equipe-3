@@ -56,8 +56,8 @@ Durante a Sprint 3, foi realizada uma execução completa e bem-sucedida do pipe
 
 A execução validou os workflows de **Backend CI** e **Frontend CI**, incluindo build e testes automatizados.
 
- **Pull Request de evidência:** #148 — Atualização do pipeline de CI para a Sprint 3.
+**Pull Request de evidência:** #148 — Atualização do pipeline de CI para a Sprint 3.
 
- **Resultado:** execução concluída com sucesso, com os checks obrigatórios de Backend CI e Frontend CI aprovados.
+**Resultado:** execução concluída com sucesso, com os checks obrigatórios de Backend CI e Frontend CI aprovados.
 
 > [Link para o Pull Request #148](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/182)
