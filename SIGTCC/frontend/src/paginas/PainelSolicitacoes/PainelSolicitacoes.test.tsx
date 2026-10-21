@@ -27,6 +27,12 @@ vi.mock("../../utils/professorService", () => ({
   obterPerfilProfessor: vi.fn(),
 }));
 
+vi.mock("../../utils/prazoEntregaService", () => ({
+  listarPrazosVigentes: vi.fn(),
+  cadastrarPrazo: vi.fn(),
+  atualizarPrazo: vi.fn(),
+}));
+
 const perfilBase: PerfilProfessor = {
   id: 1,
   nome: "Prof. Dr. Roberto",
