@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
 import type { ErroValidacaoCampo } from "../../types/Erro";
 import type { NovaSolicitacao } from "../../types/Solicitacao";
-import { ApiError } from "../../utils/orientadorService";
+import { ApiError } from "../../utils/apiErro";
 import { criarSolicitacao } from "../../utils/solicitacaoService";
 
 interface SolicitacaoFormProps {

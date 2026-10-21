@@ -5,7 +5,7 @@ import {
   type PrazoEntrega,
   type TipoEntrega,
 } from "../../types/PrazoEntrega.ts";
-import { ApiError } from "../../utils/orientadorService.ts";
+import { ApiError } from "../../utils/apiErro";
 import {
   atualizarPrazo,
   cadastrarPrazo,
