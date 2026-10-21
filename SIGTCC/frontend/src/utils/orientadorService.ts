@@ -1,53 +1,6 @@
 import { apiFetch } from "./api";
+import { ApiError, garantirResposta, normalizarErroGenerico } from "./apiErro";
 import type { Orientador, OrientadorInput } from "../types/Orientador";
-import type { RespostaErroPadrao } from "../types/Erro";
-
-export class ApiError extends Error {
-  public status: number;
-  public detalhes: RespostaErroPadrao["detalhes"];
-
-  constructor(
-    status: number,
-    message: string,
-    detalhes: RespostaErroPadrao["detalhes"] = undefined,
-  ) {
-    super(message);
-    this.name = "ApiError";
-    this.status = status;
-    this.detalhes = detalhes;
-  }
-}
-
-async function lerErro(response: Response): Promise<RespostaErroPadrao> {
-  try {
-    const erro = (await response.json()) as Partial<RespostaErroPadrao>;
-    return {
-      status: response.status,
-      erro: erro.erro || "Erro ao processar a requisição",
-      detalhes: erro.detalhes,
-    };
-  } catch {
-    return {
-      status: response.status,
-      erro: response.statusText || "Erro ao processar a requisição",
-    };
-  }
-}
-
-async function garantirResposta(
-  response: Response,
-  statusEsperado?: number,
-): Promise<Response> {
-  if (
-    statusEsperado !== undefined
-      ? response.status !== statusEsperado
-      : !response.ok
-  ) {
-    const erro = await lerErro(response);
-    throw new ApiError(response.status, erro.erro, erro.detalhes);
-  }
-  return response;
-}
 
 export async function cadastrarOrientador(
   dados: OrientadorInput,
@@ -115,32 +68,31 @@ export async function atualizarOrientador(
   }
 }
 
+// Política de mensagens específica de orientadores: substitui o texto de
+// 409 (e-mail duplicado) e 404 (orientador inexistente) por mensagens
+// amigáveis, mantendo o comportamento que já existia antes da REF-1.
 function normalizarErro(erro: unknown): ApiError | Error {
-  if (erro instanceof ApiError) {
-    if (erro.status === 409) {
+  const normalizado = normalizarErroGenerico(
+    erro,
+    "Erro ao processar a requisição",
+  );
+
+  if (normalizado instanceof ApiError) {
+    if (normalizado.status === 409) {
       return new ApiError(
-        erro.status,
+        normalizado.status,
         "Este e-mail já está cadastrado no sistema",
-        erro.detalhes,
+        normalizado.detalhes,
       );
     }
-    if (erro.status === 404) {
+    if (normalizado.status === 404) {
       return new ApiError(
-        erro.status,
+        normalizado.status,
         "Orientador não encontrado",
-        erro.detalhes,
+        normalizado.detalhes,
       );
     }
-    return erro;
   }
 
-  if (erro instanceof TypeError) {
-    return new Error(
-      "Não foi possível conectar ao servidor. Verifique se o backend está rodando.",
-    );
-  }
-
-  return erro instanceof Error
-    ? erro
-    : new Error("Erro ao processar a requisição");
+  return normalizado;
 }

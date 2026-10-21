@@ -5,27 +5,14 @@ import { OrientadorForm } from "./index.tsx";
 import {
   cadastrarOrientador,
   atualizarOrientador,
-  ApiError,
 } from "../../utils/orientadorService.ts";
+import { ApiError } from "../../utils/apiErro.ts";
 import type { Orientador } from "../../types/Orientador.ts";
 
 vi.mock("../../utils/orientadorService.ts", () => {
   return {
     cadastrarOrientador: vi.fn(),
     atualizarOrientador: vi.fn(),
-    ApiError: class extends Error {
-      status: number;
-      detalhes: { campo: string; mensagem: string }[];
-
-      constructor(
-        status: number,
-        detalhes: { campo: string; mensagem: string }[],
-      ) {
-        super("Erro de API");
-        this.status = status;
-        this.detalhes = detalhes;
-      }
-    },
   };
 });
 
@@ -212,9 +199,9 @@ describe("OrientadorForm", () => {
   test("deve processar erros de validação vindos do backend (ApiError 400)", async () => {
     const user = userEvent.setup();
     vi.mocked(cadastrarOrientador).mockRejectedValue(
-      new ApiError(400, [
+      new ApiError(400, "Erro de validação", [
         { campo: "email", mensagem: "E-mail já cadastrado" },
-      ] as unknown as string),
+      ]),
     );
 
     render(<OrientadorForm onSucesso={mockOnSucesso} onErro={mockOnErro} />);
