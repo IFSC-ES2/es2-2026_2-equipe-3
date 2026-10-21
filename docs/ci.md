@@ -49,3 +49,15 @@ A integração atua como a primeira linha de defesa contra bugs e erros (Risco R
 2. Receber a aprovação manual de revisão de código por ao menos um colega da equipe.
 
 Caso algum _check_ do pipeline falhe, o botão de _Merge_ do GitHub ficará bloqueado, exigindo que o desenvolvedor corrija o erro na branch de origem e faça um novo _push_ para disparar o pipeline novamente.
+
+## 5. Evidência de Execução do Pipeline — Sprint 3
+
+Durante a Sprint 3, foi realizada uma execução completa e bem-sucedida do pipeline de Integração Contínua em um Pull Request direcionado à ramificação `entrega-7`.
+
+A execução validou os workflows de **Backend CI** e **Frontend CI**, incluindo build e testes automatizados.
+
+ **Pull Request de evidência:** #148 — Atualização do pipeline de CI para a Sprint 3.
+
+ **Resultado:** execução concluída com sucesso, com os checks obrigatórios de Backend CI e Frontend CI aprovados.
+
+> [Link para o Pull Request #148](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/182)
