@@ -11,24 +11,19 @@ import {
   cadastrarPrazo,
   listarPrazosVigentes,
 } from "../../utils/prazoEntregaService.ts";
+import {
+  calcularContagemRegressiva,
+  formatarDataPrazo,
+} from "../../utils/contagemRegressiva.ts";
 import "./GestaoCalendario.css";
 
 type ItemTipoEntrega = { valor: TipoEntrega; rotulo: string };
 type ErrosCampos = Record<string, string>;
 
-function formatarData(dataIso: string): string {
-  try {
-    return new Date(`${dataIso}T00:00:00`).toLocaleDateString("pt-BR");
-  } catch {
-    return dataIso;
-  }
-}
-
 export function GestaoCalendario() {
   const [prazos, setPrazos] = useState<PrazoEntrega[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erroCarregamento, setErroCarregamento] = useState("");
-
   const [tipoSelecionado, setTipoSelecionado] =
     useState<TipoEntrega>("PROJETO_TCC");
   const [dataLimite, setDataLimite] = useState("");
@@ -39,7 +34,6 @@ export function GestaoCalendario() {
 
   useEffect(() => {
     let ativo = true;
-
     const carregar = async () => {
       try {
         const dados = await listarPrazosVigentes();
@@ -57,7 +51,6 @@ export function GestaoCalendario() {
         if (ativo) setCarregando(false);
       }
     };
-
     void carregar();
     return () => {
       ativo = false;
@@ -69,11 +62,6 @@ export function GestaoCalendario() {
   );
   const emEdicao = Boolean(prazoDoTipoSelecionado);
 
-  // Troca o tipo em edição e já sincroniza o formulário com o prazo
-  // correspondente (se existir), em vez de delegar isso a um effect
-  // separado — evita o antipadrão de "estado derivado via effect" e o
-  // risco de essa sincronização disparar em momentos inesperados (ex.:
-  // logo após salvar, quando `prazos` muda).
   const trocarTipoSelecionado = (tipo: TipoEntrega) => {
     setTipoSelecionado(tipo);
     const prazoExistente = prazos.find((prazo) => prazo.tipo === tipo);
@@ -156,30 +144,35 @@ export function GestaoCalendario() {
     <div className="gestao-calendario">
       <div className="calendario-lista">
         <h2>Prazos vigentes</h2>
-
         {erroCarregamento && (
           <p className="erro-texto" role="alert">
             {erroCarregamento}
           </p>
         )}
-
         <table className="calendario-tabela">
           <thead>
             <tr>
               <th>Entrega</th>
               <th>Data limite</th>
+              <th>Contagem regressiva</th>
               <th />
             </tr>
           </thead>
           <tbody>
             {TIPOS_ENTREGA.map(({ valor, rotulo }: ItemTipoEntrega) => {
               const prazo = prazos.find((item) => item.tipo === valor);
+              const contagem = prazo
+                ? calcularContagemRegressiva(prazo.dataLimite)
+                : null;
               return (
                 <tr key={valor}>
                   <td>{rotulo}</td>
                   <td>
-                    {prazo ? formatarData(prazo.dataLimite) : "Não cadastrado"}
+                    {prazo
+                      ? formatarDataPrazo(prazo.dataLimite)
+                      : "Não cadastrado"}
                   </td>
+                  <td>{contagem ? contagem.texto : "—"}</td>
                   <td>
                     <button
                       type="button"
