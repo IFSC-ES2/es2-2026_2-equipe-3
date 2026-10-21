@@ -110,18 +110,18 @@ As principais ressalvas são a ausência de proteção da branch `main`, a falta
 - Expandir o CI na próxima etapa para build, testes e validações de backend/frontend, alinhando a automação aos riscos R02 e R03.
 - Registrar evidências de acompanhamento dos riscos nas próximas retrospectivas, mostrando alterações de probabilidade, impacto ou ações de mitigação realizadas.
 
-## Observações Sobre Uso de IA
-
-O `USO-IA.md` declara uso do Gemini na Entrega 4 para apoio na elaboração dos documentos de riscos, fluxo de trabalho e governança, além de apoio na infraestrutura de CI. Essa declaração é compatível com os artefatos entregues, que são majoritariamente documentação estruturada em Markdown e configuração simples de GitHub Actions.
-
-Há uma pequena inconsistência textual: o `USO-IA.md` menciona `verificacao-formatacao.yml`, enquanto o arquivo real é `.github/workflows/verificar-formatacao.yml`. A diferença não compromete a transparência geral do registro, mas deve ser revisada para manter rastreabilidade precisa.
-
 ## Nota da Entrega
 
-- Nota: 4,2 / 5,0
+Nota: 4,2 / 5,0
 
 ## Justificativa da Nota
 
 A entrega atende aos objetivos centrais de riscos e consolidação, com documentação robusta, riscos relevantes e priorizados, plano de resposta, critérios de qualidade coerentes com o MVP, issues organizadas, PR integrado por merge commit, aprovação formal e checks executados com sucesso.
 
 A nota não é maior por causa de inconsistências importantes entre o processo declarado e a configuração verificável: a `main` não está protegida, não há enforcement comprovado de checks obrigatórios, a documentação declara workflow de links inexistente, há link incorreto para o documento de CI e o pipeline atual ainda tem validações limitadas. Mesmo assim, considerando o estágio do projeto e a qualidade geral dos artefatos, a entrega demonstra boa aderência aos critérios da etapa.
+
+## Observações sobre Uso de IA
+
+O `USO-IA.md` declara uso do Gemini na Entrega 4 para apoio na elaboração dos documentos de riscos, fluxo de trabalho e governança, além de apoio na infraestrutura de CI. Essa declaração é compatível com os artefatos entregues, que são majoritariamente documentação estruturada em Markdown e configuração simples de GitHub Actions.
+
+Há uma pequena inconsistência textual: o `USO-IA.md` menciona `verificacao-formatacao.yml`, enquanto o arquivo real é `.github/workflows/verificar-formatacao.yml`. A diferença não compromete a transparência geral do registro, mas deve ser revisada para manter rastreabilidade precisa.
