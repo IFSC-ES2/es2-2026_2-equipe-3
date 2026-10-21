@@ -2,12 +2,17 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { PageShell } from "../OrientadorCadastro";
 import type { Solicitacao } from "../../types/Solicitacao";
+import type { PerfilProfessor } from "../../types/Professor";
+import { GestaoCalendario } from "../../components/GestaoCalendario";
 import {
   listarSolicitacoesPorOrientador,
   atualizarStatusSolicitacao,
 } from "../../utils/solicitacaoService";
-import { ApiError } from "../../utils/orientadorService";
+import { obterPerfilProfessor } from "../../utils/professorService";
+import { ApiError } from "../../utils/apiErro";
 import "./PainelSolicitacoes.css";
+
+type Aba = "orientandos" | "turma";
 
 export function PainelSolicitacoesPage() {
   const { orientadorId: paramId } = useParams<{ orientadorId?: string }>();
@@ -21,6 +26,23 @@ export function PainelSolicitacoesPage() {
   const [mensagem, setMensagem] = useState("");
   const [sucesso, setSucesso] = useState(false);
   const [processandoId, setProcessandoId] = useState<number | null>(null);
+
+  const [perfil, setPerfil] = useState<PerfilProfessor | null>(null);
+  const [abaAtiva, setAbaAtiva] = useState<Aba>("orientandos");
+
+  useEffect(() => {
+    let ativo = true;
+    obterPerfilProfessor()
+      .then((dados) => {
+        if (ativo) setPerfil(dados);
+      })
+      .catch(() => {
+        if (ativo) setPerfil(null);
+      });
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   // Controle de recusa por ID de solicitacao
   const [solicitacaoRecusandoId, setSolicitacaoRecusandoId] = useState<
@@ -214,7 +236,32 @@ export function PainelSolicitacoesPage() {
           </div>
         </div>
 
-        {carregando ? (
+        <div className="painel-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            className={abaAtiva === "orientandos" ? "tab-ativa" : ""}
+            aria-selected={abaAtiva === "orientandos"}
+            onClick={() => setAbaAtiva("orientandos")}
+          >
+            Orientandos
+          </button>
+          {perfil?.responsavelTurma && (
+            <button
+              type="button"
+              role="tab"
+              className={abaAtiva === "turma" ? "tab-ativa" : ""}
+              aria-selected={abaAtiva === "turma"}
+              onClick={() => setAbaAtiva("turma")}
+            >
+              Gestão da Turma/Calendário
+            </button>
+          )}
+        </div>
+
+        {abaAtiva === "turma" ? (
+          <GestaoCalendario />
+        ) : carregando ? (
           <div className="painel-carregando" role="status">
             Carregando solicitações...
           </div>

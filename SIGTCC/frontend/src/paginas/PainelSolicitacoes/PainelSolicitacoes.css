@@ -51,6 +51,27 @@
   color: var(--teal);
 }
 
+.painel-tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--line);
+}
+
+.painel-tabs button {
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  padding: 10px 4px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.painel-tabs button.tab-ativa {
+  color: var(--teal-dark);
+  border-bottom-color: var(--teal);
+}
+
 .painel-status-msg {
   padding: 16px 20px;
   border-radius: 10px;

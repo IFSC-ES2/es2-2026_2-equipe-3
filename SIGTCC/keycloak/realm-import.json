@@ -27,13 +27,13 @@
     {
       "clientId": "sigtcc-frontend",
       "name": "SIGTCC Frontend (React)",
-      "description": "Cliente público da SPA. Usa Authorization Code com PKCE.",
+      "description": "Cliente público da SPA. Usa Direct Access Grant (Resource Owner Password Credentials) para suportar o formulário de login próprio exigido pela issue #130 (ver ADR-0014). Authorization Code + PKCE permanece disponível (standardFlowEnabled) para uso futuro.",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": true,
       "standardFlowEnabled": true,
       "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": false,
+      "directAccessGrantsEnabled": true,
       "serviceAccountsEnabled": false,
       "rootUrl": "http://localhost:5173",
       "redirectUris": ["http://localhost:5173/*"],
@@ -79,7 +79,11 @@
       "enabled": true,
       "emailVerified": true,
       "credentials": [
-        { "type": "password", "value": "aluno123", "temporary": false }
+        {
+          "type": "password",
+          "value": "aluno123",
+          "temporary": false
+        }
       ],
       "realmRoles": ["ROLE_ALUNO"]
     },
@@ -91,7 +95,11 @@
       "enabled": true,
       "emailVerified": true,
       "credentials": [
-        { "type": "password", "value": "professor123", "temporary": false }
+        {
+          "type": "password",
+          "value": "professor123",
+          "temporary": false
+        }
       ],
       "realmRoles": ["ROLE_PROFESSOR"]
     },
@@ -103,7 +111,11 @@
       "enabled": true,
       "emailVerified": true,
       "credentials": [
-        { "type": "password", "value": "professor123", "temporary": false }
+        {
+          "type": "password",
+          "value": "professor123",
+          "temporary": false
+        }
       ],
       "realmRoles": ["ROLE_PROFESSOR"]
     }

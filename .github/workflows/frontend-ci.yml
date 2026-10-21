@@ -53,7 +53,7 @@ jobs:
 
       - name: Executar Testes Unitários (Vitest)
         if: steps.filter.outputs.frontend == 'true'
-        run: npm run test
+        run: npm test
 
       - name: Executar Build
         if: steps.filter.outputs.frontend == 'true'

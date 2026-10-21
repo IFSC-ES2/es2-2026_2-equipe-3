@@ -1,9 +1,10 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { vi } from "vitest";
-import { ApiError } from "../../utils/orientadorService";
+import { ApiError } from "../../utils/apiErro";
 import { obterSolicitacao } from "../../utils/solicitacaoService";
 import { AcompanharSolicitacaoPage } from "./index";
+import { AuthProvider } from "../../auth/AuthContext";
 
 vi.mock("../../utils/solicitacaoService", () => ({
   obterSolicitacao: vi.fn(),
@@ -27,11 +28,16 @@ const solicitacao = {
 
 function renderRota() {
   return render(
-    <MemoryRouter initialEntries={["/acompanhar/84"]}>
-      <Routes>
-        <Route path="/acompanhar/:id" element={<AcompanharSolicitacaoPage />} />
-      </Routes>
-    </MemoryRouter>,
+    <AuthProvider>
+      <MemoryRouter initialEntries={["/acompanhar/84"]}>
+        <Routes>
+          <Route
+            path="/acompanhar/:id"
+            element={<AcompanharSolicitacaoPage />}
+          />
+        </Routes>
+      </MemoryRouter>
+    </AuthProvider>,
   );
 }
 
