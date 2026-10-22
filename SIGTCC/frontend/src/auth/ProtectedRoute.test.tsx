@@ -72,12 +72,13 @@ describe("ProtectedRoute", () => {
     expect(await screen.findByText("Conteúdo protegido")).toBeInTheDocument();
   });
 
-  test("redireciona para a página inicial quando o usuário autenticado não possui o papel exigido", async () => {
+  test("exibe a página de acesso negado quando o usuário autenticado não possui o papel exigido", async () => {
     armazenarSessaoFake(["ROLE_ALUNO"], "aluno@example.com");
 
     renderComRota("/area-protegida", "ROLE_PROFESSOR");
 
-    expect(await screen.findByText("Página inicial")).toBeInTheDocument();
+    expect(await screen.findByText("Acesso negado")).toBeInTheDocument();
+    expect(screen.queryByText("Página inicial")).not.toBeInTheDocument();
     expect(screen.queryByText("Conteúdo protegido")).not.toBeInTheDocument();
   });
 
