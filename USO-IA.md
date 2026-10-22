@@ -264,4 +264,53 @@ Todo o conteúdo, código e documentação gerados com o apoio da IA foram lidos
 
 ### Willian Ferreira dos Santos (DevOps / Infraestrutura / Backend)
 
-_Espaço reservado para o integrante registrar suas declarações de uso de IA na Sprint 3._
+**Ferramenta utilizada:** ChatGPT (OpenAI)  
+**Período:** 01/10/2026 a 22/10/2026
+
+#### Detalhamento de Usos por Artefato e Atividade:
+
+- **Implementação do filtro combinado de orientadores (Issue #133):**
+  - **Data:** 09/10/2026 a 10/10/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefatos:** `OrientadorRepository`, `OrientadorService`, `OrientadorController`, testes automatizados do backend e `docs/contrato-dados-us02.md`.
+  - **Aproveitamento:** Apoio na análise da implementação do filtro por linha de pesquisa e disponibilidade de vagas, na estruturação da consulta JPQL com os dois parâmetros e na organização dos testes para os cenários de filtros isolados e combinados.
+  - **Adaptação/Descarte:** A implementação foi analisada e adaptada aos padrões já existentes no backend. Os parâmetros, regras de filtragem e comportamento esperado foram conferidos manualmente com os critérios da Issue #133 e com o contrato de dados da US02.
+  - **Validação Técnica:** Execução dos testes automatizados do backend e do `./gradlew build`, além da revisão do comportamento do endpoint antes da integração pelo **PR #165**.
+
+- **Atualização do pipeline de Integração Contínua da Sprint 3 (Issue #148):**
+  - **Data:** 18/10/2026 a 20/10/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefatos:** `.github/workflows/backend-ci.yml` e `.github/workflows/frontend-ci.yml`.
+  - **Aproveitamento:** Apoio na análise dos workflows existentes, na adequação da execução dos testes automatizados do frontend com `npm test`, na inclusão da execução explícita dos testes do backend com `./gradlew test` e na verificação dos gatilhos dos workflows para Pull Requests direcionados às branches de entrega.
+  - **Adaptação/Descarte:** As alterações foram conferidas manualmente com os scripts definidos no `package.json`, com a estrutura do Gradle e com os critérios de aceitação da Issue #148. Também foi configurado o Ruleset da `entrega-7` para exigir os checks de Backend CI e Frontend CI e pelo menos uma aprovação antes do merge.
+  - **Validação Técnica:** Os workflows foram executados no Pull Request **#182**, com execução bem-sucedida dos checks de CI antes da aprovação e integração da alteração.
+
+- **Registro de evidência do pipeline de CI (Issue #149):**
+  - **Data:** 20/10/2026 a 21/10/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefato:** `docs/ci.md`.
+  - **Aproveitamento:** Apoio na organização da documentação dos workflows de CI e na definição da forma de registrar a execução bem-sucedida do pipeline como evidência da Sprint 3.
+  - **Adaptação/Descarte:** A evidência utilizada foi conferida diretamente no histórico do Pull Request #182 e a documentação foi ajustada para refletir os workflows e regras efetivamente configurados no repositório.
+  - **Validação Técnica:** Conferência do histórico de execução do GitHub Actions e integração por meio do **PR #183**.
+
+- **Atualização da Métrica M-04 - Lead Time de Pull Requests:**
+  - **Data:** Durante a Sprint 3.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefato:** `docs/metricas/M-04.md`.
+  - **Aproveitamento:** Apoio na organização da ficha da métrica, no cálculo dos tempos entre abertura e merge dos Pull Requests e na estruturação da tabela de acompanhamento da Sprint 3.
+  - **Adaptação/Descarte:** As datas, horários, títulos e Pull Requests utilizados no cálculo foram levantados a partir do histórico real do GitHub. Os valores foram calculados e conferidos manualmente antes de serem registrados na documentação.
+  - **Validação Técnica:** Conferência dos valores com o histórico dos Pull Requests e revisão da documentação antes da integração ao repositório.
+
+- **Revisão e atualização do Registro de Riscos da Sprint 3 (Issue #155):**
+  - **Data:** 21/10/2026 a 22/10/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefato:** `docs/riscos.md`.
+  - **Aproveitamento:** Apoio na análise da evolução dos riscos R03 e R05, na estruturação da reavaliação de probabilidade, impacto e prioridade e na identificação e descrição do novo risco R09, relacionado à complexidade da integração com o Keycloak.
+  - **Adaptação/Descarte:** As alterações foram confrontadas com as evidências da Sprint 3, incluindo a infraestrutura Docker, a integração com Keycloak e as funcionalidades implementadas. As classificações e decisões finais foram revisadas e ajustadas manualmente de acordo com a situação real do projeto.
+  - **Validação Técnica:** Revisão do documento e integração da atualização por meio da branch e Pull Request relacionados à **Issue #155**.
+
+- **Apoio na resolução de problemas de Git, CI e documentação:** Utilização do ChatGPT como ferramenta de apoio durante a Sprint 3 para interpretar mensagens de erro, analisar resultados dos workflows do GitHub Actions, revisar configurações YAML, conferir comandos Git e estruturar documentos Markdown. As sugestões foram utilizadas somente após conferência com o comportamento real do repositório e com as regras definidas pela equipe.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código, configurações e documentação gerados ou revisados com o apoio da IA foram lidos, compreendidos, conferidos e validados pelo integrante antes da integração aos respectivos Pull Requests. A IA foi utilizada como ferramenta de apoio à análise, implementação, revisão e documentação, não substituindo a tomada de decisões técnicas. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
