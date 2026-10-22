@@ -203,7 +203,62 @@ _Espaço reservado para o integrante registrar suas declarações de uso de IA n
 
 ### Talles Souza da Cruz (Scrum Master / Desenvolvimento Backend e Infraestrutura)
 
-_Espaço reservado para o integrante registrar suas declarações de uso de IA na Sprint 3._
+**Ferramenta utilizada:** Claude (Anthropic)  
+**Período:** 04/10/2026 a 22/10/2026
+
+#### Detalhamento de Usos por Artefato e Atividade:
+
+- **Inspeção e Replanejamento da Sprint 3 (Issue #142):**
+  - **Data:** 04/10/2026 a 06/10/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Artefato:** `docs/entregas/sprint-3.md`.
+  - **Aproveitamento:** Apoio na estruturação do documento em seções e na organização das tabelas de estado das histórias, métricas e riscos ao final da Sprint 2.
+  - **Adaptação/Descarte:** Os dados das tabelas (estado de cada US, valores das métricas M-01 a M-06 e situação dos riscos) foram levantados manualmente a partir do repositório, das fichas de métricas e do `docs/riscos.md`. Os ajustes de escopo foram registrados conforme o relatório de refatoração de escopo aprovado pela equipe, e a meta da sprint foi definida pela equipe.
+  - **Validação Técnica:** Revisão e aprovação no **PR #161**.
+
+- **Infraestrutura do Keycloak: Contêiner, Realm, Clients e Roles (Issues #143 e #144):**
+  - **Data:** 06/10/2026 a 07/10/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Artefatos:** `SIGTCC/docker-compose.yml`, `SIGTCC/.env.example`, `SIGTCC/keycloak/realm-import.json`, `docs/keycloak/keycloak.md` e `docs/adrs/ADR-0011.md`.
+  - **Aproveitamento:** Apoio na configuração do serviço `keycloak` no `docker-compose.yml` (volume de persistência e importação automática do _realm_), na estrutura do `realm-import.json` (realm `sigtcc`, clients do backend e do frontend, roles `ROLE_ALUNO` e `ROLE_PROFESSOR` e usuários de teste) e na redação do passo a passo de configuração e da ADR de adoção do Keycloak.
+  - **Adaptação/Descarte:** As variáveis sensíveis foram mantidas apenas como exemplo no `.env.example`, sem valores reais versionados. Os usuários de teste foram definidos manualmente para cobrir os cenários da US01.
+  - **Validação Técnica:** Execução local do `docker compose up`, acesso ao console administrativo e login com os usuários de teste de cada papel; revisão e aprovação nos **PRs #162 e #164**.
+
+- **Identificação de Problema Real de Design para a Reengenharia (Issue #145):**
+  - **Data:** 09/10/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Artefato:** `docs/REENGENHARIA.md`.
+  - **Aproveitamento:** Apoio na análise do código do frontend das Sprints 1 e 2 em busca de problemas de duplicação, acoplamento e testabilidade, e na estruturação do registro inicial.
+  - **Adaptação/Descarte:** O problema escolhido e a métrica foram conferidos manualmente contra o código real e o relatório de cobertura do frontend (M-01), descartando sugestões que não tinham evidência concreta no repositório.
+  - **Validação Técnica:** Conferência dos trechos de código citados como evidência; revisão e aprovação no **PR #166**.
+
+- **Spring Security como Resource Server com Keycloak (Issue #127):**
+  - **Data:** 10/10/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Artefatos:** `config/SecurityConfig.java`, `config/KeycloakRealmRoleConverter.java`, `application.properties`, `build.gradle`, `docker-compose.yml`, `KeycloakRealmRoleConverterTest.java`, `SecurityConfigTest.java` e `docs/adrs/ADR-0012.md`.
+  - **Aproveitamento:** Apoio na configuração do backend como Resource Server OAuth2 _stateless_ (proteção dos endpoints com `401`, CSRF desativado e CORS centralizado), na implementação do conversor que extrai as roles do claim `realm_access.roles` para o `SecurityContext`, nos testes automatizados e na redação da ADR-0012.
+  - **Adaptação/Descarte:** A configuração do `jwk-set-uri` foi ajustada manualmente para que o backend busque as chaves públicas do Keycloak pela rede interna do Docker.
+  - **Validação Técnica:** Execução local dos testes e teste manual das rotas com e sem token válido; revisão e aprovação no **PR #167**.
+
+- **Backend do Calendário de Prazos: CRUD e Validações de Negócio (Issues #137 e #138):**
+  - **Data:** 15/10/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Artefatos:** `PrazoEntregaController.java`, `PrazoEntregaService.java`, `PrazoEntrega.java`, `TipoEntrega.java`, `PrazoEntregaRepository.java`, DTOs de `PrazoEntrega`, `AcessoNegadoException.java`, `PrazoJaCadastradoException.java`, `GlobalExceptionHandler.java`, `ClockConfig.java`, migração `V4__criar_tabela_prazos_entrega.sql`, `PrazoEntregaServiceTest.java` e `docs/contrato-dados-us05.md`.
+  - **Aproveitamento:** Apoio na redação do contrato de dados da US05, na implementação da migração Flyway e na restrição de escrita ao professor responsável pela `Turma_TCC` vigente (`403`) e nas validações de data, além dos testes unitários do serviço.
+  - **Adaptação/Descarte:** O código foi adaptado aos padrões do projeto (camadas `controller → service → repository`, DTOs e exceções de domínio mapeadas no `GlobalExceptionHandler`). Para os testes de data, foi adotado um bean `Clock` injetável (`ClockConfig`), permitindo fixar a data atual nos testes.
+  - **Validação Técnica:** Execução local do `./gradlew build` com os testes de autorização, criação, edição e cada regra de validação; revisão e aprovação nos **PRs #171 e #172**.
+
+- **Correção de Botões de Professor Visíveis no Painel do Aluno (Issue #189):**
+  - **Data:** 21/10/2026 a 22/10/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Artefatos:** `auth/ProtectedRoute.tsx`, `auth/rotaInicial.ts`, `paginas/AcessoNegado/index.tsx`, `paginas/Login/index.tsx`, `paginas/OrientadorCadastro/index.tsx` e os testes `ProtectedRoute.test.tsx`, `AcessoNegado.test.tsx` e `Orientadores.test.tsx`.
+  - **Aproveitamento:** Apoio na evolução do `ProtectedRoute` com a propriedade `papelExigido`, na criação da página de Acesso Negado com retorno à rota inicial de cada papel (`rotaInicialPorPapel`) e na escrita dos testes para cada perfil.
+  - **Adaptação/Descarte:** A lógica de rota inicial por papel foi extraída para `rotaInicial.ts` e reaproveitada na tela de Login, evitando duplicação. Os botões ocultados ("Novo cadastro", "Meu perfil" e "Painel do Professor") foram definidos a partir da verificação manual da interface com os usuários de teste de aluno e de professor.
+  - **Validação Técnica:** Execução local das suítes do frontend e teste manual com os dois perfis, incluindo acesso direto pela URL; revisão e aprovação no **PR #190**.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código e documentação gerados com o apoio da IA foram lidos, compreendidos, executados, testados e revisados pelo integrante antes da integração aos respectivos pull requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
 
 ---
 
