@@ -102,7 +102,8 @@ A classificação dos riscos utiliza uma matriz baseada em duas dimensões:
 ### 2.2 Matriz de Riscos
 
 Matriz original da Entrega 4. Para o status atualizado ao final da
-Sprint 2, incluindo os riscos R06 e R07, ver [seção 4](#4-revisão-ao-final-da-sprint-2-entrega-6).
+Sprint 2, incluindo os riscos R06 a R08, ver [seção 4](#4-atualização-intermediária-sprint-2-em-andamento-entrega-6-até-0110).
+Para a revisão de R01 e R04 ao final da Sprint 3, ver [seção 5](#5-revisão-ao-final-da-sprint-3-entrega-7-0210-a-2210).
 
 | ID      | Risco                             | Natureza   | Probabilidade |  Impacto  |   Prioridade    |
 | :------ | :-------------------------------- | :--------- | :-----------: | :-------: | :-------------: |
@@ -238,3 +239,102 @@ deve ser revisada novamente como parte do fechamento formal (Doc-9,
 - **R06:** Priorizar a US01 (autenticação/JWT) no planejamento da próxima sprint; até lá, reforçar no README e na release `v0.2.0` que o sistema não deve ser exposto fora de ambiente de avaliação.
 - **R08:** Reservar um momento dedicado na próxima Sprint Planning para avaliar a sugestão do professor com calma, mapeando o reaproveitamento possível de cada alternativa antes de comprometer a Sprint 3 a um novo rumo. Não decidir o pivot sob pressão do fechamento da Entrega 6.
 - **Geral:** Manter a prática de contrato-first (R03) e de escopo revisado explicitamente por sprint (R04) nas próximas sprints, já que ambas se mostraram eficazes até o momento nesta iteração.
+
+---
+
+## 5. Revisão ao Final da Sprint 3 (Entrega 7, 02/10 a 22/10)
+
+Esta seção registra a reavaliação dos riscos da Sprint 3.
+
+### 5.1 R01 - Desistência ou Abandono de Membro da Equipe
+
+- **Status na Sprint 3:** Concretizado (abandono de fato, sem desligamento formal).
+- **O que ocorreu:** Diferente da Sprint 2, em que houve baixa participação
+  pontual, nesta sprint um integrante **não realizou nenhuma atividade**.
+  Ele não deixou formalmente a equipe nem trancou a disciplina, mas, na
+  prática, a equipe trabalhou com um membro a menos durante toda a
+  iteração. As tarefas que caberiam a ele foram absorvidas pelos demais
+  integrantes.
+- **Reavaliação:**
+  - **Probabilidade:** Média (2) → **Alta (3)**. O risco se concretizou em
+    duas sprints seguidas, com agravamento da Sprint 2 (participação
+    reduzida) para a Sprint 3 (nenhuma participação). Não há indício de
+    que a situação se reverta sozinha.
+  - **Impacto:** Alto (3), mantido. A perda de um integrante reduz
+    diretamente a capacidade da equipe (M-06) e sobrecarrega os demais
+    em uma sprint que já tinha o escopo ampliado.
+  - **Prioridade:** Alta (6) → **Crítica (9)**.
+- **Eficácia da mitigação:** A mitigação preventiva (documentação no
+  repositório, nenhum conhecimento exclusivo de uma só pessoa) funcionou:
+  as tarefas puderam ser redistribuídas sem perda de conhecimento. A
+  falha está na detecção tardia. Como o integrante não saiu formalmente,
+  a ausência só ficou evidente com a sprint em andamento, e não houve
+  um gatilho claro para acionar a ação de resposta.
+- **Ações para a próxima sprint:**
+  - Planejar a Sprint 4 com a capacidade real da equipe, sem contar com
+    o integrante ausente até que ele volte a contribuir, e repriorizar o
+    backlog conforme a ação de resposta prevista para o R01.
+  - Definir um gatilho objetivo para o risco: um integrante sem
+    atividade registrada (commit, PR, revisão ou issue movida) por mais
+    de uma semana deve ser sinalizado na Daily e tratado pelo Scrum
+    Master.
+  - Conversar diretamente com o integrante para entender a situação e
+    combinar se ele continua no projeto e com quais tarefas.
+  - Comunicar a situação ao professor da disciplina, já que afeta a
+    capacidade da equipe e a distribuição das entregas.
+- **Responsável pelo Acompanhamento:** Scrum Master da sprint (`Talles Souza da Cruz`)
+
+### 5.2 R04 - Crescimento Não Planejado do Escopo (Scope Creep)
+
+- **Status na Sprint 3:** Concretizado (aumento de escopo aprovado pela equipe).
+- **O que ocorreu:** O ajuste de escopo da Sprint 3, feito em resposta ao
+  R08 (seção 3 de [`sprint-3.md`](entregas/sprint-3.md)), aumentou o
+  tamanho do MVP:
+  - **Autenticação com Keycloak (US01):** substituiu o login próprio
+    previsto no baseline e adicionou um novo contêiner ao
+    `docker-compose`, a configuração versionada do _realm_ e uma nova ADR.
+    A estimativa de 5 SP foi feita para o desenho anterior.
+  - **Nova entidade `Turma_TCC`:** a permissão de gestão do calendário
+    passou a ser verificada no banco (professor responsável pela turma
+    do semestre), o que afeta a US01 e a US05.
+  - **Agendamento de bancas de defesa:** voltou ao backlog do MVP como
+    nova história, ainda sem estimativa.
+  - **US05 entrou na sprint sem estimativa**, com seis cenários de
+    aceitação.
+  - Houve também reduções (perfil `Coordenador` e armazenamento de
+    arquivos removidos), mas elas não compensam as adições.
+- **Reavaliação:**
+  - **Probabilidade:** Média (2) → **Alta (3)**. O escopo cresceu de
+    fato, e o total de Story Points do MVP (M-05) ainda precisa ser
+    recalculado, então novos aumentos ainda podem aparecer na estimativa
+    das histórias restantes.
+  - **Impacto:** Médio (2), mantido. As entregas das Sprints 1 e 2 foram
+    preservadas e as bancas ficaram fora da Sprint 3. O impacto deve ser
+    reavaliado para Alto (3) se a recontagem do M-05 mostrar que o MVP
+    não cabe nas sprints restantes com a capacidade atual (ver R01).
+  - **Prioridade:** Média (4) → **Alta (6)**.
+- **Eficácia da mitigação:** A contenção funcionou parcialmente. O aumento
+  foi uma decisão consciente da equipe, registrada no planejamento, e o
+  agendamento de bancas foi mantido fora da sprint. Porém, as histórias
+  entraram na sprint sem reestimativa (US01) ou sem estimativa (US05),
+  o que dificulta medir o crescimento real.
+- **Ações para a próxima sprint:**
+  - Estimar a US05 e a história de agendamento de bancas e recalcular o
+    denominador do M-05 com o MVP completo.
+  - Confrontar o novo total do MVP com a velocidade observada (M-03) e a
+    capacidade real da equipe, já considerando o R01. Se não couber,
+    cortar ou adiar itens secundários, conforme a ação de resposta do R04.
+  - Não iniciar nenhuma história sem estimativa na Sprint Planning.
+- **Responsável pelo Acompanhamento:** Scrum Master (`Talles Souza da Cruz`) / Product Owner (`Adriano Luiz de Souza`)
+
+### 5.3 Matriz Atualizada dos Riscos Revisados (Entrega 7)
+
+| ID      | Risco                           | Natureza |  Probabilidade   |  Impacto  |     Prioridade     | Status                      |
+| :------ | :------------------------------ | :------- | :--------------: | :-------: | :----------------: | :-------------------------- |
+| **R01** | Desistência de membro da equipe | Equipe   | Média → Alta (3) | Alto (3)  | Alta → Crítica (9) | Concretizado (abandono)     |
+| **R04** | Crescimento do escopo           | Escopo   | Média → Alta (3) | Médio (2) |  Média → Alta (6)  | Concretizado (escopo maior) |
+
+Os dois riscos se reforçam: a equipe ficou com menos capacidade (R01) na
+mesma sprint em que o escopo do MVP aumentou (R04). Por isso, a Sprint
+Planning da Sprint 4 deve tratá-los juntos, ajustando o escopo à
+capacidade real da equipe.
