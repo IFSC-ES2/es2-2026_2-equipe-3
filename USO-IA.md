@@ -133,9 +133,65 @@ Todo o conteúdo técnico, diagramas, documentações e decisões de arquitetura
 
 ---
 
-### Eduardo Cardoso Oliveira (Engenheiro de Requisitos / Desenvolvimento Fullstack)
+### Eduardo Cardoso Oliveira (Engenheiro de Qualidade / Desenvolvimento Fullstack)
 
-_Espaço reservado para o integrante registrar suas declarações de uso de IA na Sprint 3._
+**Ferramentas utilizadas:** Claude (Anthropic) e Google Gemini (versão Advanced)
+**Período:** 16/10/2026 a 20/10/2026
+
+**Contexto da atuação:** o integrante responsável pelo papel de Frontend na equipe ficou inativo durante a Sprint 3, sem entregas nem comunicação. Para evitar o atraso das User Stories US01, US03 e US05, o Engenheiro de Qualidade assumiu emergencialmente a implementação das telas de frontend abaixo, usando IA de forma intensiva por não ser o desenvolvedor titular dessa camada. Nessas issues, **não houve alteração manual do código de produção**: a IA gerou os componentes a partir dos padrões já existentes no repositório (`AuthContext`, tipos e serviços), e o integrante revisou, executou e testou cada tela funcionalmente, editando manualmente apenas os arquivos de teste (mocks, seletores de texto, temporização assíncrona e datas fixas) para refletir o comportamento real.
+
+- **Frontend assumido emergencialmente - Issues #130, #131, #134, #135, #139, #140, #146:**
+  - **Data:** 16/10/2026 a 20/10/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Artefatos:** `paginas/Login`, `paginas/dashboard do Professor`, `components/OrientadorList` (filtros, vagas e estado vazio), `components/GestaoCalendario`, `components/PainelPrazos` e `docs/REENGENHARIA.md` (refatoração REF-1), com os respectivos arquivos `.test.tsx`.
+  - **Prompts utilizados:**
+    - **#130 (Login com Keycloak):** "Preciso implementar uma tela de login em React + TypeScript integrada ao Keycloak. Já existe um `AuthContext` no repositório e os tipos de usuário (código anexado). O formulário deve ter e-mail e senha, armazenar o token, exibir 'Credenciais inválidas' quando a senha estiver incorreta e redirecionar para o painel de Aluno ou Professor conforme o papel do usuário. Rotas de painel acessadas sem autenticação devem redirecionar para a tela de login. Siga os padrões do código existente, e os critérios de aceitação da US01 estão colados abaixo." e, em seguida, "Gere os testes de componente com Vitest e Testing Library para essa tela, cobrindo login com sucesso e login com senha incorreta."
+    - **#131 (Dashboard do Professor):** "Crie o dashboard do professor que consulta o campo `responsavelTurma` ao carregar. A aba 'Orientandos' aparece para qualquer professor autenticado, e a aba 'Gestão da Turma/Calendário' só aparece se `responsavelTurma` for verdadeiro (cenários 3 e 4 da US01, colados abaixo). Reutilize o `AuthContext` e os serviços existentes e gere também os testes dos dois cenários."
+    - **#134 e #135 (Filtros e estado vazio):** "Implemente no `OrientadorList` um seletor de linha de pesquisa, um toggle 'Somente com vagas disponíveis' e um botão 'Limpar filtros'. Os filtros devem ser combinados e refletir imediatamente na listagem, consumindo o serviço do catálogo que já existe. Os cenários 1 a 5 da US03 estão colados abaixo." e "Adicione o estado vazio para quando a filtragem não retornar resultados: mensagem 'Nenhum orientador encontrado' e uma sugestão para o aluno ajustar ou limpar os filtros. Gere o teste do cenário de lista vazia."
+    - **#139 e #140 (Calendário e contagem regressiva):** "Crie o componente `GestaoCalendario` com formulário de cadastro de prazo para cada tipo de entrega (Projeto de TCC, TCC 1, TCC 2), edição de prazo já cadastrado na mesma tela e exibição das mensagens de erro de validação retornadas pelo backend (data no passado ou prazo de TCC 1/TCC 2 anterior ao da entrega anterior). A tela só deve estar acessível quando a aba de gestão estiver disponível." e "Crie o `PainelPrazos`, usado nos painéis de Aluno e Professor, listando os prazos vigentes por tipo de entrega com contagem regressiva baseada na data atual. Gere os testes para ambos os painéis."
+    - **#146 (Refatoração REF-1):** "Na REF-1 identificamos o problema descrito em `docs/REENGENHARIA.md`. Proponha uma refatoração orientada a design que preserve o comportamento atual do sistema, com justificativa técnica para a descrição do pull request e um rascunho da seção correspondente do `docs/REENGENHARIA.md`."
+  - **Aproveitamento:** geração integral das telas/componentes — login integrado ao Keycloak; exibição condicional das abas do dashboard do professor conforme `responsavelTurma`; filtros combinados e estado vazio no catálogo de orientadores; cadastro/edição de prazos por tipo de entrega e contagem regressiva nos painéis; e a refatoração orientada a design da REF-1 — e também de uma primeira versão dos testes de cada tela.
+  - **Adaptação/Descarte:** componentes integrados sem edição manual de código de produção; testes ajustados manualmente (mocks de autenticação e de `responsavelTurma`, ordem de eventos assíncronos, data fixada com `vi.setSystemTime`, textos exatos renderizados).
+  - **Validação Técnica:** execução local das suítes e verificação funcional de cada critério de aceitação na interface; integrados via **PRs #174, #175, #177, #178, #179, #180 e #186**.
+
+Já as issues abaixo são do papel titular do integrante (Engenheiro de Qualidade) e tiveram edição manual mais aprofundada, por envolverem conhecimento próprio de regras de negócio e de métricas que a IA não tinha como suprir sozinha.
+
+- **Testes de QA — filtro de orientadores e fluxo de calendário (Issues #136 e #141):**
+  - **Data:** 18/10/2026 e 20/10/2026.
+  - **Ferramenta:** Google Gemini.
+  - **Artefatos:** `OrientadorList.test.tsx`, `GestaoCalendario.test.tsx` e `prazoEntregaService.test.ts`.
+  - **Prompts utilizados:**
+    - **#136:** "Gere a estrutura inicial dos testes automatizados do `OrientadorList`: filtragem por linha de pesquisa, filtragem por vagas disponíveis, combinação de filtros e estado de nenhum resultado encontrado."
+    - **#141:** "Gere a estrutura inicial dos testes do fluxo de calendário, um caso por cenário da US05 (colados abaixo): cadastro de prazo pelo professor responsável, bloqueio de acesso por professor não responsável, cadastro dos três tipos de entrega (Projeto de TCC, TCC 1, TCC 2), edição de prazo, rejeição de data inválida e visibilidade no painel do Aluno. Os testes de `prazoEntregaService` devem usar mocks."
+    - **Ajuste de temporização (#141):** "O teste da contagem regressiva está falhando por timing assíncrono. Como usar `waitFor`/`findBy` e `vi.setSystemTime` para fixar a data?"
+  - **Aproveitamento:** estrutura inicial dos testes de filtragem combinada e de autorização/cadastro de prazos.
+  - **Adaptação/Descarte:** o integrante **reescreveu e complementou manualmente** os casos que a IA não cobriu de primeira — combinação simultânea de filtros e reset do estado vazio (#136); bloqueio de cadastro por professor não responsável pela turma e rejeição de data inválida (#141) — com base no conhecimento próprio das regras de negócio.
+  - **Validação Técnica:** execução local das suítes e conferência de bloqueio de merge em CI; integrados via **PR #181** (#136) e **PR #187** (#141).
+
+- **Comparação de métrica antes/depois da refatoração REF-2 (Issue #147):**
+  - **Data:** 20/10/2026.
+  - **Ferramenta:** Google Gemini e Claude (Anthropic).
+  - **Artefato:** `docs/REENGENHARIA.md`.
+  - **Prompts utilizados:**
+    - "Monte a estrutura de uma tabela comparativa antes/depois para a métrica escolhida na REF-1, para registrar em `docs/REENGENHARIA.md`."
+    - "Escreva um rascunho de análise indicando se a REF-2 representou melhoria, piora ou apenas reorganização justificada, relacionando com atributos de qualidade da ISO/IEC 25010 (por exemplo, manutenibilidade e modularidade)."
+  - **Aproveitamento:** estruturação inicial da tabela comparativa e rascunho da análise.
+  - **Adaptação/Descarte:** o integrante **recalculou manualmente** o valor da métrica antes e depois da refatoração a partir do código real, reescreveu a análise de melhoria/piora e a relacionou aos atributos da ISO/IEC 25010 definidos na Entrega 4.
+  - **Validação Técnica:** conferência cruzada do valor da métrica contra os commits do REF-1 e REF-2; integrado via **PR #184**.
+
+- **Formatação de documentação em Markdown (uso transversal a todas as entregas):**
+  - **Ferramentas:** Claude (Anthropic).
+  - **Prompts utilizados:**
+    - "Formate o texto abaixo como documento Markdown, organizando em tópicos e tabela, sem alterar o conteúdo nem os dados (datas, PRs, artefatos)."
+    - "Preencha o modelo de ficha de métrica a seguir com as informações que forneci, mantendo a estrutura do template."
+    - "Preciso de mais exemplos de prompts para preencher no meu `USO-IA.md` com base na minha sessão" (Claude, para organizar o registro de prompts neste documento).
+  - **Aproveitamento:** apoio na formatação, estruturação de tabelas/tópicos e preenchimento textual de documentos Markdown do repositório (como `USO-IA.md`, fichas de métricas e documentos de planejamento), a partir de conteúdo e decisões já definidos pela equipe.
+  - **Adaptação/Descarte:** o conteúdo técnico, as decisões registradas e os dados (datas, PRs, artefatos) foram fornecidos e revisados manualmente pelo integrante; a IA foi usada apenas para formatação e organização do texto, não para decidir o conteúdo.
+  - **Validação Técnica:** revisão manual de cada documento gerado antes da integração ao repositório.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo e código gerados com o apoio da IA foram lidos, executados e testados manualmente pelo integrante antes da integração aos respectivos pull requests. Assumo total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues e pelas adições/correções realizadas pela inteligência artificial em artefatos conforme citado na explicação anterior..
 
 ---
 
