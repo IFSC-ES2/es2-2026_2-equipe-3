@@ -2,11 +2,23 @@
 
 ## 1. Equipe
 
-- **DAMARES DO SOCORRO GONCALVES GAIA** (Matrícula: 202510703590) - Papel: Arquiteta de Software
-- **EDUARDO CARDOSO OLIVEIRA** (Matrícula: 202510703625) - Papel: Engenheiro de Requisitos e Scrum Master (Sprint 1)
-- **MARCUS JHUAN EPIFANIO LIMA** (Matrícula: 202320003071) - Papel: Designer de UX/UI
-- **TALLES SOUZA DA CRUZ** (Matrícula: 202510703745) - Papel: Engenheiro de Qualidade (QA)
-- **WILLIAN FERREIRA DOS SANTOS** (Matrícula: 202320002996) - Papel: DevOps/Infra
+- **DAMARES DO SOCORRO GONCALVES GAIA** (Matrícula: 202510703590)
+- **EDUARDO CARDOSO OLIVEIRA** (Matrícula: 202510703625)
+- **MARCUS JHUAN EPIFANIO LIMA** (Matrícula: 202320003071)
+- **TALLES SOUZA DA CRUZ** (Matrícula: 202510703745)
+- **WILLIAN FERREIRA DOS SANTOS** (Matrícula: 202320002996)
+
+### 1.1. Papéis por Sprint
+
+Os papéis foram revistos a cada sprint. O papel de Scrum Master é rotativo.
+
+| Integrante                        | Sprint 1 (Entrega 5)                        | Sprint 2 (Entrega 6)                     | Sprint 3 (Entrega 7)                     |
+| :-------------------------------- | :------------------------------------------ | :--------------------------------------- | :--------------------------------------- |
+| Damares do Socorro Gonçalves Gaia | Arquiteta de Software                       | **Scrum Master** e Arquiteta de Software | Arquiteta de Software                    |
+| Eduardo Cardoso Oliveira          | **Scrum Master** e Engenheiro de Requisitos | Engenheiro de Requisitos                 | Engenheiro de Qualidade (QA)             |
+| Marcus Jhuan Epifanio Lima        | Designer de UX/UI                           | Designer de UX/UI                        | Designer de UX/UI                        |
+| Talles Souza da Cruz              | Engenheiro de Qualidade (QA)                | Engenheiro de Qualidade (QA)             | **Scrum Master** e Desenvolvedor Backend |
+| Willian Ferreira dos Santos       | DevOps/Infra                                | DevOps/Infra                             | DevOps/Infra                             |
 
 ## 2. Definição e Contextualização do Tema
 

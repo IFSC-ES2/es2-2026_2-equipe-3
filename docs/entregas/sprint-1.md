@@ -2,6 +2,16 @@
 
 Data da entrega: 17/09/2026
 
+Scrum Master da Sprint 1: Eduardo Cardoso Oliveira
+
+## Papéis na Sprint 1
+
+- **Damares do Socorro Gonçalves Gaia:** Arquiteta de Software.
+- **Eduardo Cardoso Oliveira:** Scrum Master e Engenheiro de Requisitos.
+- **Marcus Jhuan Epifanio Lima:** Designer de UX/UI.
+- **Talles Souza da Cruz:** Engenheiro de Qualidade (QA).
+- **Willian Ferreira dos Santos:** DevOps/Infra.
+
 ## Escopo da Sprint 1
 
 ### Issues planejadas (epic e desdobramentos)

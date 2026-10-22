@@ -166,3 +166,17 @@ A revisão completa será registrada em [`docs/riscos.md`](../riscos.md) no fech
 - **Critérios de merge:** ao menos uma aprovação de outro integrante, pipeline de CI verde e integração por commit de mesclagem.
 - **Rastreabilidade:** cada PR referencia a issue correspondente; o PR da refatoração é específico e identificável.
 - **Integração final:** PR revisado da `entrega-7` para a `main`, seguido da release `v0.3.0`.
+
+---
+
+## 7. Papéis e Responsabilidades na Sprint 3
+
+Na Sprint 3 a equipe redistribuiu dois papéis: o Scrum Master passou de Damares para Talles, e o papel de Engenheiro de Qualidade passou de Talles para Eduardo. Talles também passou a atuar no desenvolvimento backend. Os demais papéis foram mantidos.
+
+| Integrante                        | Papel na Sprint 2                    | Papel na Sprint 3                    |
+| :-------------------------------- | :----------------------------------- | :----------------------------------- |
+| Damares do Socorro Gonçalves Gaia | Scrum Master e Arquiteta de Software | Arquiteta de Software                |
+| Eduardo Cardoso Oliveira          | Engenheiro de Requisitos             | Engenheiro de Qualidade (QA)         |
+| Marcus Jhuan Epifanio Lima        | Designer de UX/UI                    | Designer de UX/UI                    |
+| Talles Souza da Cruz              | Engenheiro de Qualidade (QA)         | Scrum Master e Desenvolvedor Backend |
+| Willian Ferreira dos Santos       | DevOps/Infra                         | DevOps/Infra                         |
