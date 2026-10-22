@@ -124,7 +124,7 @@ Em conformidade com as diretrizes da disciplina e visando garantir a transparên
   - **Ferramenta:** Google Gemini Advanced.
   - **Artefato:** `docs/metricas/M-06.md`.
   - **Aproveitamento:** Estruturação da fórmula matemática KaTeX e geração de rascunho textual para a seção de tendências e comparação com o baseline.
-  - **Adaptação/Descarte:** Todas as horas planejadas (84h) e executadas (81h) foram apuradas manualmente a partir do histórico de issues, PRs e commits da equipe, organizando a tabela nominal por integrante para responder diretamente à exigência do professor de reprodutibilidade e memória de cálculo transparente.
+  - **Adaptação/Descarte:** Todas as horas planejadas (84h) e executadas (73h) foram apuradas manualmente a partir do histórico de issues, PRs e commits da equipe, organizando a tabela nominal por integrante para responder diretamente à exigência do professor de reprodutibilidade e memória de cálculo transparente.
   - **Validação Técnica:** Conferência cruzada com o log do Git (`git shortlog -sne`) e validação no fechamento da Sprint 3.
 
 #### Validação e Responsabilidade Técnica:
