@@ -8,11 +8,15 @@ import {
   atualizarStatusSolicitacao,
 } from "../../utils/solicitacaoService";
 import { obterPerfilProfessor } from "../../utils/professorService";
-import { listarPrazosVigentes } from "../../utils/prazoEntregaService";
 import { AuthProvider } from "../../auth/AuthContext";
 import { ApiError } from "../../utils/apiErro";
 import type { Solicitacao } from "../../types/Solicitacao";
 import type { PerfilProfessor } from "../../types/Professor";
+import {
+  listarPrazosVigentes,
+  cadastrarPrazo,
+  atualizarPrazo,
+} from "../../utils/prazoEntregaService";
 
 vi.mock("../../utils/solicitacaoService", () => ({
   listarSolicitacoesPorOrientador: vi.fn(),
@@ -567,5 +571,122 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       expect(screen.getByText("22/10/2026")).toBeInTheDocument();
     });
     expect(screen.getByText("Faltam 12 dias")).toBeInTheDocument();
+  });
+});
+describe("Fluxo do Calendário de Entregas no Painel do Professor (US05 - Issue #141)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
+    vi.mocked(listarPrazosVigentes).mockResolvedValue([]);
+  });
+
+  it("permite ao professor responsável pela turma cadastrar os três tipos de prazo e editar prazo existente", async () => {
+    const user = userEvent.setup();
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      ...perfilBase,
+      responsavelTurma: true,
+    });
+
+    vi.mocked(cadastrarPrazo)
+      .mockResolvedValueOnce({
+        id: 1,
+        semestre: "2026/2",
+        tipo: "PROJETO_TCC",
+        descricao: "Projeto de TCC",
+        dataLimite: "2026-10-30",
+      })
+      .mockResolvedValueOnce({
+        id: 2,
+        semestre: "2026/2",
+        tipo: "TCC1",
+        descricao: "TCC 1",
+        dataLimite: "2026-11-20",
+      })
+      .mockResolvedValueOnce({
+        id: 3,
+        semestre: "2026/2",
+        tipo: "TCC2",
+        descricao: "TCC 2",
+        dataLimite: "2026-12-15",
+      });
+
+    vi.mocked(atualizarPrazo).mockResolvedValue({
+      id: 1,
+      semestre: "2026/2",
+      tipo: "PROJETO_TCC",
+      descricao: "Projeto de TCC",
+      dataLimite: "2026-11-05",
+    });
+
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    const abaCalendario = await screen.findByRole("tab", {
+      name: "Gestão da Turma/Calendário",
+    });
+    await user.click(abaCalendario);
+
+    const selectTipo = await screen.findByLabelText("Tipo de entrega *");
+    const inputData = screen.getByLabelText("Data limite *");
+
+    // 1. Cadastra PROJETO_TCC
+    await user.selectOptions(selectTipo, "PROJETO_TCC");
+    fireEvent.change(inputData, { target: { value: "2026-10-30" } });
+    await user.click(screen.getByRole("button", { name: "Cadastrar prazo" }));
+    expect(await screen.findByText("30/10/2026")).toBeInTheDocument();
+
+    // 2. Cadastra TCC1
+    await user.selectOptions(selectTipo, "TCC1");
+    fireEvent.change(inputData, { target: { value: "2026-11-20" } });
+    await user.click(screen.getByRole("button", { name: "Cadastrar prazo" }));
+    expect(await screen.findByText("20/11/2026")).toBeInTheDocument();
+
+    // 3. Cadastra TCC2
+    await user.selectOptions(selectTipo, "TCC2");
+    fireEvent.change(inputData, { target: { value: "2026-12-15" } });
+    await user.click(screen.getByRole("button", { name: "Cadastrar prazo" }));
+    expect(await screen.findByText("15/12/2026")).toBeInTheDocument();
+
+    // 4. Edita PROJETO_TCC já cadastrado
+    const botoesEditar = screen.getAllByRole("button", { name: "Editar" });
+    await user.click(botoesEditar[0]);
+    fireEvent.change(inputData, { target: { value: "2026-11-05" } });
+    await user.click(screen.getByRole("button", { name: "Salvar alterações" }));
+
+    expect(
+      await screen.findByText("Prazo atualizado com sucesso."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("05/11/2026")).toBeInTheDocument();
+  });
+
+  it("bloqueia o acesso ao formulário de cadastro de prazos para professor não responsável pela turma", async () => {
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      ...perfilBase,
+      responsavelTurma: false,
+    });
+
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    expect(
+      await screen.findByRole("tab", { name: "Orientandos" }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("tab", { name: "Gestão da Turma/Calendário" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Cadastrar prazo" }),
+    ).not.toBeInTheDocument();
   });
 });
