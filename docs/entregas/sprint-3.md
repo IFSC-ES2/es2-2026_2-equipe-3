@@ -166,3 +166,78 @@ A revisão completa será registrada em [`docs/riscos.md`](../riscos.md) no fech
 - **Critérios de merge:** ao menos uma aprovação de outro integrante, pipeline de CI verde e integração por commit de mesclagem.
 - **Rastreabilidade:** cada PR referencia a issue correspondente; o PR da refatoração é específico e identificável.
 - **Integração final:** PR revisado da `entrega-7` para a `main`, seguido da release `v0.3.0`.
+
+---
+
+## 7. Contribuições Individuais
+
+Cada integrante registra abaixo suas contribuições da Sprint 3, com as issues e os PRs como evidência. O detalhamento do uso de IA em cada artefato está em [`USO-IA.md`](../../USO-IA.md) (Entrega 7).
+
+### 7.1 Eduardo Cardoso Oliveira
+
+- **Papel na sprint:** Engenheiro de Qualidade, com atuação emergencial no frontend.
+- **Período:** 16/10/2026 a 20/10/2026 (frontend e testes); critérios de aceitação das histórias ajustados no replanejamento (seção 3.2).
+
+#### Atuação emergencial no frontend
+
+O integrante responsável pelo papel de Frontend ficou inativo durante a Sprint 3, sem entregas nem comunicação, o que configura novo episódio do risco R01 (desistência ou baixa participação, ver [`docs/riscos.md`](../riscos.md)). Como as telas de US01, US03 e US05 compõem a meta da sprint (seção 4) e a US05 depende da US01, a ausência colocava as três histórias em atraso.
+
+Para evitar esse atraso, Eduardo assumiu a implementação do frontend dessas histórias. Ele não é o desenvolvedor titular dessa camada e, por isso, usou IA de forma intensiva (Google Gemini Advanced). As condições dessa atuação foram:
+
+- **Código de produção:** gerado pela IA a partir dos padrões já existentes no repositório (`AuthContext`, tipos e serviços), sem edição manual.
+- **Revisão e execução:** o integrante leu, executou e testou funcionalmente cada tela contra os critérios de aceitação da issue.
+- **Testes:** a primeira versão veio da IA e foi ajustada manualmente (mocks de autenticação e de `responsavelTurma`, ordem de eventos assíncronos, data fixada com `vi.setSystemTime` e textos exatos renderizados).
+- **Responsabilidade:** ele assume a responsabilidade técnica pelos artefatos entregues, inclusive os produzidos fora do papel titular.
+
+| Issue | História   | Entrega                                                                                                        |
+| :---- | :--------- | :------------------------------------------------------------------------------------------------------------- |
+| #130  | US01 (#8)  | Tela de login integrada ao Keycloak, com mensagem de erro e redirecionamento por papel.                        |
+| #131  | US01 (#8)  | Renderização dinâmica do dashboard do Professor: aba "Gestão da Turma/Calendário" conforme `responsavelTurma`. |
+| #134  | US03 (#10) | Filtros no Catálogo de Orientadores: linha de pesquisa, "Somente com vagas disponíveis" e "Limpar filtros".    |
+| #135  | US03 (#10) | Estado vazio para busca sem resultados.                                                                        |
+| #139  | US05 (#12) | Tela de Gestão de Calendário: cadastro e edição de prazos por tipo de entrega.                                 |
+| #140  | US05 (#12) | Contagem regressiva dos prazos nos painéis de Aluno e Professor.                                               |
+| #146  | -          | Refatoração orientada a design identificada na REF-1.                                                          |
+
+Integrados via PRs #174, #175, #177, #178, #179, #180 e #186.
+
+#### Atividades do papel de Engenheiro de Qualidade
+
+Estas issues pertencem ao papel titular do integrante. Os testes tiveram reescrita manual dos casos que a IA não cobriu, por depender de regras de negócio, e a análise de métrica foi recalculada a partir do código real.
+
+| Issue | Atividade                                                                                                                          | PR   |
+| :---- | :--------------------------------------------------------------------------------------------------------------------------------- | :--- |
+| #136  | Testes automatizados do filtro de orientadores (filtros isolados, combinados e sem resultado).                                     | #181 |
+| #141  | Testes automatizados do fluxo de calendário (autorização, três tipos de prazo, edição, data inválida e visibilidade para o aluno). | #187 |
+| #147  | Comparação da métrica antes/depois da refatoração REF-2 em `docs/REENGENHARIA.md`.                                                 | #184 |
+
+- **#136:** o integrante complementou a combinação simultânea de filtros e o reset do estado vazio.
+- **#141:** o integrante escreveu o bloqueio de cadastro por professor não responsável pela turma e a rejeição de data inválida.
+- **#147:** o valor da métrica antes e depois foi recalculado manualmente e conferido contra os commits da REF-1 e da REF-2. A análise de melhoria ou piora foi reescrita e relacionada aos atributos da ISO/IEC 25010 definidos na Entrega 4.
+- **Pipeline:** as suítes foram executadas localmente e a conferência de bloqueio de merge em CI foi feita nas issues #136 e #141.
+
+#### Engenharia de Requisitos
+
+- **Ajuste de escopo:** manutenção dos critérios de aceitação das issues #8 (US01), #10 (US03) e #12 (US05) conforme a seção 3.2, com os cenários marcados como novos e a seção "Removido desta versão".
+- **Decisão da US03:** "área de conhecimento" foi tratada como sinônimo de "linha de pesquisa", e os filtros da US03 usam o termo "linha de pesquisa" (seção 3.2).
+
+#### Lições para a retrospectiva
+
+- A dependência de uma única pessoa na camada de frontend expôs a sprint ao R01. A cobertura emergencial evitou o atraso, mas concentrou a entrega das telas na última semana da sprint (16/10 a 20/10).
+- Na Entrega 5, o PR final foi integrado após o prazo e com checks técnicos falhando. Nesta sprint, os testes das issues #136 e #141 foram feitos para bloquear o merge em CI quando falharem.
+
+### 7.2 Damares do Socorro Gonçalves Gaia
+
+_Espaço reservado para o integrante registrar suas contribuições da Sprint 3._
+
+### 7.3 Marcus Jhuan Epifanio Lima
+
+_Espaço reservado para o integrante registrar suas contribuições da Sprint 3._
+
+### 7.4 Talles Souza da Cruz
+
+_Espaço reservado para o integrante registrar suas contribuições da Sprint 3._
+
+### 7.5 Willian Ferreira dos Santos
+
+_Espaço reservado para o integrante registrar suas contribuições da Sprint 3._
