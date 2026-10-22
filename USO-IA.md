@@ -39,7 +39,7 @@ Em conformidade com o protocolo da disciplina, declaramos que a ferramenta de in
 
 - **Apoio na elaboração da documentação de Riscos:** Auxílio na redação, organização e formatação em Markdown do registro inicial de riscos, bem como no refinamento da matriz de priorização (Probabilidade × Impacto) e na estruturação do plano de respostas.
 - **Apoio na elaboração da documentação de Fluxo de Trabalho e Governança:** Apoio na redação, formatação em Markdown, revisão do Fluxo de Trabalho, definição das regras de versionamento com Git e padronização do checklist de Pull Requests.
-- **Apoio na infraestrutura de Integração Contínua (CI):** Utilização da IA para auxiliar na formatação e revisão do documento `ci.md`, além de suporte na criação do script `verificacao-formatacao.yml` para automatizar a checagem de estilo via GitHub Actions.
+- **Apoio na infraestrutura de Integração Contínua (CI):** Utilização da IA para auxiliar na formatação e revisão do documento `ci.md`, além de suporte na criação do script `.github/workflows/verificar-formatacao.yml` para automatizar a checagem de estilo via GitHub Actions.
 
 **Validação:**
 Todo o conteúdo e documentação gerados com o apoio da IA foram lidos, compreendidos, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
@@ -81,3 +81,76 @@ Em conformidade com o protocolo da disciplina, declaramos que as ferramentas de 
 
 **Validação:**
 Todo o conteúdo, código e documentação gerados com o apoio da IA foram lidos, compreendidos, testados, revisados e adaptados pela equipe. A equipe assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues neste repositório, garantindo a transparência exigida pela disciplina.
+
+## Entrega 7 (Sprint 3):
+
+Em conformidade com as diretrizes da disciplina e visando garantir a transparência e a rastreabilidade, apresentamos as declarações de uso de Inteligência Artificial generativa referentes à Sprint 3 (02/10/2026 a 22/10/2026), organizadas por integrante responsável:
+
+---
+
+### Damares do Socorro Gonçalves Gaia (Arquiteta de Software)
+
+**Ferramenta utilizada:** Google Gemini (versão Advanced)  
+**Período:** 02/10/2026 a 22/10/2026
+
+#### Detalhamento de Usos por Artefato e Atividade:
+
+- **Formalização de Decisões Arquiteturais - ADRs (Issue #153):**
+  - **Data:** 02/10/2026 a 14/10/2026.
+  - **Ferramenta:** Google Gemini Advanced.
+  - **Artefatos:** `docs/adrs/ADR-0010.md` e `ADR-0013.md`.
+  - **Aproveitamento:** Apoio na estruturação inicial do problema, modelagem conceitual do domínio de `Turma_TCC` no início da sprint (02/10 a 06/10) e formatação padronizada segundo o modelo de ADR do repositório (Título, Status, Contexto, Decisão, Consequências, Alternativas).
+  - **Adaptação/Descarte:** A fundamentação técnica de cada ADR foi ajustada manualmente para refletir as decisões reais da sprint: a substituição do papel de Coordenador pela modelagem de `Turma_TCC` (ADR-0010) e o desacoplamento de storage físico em prol de links de nuvem para submissões de TCC (ADR-0013).
+  - **Validação Técnica:** Revisadas e mescladas na branch de entrega via **PR #169**.
+
+- **Modelagem e Diagramas de Arquitetura C4 (Issue #150):**
+  - **Data:** 14/10/2026 a 21/10/2026.
+  - **Ferramenta:** Google Gemini Advanced.
+  - **Artefatos:** `docs/diagramas/c1-contexto.md` e `docs/diagramas/c2-conteineres.md`.
+  - **Aproveitamento:** A IA sugeriu a sintaxe Mermaid para os blocos `C4Context` e `C4Container` e o encadeamento dos relacionamentos com o Keycloak.
+  - **Adaptação/Descarte:** Foram corrigidas manualmente as nomenclaturas dos contêineres e as portas de exposição (`8080` backend, `5173` frontend, `8081` keycloak, `3306` MySQL) para coincidir estritamente com o `docker-compose.yml`, além de remover nós de serviços legados que não faziam parte do MVP em execução.
+  - **Validação Técnica:** Os diagramas foram submetidos à revisão técnica do Scrum Master Talles Souza, que gerou 11 apontamentos formais de alinhamento, todos resolvidos no commit `3a9317f` e integrados no **PR #173**.
+
+- **Estruturação do Documento de Arquitetura do Sistema Real (Issue #151):**
+  - **Data:** 15/10/2026 a 21/10/2026.
+  - **Ferramenta:** Google Gemini Advanced.
+  - **Artefato:** `docs/ARQUITETURA.md`.
+  - **Aproveitamento:** Apoio na estruturação em tópicos da documentação arquitetural, organização da matriz comparativa entre arquitetura planejada original e implementada, e redação das seções de responsabilidades dos subsistemas.
+  - **Adaptação/Descarte:** Os trechos descritivos sobre o fluxo OAuth2/OIDC foram reescritos pela Arquiteta para esclarecer que a autenticação na Sprint 3 utiliza Direct Access Grant (ROPC) com validação local de tokens JWT no Resource Server (Spring Security), descartando sugestões da IA que assumiam o fluxo de Authorization Code com PKCE via browser redirection.
+  - **Validação Técnica:** Validação visual e de consistência contra as classes de configuração do backend (`SecurityConfig.java`, `JwtAuthConverter.java`) e revisão no **PR #173**.
+
+- **Memória de Cálculo e Análise da Métrica de Capacidade M-06 (Issue #154):**
+  - **Data:** 21/10/2026 a 22/10/2026.
+  - **Ferramenta:** Google Gemini Advanced.
+  - **Artefato:** `docs/metricas/M-06.md`.
+  - **Aproveitamento:** Estruturação da fórmula matemática KaTeX e geração de rascunho textual para a seção de tendências e comparação com o baseline.
+  - **Adaptação/Descarte:** Todas as horas planejadas (84h) e executadas (81h) foram apuradas manualmente a partir do histórico de issues, PRs e commits da equipe, organizando a tabela nominal por integrante para responder diretamente à exigência do professor de reprodutibilidade e memória de cálculo transparente.
+  - **Validação Técnica:** Conferência cruzada com o log do Git (`git shortlog -sne`) e validação no fechamento da Sprint 3.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo técnico, diagramas, documentações e decisões de arquitetura gerados com o apoio da IA foram lidos, conferidos contra o código real e o histórico de commits do repositório, revisados e validados tecnicamente pela Arquiteta de Software responsável. A integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
+
+---
+
+### Eduardo Cardoso Oliveira (Engenheiro de Requisitos / Desenvolvimento Fullstack)
+
+_Espaço reservado para o integrante registrar suas declarações de uso de IA na Sprint 3._
+
+---
+
+### Marcus Jhuan Epifanio Lima (Designer UX/UI / Frontend)
+
+_Espaço reservado para o integrante registrar suas declarações de uso de IA na Sprint 3._
+
+---
+
+### Talles Souza da Cruz (Scrum Master / Desenvolvimento Backend e Infraestrutura)
+
+_Espaço reservado para o integrante registrar suas declarações de uso de IA na Sprint 3._
+
+---
+
+### Willian Ferreira dos Santos (DevOps / Infraestrutura / Backend)
+
+_Espaço reservado para o integrante registrar suas declarações de uso de IA na Sprint 3._
