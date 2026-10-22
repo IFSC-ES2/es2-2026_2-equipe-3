@@ -245,7 +245,43 @@ _Espaço reservado para o integrante registrar suas contribuições da Sprint 3.
 
 ### 7.4 Talles Souza da Cruz
 
-_Espaço reservado para o integrante registrar suas contribuições da Sprint 3._
+### 7.4 Talles Souza da Cruz
+
+- **Papel na sprint:** Scrum Master da Sprint 3, com desenvolvimento de backend e infraestrutura.
+- **Período:** 04/10/2026 a 22/10/2026.
+
+#### Organização e planejamento da sprint
+
+- **Inspeção e Replanejamento da Sprint 3 (Issue #142 - PR #161):** Elaboração das seções 1 a 6 deste documento. Análise do estado do MVP ao final da Sprint 2 (histórias, métricas M-01 a M-06 e riscos), definição do que seria mantido, corrigido, replanejado e priorizado, registro dos ajustes de escopo aprovados pela equipe em resposta ao R08 e definição da meta da sprint com US01, US03 e US05.
+
+#### Implementação da autenticação (US01) e infraestrutura
+
+- **Contêiner do Keycloak (Issue #143 - PR #162):** Inclusão do serviço `keycloak` no [`docker-compose.yml`](../../SIGTCC/docker-compose.yml) e documentação das variáveis sensíveis no `.env.example`, sem valores reais versionados.
+- **Realm, Clients e Roles do Keycloak (Issue #144 - PR #164):** Configuração e versionamento do realm `sigtcc` em [`SIGTCC/keycloak/realm-import.json`](../../SIGTCC/keycloak/realm-import.json), com os clients do backend e do frontend, as roles `ROLE_ALUNO` e `ROLE_PROFESSOR` e usuários de teste para cada papel, incluindo um professor responsável pela `Turma_TCC`. Escrita do passo a passo de configuração em [`docs/keycloak/keycloak.md`](../keycloak/keycloak.md) e da [`ADR-0011`](../adrs/ADR-0011.md).
+- **Spring Security como Resource Server (Issue #127 - PR #167):** Configuração do backend como Resource Server OAuth2 em `SecurityConfig`, com todas as rotas `/api/**` protegidas (`401` sem token válido), API _stateless_ e CORS centralizado. 
+#### Implementação do calendário de prazos (US05)
+
+- **CRUD de Prazos Vinculados à Turma_TCC (Issue #137 - PR #171):** Redação do contrato de dados [`docs/contrato-dados-us05.md`](../contrato-dados-us05.md) e implementação da entidade `PrazoEntrega`, do enum `TipoEntrega`, da migração `V4__criar_tabela_prazos_entrega.sql` e dos endpoints de criação, edição e consulta de prazos. 
+- **Validações de Negócio do Calendário (Issue #138 - PR #172):** Rejeição de prazos com data no passado e de sequências inválidas, com mensagens de erro claras para cada caso. Criação do `ClockConfig`, que fornece um bean `Clock` injetável para fixar a data atual nos testes.
+- **Testes:** suíte `PrazoEntregaServiceTest` cobrindo autorização, criação, edição e cada regra de validação de datas.
+
+#### Correção de defeito
+
+- **Botões de Professor Visíveis no Painel do Aluno (Issue #189 - PR #190):** Correção da renderização condicional que exibia ao aluno os botões "Novo cadastro", "Meu perfil" e "Painel do Professor", que levavam a uma tela em branco.
+
+#### Documentação
+
+- **Problema Real de Design para a Reengenharia (Issue #145 - PR #166):** Identificação de um problema real de design no código do frontend e registro inicial em [`docs/REENGENHARIA.md`](../REENGENHARIA.md).
+- **Revisão dos ADRs Existentes (Issue #152 - PR #185):** Revisão das ADRs 0001 a 0014 frente ao ajuste de escopo da Sprint 3, com um bloco de revisão em cada uma.
+- **Revisão do Registro de Riscos (Issue #155):** Atualização de [`docs/riscos.md`](../riscos.md) com a revisão ao final da Sprint 3 dos riscos R01 e R04.
+
+#### Revisão de código e governança
+
+Como Scrum Master, foram feitas as revisões e aprovações de 18 PRs dos demais integrantes integrados à `entrega-7`:
+
+- **Damares Gaia:** PRs #160, #169 e #173.
+- **Eduardo Cardoso:** PRs #168, #174, #175, #176, #177, #178, #179, #180, #181, #184, #186 e #187.
+- **Willian Ferreira:** PRs #165, #182 e #183.
 
 ### 7.5 Willian Ferreira dos Santos
 
