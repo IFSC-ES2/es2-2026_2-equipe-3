@@ -19,7 +19,7 @@ Este documento deve ser revisitado e atualizado ao final de cada sprint.
 - **Impacto:** Alto (3)
 - **Prioridade:** Alta (6)
 - **Estratégia de Mitigação:** Adotar pareamentos eventuais e garantir que todo o código e infraestrutura estejam devidamente documentados no repositório. Nenhuma parte do sistema deve ser de conhecimento exclusivo de apenas uma pessoa.
-- **Responsável pelo Acompanhamento:** Scrum Master (`Eduardo Cardoso`)
+- **Responsável pelo Acompanhamento:** Scrum Master (Sprint 1: `Eduardo Cardoso`, Sprint 2: `Damares Gaia`, Sprint 3: `Talles Souza`)
 
 ### R02 - Falhas de Regressão por Ausência de Testes e CI Quebrado
 
@@ -58,7 +58,7 @@ Este documento deve ser revisitado e atualizado ao final de cada sprint.
 - **Impacto:** Médio (2)
 - **Prioridade:** Média (4)
 - **Estratégia de Mitigação:** O escopo principal deve ser congelado, utilizando os critérios definidos na documentação do MVP como filtro rigoroso. Ideias não essenciais devem ser obrigatoriamente movidas para um backlog de futuro.
-- **Responsável pelo Acompanhamento:** Scrum Master (`Eduardo Cardoso`) / Product Owner (`Adriano Luiz de Souza`)
+- **Responsável pelo Acompanhamento:** Scrum Master (Sprint 1: `Eduardo Cardoso`, Sprint 2: `Damares Gaia`, Sprint 3: `Talles Souza`) / Product Owner (`Adriano Luiz de Souza`)
 
 ### R05 - Divergência de Ambientes e Instabilidade na Orquestração (Docker)
 
@@ -184,7 +184,7 @@ deve ser revisada novamente como parte do fechamento formal (Doc-9,
 - **Impacto:** Médio (2) mitigado pelo fato de o sistema ainda não estar em produção real com dados sensíveis; o impacto seria alto em um ambiente de uso real.
 - **Prioridade:** Alta (6)
 - **Estratégia de Mitigação:** Manter o sistema restrito a ambiente de desenvolvimento/avaliação até a implementação da US01. Documentar a limitação de forma explícita e visível no `README.md` e na release `v0.2.0`, para que ninguém trate o sistema como pronto para uso real nesse estado. Priorizar a US01 no backlog da próxima sprint.
-- **Responsável pelo Acompanhamento:** Scrum Master (`Damares Gaia`)
+- **Responsável pelo Acompanhamento:** Scrum Master (Sprint 1: `Eduardo Cardoso`, Sprint 2: `Damares Gaia`, Sprint 3: `Talles Souza`)
 
 ### R07 - Condição de Corrida no Aceite da Última Vaga Disponível
 
@@ -210,7 +210,7 @@ deve ser revisada novamente como parte do fechamento formal (Doc-9,
 - **Impacto:** Alto (3) uma mudança de direção do produto pode invalidar parte do trabalho de modelagem e implementação já feito, e força a equipe a reabrir decisões que pareciam fechadas (MVP, ADRs, contrato de dados).
 - **Prioridade:** Alta (6)
 - **Estratégia de Mitigação:** Reservar um espaço explícito na próxima Sprint Planning para avaliar a sugestão do professor antes de iniciar qualquer nova implementação, evitando decidir o novo rumo "no meio" de uma sprint em andamento. Ao avaliar as opções, mapear explicitamente o que de US02/US03/US04/UML/contrato de dados seria reaproveitável em cada alternativa, para que a decisão considere custo de retrabalho, não só adequação conceitual. Não iniciar a Sprint 3 sem essa decisão fechada, para evitar implementar sobre uma base que pode ser descartada.
-- **Responsável pelo Acompanhamento:** Scrum Master (`Damares Gaia`) / Product Owner (`Adriano Luiz de Souza`)
+- **Responsável pelo Acompanhamento:** Scrum Master (Sprint 1: `Eduardo Cardoso`, Sprint 2: `Damares Gaia`, Sprint 3: `Talles Souza`) / Product Owner (`Adriano Luiz de Souza`)
 
 ### Matriz de Riscos Atualizada (Entrega 6, situação em 23/09/2026)
 
@@ -327,7 +327,29 @@ Esta seção registra a reavaliação dos riscos da Sprint 3.
   - Não iniciar nenhuma história sem estimativa na Sprint Planning.
 - **Responsável pelo Acompanhamento:** Scrum Master (`Talles Souza da Cruz`) / Product Owner (`Adriano Luiz de Souza`)
 
-### 5.3 Matriz Atualizada dos Riscos Revisados (Entrega 7)
+### 5.3 Status Atualizado dos Riscos Existentes (QA)
+
+| ID      | Risco                                                    | Status na Sprint 3 | Observação                                                                                                                                                                                                                                                                                                                                                                                   |
+| :------ | :------------------------------------------------------- | :----------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **R02** | Falhas de regressão por ausência de testes e CI quebrado | Mitigado           | A equipe consolidou uma forte cultura de testes automatizados nesta sprint. No frontend, foram implementadas extensas suítes com Vitest e React Testing Library (ex: `SolicitacaoForm.test.tsx`, `PainelSolicitacoes.test.tsx`). No backend, testes unitários robustos com JUnit e Mockito para as regras de negócio e serviços. O risco de regressão silenciosa foi drasticamente reduzido. |
+| **R07** | Condição de corrida no aceite da última vaga             | Mitigado           | Bloqueio otimista (`@Version` / lock otimista) na entidade `PerfilOrientador` foi validado com sucesso através de testes de concorrência, evitando definitivamente a inconsistência de dados (vagas negativas) identificada anteriormente.                                                                                                                                                   |
+
+### 5.4 Riscos Novos Identificados na Sprint 3
+
+### R09 - Complexidade e Instabilidade na Integração com Keycloak (Autenticação)
+
+- **Natureza:** Segurança / Tecnologia
+- **Identificação:** A introdução do Keycloak como provedor de identidade adiciona sobrecarga na infraestrutura local e no tratamento assíncrono de sessões no frontend.
+- **Descrição:** A gestão de tokens JWT (access/refresh) e a proteção de rotas (`ProtectedRoute.tsx`) exigem sincronização rigorosa. Falhas na renovação do token (`authService.ts`) ou instabilidade no contêiner do Keycloak (`docker-compose.yml`) podem bloquear o desenvolvimento e teste das rotas protegidas por toda a equipe.
+- **Causa:** Adição de um novo componente arquitetural complexo (Identity and Access Management) para suprir a funcionalidade de autenticação (US01) introduzida nesta sprint.
+- **Consequência / Impacto Esperado:** Erros frequentes de HTTP 401 (Não Autorizado) para usuários ativos, bloqueio do ambiente local de desenvolvedores e atraso nas entregas devido ao tempo gasto depurando permissões e escopos.
+- **Probabilidade:** Alta (3)
+- **Impacto:** Alto (3)
+- **Prioridade:** Crítica (9)
+- **Estratégia de Mitigação:** Manter os scripts de orquestração do Docker e o artefato `realm-import.json` estritamente sincronizados no repositório. Criar testes E2E automatizados específicos para o ciclo de vida da autenticação e exigir que todo erro de login gere logs explícitos para facilitar a depuração.
+- **Responsável pelo Acompanhamento:** DevOps/Infra (`Willian Ferreira`), QA (sprint 1 e 2: `Talles Souza`; sprint 3: `Eduardo Cardoso`) e Scrum Master (`Talles Souza`)
+
+### 5.5 Matriz Atualizada dos Riscos Revisados (Entrega 7)
 
 | ID      | Risco                           | Natureza |  Probabilidade   |  Impacto  |     Prioridade     | Status                      |
 | :------ | :------------------------------ | :------- | :--------------: | :-------: | :----------------: | :-------------------------- |
