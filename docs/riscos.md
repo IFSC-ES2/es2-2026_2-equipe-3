@@ -351,10 +351,12 @@ Esta seção registra a reavaliação dos riscos da Sprint 3.
 
 ### 5.5 Matriz Atualizada dos Riscos Revisados (Entrega 7)
 
-| ID      | Risco                           | Natureza |  Probabilidade   |  Impacto  |     Prioridade     | Status                      |
-| :------ | :------------------------------ | :------- | :--------------: | :-------: | :----------------: | :-------------------------- |
-| **R01** | Desistência de membro da equipe | Equipe   | Média → Alta (3) | Alto (3)  | Alta → Crítica (9) | Concretizado (abandono)     |
-| **R04** | Crescimento do escopo           | Escopo   | Média → Alta (3) | Médio (2) |  Média → Alta (6)  | Concretizado (escopo maior) |
+| ID      | Risco                                 | Natureza   |  Probabilidade   |  Impacto  |     Prioridade      | Status                      |
+| :------ | :------------------------------------ | :--------- | :--------------: | :-------: | :-----------------: | :-------------------------- |
+| **R01** | Desistência de membro da equipe       | Equipe     | Média → Alta (3) | Alto (3)  | Alta → Crítica (9)  | Concretizado (abandono)     |
+| **R04** | Crescimento do escopo                 | Escopo     | Média → Alta (3) | Médio (2) |  Média → Alta (6)   | Concretizado (escopo maior) |
+| **R03** | Atraso de integração backend/frontend | Prazo      | Alta → Baixa (1) | Alto (3)  | Crítica → Média (3) | Mitigado                    |
+| **R05** | Divergência de ambientes (Docker)     | Tecnologia | Alta → Média (2) | Médio (2) |  Alta → Média (4)   | Mitigado, com atenção       |
 
 Os dois riscos se reforçam: a equipe ficou com menos capacidade (R01) na
 mesma sprint em que o escopo do MVP aumentou (R04). Por isso, a Sprint
