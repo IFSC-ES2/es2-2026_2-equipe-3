@@ -379,7 +379,7 @@ capacidade real da equipe.
 ### 5.7 R05 - Divergência de Ambientes e Instabilidade na Orquestração (Docker)
 
 - **Status na Sprint 3:** Mitigado, com atenção.
-- **O que ocorreu:** O problema de permissão do *gradlew* identificado na Sprint 2 em ambiente Linux foi corrigido e a correção foi integrada ao repositório. Na Sprint 3, a infraestrutura Docker foi ampliada com a inclusão do Keycloak como novo serviço, aumentando a quantidade de componentes e dependências necessárias para executar o sistema localmente.
+- **O que ocorreu:** O problema de permissão do _gradlew_ identificado na Sprint 2 em ambiente Linux foi corrigido e a correção foi integrada ao repositório. Na Sprint 3, a infraestrutura Docker foi ampliada com a inclusão do Keycloak como novo serviço, aumentando a quantidade de componentes e dependências necessárias para executar o sistema localmente.
 - **Reavaliação:**
   - **Probabilidade:** Alta (3) → **Média (2)**. A padronização do ambiente e a correção do problema identificado na Sprint 2 reduziram a probabilidade de divergências, mas a adição do Keycloak e de novas dependências mantém a possibilidade de problemas de configuração entre ambientes.
   - **Impacto:** Médio (2), mantido. Uma falha na orquestração pode impedir o desenvolvimento ou os testes locais e consumir tempo da equipe, mas a infraestrutura está versionada e pode ser reproduzida a partir dos arquivos do projeto.
@@ -391,4 +391,4 @@ capacidade real da equipe.
   - Validar o ambiente completo após alterações na infraestrutura.
   - Manter documentado o procedimento para subir o ambiente de desenvolvimento a partir de uma configuração limpa.
   - Diferenciar problemas gerais de orquestração Docker de problemas específicos da integração com Keycloak, mantendo estes últimos acompanhados pelo R09.
- - **Responsável pelo Acompanhamento:** DevOps/Infra (`Willian Ferreira`)
+- **Responsável pelo Acompanhamento:** DevOps/Infra (`Willian Ferreira`)
