@@ -169,7 +169,7 @@ A revisão completa será registrada em [`docs/riscos.md`](../riscos.md) no fech
 
 ---
 
-## 7. Contribuições Individuais
+## 7. Contribuições Individuais Detalhadas
 
 Cada integrante registra abaixo suas contribuições da Sprint 3, com as issues e os PRs como evidência. O detalhamento do uso de IA em cada artefato está em [`USO-IA.md`](../../USO-IA.md) (Entrega 7).
 
@@ -228,7 +228,16 @@ Estas issues pertencem ao papel titular do integrante. Os testes tiveram reescri
 
 ### 7.2 Damares do Socorro Gonçalves Gaia
 
-_Espaço reservado para o integrante registrar suas contribuições da Sprint 3._
+- **Papel:** Arquiteta de Software.
+- **Identificadores Git:** `Damares Gaia <damaresgaia@gmail.com>`, `121111955+damaresgaia@users.noreply.github.com` (usuária GitHub: `damaresgaia`).
+- **Atividades e Entregas na Sprint 3:**
+    - **Diagramas de Arquitetura C4 (Issue #150 - PR #173):** Concepção e elaboração dos diagramas de arquitetura do sistema real utilizando o modelo C4 em Mermaid. Criação da visão de Contexto C1 ([`docs/diagramas/c1-contexto.md`](../diagramas/c1-contexto.md)), mapeando os atores (Aluno e Professor) e as integrações externas (Keycloak IAM e MySQL), e da visão de Contêineres C2 ([`docs/diagramas/c2-conteineres.md`](../diagramas/c2-conteineres.md)), detalhando Frontend React (Vite), Backend Spring Boot (Resource Server), Banco MySQL e Keycloak IAM com respectivas portas e protocolos de comunicação.
+    - **Documento de Arquitetura do Sistema Real (Issue #151 - PR #173):** Redação completa e estruturação do artefato [`docs/ARQUITETURA.md`](../ARQUITETURA.md), documentando os componentes em execução, responsabilidades, dependências, suporte funcional ao MVP e a matriz de rastreabilidade das diferenças entre a arquitetura planejada original e a efetivamente implementada (inclusão do Keycloak com Direct Access Grant/ROPC em vez de PKCE, modelagem de `Turma_TCC` substituindo o papel de Coordenador e submissão de entregas por link de nuvem em vez de upload físico). Atendimento integral dos 11 apontamentos técnicos emitidos na revisão pelo Scrum Master Talles Souza na branch `docs/150-151-arquitetura-e-diagramas` (commit `3a9317f`).
+    - **Consolidação das Decisões Arquiteturais - ADRs (Issue #153 - PR #169):** Formalização técnica, justificativas e análise de consequências das decisões da sprint: [`ADR-0010`](../adrs/ADR-0010.md) (Modelagem de Turma_TCC), [`ADR-0011`](../adrs/ADR-0011.md) (Keycloak como Provedor de Identidade e Acesso IAM), [`ADR-0012`](../adrs/ADR-0012.md) (Backend Resource Server e Validação de Tokens JWT), [`ADR-0013`](../adrs/ADR-0013.md) (Submissão de Entregas por Link de Nuvem) e [`ADR-0014`](../adrs/ADR-0014.md) (Autenticação no Frontend com Direct Access Grant).
+    - **Acompanhamento e Memória de Cálculo de Métricas (Issue #154 - PR #185):** Atualização da ficha técnica da métrica [`M-06: Cumprimento da Capacidade`](../metricas/M-06.md), consolidando 73h executadas de 84h planejadas (86,9% - Faixa Aceitável). Estruturou a memória de cálculo nominal por integrante, eliminou pendências provisórias, registrou a evidência de 162 commits técnicos dos 4 membros ativos e a concretização do risco R01 (inatividade de Marcus Jhuan), com análise de tendência e estabilidade da equipe frente ao baseline de 28h/semana.
+    - **Revisão de Código (Code Review) e Governança:** Atuação ativa na revisão técnica formal e aprovação via GitHub de entregas centrais da sprint:
+        - **Revisão e Aprovação do PR #187 (Issue #141):** Análise e aprovação formal da suíte completa de testes automatizados do fluxo do calendário de entregas (US05), validando os testes de integração do Spring Boot (`PrazoEntregaControllerIntegrationTest`, `PrazoEntregaRepositoryTest`), o isolamento temporal contra falhas de fuso horário com `ClockConfig.FUSO_INSTITUICAO`, conformidade com a modelagem de `Turma_TCC` (ADR-0010) e tokens JWT (ADR-0012), além dos testes frontend em `GestaoCalendario.test.tsx`, `PainelSolicitacoes.test.tsx`, `Orientadores.test.tsx` e `prazoEntregaService.test.ts`. PR integrado à `entrega-7` com sucesso.
+        - **Revisão e Aprovação do PR #184 (Issues #145, #146 e #147):** Revisão técnica detalhada da refatoração orientada a design REF-1 e da análise comparativa de métricas antes/depois documentada em [`docs/REENGENHARIA.md`](../REENGENHARIA.md).
 
 ### 7.3 Marcus Jhuan Epifanio Lima
 
