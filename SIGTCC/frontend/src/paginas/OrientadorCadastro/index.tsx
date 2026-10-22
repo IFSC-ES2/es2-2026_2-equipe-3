@@ -34,7 +34,7 @@ export function OrientadorCadastroPage() {
 }
 
 interface PageShellProps {
-  active: "cadastro" | "catalogo" | "perfil" | "painel";
+  active?: "cadastro" | "catalogo" | "perfil" | "painel";
   mensagem?: string;
   sucesso?: boolean;
   children: ReactNode;
@@ -47,7 +47,8 @@ export function PageShell({
   children,
 }: PageShellProps) {
   const navigate = useNavigate();
-  const { sair } = useAuth();
+  const { sair, temPapel } = useAuth();
+  const ehProfessor = temPapel("ROLE_PROFESSOR");
 
   const handleSair = () => {
     sair();
@@ -65,13 +66,15 @@ export function PageShell({
           </div>
         </div>
         <nav className="page-navigation" aria-label="Navegação principal">
-          <button
-            className={active === "cadastro" ? "active" : ""}
-            type="button"
-            onClick={() => navigate("/")}
-          >
-            Novo cadastro
-          </button>
+          {ehProfessor && (
+            <button
+              className={active === "cadastro" ? "active" : ""}
+              type="button"
+              onClick={() => navigate("/")}
+            >
+              Novo cadastro
+            </button>
+          )}
           <button
             className={active === "catalogo" ? "active" : ""}
             type="button"
@@ -79,20 +82,24 @@ export function PageShell({
           >
             Catálogo
           </button>
-          <button
-            className={active === "perfil" ? "active" : ""}
-            type="button"
-            onClick={() => navigate("/perfil-editar")}
-          >
-            Meu perfil
-          </button>
-          <button
-            className={active === "painel" ? "active" : ""}
-            type="button"
-            onClick={() => navigate("/painel-orientador")}
-          >
-            Painel do Professor
-          </button>
+          {ehProfessor && (
+            <button
+              className={active === "perfil" ? "active" : ""}
+              type="button"
+              onClick={() => navigate("/perfil-editar")}
+            >
+              Meu perfil
+            </button>
+          )}
+          {ehProfessor && (
+            <button
+              className={active === "painel" ? "active" : ""}
+              type="button"
+              onClick={() => navigate("/painel-orientador")}
+            >
+              Painel do Professor
+            </button>
+          )}
           <button type="button" className="sair-button" onClick={handleSair}>
             Sair
           </button>
