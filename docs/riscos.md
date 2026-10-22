@@ -360,3 +360,35 @@ Os dois riscos se reforçam: a equipe ficou com menos capacidade (R01) na
 mesma sprint em que o escopo do MVP aumentou (R04). Por isso, a Sprint
 Planning da Sprint 4 deve tratá-los juntos, ajustando o escopo à
 capacidade real da equipe.
+
+### 5.6 R03 - Atraso no Cronograma de Integração das APIs de Backend e Frontend
+
+- **Status na Sprint 3:** Mitigado.
+- **O que ocorreu:** A estratégia de definir os contratos de dados antes da implementação continuou sendo utilizada durante a Sprint 3. Os contratos das funcionalidades de autenticação e calendário foram considerados no planejamento inicial, permitindo que a equipe trabalhasse de forma mais coordenada. A implementação e integração das funcionalidades da sprint ocorreram sem um bloqueio generalizado do frontend pela indisponibilidade das APIs.
+- **Reavaliação:**
+  - **Probabilidade:** Alta (3) → **Baixa (1)**. A prática de contrato-first adotada nas sprints anteriores mostrou-se eficaz para reduzir dependências entre frontend e backend.
+  - **Impacto:** Alto (3), mantido. Caso ocorra, um atraso significativo na API ainda pode bloquear telas e testes do frontend e comprometer o cronograma da sprint.
+  - **Prioridade:** Crítica (9) → **Média (3)**.
+- **Eficácia da mitigação:** A definição antecipada dos contratos de dados mostrou-se eficaz novamente. A equipe conseguiu desenvolver e integrar funcionalidades sem depender exclusivamente da conclusão prévia de toda a implementação do backend.
+- **Ações para a próxima sprint:**
+  - Continuar definindo ou revisando os contratos de API antes do início da implementação das telas dependentes.
+  - Manter mocks ou dados estáticos disponíveis quando uma API ainda estiver em desenvolvimento.
+  - Registrar alterações de contrato por meio de documentação e revisão nos Pull Requests.
+- **Responsável pelo Acompanhamento:** DevOps/Infra (`Willian Ferreira`)
+
+### 5.7 R05 - Divergência de Ambientes e Instabilidade na Orquestração (Docker)
+
+- **Status na Sprint 3:** Mitigado, com atenção.
+- **O que ocorreu:** O problema de permissão do *gradlew* identificado na Sprint 2 em ambiente Linux foi corrigido e a correção foi integrada ao repositório. Na Sprint 3, a infraestrutura Docker foi ampliada com a inclusão do Keycloak como novo serviço, aumentando a quantidade de componentes e dependências necessárias para executar o sistema localmente.
+- **Reavaliação:**
+  - **Probabilidade:** Alta (3) → **Média (2)**. A padronização do ambiente e a correção do problema identificado na Sprint 2 reduziram a probabilidade de divergências, mas a adição do Keycloak e de novas dependências mantém a possibilidade de problemas de configuração entre ambientes.
+  - **Impacto:** Médio (2), mantido. Uma falha na orquestração pode impedir o desenvolvimento ou os testes locais e consumir tempo da equipe, mas a infraestrutura está versionada e pode ser reproduzida a partir dos arquivos do projeto.
+  - **Prioridade:** Alta (6) → **Média (4)**.
+- **Eficácia da mitigação:** A estratégia de versionar a infraestrutura mostrou-se eficaz. O problema de permissão identificado na Sprint 2 foi corrigido no repositório. Na Sprint 3, o `docker-compose.yml` passou a orquestrar também o Keycloak, com healthchecks e dependências entre os serviços, enquanto a configuração do realm foi versionada para permitir a reprodução do ambiente.
+- **Ações para a próxima sprint:**
+  - Manter `Dockerfile`, `docker-compose.yml`, `docker-compose.prod.yml` e arquivos de configuração necessários versionados.
+  - Evitar configurações feitas exclusivamente dentro dos contêineres ou volumes locais dos desenvolvedores.
+  - Validar o ambiente completo após alterações na infraestrutura.
+  - Manter documentado o procedimento para subir o ambiente de desenvolvimento a partir de uma configuração limpa.
+  - Diferenciar problemas gerais de orquestração Docker de problemas específicos da integração com Keycloak, mantendo estes últimos acompanhados pelo R09.
+ - **Responsável pelo Acompanhamento:** DevOps/Infra (`Willian Ferreira`)
