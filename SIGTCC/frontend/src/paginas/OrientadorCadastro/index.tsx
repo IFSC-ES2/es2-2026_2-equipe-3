@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Orientador } from "../../types/Orientador.ts";
 import { OrientadorForm } from "../../components/OrientadorForm";
+import { useAuth } from "../../auth/useAuth";
 
 export function OrientadorCadastroPage() {
   const navigate = useNavigate();
@@ -33,7 +34,7 @@ export function OrientadorCadastroPage() {
 }
 
 interface PageShellProps {
-  active: "cadastro" | "catalogo" | "perfil" | "painel";
+  active?: "cadastro" | "catalogo" | "perfil" | "painel";
   mensagem?: string;
   sucesso?: boolean;
   children: ReactNode;
@@ -46,6 +47,14 @@ export function PageShell({
   children,
 }: PageShellProps) {
   const navigate = useNavigate();
+  const { sair, temPapel } = useAuth();
+  const ehProfessor = temPapel("ROLE_PROFESSOR");
+
+  const handleSair = () => {
+    sair();
+    navigate("/login", { replace: true });
+  };
+
   return (
     <div className="orientador-page">
       <header className="page-header">
@@ -57,13 +66,15 @@ export function PageShell({
           </div>
         </div>
         <nav className="page-navigation" aria-label="Navegação principal">
-          <button
-            className={active === "cadastro" ? "active" : ""}
-            type="button"
-            onClick={() => navigate("/")}
-          >
-            Novo cadastro
-          </button>
+          {ehProfessor && (
+            <button
+              className={active === "cadastro" ? "active" : ""}
+              type="button"
+              onClick={() => navigate("/")}
+            >
+              Novo cadastro
+            </button>
+          )}
           <button
             className={active === "catalogo" ? "active" : ""}
             type="button"
@@ -71,19 +82,26 @@ export function PageShell({
           >
             Catálogo
           </button>
-          <button
-            className={active === "perfil" ? "active" : ""}
-            type="button"
-            onClick={() => navigate("/perfil-editar")}
-          >
-            Meu perfil
-          </button>
-          <button
-            className={active === "painel" ? "active" : ""}
-            type="button"
-            onClick={() => navigate("/painel-orientador")}
-          >
-            Painel do Professor
+          {ehProfessor && (
+            <button
+              className={active === "perfil" ? "active" : ""}
+              type="button"
+              onClick={() => navigate("/perfil-editar")}
+            >
+              Meu perfil
+            </button>
+          )}
+          {ehProfessor && (
+            <button
+              className={active === "painel" ? "active" : ""}
+              type="button"
+              onClick={() => navigate("/painel-orientador")}
+            >
+              Painel do Professor
+            </button>
+          )}
+          <button type="button" className="sair-button" onClick={handleSair}>
+            Sair
           </button>
         </nav>
       </header>

@@ -1,0 +1,329 @@
+# Sprint 3 - Entrega 7
+
+- **Data de Início:** 02/10/2026
+- **Data da Entrega:** 22/10/2026
+- **Scrum Master da Sprint 3:** Talles Souza da Cruz
+- **Marco de Release:** `v0.3.0`
+- **Branch de Trabalho:** `entrega-7`
+
+---
+
+# Inspeção e replanejamento da Sprint 3
+
+## 1. Inspeção: Estado do MVP ao Final da Sprint 2
+
+### 1.1 Funcionalidades
+
+| História                                          |  Estimativa   | Estado ao final da Sprint 2 | Observação                                                                                                       |
+| :------------------------------------------------ | :-----------: | :-------------------------- | :--------------------------------------------------------------------------------------------------------------- |
+| US01 - Autenticação e Perfis                      |     5 SP      | Não iniciada                | Postergada nas Sprints 1 e 2. Todos os endpoints são públicos.                                                   |
+| US02 - Cadastro de Perfil de Orientador e Vagas   |     5 SP      | Concluída (Sprint 1)        | CRUD de orientadores, catálogo e edição de perfil.                                                               |
+| US03 - Busca e Filtragem de Orientadores          |     3 SP      | Parcial                     | Entregues o filtro textual `?area=` (Sprint 1) e o botão "Solicitar Orientação" condicionado a vagas (Sprint 2). |
+| US04 - Solicitação e Aceite de Orientação         |     5 SP      | Concluída (Sprint 2)        | Envio, listagem, aceite/recusa e acompanhamento, com Strategy e Observer.                                        |
+| US05 - Calendário de Prazos                       | Não estimada  | Não iniciada                | Depende da US01.                                                                                                 |
+| US06 e US07 - Submissão de Documentos e Pareceres | Não estimadas | Não iniciadas               | Afetadas pelo ajuste de escopo (seção 3).                                                                        |
+
+O sistema ao final da Sprint 2 entrega o "match" entre aluno e orientador de ponta a ponta, mas sem identidade de usuário: o painel do professor identifica o orientador pelo `orientadorId` guardado no `localStorage` do navegador (com retorno ao identificador `1` quando ausente) e o aluno acompanha a solicitação por um identificador sequencial na URL.
+
+### 1.2 Métricas
+
+| Métrica                                           | Sprint 1          | Sprint 2           | Situação ao final da Sprint 2                                                                             |
+| :------------------------------------------------ | :---------------- | :----------------- | :-------------------------------------------------------------------------------------------------------- |
+| [M-01](../metricas/M-01.md) Cobertura (backend)   | 92,00%            | 91,00%             | Meta desejada.                                                                                            |
+| [M-01](../metricas/M-01.md) Cobertura (frontend)  | 97,95%            | 67,74%             | **Zona de alerta.** Queda causada pela pasta `utils` (8,53%) e pela página `OrientadorCadastro` (38,88%). |
+| [M-02](../metricas/M-02.md) Densidade de defeitos | 0,00 bugs/SP      | 0,20 bugs/SP       | Faixa aceitável. O defeito registrado é a condição de corrida no aceite (R07).                            |
+| [M-03](../metricas/M-03.md) Velocidade            | 5 SP              | 5 SP               | Estável: 5 SP por sprint de duas semanas.                                                                 |
+| [M-04](../metricas/M-04.md) Lead time de PRs      | 12h               | 0,1h a 59,7h       | Maioria dentro da meta; um PR em zona de alerta (#107, 59,7h) e um na faixa aceitável (#108, 37,3h).      |
+| [M-05](../metricas/M-05.md) Conclusão do MVP      | ~38,5% (5 de 13)  | ~55,6% (10 de 18)  | O denominador cobre apenas US01 a US04; US05 a US07 não têm estimativa.                                   |
+| [M-06](../metricas/M-06.md) Capacidade            | ~89% (50h de 56h) | 94,6% (53h de 56h) | Meta desejada.                                                                                            |
+
+### 1.3 Riscos
+
+Situação registrada em [`docs/riscos.md`](../riscos.md) na revisão da Sprint 2:
+
+| Risco                                       | Prioridade  | Situação ao final da Sprint 2                                                                                             |
+| :------------------------------------------ | :---------: | :------------------------------------------------------------------------------------------------------------------------ |
+| R01 - Desistência ou baixa participação     |  Alta (6)   | Concretizado parcialmente, com impacto em prazo de ao menos uma issue.                                                    |
+| R02 - Regressão por falta de testes/CI      |  Alta (6)   | Ativo, parcialmente mitigado pelo bloqueio de merge com CI vermelho.                                                      |
+| R03 - Atraso de integração backend/frontend | Crítica (9) | Mitigado pela prática de contrato de dados no início da sprint.                                                           |
+| R04 - Crescimento do escopo                 |  Média (4)  | Mitigado na Sprint 2; **reabre com o ajuste de escopo da seção 3**.                                                       |
+| R05 - Divergência de ambientes (Docker)     |  Alta (6)   | Concretizado na Sprint 2 (falha de permissão do `gradlew` em Linux) e resolvido: a correção foi integrada ao repositório. |
+| R06 - Ausência de autenticação              |  Alta (6)   | Ativo. É o principal motivador da priorização da US01.                                                                    |
+| R07 - Condição de corrida no aceite         |  Média (3)  | Ativo. Sem mecanismo de controle de concorrência no código.                                                               |
+| R08 - Mudança de direção do produto (pivot) |  Alta (6)   | Tratado pela equipe por meio do relatório de refatoração de escopo (seção 3).                                             |
+
+---
+
+## 2. O que será Mantido, Corrigido, Replanejado e Priorizado
+
+### 2.1 Mantido
+
+- **Funcionalidades das Sprints 1 e 2:** o catálogo de orientadores (US02) e o fluxo de solicitação e aceite (US04) permanecem válidos.
+- **Decisões de arquitetura:** arquitetura em camadas (ADR-0003), MySQL com Spring Data JPA (ADR-0004), Docker (ADR-0005), React com TypeScript (ADR-0006), Strategy e Observer (ADR-0007) e Flyway (ADR-0009).
+- **Modelagem de `Aluno` como subtipo de `Usuario` (ADR-0008):** o reaproveitamento do aluno pelo e-mail facilita o vínculo com a conta de autenticação na US01.
+- **Práticas de processo:** contrato de dados definido no início da sprint (eficaz contra o R03), revisão obrigatória de PR, bloqueio de merge com CI vermelho e integração por commit de mesclagem.
+
+### 2.2 Corrigido
+
+| Correção                                                                                                                                                | Quando                                                           |
+| :------------------------------------------------------------------------------------------------------------------------------------------------------ | :--------------------------------------------------------------- |
+| Proteger os endpoints e substituir o `localStorage` pela identidade do usuário autenticado.                                                             | Sprint 3 (US01)                                                  |
+| Alinhar README, ADR-0007 e `PADROES-DE-PROJETO.md` ao código real; atualizar `fluxo-de-trabalho.md`, `riscos.md` e o template de PR para a `entrega-7`. | Sprint 3 (ADRs consolidados e documentação)                      |
+| Candidato à refatoração orientada a design da Entrega 7, com métrica antes/depois (duplicação e cobertura de `utils`).                                  | Sprint 3 (reengenharia)                                          |
+| Coletar cobertura no pipeline (JaCoCo no backend e `vitest --coverage` no frontend) e corrigir `docs/ci.md`.                                            | Sprint 3 (testes no pipeline)                                    |
+| Decidir o mecanismo de controle de concorrência, com teste que reproduza o cenário.                                                                     | Sprint 3 se houver capacidade; senão, backlog                    |
+| Mover o filtro de ativos para o backend ao implementar os filtros combinados.                                                                           | Sprint 3 (US03)                                                  |
+| Tratar violação de integridade com `409`; alinhar `docker-compose.prod.yml` à ADR-0009 e externalizar as origens do CORS.                               | Sprint 3 (junto da US01, que altera a configuração de segurança) |
+| Completar as validações do contrato da US04 e criar o teste de integração ponta a ponta.                                                                | Backlog (débito técnico registrado)                              |
+
+### 2.3 Replanejado
+
+- **US01:** deixa de ser "login próprio com Spring Security/JWT e três perfis" e passa a ser autenticação via Keycloak com dois papéis (seção 3). A estimativa de 5 SP do baseline foi feita para o desenho anterior e deve ser revista na Sprint Planning.
+- **US03:** o que resta são os filtros por vagas disponíveis, a combinação de filtros, o estado de "nenhum resultado" e a ação de limpar filtros.
+- **US05:** o ator passa de "Coordenador" para "Professor responsável pela `Turma_TCC`". A história não possui estimativa e deve ser estimada na Sprint Planning.
+- **US06 e US07:** permanecem no backlog, com a submissão alterada de upload de arquivo para link (seção 3).
+- **M-05:** o total de Story Points do MVP deve ser recalculado após a estimativa das histórias restantes e da história de agendamento de bancas, pois o denominador atual (18 SP) não representa o MVP inteiro.
+
+### 2.4 Priorizado
+
+1. **US01 - Autenticação e Perfis.** Elimina o risco R06 e é pré-requisito das telas por perfil e da US05.
+2. **US03 - Busca e Filtragem.** Fecha uma história parcialmente entregue há duas sprints, com baixo risco técnico.
+3. **US05 - Calendário de Prazos.** Primeira história do fluxo de entregas; depende da US01.
+
+---
+
+## 3. Ajustes de Escopo
+
+Os ajustes abaixo foram aprovados pela equipe . Eles respondem ao risco R08 (possível mudança de direção do produto) preservando o que foi entregue nas Sprints 1 e 2.
+
+### 3.1 Resumo dos Ajustes
+
+| Tipo       | Ajuste                                                                                                                                | Impacto                                                                                                 |
+| :--------- | :------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| Alterado   | Perfis reduzidos a `ROLE_ALUNO` e `ROLE_PROFESSOR`. O "Coordenador" passa a ser o professor responsável pela `Turma_TCC` do semestre. | US01 e US05; nova entidade `Turma_TCC`; interface do professor renderizada conforme a responsabilidade. |
+| Alterado   | Submissão de entregas por link de nuvem, em vez de upload de arquivo.                                                                 | US06 e US07; dispensa infraestrutura de armazenamento.                                                  |
+| Adicionado | Autenticação com Spring Security e Keycloak, como prioridade máxima da Sprint 3.                                                      | US01; novo contêiner no `docker-compose`; nova ADR.                                                     |
+| Adicionado | Agendamento de bancas de defesa, sob responsabilidade do orientador ou do professor da disciplina.                                    | Volta ao backlog do MVP, **fora da Sprint 3**. Exige nova história e estimativa.                        |
+| Removido   | Papel de autenticação `Coordenador`.                                                                                                  | US01 e US05.                                                                                            |
+| Removido   | Armazenamento de arquivos físicos.                                                                                                    | US06.                                                                                                   |
+| Mantido    | Catálogo e "match" (US02 e US04), acervo público fora do escopo e independência do SIGAA.                                             | Nenhum retrabalho nas entregas anteriores.                                                              |
+
+### 3.2 Ajustes nas Histórias da Sprint 3
+
+**US01 - Autenticação e Perfis (issue #8)**
+
+- Login via Keycloak com e-mail e senha, com os papéis `ROLE_ALUNO` e `ROLE_PROFESSOR`.
+- A permissão de gestão da turma e do calendário não é um papel de login: é verificada no banco, checando se o professor autenticado é o responsável pela `Turma_TCC` do semestre vigente.
+- Critérios de aceitação atualizados para cinco cenários: login de aluno, senha incorreta, professor orientador sem responsabilidade pela turma, professor responsável pela turma e acesso não autenticado a rota protegida.
+
+**US03 - Busca e Filtragem de Orientadores (issue #10)**
+
+- Critérios de aceitação atualizados para cinco cenários: filtro por linha de pesquisa, filtro "somente com vagas disponíveis", combinação dos dois, nenhum resultado e limpar filtros.
+- **Ponto a decidir antes da implementação:** no modelo atual não existe um atributo "área de conhecimento" separado. O parâmetro `area` de `GET /api/v1/orientadores` é uma busca textual sobre o nome das linhas de pesquisa. A equipe deve registrar no contrato de dados se os termos são sinônimos ou se um novo atributo será criado.
+
+**US05 - Calendário de Prazos (issue #12)**
+
+- O ator passa a ser o professor responsável pela `Turma_TCC` vigente.
+- Critérios de aceitação atualizados para seis cenários: cadastro de prazo, bloqueio de professor sem responsabilidade pela turma, cadastro dos três tipos de entrega (Projeto de TCC, TCC 1 e TCC 2), edição de prazo, validação de data inválida e visibilidade do prazo para o aluno.
+
+---
+
+## 4. Meta da Sprint 3
+
+> **"Tornar o MVP autenticado e orientado a perfis: implementar o login via Keycloak com os papéis de Aluno e Professor (US01), concluir a busca e filtragem do catálogo de orientadores (US03) e disponibilizar o calendário de prazos gerido pelo professor responsável pela turma de TCC (US05), consolidando a documentação da arquitetura, as ADRs e a qualidade interna do código."**
+
+### 4.1 Itens Selecionados
+
+| Item                                     | Issue |             Estimativa             |
+| :--------------------------------------- | :---: | :--------------------------------: |
+| US01 - Autenticação e Perfis (Keycloak)  |  #8   |    5 SP (baseline; a reestimar)    |
+| US03 - Busca e Filtragem de Orientadores |  #10  | 3 SP (baseline; fatia já entregue) |
+| US05 - Calendário de Prazos              |  #12  |             A estimar              |
+
+### 4.2 Fundamentação
+
+- **Backlog:** US01 e US03 são as duas histórias de prioridade alta do baseline ([`docs/BASELINE.md`](../BASELINE.md)) ainda não concluídas. A US05 é a próxima do fluxo de entregas e a primeira a depender do perfil do usuário.
+- **Métricas:** a velocidade observada é de 5 SP por sprint de duas semanas (M-03) e a capacidade realizada ficou entre 89% e 95% do planejado (M-06). A cobertura do frontend em zona de alerta (M-01) orienta a escolha da refatoração e a inclusão da cobertura no pipeline.
+- **Riscos:** o R06 (ausência de autenticação, prioridade alta) deixa de ser aceitável com a entrada do calendário e dos painéis por perfil. O R03 segue mitigado pela definição dos contratos da US01 e da US05 no início da sprint.
+
+---
+
+## 5. Riscos Considerados no Planejamento
+
+A revisão completa será registrada em [`docs/riscos.md`](../riscos.md) no fechamento. No planejamento, a equipe considera:
+
+- **R06 (ausência de autenticação):** deve ser mitigado pela US01.
+- **R08 (mudança de direção):** concretizado de forma controlada; as entregas das Sprints 1 e 2 foram preservadas.
+- **R04 (crescimento do escopo):** reaberto pela inclusão do agendamento de bancas no MVP; a contenção é manter as bancas fora da Sprint 3.
+- **R05 (ambientes Docker):** tende a aumentar com mais um contêiner (Keycloak) e sua configuração de _realm_, que deve ser versionada para subir com um único comando.
+- **Novo - Curva de aprendizado do Keycloak:** a integração com Spring Security e com o frontend pode consumir mais tempo que o estimado e atrasar a US05, que depende dela. Mitigação: iniciar a sprint pela infraestrutura e pelo contrato de autenticação.
+
+---
+
+## 6. Governança e Fluxo de Trabalho
+
+- **Ramificação base:** todo o trabalho da sprint parte da `entrega-7` e retorna a ela por Pull Request.
+- **Critérios de merge:** ao menos uma aprovação de outro integrante, pipeline de CI verde e integração por commit de mesclagem.
+- **Rastreabilidade:** cada PR referencia a issue correspondente; o PR da refatoração é específico e identificável.
+- **Integração final:** PR revisado da `entrega-7` para a `main`, seguido da release `v0.3.0`.
+
+---
+
+## 7. Papéis e Responsabilidades na Sprint 3
+
+Na Sprint 3 a equipe redistribuiu dois papéis: o Scrum Master passou de Damares para Talles, e o papel de Engenheiro de Qualidade passou de Talles para Eduardo. Talles também passou a atuar no desenvolvimento backend. Os demais papéis foram mantidos.
+
+| Integrante                        | Papel na Sprint 2                    | Papel na Sprint 3                    |
+| :-------------------------------- | :----------------------------------- | :----------------------------------- |
+| Damares do Socorro Gonçalves Gaia | Scrum Master e Arquiteta de Software | Arquiteta de Software                |
+| Eduardo Cardoso Oliveira          | Engenheiro de Requisitos             | Engenheiro de Qualidade (QA)         |
+| Marcus Jhuan Epifanio Lima        | Designer de UX/UI                    | Designer de UX/UI                    |
+| Talles Souza da Cruz              | Engenheiro de Qualidade (QA)         | Scrum Master e Desenvolvedor Backend |
+| Willian Ferreira dos Santos       | DevOps/Infra                         | DevOps/Infra                         |
+
+## 8. Contribuições Individuais Detalhadas
+
+Cada integrante registra abaixo suas contribuições da Sprint 3, com as issues e os PRs como evidência. O detalhamento do uso de IA em cada artefato está em [`USO-IA.md`](../../USO-IA.md) (Entrega 7).
+
+### 8.1 Eduardo Cardoso Oliveira
+
+- **Papel na sprint:** Engenheiro de Qualidade, com atuação emergencial no frontend.
+- **Período:** 16/10/2026 a 20/10/2026 (frontend e testes); critérios de aceitação das histórias ajustados no replanejamento (seção 3.2).
+
+#### Atuação emergencial no frontend
+
+O integrante responsável pelo papel de Frontend ficou inativo durante a Sprint 3, sem entregas nem comunicação, o que configura novo episódio do risco R01 (desistência ou baixa participação, ver [`docs/riscos.md`](../riscos.md)). Como as telas de US01, US03 e US05 compõem a meta da sprint (seção 4) e a US05 depende da US01, a ausência colocava as três histórias em atraso.
+
+Para evitar esse atraso, Eduardo assumiu a implementação do frontend dessas histórias. Ele não é o desenvolvedor titular dessa camada e, por isso, usou IA de forma intensiva (Google Gemini Advanced). As condições dessa atuação foram:
+
+- **Código de produção:** gerado pela IA a partir dos padrões já existentes no repositório (`AuthContext`, tipos e serviços), sem edição manual.
+- **Revisão e execução:** o integrante leu, executou e testou funcionalmente cada tela contra os critérios de aceitação da issue.
+- **Testes:** a primeira versão veio da IA e foi ajustada manualmente (mocks de autenticação e de `responsavelTurma`, ordem de eventos assíncronos, data fixada com `vi.setSystemTime` e textos exatos renderizados).
+- **Responsabilidade:** ele assume a responsabilidade técnica pelos artefatos entregues, inclusive os produzidos fora do papel titular.
+
+| Issue | História   | Entrega                                                                                                        |
+| :---- | :--------- | :------------------------------------------------------------------------------------------------------------- |
+| #130  | US01 (#8)  | Tela de login integrada ao Keycloak, com mensagem de erro e redirecionamento por papel.                        |
+| #131  | US01 (#8)  | Renderização dinâmica do dashboard do Professor: aba "Gestão da Turma/Calendário" conforme `responsavelTurma`. |
+| #134  | US03 (#10) | Filtros no Catálogo de Orientadores: linha de pesquisa, "Somente com vagas disponíveis" e "Limpar filtros".    |
+| #135  | US03 (#10) | Estado vazio para busca sem resultados.                                                                        |
+| #139  | US05 (#12) | Tela de Gestão de Calendário: cadastro e edição de prazos por tipo de entrega.                                 |
+| #140  | US05 (#12) | Contagem regressiva dos prazos nos painéis de Aluno e Professor.                                               |
+| #146  | -          | Refatoração orientada a design identificada na REF-1.                                                          |
+
+Integrados via PRs #174, #175, #177, #178, #179, #180 e #186.
+
+#### Atividades do papel de Engenheiro de Qualidade
+
+Estas issues pertencem ao papel titular do integrante. Os testes tiveram reescrita manual dos casos que a IA não cobriu, por depender de regras de negócio, e a análise de métrica foi recalculada a partir do código real.
+
+| Issue | Atividade                                                                                                                          | PR   |
+| :---- | :--------------------------------------------------------------------------------------------------------------------------------- | :--- |
+| #136  | Testes automatizados do filtro de orientadores (filtros isolados, combinados e sem resultado).                                     | #181 |
+| #141  | Testes automatizados do fluxo de calendário (autorização, três tipos de prazo, edição, data inválida e visibilidade para o aluno). | #187 |
+| #147  | Comparação da métrica antes/depois da refatoração REF-2 em `docs/REENGENHARIA.md`.                                                 | #184 |
+
+- **#136:** o integrante complementou a combinação simultânea de filtros e o reset do estado vazio.
+- **#141:** o integrante escreveu o bloqueio de cadastro por professor não responsável pela turma e a rejeição de data inválida.
+- **#147:** o valor da métrica antes e depois foi recalculado manualmente e conferido contra os commits da REF-1 e da REF-2. A análise de melhoria ou piora foi reescrita e relacionada aos atributos da ISO/IEC 25010 definidos na Entrega 4.
+- **Pipeline:** as suítes foram executadas localmente e a conferência de bloqueio de merge em CI foi feita nas issues #136 e #141.
+
+#### Engenharia de Requisitos
+
+- **Ajuste de escopo:** manutenção dos critérios de aceitação das issues #8 (US01), #10 (US03) e #12 (US05) conforme a seção 3.2, com os cenários marcados como novos e a seção "Removido desta versão".
+- **Decisão da US03:** "área de conhecimento" foi tratada como sinônimo de "linha de pesquisa", e os filtros da US03 usam o termo "linha de pesquisa" (seção 3.2).
+
+#### Lições para a retrospectiva
+
+- A dependência de uma única pessoa na camada de frontend expôs a sprint ao R01. A cobertura emergencial evitou o atraso, mas concentrou a entrega das telas na última semana da sprint (16/10 a 20/10).
+- Na Entrega 5, o PR final foi integrado após o prazo e com checks técnicos falhando. Nesta sprint, os testes das issues #136 e #141 foram feitos para bloquear o merge em CI quando falharem.
+
+### 8.2 Damares do Socorro Gonçalves Gaia
+
+- **Papel:** Arquiteta de Software.
+- **Identificadores Git:** `Damares Gaia <damaresgaia@gmail.com>`, `121111955+damaresgaia@users.noreply.github.com` (usuária GitHub: `damaresgaia`).
+- **Atividades e Entregas na Sprint 3:**
+  - **Diagramas de Arquitetura C4 (Issue #150 - PR #173):** Concepção e elaboração dos diagramas de arquitetura do sistema real utilizando o modelo C4 em Mermaid. Criação da visão de Contexto C1 ([`docs/diagramas/c1-contexto.md`](../diagramas/c1-contexto.md)), mapeando os atores (Aluno e Professor) e as integrações externas (Keycloak IAM e MySQL), e da visão de Contêineres C2 ([`docs/diagramas/c2-conteineres.md`](../diagramas/c2-conteineres.md)), detalhando Frontend React (Vite), Backend Spring Boot (Resource Server), Banco MySQL e Keycloak IAM com respectivas portas e protocolos de comunicação.
+  - **Documento de Arquitetura do Sistema Real (Issue #151 - PR #173):** Redação completa e estruturação do artefato [`docs/ARQUITETURA.md`](../ARQUITETURA.md), documentando os componentes em execução, responsabilidades, dependências, suporte funcional ao MVP e a matriz de rastreabilidade das diferenças entre a arquitetura planejada original e a efetivamente implementada (inclusão do Keycloak com Direct Access Grant/ROPC em vez de PKCE, modelagem de `Turma_TCC` substituindo o papel de Coordenador e submissão de entregas por link de nuvem em vez de upload físico). Atendimento integral dos 11 apontamentos técnicos emitidos na revisão pelo Scrum Master Talles Souza na branch `docs/150-151-arquitetura-e-diagramas` (commit `3a9317f`).
+  - **Consolidação das Decisões Arquiteturais - ADRs (Issue #153 - PR #169):** Formalização técnica, justificativas e análise de consequências das decisões da sprint: [`ADR-0010`](../adrs/ADR-0010.md) (Modelagem de Turma_TCC), [`ADR-0011`](../adrs/ADR-0011.md) (Keycloak como Provedor de Identidade e Acesso IAM), [`ADR-0012`](../adrs/ADR-0012.md) (Backend Resource Server e Validação de Tokens JWT), [`ADR-0013`](../adrs/ADR-0013.md) (Submissão de Entregas por Link de Nuvem) e [`ADR-0014`](../adrs/ADR-0014.md) (Autenticação no Frontend com Direct Access Grant).
+  - **Acompanhamento e Memória de Cálculo de Métricas (Issue #154 - PR #185):** Atualização da ficha técnica da métrica [`M-06: Cumprimento da Capacidade`](../metricas/M-06.md), consolidando 73h executadas de 84h planejadas (86,9% - Faixa Aceitável). Estruturou a memória de cálculo nominal por integrante, eliminou pendências provisórias, registrou a evidência de 162 commits técnicos dos 4 membros ativos e a concretização do risco R01 (inatividade de Marcus Jhuan), com análise de tendência e estabilidade da equipe frente ao baseline de 28h/semana.
+  - **Revisão de Código (Code Review) e Governança:** Atuação ativa na revisão técnica formal e aprovação via GitHub de entregas centrais da sprint:
+    - **Revisão e Aprovação do PR #187 (Issue #141):** Análise e aprovação formal da suíte completa de testes automatizados do fluxo do calendário de entregas (US05), validando os testes de integração do Spring Boot (`PrazoEntregaControllerIntegrationTest`, `PrazoEntregaRepositoryTest`), o isolamento temporal contra falhas de fuso horário com `ClockConfig.FUSO_INSTITUICAO`, conformidade com a modelagem de `Turma_TCC` (ADR-0010) e tokens JWT (ADR-0012), além dos testes frontend em `GestaoCalendario.test.tsx`, `PainelSolicitacoes.test.tsx`, `Orientadores.test.tsx` e `prazoEntregaService.test.ts`. PR integrado à `entrega-7` com sucesso.
+    - **Revisão e Aprovação do PR #184 (Issues #145, #146 e #147):** Revisão técnica detalhada da refatoração orientada a design REF-1 e da análise comparativa de métricas antes/depois documentada em [`docs/REENGENHARIA.md`](../REENGENHARIA.md).
+
+### 8.3 Marcus Jhuan Epifanio Lima
+
+Não houveram contribuições na sprint 3.
+
+### 8.4 Talles Souza da Cruz
+
+- **Papel na sprint:** Scrum Master da Sprint 3, com desenvolvimento de backend e infraestrutura.
+- **Período:** 04/10/2026 a 22/10/2026.
+
+#### Organização e planejamento da sprint
+
+- **Inspeção e Replanejamento da Sprint 3 (Issue #142 - PR #161):** Elaboração das seções 1 a 6 deste documento. Análise do estado do MVP ao final da Sprint 2 (histórias, métricas M-01 a M-06 e riscos), definição do que seria mantido, corrigido, replanejado e priorizado, registro dos ajustes de escopo aprovados pela equipe em resposta ao R08 e definição da meta da sprint com US01, US03 e US05.
+
+#### Implementação da autenticação (US01) e infraestrutura
+
+- **Contêiner do Keycloak (Issue #143 - PR #162):** Inclusão do serviço `keycloak` no [`docker-compose.yml`](../../SIGTCC/docker-compose.yml) e documentação das variáveis sensíveis no `.env.example`, sem valores reais versionados.
+- **Realm, Clients e Roles do Keycloak (Issue #144 - PR #164):** Configuração e versionamento do realm `sigtcc` em [`SIGTCC/keycloak/realm-import.json`](../../SIGTCC/keycloak/realm-import.json), com os clients do backend e do frontend, as roles `ROLE_ALUNO` e `ROLE_PROFESSOR` e usuários de teste para cada papel, incluindo um professor responsável pela `Turma_TCC`. Escrita do passo a passo de configuração em [`docs/keycloak/keycloak.md`](../keycloak/keycloak.md) e da [`ADR-0011`](../adrs/ADR-0011.md).
+- **Spring Security como Resource Server (Issue #127 - PR #167):** Configuração do backend como Resource Server OAuth2 em `SecurityConfig`, com todas as rotas `/api/**` protegidas (`401` sem token válido), API _stateless_ e CORS centralizado.
+
+#### Implementação do calendário de prazos (US05)
+
+- **CRUD de Prazos Vinculados à Turma_TCC (Issue #137 - PR #171):** Redação do contrato de dados [`docs/contrato-dados-us05.md`](../contrato-dados-us05.md) e implementação da entidade `PrazoEntrega`, do enum `TipoEntrega`, da migração `V4__criar_tabela_prazos_entrega.sql` e dos endpoints de criação, edição e consulta de prazos.
+- **Validações de Negócio do Calendário (Issue #138 - PR #172):** Rejeição de prazos com data no passado e de sequências inválidas, com mensagens de erro claras para cada caso. Criação do `ClockConfig`, que fornece um bean `Clock` injetável para fixar a data atual nos testes.
+- **Testes:** suíte `PrazoEntregaServiceTest` cobrindo autorização, criação, edição e cada regra de validação de datas.
+
+#### Correção de defeito
+
+- **Botões de Professor Visíveis no Painel do Aluno (Issue #189 - PR #190):** Correção da renderização condicional que exibia ao aluno os botões "Novo cadastro", "Meu perfil" e "Painel do Professor", que levavam a uma tela em branco.
+
+#### Documentação
+
+- **Problema Real de Design para a Reengenharia (Issue #145 - PR #166):** Identificação de um problema real de design no código do frontend e registro inicial em [`docs/REENGENHARIA.md`](../REENGENHARIA.md).
+- **Revisão dos ADRs Existentes (Issue #152 - PR #185):** Revisão das ADRs 0001 a 0014 frente ao ajuste de escopo da Sprint 3, com um bloco de revisão em cada uma.
+- **Revisão do Registro de Riscos (Issue #155):** Atualização de [`docs/riscos.md`](../riscos.md) com a revisão ao final da Sprint 3 dos riscos R01 e R04.
+
+#### Revisão de código e governança
+
+Como Scrum Master, foram feitas as revisões e aprovações de 18 PRs dos demais integrantes integrados à `entrega-7`:
+
+- **Damares Gaia:** PRs #160, #169 e #173.
+- **Eduardo Cardoso:** PRs #168, #174, #175, #176, #177, #178, #179, #180, #181, #184, #186 e #187.
+- **Willian Ferreira:** PRs #165, #182 e #183.
+
+### 8.5 Willian Ferreira dos Santos
+
+- **Papel na sprint:** DevOps / Infraestrutura / Backend.
+- **Período:** 09/10/2026 a 22/10/2026.
+
+#### Desenvolvimento do Backend
+
+- **Filtro combinado de orientadores (Issue #133 - PR #165):** Implementação do filtro combinado no endpoint `GET /api/v1/orientadores`, permitindo filtrar orientadores por linha de pesquisa e pela existência de vagas disponíveis. A implementação foi realizada nas camadas de `Repository`, `Service` e `Controller`, mantendo os filtros opcionais e permitindo sua utilização de forma isolada ou combinada.
+- **Testes automatizados do filtro:** Criação e atualização dos testes do backend para os cenários sem filtro, filtro por linha de pesquisa, filtro por vagas disponíveis e combinação dos dois filtros.
+- **Contrato de dados:** Atualização de [`docs/contrato-dados-us02.md`](../contrato-dados-us02.md) para documentar os parâmetros `area` e `temVagas`, incluindo o comportamento esperado quando os filtros são utilizados simultaneamente.
+- **Validação:** Execução dos testes automatizados e do _./gradlew build_ antes da integração do PR #165.
+
+#### Integração Contínua e DevOps
+
+- **Atualização do pipeline de CI da Sprint 3 (Issue #148 - PR #182):** Atualização dos workflows [`frontend-ci.yml`](../../.github/workflows/frontend-ci.yml) e [`backend-ci.yml`](../../.github/workflows/backend-ci.yml) para garantir a execução dos testes automatizados do frontend e backend nos Pull Requests direcionados às branches de entrega.
+- **Testes do frontend e backend no CI:** Configuração da execução de `npm test` no frontend e de _./gradlew test_ no backend, mantendo também a etapa de build do backend.
+- **Quality Gate da `entrega-7`:** Configuração do Ruleset da branch `entrega-7`, exigindo pelo menos uma aprovação e os checks de Backend CI e Frontend CI aprovados antes do merge.
+- **Evidência de CI (Issue #149 - PR #183):** Atualização de [`docs/ci.md`](../ci.md) com o registro de uma execução bem-sucedida do pipeline da Sprint 3 e documentação dos workflows e checks utilizados.
+
+#### Métricas
+
+- **Atualização da M-04 - Lead Time de Pull Requests:** Atualização de [`docs/metricas/M-04.md`](../metricas/M-04.md) com os dados dos Pull Requests da Sprint 3, calculando o intervalo entre a abertura e o merge de cada PR e classificando os resultados conforme os limiares definidos na ficha da métrica.
+- **Memória de cálculo:** Os horários de abertura e merge foram conferidos no histórico dos Pull Requests do GitHub, mantendo os dados rastreáveis e reproduzíveis.
+
+#### Documentação e Gestão de Riscos
+
+- **Revisão do registro de riscos (Issue #155):** Atualização de [`docs/riscos.md`](../riscos.md) com a reavaliação dos riscos existentes ao final da Sprint 3 e o registro de novos riscos relacionados à infraestrutura e à integração com o Keycloak.
+- **Documentação da Sprint 3:** Apoio na revisão e atualização dos documentos relacionados a CI, métricas e riscos, mantendo os artefatos alinhados ao estado real do projeto e às evidências dos Pull Requests.
+
+#### Revisão de Código e Governança
+
+- **Pull Requests integrados:** PRs #165, #182 e #183.
+- **Processo de integração:** Desenvolvimento realizado em branches específicas, com revisão por outro integrante, execução dos checks automatizados e integração à `entrega-7` por Pull Request.

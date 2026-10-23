@@ -78,34 +78,74 @@ class OrientadorServiceTest {
     }
 
     @Test
-    @DisplayName("Deve retornar todos os orientadores quando não passar filtro de área")
-    void listarOrientadores_DeveRetornarTodos_QuandoFiltroForNuloOuVazio() {
+    @DisplayName("Deve retornar todos os orientadores quando não houver filtros")
+    void listarOrientadores_DeveRetornarTodos_QuandoNaoHouverFiltros() {
         Orientador o1 = criarOrientadorMock(1L, "João");
         Orientador o2 = criarOrientadorMock(2L, "Maria");
 
-        when(orientadorRepository.findAll()).thenReturn(List.of(o1, o2));
+        when(orientadorRepository.findByFiltros(null, null))
+                .thenReturn(List.of(o1, o2));
 
-        List<OrientadorResponseDTO> resultado = orientadorService.listarOrientadores(null);
+        List<OrientadorResponseDTO> resultado =
+                orientadorService.listarOrientadores(null, null);
 
         assertEquals(2, resultado.size());
-        verify(orientadorRepository, times(1)).findAll();
-        verify(orientadorRepository, never()).findByLinhasPesquisaNomeContainingIgnoreCase(anyString());
+        verify(orientadorRepository, times(1))
+                .findByFiltros(null, null);
     }
 
     @Test
-    @DisplayName("Deve retornar orientadores filtrados pela área")
-    void listarOrientadores_DeveRetornarFiltrados_QuandoPassarFiltro() {
+    @DisplayName("Deve retornar orientadores filtrados pela linha de pesquisa")
+    void listarOrientadores_DeveRetornarFiltrados_QuandoPassarLinhaDePesquisa() {
         Orientador o1 = criarOrientadorMock(1L, "João");
 
-        when(orientadorRepository.findByLinhasPesquisaNomeContainingIgnoreCase("IA"))
+        when(orientadorRepository.findByFiltros("IA", null))
                 .thenReturn(List.of(o1));
 
-        List<OrientadorResponseDTO> resultado = orientadorService.listarOrientadores("IA");
+        List<OrientadorResponseDTO> resultado =
+                orientadorService.listarOrientadores("IA", null);
 
         assertEquals(1, resultado.size());
         assertEquals("João", resultado.get(0).nome());
-        verify(orientadorRepository, times(1)).findByLinhasPesquisaNomeContainingIgnoreCase("IA");
-        verify(orientadorRepository, never()).findAll();
+
+        verify(orientadorRepository, times(1))
+                .findByFiltros("IA", null);
+    }
+
+    @Test
+    @DisplayName("Deve retornar somente orientadores com vagas disponíveis")
+    void listarOrientadores_DeveFiltrarPorVagasDisponiveis() {
+        Orientador o1 = criarOrientadorMock(1L, "João");
+
+        when(orientadorRepository.findByFiltros(null, true))
+                .thenReturn(List.of(o1));
+
+        List<OrientadorResponseDTO> resultado =
+                orientadorService.listarOrientadores(null, true);
+
+        assertEquals(1, resultado.size());
+        assertEquals("João", resultado.get(0).nome());
+
+        verify(orientadorRepository, times(1))
+                .findByFiltros(null, true);
+    }
+
+    @Test
+    @DisplayName("Deve combinar filtro de linha de pesquisa e vagas disponíveis")
+    void listarOrientadores_DeveCombinarFiltros() {
+        Orientador o1 = criarOrientadorMock(1L, "João");
+
+        when(orientadorRepository.findByFiltros("IA", true))
+                .thenReturn(List.of(o1));
+
+        List<OrientadorResponseDTO> resultado =
+                orientadorService.listarOrientadores("IA", true);
+
+        assertEquals(1, resultado.size());
+        assertEquals("João", resultado.get(0).nome());
+
+        verify(orientadorRepository, times(1))
+                .findByFiltros("IA", true);
     }
 
     @Test

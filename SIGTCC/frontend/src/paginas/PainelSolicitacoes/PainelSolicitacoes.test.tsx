@@ -1,19 +1,45 @@
 import { render, screen, waitFor, fireEvent } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { vi, describe, it, expect, beforeEach } from "vitest";
+import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import { PainelSolicitacoesPage } from "./index";
 import {
   listarSolicitacoesPorOrientador,
   atualizarStatusSolicitacao,
 } from "../../utils/solicitacaoService";
-import { ApiError } from "../../utils/orientadorService";
+import { obterPerfilProfessor } from "../../utils/professorService";
+import { AuthProvider } from "../../auth/AuthContext";
+import { ApiError } from "../../utils/apiErro";
 import type { Solicitacao } from "../../types/Solicitacao";
+import type { PerfilProfessor } from "../../types/Professor";
+import {
+  listarPrazosVigentes,
+  cadastrarPrazo,
+  atualizarPrazo,
+} from "../../utils/prazoEntregaService";
 
 vi.mock("../../utils/solicitacaoService", () => ({
   listarSolicitacoesPorOrientador: vi.fn(),
   atualizarStatusSolicitacao: vi.fn(),
 }));
+
+vi.mock("../../utils/professorService", () => ({
+  obterPerfilProfessor: vi.fn(),
+}));
+
+vi.mock("../../utils/prazoEntregaService", () => ({
+  listarPrazosVigentes: vi.fn().mockResolvedValue([]),
+  cadastrarPrazo: vi.fn(),
+  atualizarPrazo: vi.fn(),
+}));
+
+const perfilBase: PerfilProfessor = {
+  id: 1,
+  nome: "Prof. Dr. Roberto",
+  email: "roberto@ifsc.edu.br",
+  departamento: "DAELN",
+  responsavelTurma: false,
+};
 
 describe("PainelSolicitacoesPage (Issue #87)", () => {
   const mockSolicitacoes: Solicitacao[] = [
@@ -63,16 +89,25 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(obterPerfilProfessor).mockResolvedValue(perfilBase);
+    vi.mocked(listarPrazosVigentes).mockResolvedValue([]);
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it("deve exibir estado de carregamento inicial e depois a lista de solicitações com indicador de vagas", async () => {
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue(
       mockSolicitacoes,
     );
+
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     expect(screen.getByText("Carregando solicitações...")).toBeInTheDocument();
@@ -96,10 +131,13 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue(
       mockSolicitacoes,
     );
+
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -137,9 +175,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -149,7 +189,6 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     const botoesAceitar = screen.getAllByRole("button", {
       name: "Aceitar",
     });
-
     await user.click(botoesAceitar[0]);
 
     await waitFor(() => {
@@ -173,9 +212,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     ]);
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -192,17 +233,13 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
       name: "Confirmar Recusa",
     });
 
-    // Inicialmente vazio.
     expect(botaoConfirmar).toBeDisabled();
-    // Novo contador: quantidade atual / limite máximo.
     expect(screen.getByText("0 / 500 caracteres")).toBeInTheDocument();
 
-    // Com 5 caracteres: botão continua desabilitado.
     await user.type(textarea, "Pouco");
     expect(botaoConfirmar).toBeDisabled();
     expect(screen.getByText("5 / 500 caracteres")).toBeInTheDocument();
 
-    // Com 10 ou mais caracteres: botão habilitado.
     await user.type(textarea, " motivo detalhado");
     expect(botaoConfirmar).toBeEnabled();
     expect(screen.getByText("22 / 500 caracteres")).toBeInTheDocument();
@@ -215,9 +252,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     ]);
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -231,12 +270,8 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     );
 
     const textarea = screen.getByPlaceholderText(/informe o motivo da recusa/i);
-
-    // Verifica se a trava nativa do HTML está aplicada
     expect(textarea).toHaveAttribute("maxLength", "500");
 
-    // Usa o fireEvent.change para injetar 500 caracteres instantaneamente
-    // Assim não causa o erro de timeout (5000ms) que acontece ao simular 600 teclas uma a uma
     fireEvent.change(textarea, { target: { value: "a".repeat(500) } });
 
     expect(textarea).toHaveValue("a".repeat(500));
@@ -255,9 +290,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -299,9 +336,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     ]);
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -331,13 +370,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
         name: "Confirmar Recusa",
       }),
     ).not.toBeInTheDocument();
-
     expect(
       screen.getByRole("button", {
         name: "Aceitar",
       }),
     ).toBeInTheDocument();
-
     expect(
       screen.getByRole("button", {
         name: "Recusar",
@@ -355,9 +392,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     );
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -377,7 +416,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
   });
 
-  it("deve exibir mensagem de erro 409 quando a solicitação foi respondida anteriormente", async () => {
+  it("deve exibir mensagem de erro 409 quando a solicitação já foi respondida anteriormente", async () => {
     const user = userEvent.setup();
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([
       mockSolicitacoes[0],
@@ -385,14 +424,16 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     vi.mocked(atualizarStatusSolicitacao).mockRejectedValue(
       new ApiError(
         409,
-        "Esta solicitação foi respondida e não pode ser alterada.",
+        "Esta solicitação já foi respondida e não pode ser alterada.",
       ),
     );
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -408,7 +449,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     await waitFor(() => {
       expect(
         screen.getByText(
-          "Esta solicitação foi respondida e não pode ser alterada.",
+          "Esta solicitação já foi respondida e não pode ser alterada.",
         ),
       ).toBeInTheDocument();
     });
@@ -418,9 +459,11 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
 
     render(
-      <MemoryRouter>
-        <PainelSolicitacoesPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -428,5 +471,222 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
         screen.getByText("Nenhuma solicitação pendente no momento."),
       ).toBeInTheDocument();
     });
+  });
+
+  it("deve exibir a aba 'Gestão da Turma/Calendário' quando o professor for responsável pela turma", async () => {
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      ...perfilBase,
+      responsavelTurma: true,
+    });
+
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    expect(
+      await screen.findByRole("tab", { name: "Orientandos" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole("tab", { name: "Gestão da Turma/Calendário" }),
+    ).toBeInTheDocument();
+  });
+
+  it("não deve exibir a aba 'Gestão da Turma/Calendário' quando o professor não for responsável pela turma", async () => {
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      ...perfilBase,
+      responsavelTurma: false,
+    });
+
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    expect(
+      await screen.findByRole("tab", { name: "Orientandos" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("tab", { name: "Gestão da Turma/Calendário" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("deve exibir os prazos vigentes com contagem regressiva tanto para professor orientador quanto para responsável pela turma", async () => {
+    vi.setSystemTime(new Date("2026-10-10T10:00:00"));
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
+    vi.mocked(listarPrazosVigentes).mockResolvedValue([
+      {
+        id: 1,
+        semestre: "2026/2",
+        tipo: "PROJETO_TCC",
+        descricao: "Projeto de TCC",
+        dataLimite: "2026-10-22",
+      },
+    ]);
+
+    // 1. Professor apenas orientador (responsavelTurma: false)
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      ...perfilBase,
+      responsavelTurma: false,
+    });
+
+    const { unmount } = render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("22/10/2026")).toBeInTheDocument();
+    });
+    expect(screen.getByText("Faltam 12 dias")).toBeInTheDocument();
+
+    unmount();
+
+    // 2. Professor responsável pela turma (responsavelTurma: true)
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      ...perfilBase,
+      responsavelTurma: true,
+    });
+
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("22/10/2026")).toBeInTheDocument();
+    });
+    expect(screen.getByText("Faltam 12 dias")).toBeInTheDocument();
+  });
+});
+describe("Fluxo do Calendário de Entregas no Painel do Professor (US05 - Issue #141)", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
+    vi.mocked(listarPrazosVigentes).mockResolvedValue([]);
+  });
+
+  it("permite ao professor responsável pela turma cadastrar os três tipos de prazo e editar prazo existente", async () => {
+    const user = userEvent.setup();
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      ...perfilBase,
+      responsavelTurma: true,
+    });
+
+    vi.mocked(cadastrarPrazo)
+      .mockResolvedValueOnce({
+        id: 1,
+        semestre: "2026/2",
+        tipo: "PROJETO_TCC",
+        descricao: "Projeto de TCC",
+        dataLimite: "2026-10-30",
+      })
+      .mockResolvedValueOnce({
+        id: 2,
+        semestre: "2026/2",
+        tipo: "TCC1",
+        descricao: "TCC 1",
+        dataLimite: "2026-11-20",
+      })
+      .mockResolvedValueOnce({
+        id: 3,
+        semestre: "2026/2",
+        tipo: "TCC2",
+        descricao: "TCC 2",
+        dataLimite: "2026-12-15",
+      });
+
+    vi.mocked(atualizarPrazo).mockResolvedValue({
+      id: 1,
+      semestre: "2026/2",
+      tipo: "PROJETO_TCC",
+      descricao: "Projeto de TCC",
+      dataLimite: "2026-11-05",
+    });
+
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    const abaCalendario = await screen.findByRole("tab", {
+      name: "Gestão da Turma/Calendário",
+    });
+    await user.click(abaCalendario);
+
+    const selectTipo = await screen.findByLabelText("Tipo de entrega *");
+    const inputData = screen.getByLabelText("Data limite *");
+
+    // 1. Cadastra PROJETO_TCC
+    await user.selectOptions(selectTipo, "PROJETO_TCC");
+    fireEvent.change(inputData, { target: { value: "2026-10-30" } });
+    await user.click(screen.getByRole("button", { name: "Cadastrar prazo" }));
+    expect(await screen.findByText("30/10/2026")).toBeInTheDocument();
+
+    // 2. Cadastra TCC1
+    await user.selectOptions(selectTipo, "TCC1");
+    fireEvent.change(inputData, { target: { value: "2026-11-20" } });
+    await user.click(screen.getByRole("button", { name: "Cadastrar prazo" }));
+    expect(await screen.findByText("20/11/2026")).toBeInTheDocument();
+
+    // 3. Cadastra TCC2
+    await user.selectOptions(selectTipo, "TCC2");
+    fireEvent.change(inputData, { target: { value: "2026-12-15" } });
+    await user.click(screen.getByRole("button", { name: "Cadastrar prazo" }));
+    expect(await screen.findByText("15/12/2026")).toBeInTheDocument();
+
+    // 4. Edita PROJETO_TCC já cadastrado
+    const botoesEditar = screen.getAllByRole("button", { name: "Editar" });
+    await user.click(botoesEditar[0]);
+    fireEvent.change(inputData, { target: { value: "2026-11-05" } });
+    await user.click(screen.getByRole("button", { name: "Salvar alterações" }));
+
+    expect(
+      await screen.findByText("Prazo atualizado com sucesso."),
+    ).toBeInTheDocument();
+    expect(screen.getByText("05/11/2026")).toBeInTheDocument();
+  });
+
+  it("bloqueia o acesso ao formulário de cadastro de prazos para professor não responsável pela turma", async () => {
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      ...perfilBase,
+      responsavelTurma: false,
+    });
+
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    expect(
+      await screen.findByRole("tab", { name: "Orientandos" }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole("tab", { name: "Gestão da Turma/Calendário" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "Cadastrar prazo" }),
+    ).not.toBeInTheDocument();
   });
 });

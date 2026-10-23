@@ -50,6 +50,24 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
+    @DisplayName("Deve capturar AcessoNegadoException e formatar como status 403")
+    void testHandleAcessoNegadoException() {
+        request.setRequestURI("/api/v1/prazos");
+        AcessoNegadoException ex = new AcessoNegadoException(
+                "Somente o professor responsável pela Turma_TCC vigente pode gerenciar os prazos de entrega.");
+
+        ResponseEntity<ErrorResponseDTO> response = exceptionHandler.handleAcessoNegadoException(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.FORBIDDEN);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().status()).isEqualTo(403);
+        assertThat(response.getBody().erro()).isEqualTo("Acesso negado");
+        assertThat(response.getBody().caminho()).isEqualTo("/api/v1/prazos");
+        assertThat(response.getBody().detalhes()).isEqualTo(
+                "Somente o professor responsável pela Turma_TCC vigente pode gerenciar os prazos de entrega.");
+    }
+
+    @Test
     @DisplayName("Deve capturar EmailDuplicadoException e formatar como status 409")
     void testHandleEmailDuplicadoException() {
         EmailDuplicadoException ex = new EmailDuplicadoException("E-mail já cadastrado");

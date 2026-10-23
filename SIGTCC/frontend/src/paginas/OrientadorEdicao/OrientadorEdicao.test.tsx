@@ -3,6 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { describe, test, expect, vi, beforeEach } from "vitest";
 import { OrientadorEdicaoPage } from "./index";
 import { obterOrientador } from "../../utils/orientadorService";
+import { AuthProvider } from "../../auth/AuthContext";
 
 vi.mock("../../utils/orientadorService", () => ({
   obterOrientador: vi.fn(),
@@ -16,9 +17,11 @@ describe("OrientadorEdicaoPage", () => {
 
   test("deve exibir erro se não estiver autenticado (sem ID no localStorage)", async () => {
     render(
-      <MemoryRouter>
-        <OrientadorEdicaoPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <OrientadorEdicaoPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     await waitFor(() => {
@@ -42,9 +45,11 @@ describe("OrientadorEdicaoPage", () => {
     });
 
     render(
-      <MemoryRouter>
-        <OrientadorEdicaoPage />
-      </MemoryRouter>,
+      <AuthProvider>
+        <MemoryRouter>
+          <OrientadorEdicaoPage />
+        </MemoryRouter>
+      </AuthProvider>,
     );
 
     expect(screen.getByText("Carregando perfil...")).toBeInTheDocument();

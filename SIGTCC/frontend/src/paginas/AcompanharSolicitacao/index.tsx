@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import type { Solicitacao } from "../../types/Solicitacao";
-import { ApiError } from "../../utils/orientadorService";
+import { ApiError } from "../../utils/apiErro";
 import { obterSolicitacao } from "../../utils/solicitacaoService";
+import { PainelPrazos } from "../../components/PainelPrazos";
 import { PageShell } from "../OrientadorCadastro";
 
 const rotulosStatus = {
@@ -56,23 +57,28 @@ export function AcompanharSolicitacaoPage() {
 
   return (
     <PageShell active="catalogo">
+      <PainelPrazos />
       <section className="orientador-form acompanhamento">
         <p className="section-kicker">Acompanhamento público</p>
         <h2>Status da solicitação</h2>
+
         {carregando && (
           <p className="feedback loading">Carregando solicitação...</p>
         )}
+
         {(naoEncontrada || idInvalido) && (
           <p className="feedback erro" role="alert">
             Não encontramos uma solicitação com esse código. Confira o link ou o
             número informado.
           </p>
         )}
+
         {erro && (
           <p className="feedback erro" role="alert">
             {erro}
           </p>
         )}
+
         {solicitacao && (
           <div className="acompanhamento-detalhes">
             <p
@@ -82,6 +88,7 @@ export function AcompanharSolicitacaoPage() {
               <span aria-hidden="true" />
               {rotulosStatus[solicitacao.status]}
             </p>
+
             <dl>
               <div>
                 <dt>Código</dt>
@@ -102,6 +109,7 @@ export function AcompanharSolicitacaoPage() {
                 </dd>
               </div>
             </dl>
+
             {solicitacao.status === "RECUSADA" && solicitacao.justificativa && (
               <div className="justificativa-recusa">
                 <h3>Justificativa do orientador</h3>

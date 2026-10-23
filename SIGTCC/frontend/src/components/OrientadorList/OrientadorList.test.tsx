@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import userEvent from "@testing-library/user-event";
 import { vi } from "vitest";
@@ -90,9 +90,25 @@ describe("OrientadorList", () => {
     });
   });
 
-  test("deve chamar a API com o termo digitado ao submeter o formulário de filtro", async () => {
-    const user = userEvent.setup();
+  test("não deve exibir sugestão de ajuste de filtros quando nenhum filtro estiver ativo", async () => {
     vi.mocked(listarOrientadores).mockResolvedValue([]);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Nenhum orientador encontrado"),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByText(/tente ajustar a linha de pesquisa/i),
+    ).not.toBeInTheDocument();
+  });
+
+  test("deve exibir sugestão para ajustar ou limpar os filtros quando a busca filtrada não retornar resultados", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
 
     renderOrientadorList();
 
@@ -102,15 +118,293 @@ describe("OrientadorList", () => {
       ).not.toBeInTheDocument();
     });
 
-    const inputArea = screen.getByPlaceholderText(
-      "Ex.: Engenharia de Software",
+    vi.mocked(listarOrientadores).mockResolvedValue([]);
+    await user.selectOptions(screen.getByLabelText("Linha de pesquisa"), "IA");
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Nenhum orientador encontrado"),
+      ).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByText(/tente ajustar a linha de pesquisa/i),
+    ).toBeInTheDocument();
+
+    const estadoVazio = screen
+      .getByText("Nenhum orientador encontrado")
+      .closest(".empty-state") as HTMLElement;
+    expect(
+      within(estadoVazio).getByRole("button", { name: "Limpar filtros" }),
+    ).toBeInTheDocument();
+  });
+
+  test("deve limpar os filtros a partir do botão exibido no estado vazio", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Carregando orientadores..."),
+      ).not.toBeInTheDocument();
+    });
+
+    vi.mocked(listarOrientadores).mockResolvedValue([]);
+    await user.selectOptions(screen.getByLabelText("Linha de pesquisa"), "IA");
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/tente ajustar a linha de pesquisa/i),
+      ).toBeInTheDocument();
+    });
+
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    const botoesLimpar = screen.getAllByRole("button", {
+      name: "Limpar filtros",
+    });
+    await user.click(botoesLimpar[botoesLimpar.length - 1]);
+
+    expect(screen.getByLabelText("Linha de pesquisa")).toHaveValue("");
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
+        area: undefined,
+        temVagas: undefined,
+      });
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText("Dr. Adriano Lima")).toBeInTheDocument();
+    });
+  });
+
+  test("deve popular o seletor de linha de pesquisa com as linhas retornadas pela API", async () => {
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Carregando orientadores..."),
+      ).not.toBeInTheDocument();
+    });
+
+    const seletor = screen.getByLabelText("Linha de pesquisa");
+    expect(
+      screen.getByRole("option", { name: "Todas as linhas" }),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "IA" })).toBeInTheDocument();
+    expect(seletor).toHaveValue("");
+  });
+
+  test("deve chamar a API com a linha de pesquisa selecionada, refletindo o filtro automaticamente", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenCalledWith({
+        area: undefined,
+        temVagas: undefined,
+      });
+    });
+
+    const seletor = screen.getByLabelText("Linha de pesquisa");
+    await user.selectOptions(seletor, "IA");
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
+        area: "IA",
+        temVagas: undefined,
+      });
+    });
+  });
+
+  test("deve chamar a API filtrando apenas orientadores com vagas disponíveis", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenCalledWith({
+        area: undefined,
+        temVagas: undefined,
+      });
+    });
+
+    const toggleVagas = screen.getByLabelText("Somente com vagas disponíveis");
+    await user.click(toggleVagas);
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
+        area: undefined,
+        temVagas: true,
+      });
+    });
+  });
+
+  test("deve exibir estado vazio ao selecionar uma linha de pesquisa válida sem correspondência atual", async () => {
+    const user = userEvent.setup();
+
+    const orientadorDireitoDigital: Orientador = {
+      id: 3,
+      nome: "Dr. Direito Digital",
+      email: "direito@ifsc.edu.br",
+      vagasDisponiveis: 0,
+      linhasDePesquisa: ["Direito Digital"],
+      ativo: true,
+    };
+    vi.mocked(listarOrientadores).mockResolvedValue([
+      ...mockOrientadores,
+      orientadorDireitoDigital,
+    ]);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("option", { name: "Direito Digital" }),
+      ).toBeInTheDocument();
+    });
+
+    vi.mocked(listarOrientadores).mockResolvedValue([]);
+    await user.selectOptions(
+      screen.getByLabelText("Linha de pesquisa"),
+      "Direito Digital",
     );
-    await user.type(inputArea, "IA");
 
-    const botaoFiltrar = screen.getByRole("button", { name: "Filtrar" });
-    await user.click(botaoFiltrar);
+    await waitFor(() => {
+      expect(
+        screen.getByText("Nenhum orientador encontrado"),
+      ).toBeInTheDocument();
+    });
+  });
 
-    expect(vi.mocked(listarOrientadores)).toHaveBeenCalledTimes(2);
-    expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith("IA");
+  test("deve ocultar um orientador inativo mesmo quando ele atende aos filtros de linha de pesquisa e vagas", async () => {
+    const user = userEvent.setup();
+    const orientadorInativoComVaga: Orientador = {
+      id: 4,
+      nome: "Dr. Inativo Com Vaga",
+      email: "inativo.vaga@ifsc.edu.br",
+      vagasDisponiveis: 2,
+      linhasDePesquisa: ["IA"],
+      ativo: false,
+    };
+    vi.mocked(listarOrientadores).mockResolvedValue([
+      mockOrientadores[0],
+      orientadorInativoComVaga,
+    ]);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Carregando orientadores..."),
+      ).not.toBeInTheDocument();
+    });
+
+    await user.selectOptions(screen.getByLabelText("Linha de pesquisa"), "IA");
+    await user.click(screen.getByLabelText("Somente com vagas disponíveis"));
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
+        area: "IA",
+        temVagas: true,
+      });
+    });
+
+    expect(screen.getByText("Dr. Adriano Lima")).toBeInTheDocument();
+    expect(screen.queryByText("Dr. Inativo Com Vaga")).not.toBeInTheDocument();
+  });
+
+  test("deve combinar o filtro de linha de pesquisa com o alternador de vagas disponíveis", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenCalledWith({
+        area: undefined,
+        temVagas: undefined,
+      });
+    });
+
+    const seletor = screen.getByLabelText("Linha de pesquisa");
+    await user.selectOptions(seletor, "IA");
+
+    const toggleVagas = screen.getByLabelText("Somente com vagas disponíveis");
+    await user.click(toggleVagas);
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
+        area: "IA",
+        temVagas: true,
+      });
+    });
+  });
+
+  test("botão 'Limpar filtros' deve estar desabilitado sem filtros e habilitado após aplicá-los", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Carregando orientadores..."),
+      ).not.toBeInTheDocument();
+    });
+
+    const botaoLimpar = screen.getByRole("button", { name: "Limpar filtros" });
+    expect(botaoLimpar).toBeDisabled();
+
+    const toggleVagas = screen.getByLabelText("Somente com vagas disponíveis");
+    await user.click(toggleVagas);
+
+    expect(botaoLimpar).toBeEnabled();
+  });
+
+  test("deve limpar os filtros e voltar a listar todos os orientadores ao clicar em 'Limpar filtros'", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarOrientadores).mockResolvedValue(mockOrientadores);
+
+    renderOrientadorList();
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Carregando orientadores..."),
+      ).not.toBeInTheDocument();
+    });
+
+    const seletor = screen.getByLabelText("Linha de pesquisa");
+    await user.selectOptions(seletor, "IA");
+
+    const toggleVagas = screen.getByLabelText("Somente com vagas disponíveis");
+    await user.click(toggleVagas);
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
+        area: "IA",
+        temVagas: true,
+      });
+    });
+
+    await user.click(screen.getByRole("button", { name: "Limpar filtros" }));
+
+    expect(seletor).toHaveValue("");
+    expect(toggleVagas).not.toBeChecked();
+
+    await waitFor(() => {
+      expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
+        area: undefined,
+        temVagas: undefined,
+      });
+    });
   });
 });

@@ -17,10 +17,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/orientadores")
-@CrossOrigin(
-    origins = {"http://localhost:5173", "http://127.0.0.1:5173"},
-    exposedHeaders = "Location"
-)
 @RequiredArgsConstructor
 public class OrientadorController {
 
@@ -39,8 +35,9 @@ public class OrientadorController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrientadorResponseDTO>> listaOrientadores(@RequestParam(required = false) String area) {
-        List<OrientadorResponseDTO> lista = orientadorService.listarOrientadores(area);
+    public ResponseEntity<List<OrientadorResponseDTO>> listaOrientadores(@RequestParam(required = false) String area, @RequestParam(required = false) Boolean temVagas) {
+
+        List<OrientadorResponseDTO> lista = orientadorService.listarOrientadores(area, temVagas);
         return ResponseEntity.ok(lista);
     }
 

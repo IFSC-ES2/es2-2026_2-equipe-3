@@ -130,6 +130,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
+    @ExceptionHandler(AcessoNegadoException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAcessoNegadoException(
+            AcessoNegadoException ex, HttpServletRequest request) {
+
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                HttpStatus.FORBIDDEN.value(),
+                "Acesso negado",
+                request.getRequestURI(),
+                ex.getMessage()
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorResponse);
+    }
+
     @ExceptionHandler(ValidacaoRequisicaoException.class)
     public ResponseEntity<ErrorResponseDTO> handleValidacaoRequisicaoException(
             ValidacaoRequisicaoException ex, HttpServletRequest request) {

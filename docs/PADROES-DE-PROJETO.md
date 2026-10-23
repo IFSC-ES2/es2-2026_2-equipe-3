@@ -2,7 +2,7 @@
 
 > **SIGTCC - Sistema de Gestão Centralizada de TCC**  
 > **Artefato:** `docs/PADROES-DE-PROJETO.md`  
-> **Autora:** Damares Gaia (Scrum Master & Arquiteta de Software)  
+> **Autora:** Damares Gaia (Scrum Master da Sprint 2 & Arquiteta de Software)  
 > **Status:** Aprovado  
 > **Rastreabilidade:** Issue #11 (US04), Issue #91 (Doc-1 / ADRs), Issue #92 (Doc-2), Issue #83 (Backend Strategy), Issue #84 (Backend Observer)
 

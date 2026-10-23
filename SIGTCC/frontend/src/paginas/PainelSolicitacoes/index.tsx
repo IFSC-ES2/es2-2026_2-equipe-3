@@ -2,12 +2,18 @@ import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { PageShell } from "../OrientadorCadastro";
 import type { Solicitacao } from "../../types/Solicitacao";
+import type { PerfilProfessor } from "../../types/Professor";
+import { GestaoCalendario } from "../../components/GestaoCalendario";
+import { PainelPrazos } from "../../components/PainelPrazos";
 import {
   listarSolicitacoesPorOrientador,
   atualizarStatusSolicitacao,
 } from "../../utils/solicitacaoService";
-import { ApiError } from "../../utils/orientadorService";
+import { obterPerfilProfessor } from "../../utils/professorService";
+import { ApiError } from "../../utils/apiErro";
 import "./PainelSolicitacoes.css";
+
+type Aba = "orientandos" | "turma";
 
 export function PainelSolicitacoesPage() {
   const { orientadorId: paramId } = useParams<{ orientadorId?: string }>();
@@ -21,6 +27,22 @@ export function PainelSolicitacoesPage() {
   const [mensagem, setMensagem] = useState("");
   const [sucesso, setSucesso] = useState(false);
   const [processandoId, setProcessandoId] = useState<number | null>(null);
+  const [perfil, setPerfil] = useState<PerfilProfessor | null>(null);
+  const [abaAtiva, setAbaAtiva] = useState<Aba>("orientandos");
+
+  useEffect(() => {
+    let ativo = true;
+    obterPerfilProfessor()
+      .then((dados) => {
+        if (ativo) setPerfil(dados);
+      })
+      .catch(() => {
+        if (ativo) setPerfil(null);
+      });
+    return () => {
+      ativo = false;
+    };
+  }, []);
 
   // Controle de recusa por ID de solicitacao
   const [solicitacaoRecusandoId, setSolicitacaoRecusandoId] = useState<
@@ -63,6 +85,7 @@ export function PainelSolicitacoesPage() {
     };
 
     void carregarInicial();
+
     return () => {
       ativo = false;
     };
@@ -71,12 +94,10 @@ export function PainelSolicitacoesPage() {
   const handleAceitar = async (id: number) => {
     setProcessandoId(id);
     setMensagem("");
-
     try {
       const resposta = await atualizarStatusSolicitacao(id, {
         status: "ACEITA",
       });
-
       setSolicitacoes((prev) => prev.filter((item) => item.id !== id));
 
       if (
@@ -92,7 +113,6 @@ export function PainelSolicitacoesPage() {
       setMensagem("Solicitação aceita com sucesso!");
     } catch (erro) {
       setSucesso(false);
-
       if (erro instanceof ApiError) {
         if (erro.status === 422) {
           setMensagem(
@@ -132,7 +152,6 @@ export function PainelSolicitacoesPage() {
 
   const handleConfirmarRecusa = async (id: number) => {
     const textoLimpo = justificativa.trim();
-
     if (textoLimpo.length < 10 || textoLimpo.length > 500) {
       setSucesso(false);
       setMensagem(
@@ -143,13 +162,11 @@ export function PainelSolicitacoesPage() {
 
     setProcessandoId(id);
     setMensagem("");
-
     try {
       await atualizarStatusSolicitacao(id, {
         status: "RECUSADA",
         justificativa: textoLimpo,
       });
-
       setSolicitacoes((prev) => prev.filter((item) => item.id !== id));
       setSolicitacaoRecusandoId(null);
       setJustificativa("");
@@ -157,7 +174,6 @@ export function PainelSolicitacoesPage() {
       setMensagem("Solicitação recusada com sucesso.");
     } catch (erro) {
       setSucesso(false);
-
       if (erro instanceof ApiError) {
         if (erro.status === 409) {
           setMensagem(
@@ -182,7 +198,6 @@ export function PainelSolicitacoesPage() {
   const formatarData = (dataIso: string) => {
     try {
       const data = new Date(dataIso);
-
       return data.toLocaleDateString("pt-BR", {
         day: "2-digit",
         month: "2-digit",
@@ -205,7 +220,6 @@ export function PainelSolicitacoesPage() {
               Gerencie e responda às solicitações de TCC enviadas pelos alunos
             </p>
           </div>
-
           <div className="painel-vagas-badge">
             <span>Vagas disponíveis:</span>
             <strong>
@@ -214,7 +228,34 @@ export function PainelSolicitacoesPage() {
           </div>
         </div>
 
-        {carregando ? (
+        <div className="painel-tabs" role="tablist">
+          <button
+            type="button"
+            role="tab"
+            className={abaAtiva === "orientandos" ? "tab-ativa" : ""}
+            aria-selected={abaAtiva === "orientandos"}
+            onClick={() => setAbaAtiva("orientandos")}
+          >
+            Orientandos
+          </button>
+          {perfil?.responsavelTurma && (
+            <button
+              type="button"
+              role="tab"
+              className={abaAtiva === "turma" ? "tab-ativa" : ""}
+              aria-selected={abaAtiva === "turma"}
+              onClick={() => setAbaAtiva("turma")}
+            >
+              Gestão da Turma/Calendário
+            </button>
+          )}
+        </div>
+
+        {abaAtiva === "orientandos" && <PainelPrazos />}
+
+        {abaAtiva === "turma" ? (
+          <GestaoCalendario />
+        ) : carregando ? (
           <div className="painel-carregando" role="status">
             Carregando solicitações...
           </div>
@@ -227,7 +268,6 @@ export function PainelSolicitacoesPage() {
             {solicitacoes.map((item) => {
               const estaRecusando = solicitacaoRecusandoId === item.id;
               const emProcessamento = processandoId === item.id;
-
               const justificativaValida =
                 justificativa.trim().length >= 10 &&
                 justificativa.trim().length <= 500;
@@ -241,22 +281,18 @@ export function PainelSolicitacoesPage() {
                   <header className="solicitacao-cabecalho">
                     <div className="solicitacao-aluno">
                       <h2>{item.aluno.nome}</h2>
-
                       <div className="solicitacao-aluno-info">
                         <span>
                           <strong>Curso:</strong> {item.aluno.curso}
                         </span>
-
                         <span>
                           <strong>E-mail:</strong> {item.aluno.email}
                         </span>
-
                         <span>
                           <strong>Data:</strong> {formatarData(item.criadoEm)}
                         </span>
                       </div>
                     </div>
-
                     <span className="solicitacao-tag">Pendente</span>
                   </header>
 
@@ -264,7 +300,6 @@ export function PainelSolicitacoesPage() {
                     <div className="solicitacao-tema">
                       <strong>Tema proposto:</strong> {item.tema}
                     </div>
-
                     <div className="solicitacao-mensagem">
                       <strong>Mensagem do aluno:</strong>
                       <p>{item.mensagem}</p>
@@ -277,7 +312,6 @@ export function PainelSolicitacoesPage() {
                         Justificativa da recusa (obrigatória, de 10 a 500
                         caracteres):
                       </label>
-
                       <textarea
                         id={`justificativa-${item.id}`}
                         className="recusa-textarea"
@@ -288,7 +322,6 @@ export function PainelSolicitacoesPage() {
                         disabled={emProcessamento}
                         rows={3}
                       />
-
                       <div className="recusa-rodape">
                         <span
                           className={`recusa-contador ${
@@ -297,7 +330,6 @@ export function PainelSolicitacoesPage() {
                         >
                           {justificativa.length} / 500 caracteres
                         </span>
-
                         <div className="recusa-botoes">
                           <button
                             type="button"
@@ -307,7 +339,6 @@ export function PainelSolicitacoesPage() {
                           >
                             Cancelar
                           </button>
-
                           <button
                             type="button"
                             className="btn-confirmar-recusa"
@@ -331,7 +362,6 @@ export function PainelSolicitacoesPage() {
                       >
                         Recusar
                       </button>
-
                       <button
                         type="button"
                         className="btn-aceitar"
