@@ -180,6 +180,7 @@ Na Sprint 3 a equipe redistribuiu dois papéis: o Scrum Master passou de Damares
 | Marcus Jhuan Epifanio Lima        | Designer de UX/UI                    | Designer de UX/UI                    |
 | Talles Souza da Cruz              | Engenheiro de Qualidade (QA)         | Scrum Master e Desenvolvedor Backend |
 | Willian Ferreira dos Santos       | DevOps/Infra                         | DevOps/Infra                         |
+
 ## 8. Contribuições Individuais Detalhadas
 
 Cada integrante registra abaixo suas contribuições da Sprint 3, com as issues e os PRs como evidência. O detalhamento do uso de IA em cada artefato está em [`USO-IA.md`](../../USO-IA.md) (Entrega 7).
