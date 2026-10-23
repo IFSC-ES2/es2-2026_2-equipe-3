@@ -2,15 +2,10 @@ import { useState, type FormEvent } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/useAuth";
 import { CredenciaisInvalidasError } from "../../auth/authService";
+import { rotaInicialPorPapel } from "../../auth/rotaInicial";
 
 interface LocationState {
   from?: { pathname: string };
-}
-
-function rotaPosLogin(papeis: string[]): string {
-  if (papeis.includes("ROLE_PROFESSOR")) return "/painel-orientador";
-  if (papeis.includes("ROLE_ALUNO")) return "/orientadores";
-  return "/";
 }
 
 export function LoginPage() {
@@ -32,7 +27,7 @@ export function LoginPage() {
       const sessao = await autenticar(email, senha);
       const destino =
         (location.state as LocationState | null)?.from?.pathname ??
-        rotaPosLogin(sessao.papeis);
+        rotaInicialPorPapel(sessao.papeis);
       navigate(destino, { replace: true });
     } catch (erroCapturado) {
       if (erroCapturado instanceof CredenciaisInvalidasError) {

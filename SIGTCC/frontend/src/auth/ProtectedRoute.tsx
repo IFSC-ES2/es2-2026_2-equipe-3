@@ -2,6 +2,7 @@ import { Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth } from "./useAuth";
 import type { Papel } from "./authService";
+import { AcessoNegadoPage } from "../paginas/AcessoNegado";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -23,7 +24,7 @@ export function ProtectedRoute({
   }
 
   if (papelExigido && !temPapel(papelExigido)) {
-    return <Navigate to="/" replace />;
+    return <AcessoNegadoPage />;
   }
 
   return <>{children}</>;
