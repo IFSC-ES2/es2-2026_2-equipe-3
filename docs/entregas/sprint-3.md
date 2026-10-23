@@ -241,9 +241,7 @@ Estas issues pertencem ao papel titular do integrante. Os testes tiveram reescri
 
 ### 7.3 Marcus Jhuan Epifanio Lima
 
-_Espaço reservado para o integrante registrar suas contribuições da Sprint 3._
-
-### 7.4 Talles Souza da Cruz
+Não houveram contribuições na sprint 3.
 
 ### 7.4 Talles Souza da Cruz
 
