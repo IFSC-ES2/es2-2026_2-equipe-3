@@ -19,7 +19,7 @@ Este documento deve ser revisitado e atualizado ao final de cada sprint.
 - **Impacto:** Alto (3)
 - **Prioridade:** Alta (6)
 - **Estratégia de Mitigação:** Adotar pareamentos eventuais e garantir que todo o código e infraestrutura estejam devidamente documentados no repositório. Nenhuma parte do sistema deve ser de conhecimento exclusivo de apenas uma pessoa.
-- **Responsável pelo Acompanhamento:** Scrum Master (`Eduardo Cardoso`)
+- **Responsável pelo Acompanhamento:** Scrum Master (Sprint 1: `Eduardo Cardoso`, Sprint 2: `Damares Gaia`, Sprint 3: `Talles Souza`)
 
 ### R02 - Falhas de Regressão por Ausência de Testes e CI Quebrado
 
@@ -58,7 +58,7 @@ Este documento deve ser revisitado e atualizado ao final de cada sprint.
 - **Impacto:** Médio (2)
 - **Prioridade:** Média (4)
 - **Estratégia de Mitigação:** O escopo principal deve ser congelado, utilizando os critérios definidos na documentação do MVP como filtro rigoroso. Ideias não essenciais devem ser obrigatoriamente movidas para um backlog de futuro.
-- **Responsável pelo Acompanhamento:** Scrum Master (`Eduardo Cardoso`) / Product Owner (`Adriano Luiz de Souza`)
+- **Responsável pelo Acompanhamento:** Scrum Master (Sprint 1: `Eduardo Cardoso`, Sprint 2: `Damares Gaia`, Sprint 3: `Talles Souza`) / Product Owner (`Adriano Luiz de Souza`)
 
 ### R05 - Divergência de Ambientes e Instabilidade na Orquestração (Docker)
 
@@ -102,7 +102,8 @@ A classificação dos riscos utiliza uma matriz baseada em duas dimensões:
 ### 2.2 Matriz de Riscos
 
 Matriz original da Entrega 4. Para o status atualizado ao final da
-Sprint 2, incluindo os riscos R06 e R07, ver [seção 4](#4-revisão-ao-final-da-sprint-2-entrega-6).
+Sprint 2, incluindo os riscos R06 a R08, ver [seção 4](#4-atualização-intermediária-sprint-2-em-andamento-entrega-6-até-0110).
+Para a revisão de R01 e R04 ao final da Sprint 3, ver [seção 5](#5-revisão-ao-final-da-sprint-3-entrega-7-0210-a-2210).
 
 | ID      | Risco                             | Natureza   | Probabilidade |  Impacto  |   Prioridade    |
 | :------ | :-------------------------------- | :--------- | :-----------: | :-------: | :-------------: |
@@ -183,7 +184,7 @@ deve ser revisada novamente como parte do fechamento formal (Doc-9,
 - **Impacto:** Médio (2) mitigado pelo fato de o sistema ainda não estar em produção real com dados sensíveis; o impacto seria alto em um ambiente de uso real.
 - **Prioridade:** Alta (6)
 - **Estratégia de Mitigação:** Manter o sistema restrito a ambiente de desenvolvimento/avaliação até a implementação da US01. Documentar a limitação de forma explícita e visível no `README.md` e na release `v0.2.0`, para que ninguém trate o sistema como pronto para uso real nesse estado. Priorizar a US01 no backlog da próxima sprint.
-- **Responsável pelo Acompanhamento:** Scrum Master (`Damares Gaia`)
+- **Responsável pelo Acompanhamento:** Scrum Master (Sprint 1: `Eduardo Cardoso`, Sprint 2: `Damares Gaia`, Sprint 3: `Talles Souza`)
 
 ### R07 - Condição de Corrida no Aceite da Última Vaga Disponível
 
@@ -209,7 +210,7 @@ deve ser revisada novamente como parte do fechamento formal (Doc-9,
 - **Impacto:** Alto (3) uma mudança de direção do produto pode invalidar parte do trabalho de modelagem e implementação já feito, e força a equipe a reabrir decisões que pareciam fechadas (MVP, ADRs, contrato de dados).
 - **Prioridade:** Alta (6)
 - **Estratégia de Mitigação:** Reservar um espaço explícito na próxima Sprint Planning para avaliar a sugestão do professor antes de iniciar qualquer nova implementação, evitando decidir o novo rumo "no meio" de uma sprint em andamento. Ao avaliar as opções, mapear explicitamente o que de US02/US03/US04/UML/contrato de dados seria reaproveitável em cada alternativa, para que a decisão considere custo de retrabalho, não só adequação conceitual. Não iniciar a Sprint 3 sem essa decisão fechada, para evitar implementar sobre uma base que pode ser descartada.
-- **Responsável pelo Acompanhamento:** Scrum Master (`Damares Gaia`) / Product Owner (`Adriano Luiz de Souza`)
+- **Responsável pelo Acompanhamento:** Scrum Master (Sprint 1: `Eduardo Cardoso`, Sprint 2: `Damares Gaia`, Sprint 3: `Talles Souza`) / Product Owner (`Adriano Luiz de Souza`)
 
 ### Matriz de Riscos Atualizada (Entrega 6, situação em 23/09/2026)
 
@@ -238,3 +239,158 @@ deve ser revisada novamente como parte do fechamento formal (Doc-9,
 - **R06:** Priorizar a US01 (autenticação/JWT) no planejamento da próxima sprint; até lá, reforçar no README e na release `v0.2.0` que o sistema não deve ser exposto fora de ambiente de avaliação.
 - **R08:** Reservar um momento dedicado na próxima Sprint Planning para avaliar a sugestão do professor com calma, mapeando o reaproveitamento possível de cada alternativa antes de comprometer a Sprint 3 a um novo rumo. Não decidir o pivot sob pressão do fechamento da Entrega 6.
 - **Geral:** Manter a prática de contrato-first (R03) e de escopo revisado explicitamente por sprint (R04) nas próximas sprints, já que ambas se mostraram eficazes até o momento nesta iteração.
+
+---
+
+## 5. Revisão ao Final da Sprint 3 (Entrega 7, 02/10 a 22/10)
+
+Esta seção registra a reavaliação dos riscos da Sprint 3.
+
+### 5.1 R01 - Desistência ou Abandono de Membro da Equipe
+
+- **Status na Sprint 3:** Concretizado (abandono de fato, sem desligamento formal).
+- **O que ocorreu:** Diferente da Sprint 2, em que houve baixa participação
+  pontual, nesta sprint um integrante **não realizou nenhuma atividade**.
+  Ele não deixou formalmente a equipe nem trancou a disciplina, mas, na
+  prática, a equipe trabalhou com um membro a menos durante toda a
+  iteração. As tarefas que caberiam a ele foram absorvidas pelos demais
+  integrantes.
+- **Reavaliação:**
+  - **Probabilidade:** Média (2) → **Alta (3)**. O risco se concretizou em
+    duas sprints seguidas, com agravamento da Sprint 2 (participação
+    reduzida) para a Sprint 3 (nenhuma participação). Não há indício de
+    que a situação se reverta sozinha.
+  - **Impacto:** Alto (3), mantido. A perda de um integrante reduz
+    diretamente a capacidade da equipe (M-06) e sobrecarrega os demais
+    em uma sprint que já tinha o escopo ampliado.
+  - **Prioridade:** Alta (6) → **Crítica (9)**.
+- **Eficácia da mitigação:** A mitigação preventiva (documentação no
+  repositório, nenhum conhecimento exclusivo de uma só pessoa) funcionou:
+  as tarefas puderam ser redistribuídas sem perda de conhecimento. A
+  falha está na detecção tardia. Como o integrante não saiu formalmente,
+  a ausência só ficou evidente com a sprint em andamento, e não houve
+  um gatilho claro para acionar a ação de resposta.
+- **Ações para a próxima sprint:**
+  - Planejar a Sprint 4 com a capacidade real da equipe, sem contar com
+    o integrante ausente até que ele volte a contribuir, e repriorizar o
+    backlog conforme a ação de resposta prevista para o R01.
+  - Definir um gatilho objetivo para o risco: um integrante sem
+    atividade registrada (commit, PR, revisão ou issue movida) por mais
+    de uma semana deve ser sinalizado na Daily e tratado pelo Scrum
+    Master.
+  - Conversar diretamente com o integrante para entender a situação e
+    combinar se ele continua no projeto e com quais tarefas.
+  - Comunicar a situação ao professor da disciplina, já que afeta a
+    capacidade da equipe e a distribuição das entregas.
+- **Responsável pelo Acompanhamento:** Scrum Master da sprint (`Talles Souza da Cruz`)
+
+### 5.2 R04 - Crescimento Não Planejado do Escopo (Scope Creep)
+
+- **Status na Sprint 3:** Concretizado (aumento de escopo aprovado pela equipe).
+- **O que ocorreu:** O ajuste de escopo da Sprint 3, feito em resposta ao
+  R08 (seção 3 de [`sprint-3.md`](entregas/sprint-3.md)), aumentou o
+  tamanho do MVP:
+  - **Autenticação com Keycloak (US01):** substituiu o login próprio
+    previsto no baseline e adicionou um novo contêiner ao
+    `docker-compose`, a configuração versionada do _realm_ e uma nova ADR.
+    A estimativa de 5 SP foi feita para o desenho anterior.
+  - **Nova entidade `Turma_TCC`:** a permissão de gestão do calendário
+    passou a ser verificada no banco (professor responsável pela turma
+    do semestre), o que afeta a US01 e a US05.
+  - **Agendamento de bancas de defesa:** voltou ao backlog do MVP como
+    nova história, ainda sem estimativa.
+  - **US05 entrou na sprint sem estimativa**, com seis cenários de
+    aceitação.
+  - Houve também reduções (perfil `Coordenador` e armazenamento de
+    arquivos removidos), mas elas não compensam as adições.
+- **Reavaliação:**
+  - **Probabilidade:** Média (2) → **Alta (3)**. O escopo cresceu de
+    fato, e o total de Story Points do MVP (M-05) ainda precisa ser
+    recalculado, então novos aumentos ainda podem aparecer na estimativa
+    das histórias restantes.
+  - **Impacto:** Médio (2), mantido. As entregas das Sprints 1 e 2 foram
+    preservadas e as bancas ficaram fora da Sprint 3. O impacto deve ser
+    reavaliado para Alto (3) se a recontagem do M-05 mostrar que o MVP
+    não cabe nas sprints restantes com a capacidade atual (ver R01).
+  - **Prioridade:** Média (4) → **Alta (6)**.
+- **Eficácia da mitigação:** A contenção funcionou parcialmente. O aumento
+  foi uma decisão consciente da equipe, registrada no planejamento, e o
+  agendamento de bancas foi mantido fora da sprint. Porém, as histórias
+  entraram na sprint sem reestimativa (US01) ou sem estimativa (US05),
+  o que dificulta medir o crescimento real.
+- **Ações para a próxima sprint:**
+  - Estimar a US05 e a história de agendamento de bancas e recalcular o
+    denominador do M-05 com o MVP completo.
+  - Confrontar o novo total do MVP com a velocidade observada (M-03) e a
+    capacidade real da equipe, já considerando o R01. Se não couber,
+    cortar ou adiar itens secundários, conforme a ação de resposta do R04.
+  - Não iniciar nenhuma história sem estimativa na Sprint Planning.
+- **Responsável pelo Acompanhamento:** Scrum Master (`Talles Souza da Cruz`) / Product Owner (`Adriano Luiz de Souza`)
+
+### 5.3 Status Atualizado dos Riscos Existentes (QA)
+
+| ID      | Risco                                                    | Status na Sprint 3 | Observação                                                                                                                                                                                                                                                                                                                                                                                   |
+| :------ | :------------------------------------------------------- | :----------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **R02** | Falhas de regressão por ausência de testes e CI quebrado | Mitigado           | A equipe consolidou uma forte cultura de testes automatizados nesta sprint. No frontend, foram implementadas extensas suítes com Vitest e React Testing Library (ex: `SolicitacaoForm.test.tsx`, `PainelSolicitacoes.test.tsx`). No backend, testes unitários robustos com JUnit e Mockito para as regras de negócio e serviços. O risco de regressão silenciosa foi drasticamente reduzido. |
+| **R07** | Condição de corrida no aceite da última vaga             | Mitigado           | Bloqueio otimista (`@Version` / lock otimista) na entidade `PerfilOrientador` foi validado com sucesso através de testes de concorrência, evitando definitivamente a inconsistência de dados (vagas negativas) identificada anteriormente.                                                                                                                                                   |
+
+### 5.4 Riscos Novos Identificados na Sprint 3
+
+### R09 - Complexidade e Instabilidade na Integração com Keycloak (Autenticação)
+
+- **Natureza:** Segurança / Tecnologia
+- **Identificação:** A introdução do Keycloak como provedor de identidade adiciona sobrecarga na infraestrutura local e no tratamento assíncrono de sessões no frontend.
+- **Descrição:** A gestão de tokens JWT (access/refresh) e a proteção de rotas (`ProtectedRoute.tsx`) exigem sincronização rigorosa. Falhas na renovação do token (`authService.ts`) ou instabilidade no contêiner do Keycloak (`docker-compose.yml`) podem bloquear o desenvolvimento e teste das rotas protegidas por toda a equipe.
+- **Causa:** Adição de um novo componente arquitetural complexo (Identity and Access Management) para suprir a funcionalidade de autenticação (US01) introduzida nesta sprint.
+- **Consequência / Impacto Esperado:** Erros frequentes de HTTP 401 (Não Autorizado) para usuários ativos, bloqueio do ambiente local de desenvolvedores e atraso nas entregas devido ao tempo gasto depurando permissões e escopos.
+- **Probabilidade:** Alta (3)
+- **Impacto:** Alto (3)
+- **Prioridade:** Crítica (9)
+- **Estratégia de Mitigação:** Manter os scripts de orquestração do Docker e o artefato `realm-import.json` estritamente sincronizados no repositório. Criar testes E2E automatizados específicos para o ciclo de vida da autenticação e exigir que todo erro de login gere logs explícitos para facilitar a depuração.
+- **Responsável pelo Acompanhamento:** DevOps/Infra (`Willian Ferreira`), QA (sprint 1 e 2: `Talles Souza`; sprint 3: `Eduardo Cardoso`) e Scrum Master (`Talles Souza`)
+
+### 5.5 Matriz Atualizada dos Riscos Revisados (Entrega 7)
+
+| ID      | Risco                                 | Natureza   |  Probabilidade   |  Impacto  |     Prioridade      | Status                      |
+| :------ | :------------------------------------ | :--------- | :--------------: | :-------: | :-----------------: | :-------------------------- |
+| **R01** | Desistência de membro da equipe       | Equipe     | Média → Alta (3) | Alto (3)  | Alta → Crítica (9)  | Concretizado (abandono)     |
+| **R04** | Crescimento do escopo                 | Escopo     | Média → Alta (3) | Médio (2) |  Média → Alta (6)   | Concretizado (escopo maior) |
+| **R03** | Atraso de integração backend/frontend | Prazo      | Alta → Baixa (1) | Alto (3)  | Crítica → Média (3) | Mitigado                    |
+| **R05** | Divergência de ambientes (Docker)     | Tecnologia | Alta → Média (2) | Médio (2) |  Alta → Média (4)   | Mitigado, com atenção       |
+
+Os dois riscos se reforçam: a equipe ficou com menos capacidade (R01) na
+mesma sprint em que o escopo do MVP aumentou (R04). Por isso, a Sprint
+Planning da Sprint 4 deve tratá-los juntos, ajustando o escopo à
+capacidade real da equipe.
+
+### 5.6 R03 - Atraso no Cronograma de Integração das APIs de Backend e Frontend
+
+- **Status na Sprint 3:** Mitigado.
+- **O que ocorreu:** A estratégia de definir os contratos de dados antes da implementação continuou sendo utilizada durante a Sprint 3. Os contratos das funcionalidades de autenticação e calendário foram considerados no planejamento inicial, permitindo que a equipe trabalhasse de forma mais coordenada. A implementação e integração das funcionalidades da sprint ocorreram sem um bloqueio generalizado do frontend pela indisponibilidade das APIs.
+- **Reavaliação:**
+  - **Probabilidade:** Alta (3) → **Baixa (1)**. A prática de contrato-first adotada nas sprints anteriores mostrou-se eficaz para reduzir dependências entre frontend e backend.
+  - **Impacto:** Alto (3), mantido. Caso ocorra, um atraso significativo na API ainda pode bloquear telas e testes do frontend e comprometer o cronograma da sprint.
+  - **Prioridade:** Crítica (9) → **Média (3)**.
+- **Eficácia da mitigação:** A definição antecipada dos contratos de dados mostrou-se eficaz novamente. A equipe conseguiu desenvolver e integrar funcionalidades sem depender exclusivamente da conclusão prévia de toda a implementação do backend.
+- **Ações para a próxima sprint:**
+  - Continuar definindo ou revisando os contratos de API antes do início da implementação das telas dependentes.
+  - Manter mocks ou dados estáticos disponíveis quando uma API ainda estiver em desenvolvimento.
+  - Registrar alterações de contrato por meio de documentação e revisão nos Pull Requests.
+- **Responsável pelo Acompanhamento:** DevOps/Infra (`Willian Ferreira`)
+
+### 5.7 R05 - Divergência de Ambientes e Instabilidade na Orquestração (Docker)
+
+- **Status na Sprint 3:** Mitigado, com atenção.
+- **O que ocorreu:** O problema de permissão do _gradlew_ identificado na Sprint 2 em ambiente Linux foi corrigido e a correção foi integrada ao repositório. Na Sprint 3, a infraestrutura Docker foi ampliada com a inclusão do Keycloak como novo serviço, aumentando a quantidade de componentes e dependências necessárias para executar o sistema localmente.
+- **Reavaliação:**
+  - **Probabilidade:** Alta (3) → **Média (2)**. A padronização do ambiente e a correção do problema identificado na Sprint 2 reduziram a probabilidade de divergências, mas a adição do Keycloak e de novas dependências mantém a possibilidade de problemas de configuração entre ambientes.
+  - **Impacto:** Médio (2), mantido. Uma falha na orquestração pode impedir o desenvolvimento ou os testes locais e consumir tempo da equipe, mas a infraestrutura está versionada e pode ser reproduzida a partir dos arquivos do projeto.
+  - **Prioridade:** Alta (6) → **Média (4)**.
+- **Eficácia da mitigação:** A estratégia de versionar a infraestrutura mostrou-se eficaz. O problema de permissão identificado na Sprint 2 foi corrigido no repositório. Na Sprint 3, o `docker-compose.yml` passou a orquestrar também o Keycloak, com healthchecks e dependências entre os serviços, enquanto a configuração do realm foi versionada para permitir a reprodução do ambiente.
+- **Ações para a próxima sprint:**
+  - Manter `Dockerfile`, `docker-compose.yml`, `docker-compose.prod.yml` e arquivos de configuração necessários versionados.
+  - Evitar configurações feitas exclusivamente dentro dos contêineres ou volumes locais dos desenvolvedores.
+  - Validar o ambiente completo após alterações na infraestrutura.
+  - Manter documentado o procedimento para subir o ambiente de desenvolvimento a partir de uma configuração limpa.
+  - Diferenciar problemas gerais de orquestração Docker de problemas específicos da integração com Keycloak, mantendo estes últimos acompanhados pelo R09.
+- **Responsável pelo Acompanhamento:** DevOps/Infra (`Willian Ferreira`)
