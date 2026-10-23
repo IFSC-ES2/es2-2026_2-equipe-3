@@ -2,11 +2,23 @@
 
 ## 1. Equipe
 
-- **DAMARES DO SOCORRO GONCALVES GAIA** (Matrícula: 202510703590) - Papel: Arquiteta de Software
-- **EDUARDO CARDOSO OLIVEIRA** (Matrícula: 202510703625) - Papel: Engenheiro de Requisitos e Scrum Master (Sprint 1)
-- **MARCUS JHUAN EPIFANIO LIMA** (Matrícula: 202320003071) - Papel: Designer de UX/UI
-- **TALLES SOUZA DA CRUZ** (Matrícula: 202510703745) - Papel: Engenheiro de Qualidade (QA)
-- **WILLIAN FERREIRA DOS SANTOS** (Matrícula: 202320002996) - Papel: DevOps/Infra
+- **DAMARES DO SOCORRO GONCALVES GAIA** (Matrícula: 202510703590)
+- **EDUARDO CARDOSO OLIVEIRA** (Matrícula: 202510703625)
+- **MARCUS JHUAN EPIFANIO LIMA** (Matrícula: 202320003071)
+- **TALLES SOUZA DA CRUZ** (Matrícula: 202510703745)
+- **WILLIAN FERREIRA DOS SANTOS** (Matrícula: 202320002996)
+
+### 1.1. Papéis por Sprint
+
+Os papéis foram revistos a cada sprint. O papel de Scrum Master é rotativo.
+
+| Integrante                        | Sprint 1 (Entrega 5)                        | Sprint 2 (Entrega 6)                     | Sprint 3 (Entrega 7)                     |
+| :-------------------------------- | :------------------------------------------ | :--------------------------------------- | :--------------------------------------- |
+| Damares do Socorro Gonçalves Gaia | Arquiteta de Software                       | **Scrum Master** e Arquiteta de Software | Arquiteta de Software                    |
+| Eduardo Cardoso Oliveira          | **Scrum Master** e Engenheiro de Requisitos | Engenheiro de Requisitos                 | Engenheiro de Qualidade (QA)             |
+| Marcus Jhuan Epifanio Lima        | Designer de UX/UI                           | Designer de UX/UI                        | Designer de UX/UI                        |
+| Talles Souza da Cruz              | Engenheiro de Qualidade (QA)                | Engenheiro de Qualidade (QA)             | **Scrum Master** e Desenvolvedor Backend |
+| Willian Ferreira dos Santos       | DevOps/Infra                                | DevOps/Infra                             | DevOps/Infra                             |
 
 ## 2. Definição e Contextualização do Tema
 
@@ -140,7 +152,61 @@ Detalhamento completo, diagramas de classes e de sequência em [`docs/PADROES-DE
 - **Sem autenticação:** A US01 (Autenticação e Perfis com Spring Security/JWT) foi postergada para uma sprint futura. Todos os endpoints, incluindo os de solicitação e de aceite/recusa, são públicos nesta versão.
 - **Sem notificação por e-mail (ou push/WebSocket):** O painel do orientador funciona por consulta sob demanda (`GET /api/v1/solicitacoes/orientador/{id}?status=PENDENTE`). Não há envio de e-mail, notificação push ou WebSocket quando uma nova solicitação é criada ou respondida.
 
-## 9. Como executar o aplicativo
+## 9. Entrega 7: Autenticação, Busca e Calendário de Prazos (Sprint 3)
+
+Nesta etapa, o MVP passou a ser autenticado e orientado a perfis. Implementamos o login via Keycloak com os papéis de Aluno e Professor (US01), concluímos a busca e filtragem do catálogo de orientadores (US03) e disponibilizamos o calendário de prazos gerido pelo professor responsável pela turma de TCC (US05). A sprint também consolidou a documentação da arquitetura real, as ADRs e uma refatoração orientada a design com métrica antes/depois.
+
+- **[Inspeção, Replanejamento e Contribuições da Sprint 3](docs/entregas/sprint-3.md):** Estado do MVP ao final da Sprint 2, ajustes de escopo, meta da sprint e registro das contribuições individuais.
+- **[Documento de Arquitetura](docs/ARQUITETURA.md):** Componentes em execução, responsabilidades, integrações e diferenças entre a arquitetura planejada e a implementada.
+- **Diagramas C4:** [Contexto (C1)](docs/diagramas/c1-contexto.md) e [Contêineres (C2)](docs/diagramas/c2-conteineres.md).
+- **Novas Decisões Arquiteturais (ADRs):**
+  - [`ADR-0010`](docs/adrs/ADR-0010.md): Modelagem da entidade `Turma_TCC` em substituição ao papel de Coordenador
+  - [`ADR-0011`](docs/adrs/ADR-0011.md): Adoção do Keycloak para autenticação e gestão de identidades
+  - [`ADR-0012`](docs/adrs/ADR-0012.md): Backend como Resource Server OAuth2 com validação local de tokens JWT
+  - [`ADR-0013`](docs/adrs/ADR-0013.md): Submissão de entregas por link externo em substituição ao upload de arquivos
+  - [`ADR-0014`](docs/adrs/ADR-0014.md): Autenticação do frontend via Direct Access Grant do Keycloak
+  - As ADRs anteriores (0001 a 0009) foram revisadas e receberam um bloco de revisão da Sprint 3 em [`docs/adrs/`](docs/adrs/).
+- **[Reengenharia](docs/REENGENHARIA.md):** Problema real de design no tratamento de erros do cliente HTTP do frontend, refatoração REF-1 e comparação de métricas antes/depois.
+- **[Plano de Medição e Métricas](docs/METRICAS.md):** Matriz geral das métricas, com as fichas de [M-01](docs/metricas/M-01.md) a [M-06](docs/metricas/M-06.md) acompanhadas a cada sprint.
+- **[Riscos do Projeto](docs/riscos.md):** Revisão dos riscos ao final da Sprint 3.
+- **Contratos de Dados da API:** [US01 - Perfil do Professor](docs/contrato-dados-us01.md) e [US05 - Calendário de Prazos](docs/contrato-dados-us05.md).
+- **[Configuração do Keycloak](docs/keycloak/keycloak.md):** Realm, clients, roles, usuários de teste e passo a passo de configuração.
+- **[Integração Contínua (CI)](docs/ci.md):** Pipeline atualizado para a Sprint 3, com evidência de execução.
+- **[Declaração de Uso de IA](USO-IA.md):** Registro da utilização de ferramentas de IA na Sprint 3, por integrante.
+- **Release:** `v0.3.0`, publicada após a integração da `entrega-7` na `main`.
+
+### 9.1. O que já funciona no MVP ao final da Sprint 3
+
+- **Login com Keycloak (US01):** Tela de login com e-mail e senha, mensagem de credenciais inválidas e redirecionamento para o painel de Aluno ou Professor conforme o papel do usuário (`ROLE_ALUNO` ou `ROLE_PROFESSOR`).
+- **Rotas e endpoints protegidos (US01):** Todas as rotas `/api/**` exigem um token JWT válido emitido pelo Keycloak (`401` sem token). No frontend, rotas restritas ao professor redirecionam o aluno para uma página de Acesso Negado, e os botões exclusivos do professor ficam ocultos para o aluno.
+- **Dashboard do Professor por responsabilidade (US01):** A aba de gestão da turma e do calendário aparece apenas para o professor responsável pela `Turma_TCC` vigente, verificado no banco de dados via `GET /api/v1/professores/me`.
+- **Busca e filtragem de orientadores (US03):** Filtro por linha de pesquisa, filtro "Somente com vagas disponíveis", combinação dos dois, estado de "nenhum orientador encontrado" e ação de limpar filtros, via `GET /api/v1/orientadores?area=...&temVagas=...`.
+- **Calendário de prazos (US05):** O professor responsável pela turma cadastra e edita os prazos de Projeto de TCC, TCC 1 e TCC 2. O backend rejeita datas no passado e sequências inválidas (TCC 1 antes do Projeto de TCC e TCC 2 antes do TCC 1).
+- **Contagem regressiva dos prazos (US05):** Alunos e professores visualizam os prazos vigentes com a contagem regressiva até cada entrega.
+
+### 9.2. Endpoints da API adicionados na Sprint 3
+
+| Método  | Rota                     | Descrição                                                                                          | Sucesso       | Quem usa                         |
+| :------ | :----------------------- | :------------------------------------------------------------------------------------------------- | :------------ | :------------------------------- |
+| `GET`   | `/api/v1/professores/me` | Dados do professor autenticado e indicador `responsavelTurma`.                                     | `200 OK`      | Professor                        |
+| `GET`   | `/api/v1/prazos`         | Lista os prazos da `Turma_TCC` vigente, na ordem do fluxo (Projeto de TCC, TCC 1, TCC 2).          | `200 OK`      | Aluno e Professor                |
+| `POST`  | `/api/v1/prazos`         | Cadastra o prazo de um tipo de entrega na turma vigente.                                           | `201 Created` | Professor responsável pela turma |
+| `PATCH` | `/api/v1/prazos/{id}`    | Altera a data limite de um prazo da turma vigente, reaplicando as regras de data.                  | `200 OK`      | Professor responsável pela turma |
+| `GET`   | `/api/v1/orientadores`   | Lista orientadores com os filtros opcionais `area` (linha de pesquisa) e `temVagas` (combináveis). | `200 OK`      | Aluno e Professor                |
+
+Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificação completa de request/response e códigos de erro (`400`, `401`, `403`, `404`, `409`, `422`) em [`docs/contrato-dados-us01.md`](docs/contrato-dados-us01.md) e [`docs/contrato-dados-us05.md`](docs/contrato-dados-us05.md).
+
+### 9.3. Limitações Conhecidas desta Versão
+
+- **Autenticação resolvida:** A limitação "Sem autenticação" da Entrega 6 (seção 8.4) foi resolvida nesta sprint pela US01.
+- **Login por Direct Access Grant:** O frontend envia e-mail e senha diretamente ao endpoint de token do Keycloak (`grant_type=password`), em vez do fluxo Authorization Code com PKCE, e guarda os tokens no `sessionStorage`. A escolha e seus riscos estão registrados na [ADR-0014](docs/adrs/ADR-0014.md).
+- **Ambiente apenas de desenvolvimento:** O Keycloak roda em modo `start-dev`, com credenciais padrão de administrador, e o realm traz usuários de teste com senhas conhecidas. Essa configuração não deve ser exposta fora do ambiente de avaliação.
+- **Condição de corrida no aceite da última vaga (R07):** Ainda não há controle de concorrência (como lock otimista) no aceite de solicitações, conforme registrado em [`docs/riscos.md`](docs/riscos.md).
+- **Submissão de documentos e pareceres não implementados:** As US06 e US07 (submissão por link e pareceres do orientador) e o agendamento de bancas de defesa permanecem no backlog do MVP.
+- **Sem notificações:** Continua não havendo envio de e-mail, notificação push ou WebSocket para novas solicitações, respostas ou prazos próximos.
+- **Débitos técnicos registrados:** Validações pendentes do contrato da US04 e ausência de teste de integração ponta a ponta, conforme a seção 2.2 de [`docs/entregas/sprint-3.md`](docs/entregas/sprint-3.md).
+
+## 10. Como executar o aplicativo
 
 Para facilitar a execução dos ambientes de frontend, backend e banco de dados simultaneamente, o projeto está configurado com Docker Compose.
 
@@ -172,6 +238,17 @@ docker-compose up
 
 - **Frontend:** [http://localhost:5173](http://localhost:5173)
 - **Backend (API):** [http://localhost:8080](http://localhost:8080)
+- **Keycloak (console administrativo):** [http://localhost:8081](http://localhost:8081)
+
+4. Faça login no frontend com um dos usuários de teste do realm `sigtcc`:
+
+| E-mail                              | Senha          | Perfil                                         |
+| :---------------------------------- | :------------- | :--------------------------------------------- |
+| `aluno@example.com`                 | `aluno123`     | Aluno                                          |
+| `professor.orientador@example.com`  | `professor123` | Professor orientador                           |
+| `professor.responsavel@example.com` | `professor123` | Professor responsável pela `Turma_TCC` vigente |
+
+> **Nota:** O realm é importado automaticamente na primeira subida do Keycloak. Detalhes da configuração e de como alterá-la em [`docs/keycloak/keycloak.md`](docs/keycloak/keycloak.md).
 
 ### Comandos Úteis
 
@@ -189,7 +266,7 @@ docker compose down
 
 ```
 
-## 10. Como executar os testes unitários
+## 11. Como executar os testes unitários
 
 O projeto possui suítes de testes isoladas para as camadas de frontend e backend. Certifique-se de abrir o terminal e navegar para a pasta correspondente antes de executar os comandos.
 

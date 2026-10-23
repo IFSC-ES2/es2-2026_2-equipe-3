@@ -169,11 +169,23 @@ A revisão completa será registrada em [`docs/riscos.md`](../riscos.md) no fech
 
 ---
 
-## 7. Contribuições Individuais Detalhadas
+## 7. Papéis e Responsabilidades na Sprint 3
+
+Na Sprint 3 a equipe redistribuiu dois papéis: o Scrum Master passou de Damares para Talles, e o papel de Engenheiro de Qualidade passou de Talles para Eduardo. Talles também passou a atuar no desenvolvimento backend. Os demais papéis foram mantidos.
+
+| Integrante                        | Papel na Sprint 2                    | Papel na Sprint 3                    |
+| :-------------------------------- | :----------------------------------- | :----------------------------------- |
+| Damares do Socorro Gonçalves Gaia | Scrum Master e Arquiteta de Software | Arquiteta de Software                |
+| Eduardo Cardoso Oliveira          | Engenheiro de Requisitos             | Engenheiro de Qualidade (QA)         |
+| Marcus Jhuan Epifanio Lima        | Designer de UX/UI                    | Designer de UX/UI                    |
+| Talles Souza da Cruz              | Engenheiro de Qualidade (QA)         | Scrum Master e Desenvolvedor Backend |
+| Willian Ferreira dos Santos       | DevOps/Infra                         | DevOps/Infra                         |
+
+## 8. Contribuições Individuais Detalhadas
 
 Cada integrante registra abaixo suas contribuições da Sprint 3, com as issues e os PRs como evidência. O detalhamento do uso de IA em cada artefato está em [`USO-IA.md`](../../USO-IA.md) (Entrega 7).
 
-### 7.1 Eduardo Cardoso Oliveira
+### 8.1 Eduardo Cardoso Oliveira
 
 - **Papel na sprint:** Engenheiro de Qualidade, com atuação emergencial no frontend.
 - **Período:** 16/10/2026 a 20/10/2026 (frontend e testes); critérios de aceitação das histórias ajustados no replanejamento (seção 3.2).
@@ -226,7 +238,7 @@ Estas issues pertencem ao papel titular do integrante. Os testes tiveram reescri
 - A dependência de uma única pessoa na camada de frontend expôs a sprint ao R01. A cobertura emergencial evitou o atraso, mas concentrou a entrega das telas na última semana da sprint (16/10 a 20/10).
 - Na Entrega 5, o PR final foi integrado após o prazo e com checks técnicos falhando. Nesta sprint, os testes das issues #136 e #141 foram feitos para bloquear o merge em CI quando falharem.
 
-### 7.2 Damares do Socorro Gonçalves Gaia
+### 8.2 Damares do Socorro Gonçalves Gaia
 
 - **Papel:** Arquiteta de Software.
 - **Identificadores Git:** `Damares Gaia <damaresgaia@gmail.com>`, `121111955+damaresgaia@users.noreply.github.com` (usuária GitHub: `damaresgaia`).
@@ -239,11 +251,11 @@ Estas issues pertencem ao papel titular do integrante. Os testes tiveram reescri
     - **Revisão e Aprovação do PR #187 (Issue #141):** Análise e aprovação formal da suíte completa de testes automatizados do fluxo do calendário de entregas (US05), validando os testes de integração do Spring Boot (`PrazoEntregaControllerIntegrationTest`, `PrazoEntregaRepositoryTest`), o isolamento temporal contra falhas de fuso horário com `ClockConfig.FUSO_INSTITUICAO`, conformidade com a modelagem de `Turma_TCC` (ADR-0010) e tokens JWT (ADR-0012), além dos testes frontend em `GestaoCalendario.test.tsx`, `PainelSolicitacoes.test.tsx`, `Orientadores.test.tsx` e `prazoEntregaService.test.ts`. PR integrado à `entrega-7` com sucesso.
     - **Revisão e Aprovação do PR #184 (Issues #145, #146 e #147):** Revisão técnica detalhada da refatoração orientada a design REF-1 e da análise comparativa de métricas antes/depois documentada em [`docs/REENGENHARIA.md`](../REENGENHARIA.md).
 
-### 7.3 Marcus Jhuan Epifanio Lima
+### 8.3 Marcus Jhuan Epifanio Lima
 
 Não houveram contribuições na sprint 3.
 
-### 7.4 Talles Souza da Cruz
+### 8.4 Talles Souza da Cruz
 
 - **Papel na sprint:** Scrum Master da Sprint 3, com desenvolvimento de backend e infraestrutura.
 - **Período:** 04/10/2026 a 22/10/2026.
@@ -282,7 +294,7 @@ Como Scrum Master, foram feitas as revisões e aprovações de 18 PRs dos demais
 - **Eduardo Cardoso:** PRs #168, #174, #175, #176, #177, #178, #179, #180, #181, #184, #186 e #187.
 - **Willian Ferreira:** PRs #165, #182 e #183.
 
-### 7.5 Willian Ferreira dos Santos
+### 8.5 Willian Ferreira dos Santos
 
 - **Papel na sprint:** DevOps / Infraestrutura / Backend.
 - **Período:** 09/10/2026 a 22/10/2026.
