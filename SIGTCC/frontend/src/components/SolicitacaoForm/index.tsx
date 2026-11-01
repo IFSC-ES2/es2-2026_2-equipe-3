@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../../auth/useAuth";
 import type { ErroValidacaoCampo } from "../../types/Erro";
 import type { NovaSolicitacao } from "../../types/Solicitacao";
 import { ApiError } from "../../utils/apiErro";
@@ -10,48 +11,38 @@ interface SolicitacaoFormProps {
   orientadorId: number;
 }
 
-type CampoFormulario =
-  "aluno.nome" | "aluno.email" | "aluno.curso" | "tema" | "mensagem";
+type CampoFormulario = "curso" | "tema" | "mensagem";
 
 export function SolicitacaoForm({ orientadorId }: SolicitacaoFormProps) {
-  const [formulario, setFormulario] = useState({
-    aluno: { nome: "", email: "", curso: "" },
-    tema: "",
-    mensagem: "",
-  });
+  const { sessao } = useAuth();
+  const nomeAluno = sessao?.nome ?? "";
+  const emailAluno = sessao?.email ?? "";
+
+  const [formulario, setFormulario] = useState<Record<CampoFormulario, string>>(
+    {
+      curso: "",
+      tema: "",
+      mensagem: "",
+    },
+  );
   const [errosCampo, setErrosCampo] = useState<Record<string, string>>({});
   const [erroEnvio, setErroEnvio] = useState("");
   const [sucessoId, setSucessoId] = useState<number | null>(null);
   const [enviando, setEnviando] = useState(false);
 
   const atualizarCampo = (campo: CampoFormulario, valor: string) => {
-    setFormulario((atual) => {
-      if (campo.startsWith("aluno.")) {
-        const propriedade = campo.slice(6) as keyof typeof atual.aluno;
-        return { ...atual, aluno: { ...atual.aluno, [propriedade]: valor } };
-      }
-      return { ...atual, [campo]: valor };
-    });
+    setFormulario((atual) => ({ ...atual, [campo]: valor }));
     setErrosCampo((atual) => ({ ...atual, [campo]: "" }));
   };
 
   const validar = (): Record<string, string> => {
     const novosErros: Record<string, string> = {};
-    const nome = formulario.aluno.nome.trim();
-    const email = formulario.aluno.email.trim();
-    const curso = formulario.aluno.curso.trim();
+    const curso = formulario.curso.trim();
     const tema = formulario.tema.trim();
     const mensagem = formulario.mensagem.trim();
 
-    if (nome.length < 3 || nome.length > 100) {
-      novosErros["aluno.nome"] = "Informe um nome entre 3 e 100 caracteres.";
-    }
-    if (email.length > 100 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      novosErros["aluno.email"] =
-        "Informe um e-mail válido (até 100 caracteres).";
-    }
     if (curso.length < 2 || curso.length > 100) {
-      novosErros["aluno.curso"] = "Informe um curso entre 2 e 100 caracteres.";
+      novosErros.curso = "Informe um curso entre 2 e 100 caracteres.";
     }
     if (tema.length < 5 || tema.length > 150) {
       novosErros.tema = "Informe um tema entre 5 e 150 caracteres.";
@@ -71,11 +62,7 @@ export function SolicitacaoForm({ orientadorId }: SolicitacaoFormProps) {
 
     const dados: NovaSolicitacao = {
       orientadorId,
-      aluno: {
-        nome: formulario.aluno.nome.trim(),
-        email: formulario.aluno.email.trim(),
-        curso: formulario.aluno.curso.trim(),
-      },
+      curso: formulario.curso.trim(),
       tema: formulario.tema.trim(),
       mensagem: formulario.mensagem.trim(),
     };
@@ -156,47 +143,11 @@ export function SolicitacaoForm({ orientadorId }: SolicitacaoFormProps) {
       <div className="form-grid">
         <label className="form-group" htmlFor="aluno-nome">
           Nome completo
-          <input
-            id="aluno-nome"
-            required
-            minLength={3}
-            maxLength={100}
-            value={formulario.aluno.nome}
-            onChange={(evento) =>
-              atualizarCampo("aluno.nome", evento.target.value)
-            }
-            aria-invalid={Boolean(campoComErro("aluno.nome"))}
-            aria-describedby={
-              campoComErro("aluno.nome") ? "erro-aluno-nome" : undefined
-            }
-          />
-          {campoComErro("aluno.nome") && (
-            <span id="erro-aluno-nome" className="erro-texto">
-              {campoComErro("aluno.nome")}
-            </span>
-          )}
+          <input id="aluno-nome" value={nomeAluno} readOnly />
         </label>
         <label className="form-group" htmlFor="aluno-email">
           E-mail
-          <input
-            id="aluno-email"
-            type="email"
-            required
-            maxLength={100}
-            value={formulario.aluno.email}
-            onChange={(evento) =>
-              atualizarCampo("aluno.email", evento.target.value)
-            }
-            aria-invalid={Boolean(campoComErro("aluno.email"))}
-            aria-describedby={
-              campoComErro("aluno.email") ? "erro-aluno-email" : undefined
-            }
-          />
-          {campoComErro("aluno.email") && (
-            <span id="erro-aluno-email" className="erro-texto">
-              {campoComErro("aluno.email")}
-            </span>
-          )}
+          <input id="aluno-email" type="email" value={emailAluno} readOnly />
         </label>
         <label className="form-group form-group-wide" htmlFor="aluno-curso">
           Curso
@@ -205,18 +156,16 @@ export function SolicitacaoForm({ orientadorId }: SolicitacaoFormProps) {
             required
             minLength={2}
             maxLength={100}
-            value={formulario.aluno.curso}
-            onChange={(evento) =>
-              atualizarCampo("aluno.curso", evento.target.value)
-            }
-            aria-invalid={Boolean(campoComErro("aluno.curso"))}
+            value={formulario.curso}
+            onChange={(evento) => atualizarCampo("curso", evento.target.value)}
+            aria-invalid={Boolean(campoComErro("curso"))}
             aria-describedby={
-              campoComErro("aluno.curso") ? "erro-aluno-curso" : undefined
+              campoComErro("curso") ? "erro-aluno-curso" : undefined
             }
           />
-          {campoComErro("aluno.curso") && (
+          {campoComErro("curso") && (
             <span id="erro-aluno-curso" className="erro-texto">
-              {campoComErro("aluno.curso")}
+              {campoComErro("curso")}
             </span>
           )}
         </label>
