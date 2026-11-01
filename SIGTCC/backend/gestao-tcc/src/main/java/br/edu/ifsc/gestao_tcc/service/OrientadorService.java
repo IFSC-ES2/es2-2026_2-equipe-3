@@ -1,7 +1,9 @@
 package br.edu.ifsc.gestao_tcc.service;
 
 import br.edu.ifsc.gestao_tcc.dto.OrientadorRequestDTO;
+import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.EmailDuplicadoException;
+import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
 import br.edu.ifsc.gestao_tcc.dto.OrientadorResponseDTO;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.model.LinhaPesquisa;
@@ -22,6 +24,10 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class OrientadorService {
+
+    private static final String MENSAGEM_ACESSO_NEGADO =
+            "Você só pode alterar o seu próprio cadastro de orientador.";
+    private static final String MENSAGEM_EMAIL_IMUTAVEL = "O e-mail do orientador não pode ser alterado.";
 
     private final OrientadorRepository orientadorRepository;
 
@@ -77,16 +83,19 @@ public class OrientadorService {
     }
 
     @Transactional
-    public OrientadorResponseDTO atualizar(Long id, OrientadorUpdateDTO dto) {
+    public OrientadorResponseDTO atualizar(Long id, OrientadorUpdateDTO dto, String emailUsuario) {
         Orientador orientador = orientadorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Orientador com identificador " + id + " não foi encontrado."));
 
+        validarProprietario(orientador, emailUsuario);
+
+        if (dto.email() != null && !dto.email().equalsIgnoreCase(orientador.getEmail())) {
+            throw new RegraDeNegocioException(MENSAGEM_EMAIL_IMUTAVEL);
+        }
+
         if (dto.nome() != null) {
             orientador.setNome(dto.nome());
-        }
-        if (dto.email() != null) {
-            orientador.setEmail(dto.email());
         }
         if (dto.departamento() != null) {
             orientador.setDepartamento(dto.departamento());
@@ -155,12 +164,21 @@ public class OrientadorService {
     }
 
     @Transactional
-    public void deletar(Long id) {
+    public void deletar(Long id, String emailUsuario) {
         Orientador orientador = orientadorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Orientador com identificador " + id + " não foi encontrado."));
 
+        validarProprietario(orientador, emailUsuario);
+
         orientador.setAtivo(false);
         orientadorRepository.save(orientador);
+    }
+
+    private void validarProprietario(Orientador orientador, String emailUsuario) {
+        if (emailUsuario == null || emailUsuario.isBlank()
+                || !emailUsuario.equalsIgnoreCase(orientador.getEmail())) {
+            throw new AcessoNegadoException(MENSAGEM_ACESSO_NEGADO);
+        }
     }
 }
