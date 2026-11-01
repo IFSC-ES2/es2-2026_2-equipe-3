@@ -3,10 +3,12 @@ package br.edu.ifsc.gestao_tcc.controller;
 import br.edu.ifsc.gestao_tcc.dto.AtualizaStatusRequest;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoResponseDTO;
+import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.GlobalExceptionHandler;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.model.StatusSolicitacao;
 import br.edu.ifsc.gestao_tcc.service.SolicitacaoService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,7 +17,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
@@ -30,6 +37,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(MockitoExtension.class)
 class SolicitacaoControllerTest {
+
+    private static final String EMAIL_PROFESSOR = "adriano@ifsc.edu.br";
 
     private MockMvc mockMvc;
 
@@ -47,7 +56,24 @@ class SolicitacaoControllerTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(solicitacaoController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .setValidator(validator)
+                .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                 .build();
+    }
+
+    @AfterEach
+    void limparContextoDeSeguranca() {
+        SecurityContextHolder.clearContext();
+    }
+
+    private RequestPostProcessor tokenProfessor() {
+        return request -> {
+            Jwt jwt = Jwt.withTokenValue("token")
+                    .header("alg", "none")
+                    .claim("email", EMAIL_PROFESSOR)
+                    .build();
+            SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(jwt));
+            return request;
+        };
     }
 
     @Test
@@ -153,7 +179,8 @@ class SolicitacaoControllerTest {
     void atualizarStatus_DeveRetornar200_QuandoPayloadValido() throws Exception {
         SolicitacaoResponseDTO responseMock = criarResponseDTOMock(1L, StatusSolicitacao.ACEITA);
 
-        when(solicitacaoService.atualizarStatus(eq(1L), any(AtualizaStatusRequest.class))).thenReturn(responseMock);
+        when(solicitacaoService.atualizarStatus(eq(1L), any(AtualizaStatusRequest.class), eq(EMAIL_PROFESSOR)))
+                .thenReturn(responseMock);
 
         String requestBody = """
                 {
@@ -162,6 +189,7 @@ class SolicitacaoControllerTest {
                 """;
 
         mockMvc.perform(patch("/api/v1/solicitacoes/1/status")
+                        .with(tokenProfessor())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isOk())
@@ -169,6 +197,23 @@ class SolicitacaoControllerTest {
                 .andExpect(jsonPath("$.status").value("ACEITA"));
     }
 
+    @Test
+    @DisplayName("PATCH /solicitacoes/{id}/status - Deve retornar 403 Forbidden quando o professor não é o destinatário")
+    void atualizarStatus_DeveRetornar403_QuandoProfessorNaoEhDestinatario() throws Exception {
+        when(solicitacaoService.atualizarStatus(eq(1L), any(AtualizaStatusRequest.class), eq(EMAIL_PROFESSOR)))
+                .thenThrow(new AcessoNegadoException(
+                        "Somente o orientador destinatário pode aceitar ou recusar esta solicitação."));
+
+        mockMvc.perform(patch("/api/v1/solicitacoes/1/status")
+                        .with(tokenProfessor())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\": \"ACEITA\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.erro").value("Acesso negado"))
+                .andExpect(jsonPath("$.detalhes").value(
+                        "Somente o orientador destinatário pode aceitar ou recusar esta solicitação."));
+    }
 
     private SolicitacaoResponseDTO criarResponseDTOMock(Long id, StatusSolicitacao status) {
         return new SolicitacaoResponseDTO(

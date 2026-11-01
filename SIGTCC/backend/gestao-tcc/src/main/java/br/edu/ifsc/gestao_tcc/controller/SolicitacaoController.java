@@ -7,6 +7,8 @@ import br.edu.ifsc.gestao_tcc.service.SolicitacaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -17,6 +19,8 @@ import java.util.List;
 @RequestMapping("/api/v1/solicitacoes")
 @RequiredArgsConstructor
 public class SolicitacaoController {
+
+    private static final String CLAIM_EMAIL = "email";
 
     private final SolicitacaoService solicitacaoService;
 
@@ -41,15 +45,17 @@ public class SolicitacaoController {
     @GetMapping("/{id}")
     public ResponseEntity<SolicitacaoResponseDTO> buscarPorId(
             @PathVariable Long id
-    )   {
+    ) {
         return ResponseEntity.ok(solicitacaoService.buscarPorId(id));
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<SolicitacaoResponseDTO> atualizarStatus(
             @PathVariable Long id,
-            @RequestBody AtualizaStatusRequest request
+            @RequestBody AtualizaStatusRequest request,
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        return ResponseEntity.ok(solicitacaoService.atualizarStatus(id, request));
+        return ResponseEntity.ok(solicitacaoService.atualizarStatus(
+                id, request, jwt.getClaimAsString(CLAIM_EMAIL)));
     }
 }
