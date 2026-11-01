@@ -400,6 +400,20 @@ Status ausente ou inválido, ou `justificativa` ausente/fora do tamanho ao recus
 }
 ```
 
+##### Acesso Negado: `403 Forbidden`
+
+Retornado quando o token não possui `ROLE_PROFESSOR` ou quando o professor autenticado não é o orientador destinatário da solicitação.
+
+```json
+{
+  "timestamp": "2026-09-26T11:00:00Z",
+  "status": 403,
+  "erro": "Acesso negado",
+  "caminho": "/api/v1/solicitacoes/2/status",
+  "detalhes": "Somente o orientador destinatário pode aceitar ou recusar esta solicitação."
+}
+```
+
 ##### Não Encontrado: `404 Not Found`
 
 ```json
@@ -506,6 +520,7 @@ Retorna um `SolicitacaoResponse` (mesmo formato do exemplo da seção 5.3). Para
 | Código | `erro`                                 | Formato de `detalhes`        |
 | :----- | :------------------------------------- | :--------------------------- |
 | `400`  | `Erro de validação nos dados enviados` | Array de `{campo, mensagem}` |
+| `403`  | `Acesso negado`                        | String                       |
 | `404`  | `Recurso não encontrado`               | String                       |
 | `409`  | `Conflito de dados`                    | String                       |
 | `422`  | `Regra de negócio violada`             | String                       |
@@ -529,6 +544,12 @@ Retorna um `SolicitacaoResponse` (mesmo formato do exemplo da seção 5.3). Para
 | `PATCH`                 | `justificativa` | `status=RECUSADA` sem justificativa | `A justificativa é obrigatória para recusar a solicitação.`                |
 | `PATCH`                 | `justificativa` | Fora de 10–500 caracteres           | `A justificativa deve ter entre 10 e 500 caracteres.`                      |
 | `PATCH` e `GET` (lista) | `status`        | Valor fora da enumeração            | `Status inválido. Valores aceitos: PENDENTE, ACEITA, RECUSADA, CANCELADA.` |
+
+### 6.2.1. `403 Forbidden`
+
+| Endpoint | Condição                                                                          | `detalhes`                                                                    |
+| :------- | :-------------------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
+| `PATCH`  | Usuário sem `ROLE_PROFESSOR` ou professor que não é o destinatário da solicitação | `Somente o orientador destinatário pode aceitar ou recusar esta solicitação.` |
 
 ### 6.3. `404 Not Found`
 
