@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -19,6 +21,8 @@ import java.util.List;
 @RequestMapping("/api/v1/orientadores")
 @RequiredArgsConstructor
 public class OrientadorController {
+
+    private static final String CLAIM_EMAIL = "email";
 
     private final OrientadorService orientadorService;
 
@@ -50,15 +54,17 @@ public class OrientadorController {
     @PatchMapping("/{id}")
     public ResponseEntity<OrientadorResponseDTO> atualizaOrientadorID(
             @PathVariable Long id,
-            @RequestBody @Valid OrientadorUpdateDTO orientadorDTO) {
+            @RequestBody @Valid OrientadorUpdateDTO orientadorDTO,
+            @AuthenticationPrincipal Jwt jwt) {
 
-        OrientadorResponseDTO orientadorResponse = orientadorService.atualizar(id, orientadorDTO);
+        OrientadorResponseDTO orientadorResponse = orientadorService.atualizar(
+                id, orientadorDTO, jwt.getClaimAsString(CLAIM_EMAIL));
         return ResponseEntity.ok(orientadorResponse);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletaOrientadorID(@PathVariable Long id) {
-        orientadorService.deletar(id);
+    public ResponseEntity<Void> deletaOrientadorID(@PathVariable Long id, @AuthenticationPrincipal Jwt jwt) {
+        orientadorService.deletar(id, jwt.getClaimAsString(CLAIM_EMAIL));
         return ResponseEntity.noContent().build();
     }
 }
