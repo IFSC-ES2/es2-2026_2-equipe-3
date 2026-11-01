@@ -3,11 +3,13 @@ package br.edu.ifsc.gestao_tcc.controller;
 
 import br.edu.ifsc.gestao_tcc.dto.OrientadorRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.OrientadorResponseDTO;
+import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.EmailDuplicadoException;
 import br.edu.ifsc.gestao_tcc.exception.GlobalExceptionHandler;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
 import br.edu.ifsc.gestao_tcc.service.OrientadorService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,7 +18,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
+import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
@@ -26,11 +33,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 @ExtendWith(MockitoExtension.class)
 class OrientadorControllerTest {
+
+    private static final String EMAIL_PROFESSOR = "adriano.lima@ifsc.edu.br";
 
     private MockMvc mockMvc;
 
@@ -48,7 +58,26 @@ class OrientadorControllerTest {
         this.mockMvc = MockMvcBuilders.standaloneSetup(orientadorController)
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .setValidator(validator)
+                .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                 .build();
+    }
+
+    @AfterEach
+    void limparContextoDeSeguranca() {
+        SecurityContextHolder.clearContext();
+    }
+
+    // Setup standalone não tem o filtro do Spring Security: o contexto é preenchido
+    // diretamente para que o @AuthenticationPrincipal resolva o Jwt.
+    private RequestPostProcessor tokenProfessor() {
+        return request -> {
+            Jwt jwt = Jwt.withTokenValue("token")
+                    .header("alg", "none")
+                    .claim("email", EMAIL_PROFESSOR)
+                    .build();
+            SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(jwt));
+            return request;
+        };
     }
 
     @Test
@@ -254,7 +283,7 @@ class OrientadorControllerTest {
                 List.of("Engenharia de Software", "IA"), 5, "Nova biografia", true
         );
 
-        when(orientadorService.atualizar(eq(1L), any())).thenReturn(responseDTO);
+        when(orientadorService.atualizar(eq(1L), any(), eq(EMAIL_PROFESSOR))).thenReturn(responseDTO);
 
         String jsonRequestBody = """
                 {
@@ -264,6 +293,7 @@ class OrientadorControllerTest {
                 """;
 
         mockMvc.perform(patch("/api/v1/orientadores/1")
+                        .with(tokenProfessor())
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(jsonRequestBody))
@@ -283,6 +313,7 @@ class OrientadorControllerTest {
                 """;
 
         mockMvc.perform(patch("/api/v1/orientadores/1")
+                        .with(tokenProfessor())
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(jsonRequestBody))
@@ -296,7 +327,7 @@ class OrientadorControllerTest {
     @Test
     @DisplayName("PATCH /orientadores/{id} - Deve retornar 404 Not Found quando Id a ser atualizado não existe")
     void atualizaOrientadorID_DeveRetornar404NotFound_QuandoIdNaoExiste() throws Exception {
-        when(orientadorService.atualizar(eq(99L), any()))
+        when(orientadorService.atualizar(eq(99L), any(), eq(EMAIL_PROFESSOR)))
                 .thenThrow(new ResourceNotFoundException("Orientador com identificador 99 não foi encontrado."));
 
         String jsonRequestBody = """
@@ -306,6 +337,7 @@ class OrientadorControllerTest {
                 """;
 
         mockMvc.perform(patch("/api/v1/orientadores/99")
+                        .with(tokenProfessor())
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON)
                         .content(jsonRequestBody))
@@ -317,20 +349,37 @@ class OrientadorControllerTest {
     @Test
     @DisplayName("DELETE /orientadores/{id} - Deve retornar 204 No Content quando Id existe e é desativado")
     void deletaOrientadorID_DeveRetornar204_QuandoIdExiste() throws Exception {
-        doNothing().when(orientadorService).deletar(1L);
+        doNothing().when(orientadorService).deletar(1L, EMAIL_PROFESSOR);
 
-        mockMvc.perform(delete("/api/v1/orientadores/1"))
+        mockMvc.perform(delete("/api/v1/orientadores/1").with(tokenProfessor()))
                 .andExpect(status().isNoContent())
                 .andExpect(jsonPath("$").doesNotExist());
+
+        verify(orientadorService).deletar(1L, EMAIL_PROFESSOR);
+    }
+
+    @Test
+    @DisplayName("PATCH /orientadores/{id} - Deve retornar 403 Forbidden quando o professor não é dono do cadastro")
+    void atualizaOrientadorID_DeveRetornar403_QuandoNaoEhDono() throws Exception {
+        when(orientadorService.atualizar(eq(2L), any(), eq(EMAIL_PROFESSOR)))
+                .thenThrow(new AcessoNegadoException("Você só pode alterar o seu próprio cadastro de orientador."));
+
+        mockMvc.perform(patch("/api/v1/orientadores/2")
+                        .with(tokenProfessor())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"vagasDisponiveis\": 0}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.erro").value("Acesso negado"));
     }
 
     @Test
     @DisplayName("DELETE /orientadores/{id} - Deve retornar 404 Not Found quando Id a ser deletado não existe")
     void deletaOrientadorID_DeveRetornar404_QuandoIdNaoExiste() throws Exception {
         doThrow(new ResourceNotFoundException("Orientador com identificador 99 não foi encontrado."))
-                .when(orientadorService).deletar(99L);
+                .when(orientadorService).deletar(99L, EMAIL_PROFESSOR);
 
-        mockMvc.perform(delete("/api/v1/orientadores/99"))
+        mockMvc.perform(delete("/api/v1/orientadores/99").with(tokenProfessor()))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.erro").value("Recurso não encontrado"));

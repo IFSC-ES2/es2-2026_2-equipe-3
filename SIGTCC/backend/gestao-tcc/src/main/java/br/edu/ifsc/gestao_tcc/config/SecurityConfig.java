@@ -3,6 +3,7 @@ package br.edu.ifsc.gestao_tcc.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -27,6 +28,9 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/v1/professores/**").hasAuthority("ROLE_PROFESSOR")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/orientadores").hasAuthority("ROLE_PROFESSOR")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/orientadores/**").hasAuthority("ROLE_PROFESSOR")
+                        .requestMatchers(HttpMethod.DELETE, "/api/v1/orientadores/**").hasAuthority("ROLE_PROFESSOR")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
