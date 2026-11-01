@@ -49,7 +49,7 @@ function App() {
       <Route
         path="/solicitar/:orientadorId"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute papelExigido="ROLE_ALUNO">
             <SolicitarOrientacaoPage />
           </ProtectedRoute>
         }

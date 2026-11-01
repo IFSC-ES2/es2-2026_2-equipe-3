@@ -19,6 +19,7 @@ export interface TokensArmazenados {
 export interface SessaoAutenticada {
   accessToken: string;
   email: string;
+  nome: string;
   papeis: Papel[];
 }
 
@@ -31,6 +32,7 @@ export class CredenciaisInvalidasError extends Error {
 
 interface TokenClaims {
   email?: string;
+  name?: string;
   realm_access?: { roles?: string[] };
   exp?: number;
 }
@@ -62,6 +64,7 @@ function montarSessao(accessToken: string): SessaoAutenticada {
   return {
     accessToken,
     email: claims.email ?? "",
+    nome: claims.name ?? "",
     papeis: extrairPapeis(claims),
   };
 }

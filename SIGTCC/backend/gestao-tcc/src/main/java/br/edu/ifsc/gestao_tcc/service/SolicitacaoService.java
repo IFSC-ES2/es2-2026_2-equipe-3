@@ -4,6 +4,7 @@ import br.edu.ifsc.gestao_tcc.dto.AtualizaStatusRequest;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoResponseDTO;
 import br.edu.ifsc.gestao_tcc.event.SolicitacaoStatusChangedEvent;
+import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.exception.SolicitacaoJaRespondidaException;
@@ -37,16 +38,20 @@ public class SolicitacaoService {
     private final List<ValidacaoSolicitacaoOrientacao> validacoes;
 
     @Transactional
-    public SolicitacaoResponseDTO criarSolicitacao(SolicitacaoRequestDTO dto) {
+    public SolicitacaoResponseDTO criarSolicitacao(SolicitacaoRequestDTO dto, String emailAluno, String nomeAluno) {
+        if (emailAluno == null || emailAluno.isBlank()) {
+            throw new AcessoNegadoException("Não foi possível identificar o aluno autenticado.");
+        }
+
         Orientador orientador = orientadorRepository.findById(dto.getOrientadorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Orientador com identificador " + dto.getOrientadorId() + " não foi encontrado."));
 
-        Aluno aluno = alunoRepository.findByEmail(dto.getAluno().getEmail())
+        Aluno aluno = alunoRepository.findByEmail(emailAluno)
                 .orElseGet(() -> {
                     Aluno novoAluno = Aluno.builder()
-                            .nome(dto.getAluno().getNome())
-                            .email(dto.getAluno().getEmail())
-                            .curso(dto.getAluno().getCurso())
+                            .nome(nomeAluno == null || nomeAluno.isBlank() ? emailAluno : nomeAluno.trim())
+                            .email(emailAluno)
+                            .curso(dto.getCurso().trim())
                             .build();
                     return alunoRepository.save(novoAluno);
                 });
