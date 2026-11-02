@@ -572,6 +572,77 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
     expect(screen.getByText("Faltam 12 dias")).toBeInTheDocument();
   });
+
+  it("usa o perfil.id retornado por /professores/me para buscar solicitações e ignora localStorage ou fallback fixo 1 (Issue #203)", async () => {
+    localStorage.setItem("orientadorId", "1");
+
+    vi.mocked(obterPerfilProfessor).mockResolvedValue({
+      id: 2,
+      nome: "Prof. Responsável",
+      email: "professor.responsavel@example.com",
+      departamento: "DAELN",
+      responsavelTurma: true,
+    });
+
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([
+      {
+        ...mockSolicitacoes[0],
+        id: 201,
+        orientador: {
+          id: 2,
+          nome: "Prof. Responsável",
+          email: "professor.responsavel@example.com",
+          vagasDisponiveis: 4,
+        },
+      },
+    ]);
+
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Gabriel Silva")).toBeInTheDocument();
+    });
+
+    expect(listarSolicitacoesPorOrientador).toHaveBeenCalledTimes(1);
+    expect(listarSolicitacoesPorOrientador).toHaveBeenCalledWith(2, "PENDENTE");
+    expect(listarSolicitacoesPorOrientador).not.toHaveBeenCalledWith(
+      1,
+      expect.anything(),
+    );
+
+    localStorage.removeItem("orientadorId");
+  });
+
+  it("não busca solicitações nem aplica fallback para o orientador 1 quando /professores/me falha (Issue #203)", async () => {
+    vi.mocked(obterPerfilProfessor).mockRejectedValue(
+      new ApiError(404, "Professor autenticado não foi encontrado."),
+    );
+
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Carregando solicitações..."),
+      ).not.toBeInTheDocument();
+    });
+
+    expect(listarSolicitacoesPorOrientador).not.toHaveBeenCalled();
+    expect(
+      screen.getByText("Erro (404): Professor autenticado não foi encontrado."),
+    ).toBeInTheDocument();
+  });
 });
 describe("Fluxo do Calendário de Entregas no Painel do Professor (US05 - Issue #141)", () => {
   beforeEach(() => {
