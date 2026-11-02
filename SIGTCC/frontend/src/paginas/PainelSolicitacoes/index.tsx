@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
 import { PageShell } from "../OrientadorCadastro";
 import type { Solicitacao } from "../../types/Solicitacao";
 import type { PerfilProfessor } from "../../types/Professor";
@@ -16,11 +15,6 @@ import "./PainelSolicitacoes.css";
 type Aba = "orientandos" | "turma";
 
 export function PainelSolicitacoesPage() {
-  const { orientadorId: paramId } = useParams<{ orientadorId?: string }>();
-  const idOrientador = Number(
-    paramId || localStorage.getItem("orientadorId") || 1,
-  );
-
   const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
   const [vagasDisponiveis, setVagasDisponiveis] = useState<number | null>(null);
   const [carregando, setCarregando] = useState(true);
@@ -29,20 +23,6 @@ export function PainelSolicitacoesPage() {
   const [processandoId, setProcessandoId] = useState<number | null>(null);
   const [perfil, setPerfil] = useState<PerfilProfessor | null>(null);
   const [abaAtiva, setAbaAtiva] = useState<Aba>("orientandos");
-
-  useEffect(() => {
-    let ativo = true;
-    obterPerfilProfessor()
-      .then((dados) => {
-        if (ativo) setPerfil(dados);
-      })
-      .catch(() => {
-        if (ativo) setPerfil(null);
-      });
-    return () => {
-      ativo = false;
-    };
-  }, []);
 
   // Controle de recusa por ID de solicitacao
   const [solicitacaoRecusandoId, setSolicitacaoRecusandoId] = useState<
@@ -56,8 +36,12 @@ export function PainelSolicitacoesPage() {
     const carregarInicial = async () => {
       setCarregando(true);
       try {
+        const dadosPerfil = await obterPerfilProfessor();
+        if (!ativo) return;
+        setPerfil(dadosPerfil);
+
         const dados = await listarSolicitacoesPorOrientador(
-          idOrientador,
+          dadosPerfil.id,
           "PENDENTE",
         );
         if (ativo) {
@@ -68,6 +52,7 @@ export function PainelSolicitacoesPage() {
         }
       } catch (erro) {
         if (ativo) {
+          setPerfil(null);
           setSucesso(false);
           if (erro instanceof ApiError) {
             setMensagem(`Erro (${erro.status}): ${erro.message}`);
@@ -89,7 +74,7 @@ export function PainelSolicitacoesPage() {
     return () => {
       ativo = false;
     };
-  }, [idOrientador]);
+  }, []);
 
   const handleAceitar = async (id: number) => {
     setProcessandoId(id);

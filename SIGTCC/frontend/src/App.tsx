@@ -62,14 +62,6 @@ function App() {
           </ProtectedRoute>
         }
       />
-      <Route
-        path="/painel-orientador/:orientadorId"
-        element={
-          <ProtectedRoute papelExigido="ROLE_PROFESSOR">
-            <PainelSolicitacoesPage />
-          </ProtectedRoute>
-        }
-      />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
