@@ -28,6 +28,7 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/v1/professores/**").hasAuthority("ROLE_PROFESSOR")
+                        .requestMatchers(HttpMethod.PATCH, "/api/v1/solicitacoes/*/status").hasAuthority("ROLE_PROFESSOR")
                         .requestMatchers(HttpMethod.POST, "/api/v1/orientadores").hasAuthority("ROLE_PROFESSOR")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/orientadores/**").hasAuthority("ROLE_PROFESSOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/orientadores/**").hasAuthority("ROLE_PROFESSOR")

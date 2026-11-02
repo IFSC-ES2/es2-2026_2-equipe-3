@@ -31,6 +31,9 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class SolicitacaoService {
 
+    private static final String MENSAGEM_ACESSO_NEGADO =
+            "Somente o orientador destinatário pode aceitar ou recusar esta solicitação.";
+
     private final SolicitacaoRepository solicitacaoRepository;
     private final OrientadorRepository orientadorRepository;
     private final AlunoRepository alunoRepository;
@@ -100,9 +103,12 @@ public class SolicitacaoService {
     }
 
     @Transactional
-    public SolicitacaoResponseDTO atualizarStatus(Long solicitacaoId, AtualizaStatusRequest request) {
+    public SolicitacaoResponseDTO atualizarStatus(
+            Long solicitacaoId, AtualizaStatusRequest request, String emailOrientador) {
         SolicitacaoOrientacao solicitacao = solicitacaoRepository.findById(solicitacaoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Solicitação com identificador " + solicitacaoId + " não foi encontrada."));
+
+        validarOrientadorDestinatario(solicitacao.getOrientador(), emailOrientador);
 
         if (solicitacao.getStatus() != StatusSolicitacao.PENDENTE) {
             throw new SolicitacaoJaRespondidaException("Esta solicitação foi respondida e não pode ser alterada.");
@@ -134,6 +140,14 @@ public class SolicitacaoService {
         eventPublisher.publishEvent(new SolicitacaoStatusChangedEvent(solicitacao, statusAnterior, novoStatus));
 
         return toResponse(solicitacao);
+    }
+
+    private void validarOrientadorDestinatario(Orientador orientador, String emailOrientador) {
+        if (emailOrientador == null || emailOrientador.isBlank()
+                || orientador == null || orientador.getEmail() == null
+                || !emailOrientador.trim().equalsIgnoreCase(orientador.getEmail())) {
+            throw new AcessoNegadoException(MENSAGEM_ACESSO_NEGADO);
+        }
     }
 
     private void validarVagasDisponiveis(Orientador orientador) {

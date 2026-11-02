@@ -49,15 +49,17 @@ public class SolicitacaoController {
     @GetMapping("/{id}")
     public ResponseEntity<SolicitacaoResponseDTO> buscarPorId(
             @PathVariable Long id
-    )   {
+    ) {
         return ResponseEntity.ok(solicitacaoService.buscarPorId(id));
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<SolicitacaoResponseDTO> atualizarStatus(
             @PathVariable Long id,
-            @RequestBody AtualizaStatusRequest request
+            @RequestBody AtualizaStatusRequest request,
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        return ResponseEntity.ok(solicitacaoService.atualizarStatus(id, request));
+        return ResponseEntity.ok(solicitacaoService.atualizarStatus(
+                id, request, jwt.getClaimAsString(CLAIM_EMAIL)));
     }
 }
