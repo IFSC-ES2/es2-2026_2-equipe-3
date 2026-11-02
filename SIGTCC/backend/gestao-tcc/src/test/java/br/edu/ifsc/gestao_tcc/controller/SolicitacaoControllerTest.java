@@ -1,7 +1,6 @@
 package br.edu.ifsc.gestao_tcc.controller;
 
 import br.edu.ifsc.gestao_tcc.dto.AtualizaStatusRequest;
-import br.edu.ifsc.gestao_tcc.dto.SolicitacaoRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoResponseDTO;
 import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.GlobalExceptionHandler;
@@ -76,60 +75,8 @@ class SolicitacaoControllerTest {
         };
     }
 
-    @Test
-    @DisplayName("POST /solicitacoes - Deve retornar 201 Created e o header Location com dados válidos")
-    void criarSolicitacao_DeveRetornar201_QuandoDadosValidos() throws Exception {
-        SolicitacaoResponseDTO responseMock = criarResponseDTOMock(1L, StatusSolicitacao.PENDENTE);
-
-        when(solicitacaoService.criarSolicitacao(any(SolicitacaoRequestDTO.class))).thenReturn(responseMock);
-
-        String requestBody = """
-                {
-                  "orientadorId": 1,
-                  "aluno": {
-                    "nome": "João Silva",
-                    "email": "joao@ifsc.edu.br",
-                    "curso": "Engenharia de Software"
-                  },
-                  "tema": "Inteligência Artificial na Educação",
-                  "mensagem": "Gostaria de ser orientado por você."
-                }
-                """;
-
-        mockMvc.perform(post("/api/v1/solicitacoes")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "http://localhost/api/v1/solicitacoes/1"))
-                .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.status").value("PENDENTE"))
-                .andExpect(jsonPath("$.aluno.nome").value("João Silva"));
-    }
-
-    @Test
-    @DisplayName("POST /solicitacoes - Deve retornar 400 Bad Request quando payload for inválido")
-    void criarSolicitacao_DeveRetornar400_QuandoPayloadInvalido() throws Exception {
-        String requestBody = """
-                {
-                  "orientadorId": null,
-                  "aluno": {
-                    "nome": "",
-                    "email": "email-invalido",
-                    "curso": ""
-                  },
-                  "tema": "IA",
-                  "mensagem": ""
-                }
-                """;
-
-        mockMvc.perform(post("/api/v1/solicitacoes")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status").value(400))
-                .andExpect(jsonPath("$.erro").value("Erro de validação nos dados enviados"))
-                .andExpect(jsonPath("$.detalhes").isArray());
-    }
+    // Os cenários de POST /solicitacoes dependem do token JWT (aluno autenticado) e
+    // estão em SolicitacaoControllerIntegrationTest.
 
     @Test
     @DisplayName("GET /solicitacoes/orientador/{id} - Deve retornar 200 OK com lista de solicitações")

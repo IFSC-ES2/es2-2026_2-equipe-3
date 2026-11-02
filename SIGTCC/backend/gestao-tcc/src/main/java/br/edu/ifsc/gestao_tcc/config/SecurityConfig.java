@@ -32,6 +32,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/v1/orientadores").hasAuthority("ROLE_PROFESSOR")
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/orientadores/**").hasAuthority("ROLE_PROFESSOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/orientadores/**").hasAuthority("ROLE_PROFESSOR")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/solicitacoes").hasAuthority("ROLE_ALUNO")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));

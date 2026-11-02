@@ -21,12 +21,16 @@ import java.util.List;
 public class SolicitacaoController {
 
     private static final String CLAIM_EMAIL = "email";
+    private static final String CLAIM_NOME = "name";
 
     private final SolicitacaoService solicitacaoService;
 
     @PostMapping
-    public ResponseEntity<SolicitacaoResponseDTO> criarSolicitacao(@RequestBody @Valid SolicitacaoRequestDTO dto) {
-        SolicitacaoResponseDTO resposta = solicitacaoService.criarSolicitacao(dto);
+    public ResponseEntity<SolicitacaoResponseDTO> criarSolicitacao(
+            @RequestBody @Valid SolicitacaoRequestDTO dto,
+            @AuthenticationPrincipal Jwt jwt) {
+        SolicitacaoResponseDTO resposta = solicitacaoService.criarSolicitacao(
+                dto, jwt.getClaimAsString(CLAIM_EMAIL), jwt.getClaimAsString(CLAIM_NOME));
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(resposta.id())

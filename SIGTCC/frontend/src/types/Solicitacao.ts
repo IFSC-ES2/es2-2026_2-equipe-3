@@ -33,7 +33,7 @@ export interface AtualizaStatusRequest {
 
 export interface NovaSolicitacao {
   orientadorId: number;
-  aluno: Omit<AlunoSolicitacao, "id">;
+  curso: string;
   tema: string;
   mensagem: string;
 }

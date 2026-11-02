@@ -41,16 +41,20 @@ public class SolicitacaoService {
     private final List<ValidacaoSolicitacaoOrientacao> validacoes;
 
     @Transactional
-    public SolicitacaoResponseDTO criarSolicitacao(SolicitacaoRequestDTO dto) {
+    public SolicitacaoResponseDTO criarSolicitacao(SolicitacaoRequestDTO dto, String emailAluno, String nomeAluno) {
+        if (emailAluno == null || emailAluno.isBlank()) {
+            throw new AcessoNegadoException("Não foi possível identificar o aluno autenticado.");
+        }
+
         Orientador orientador = orientadorRepository.findById(dto.getOrientadorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Orientador com identificador " + dto.getOrientadorId() + " não foi encontrado."));
 
-        Aluno aluno = alunoRepository.findByEmail(dto.getAluno().getEmail())
+        Aluno aluno = alunoRepository.findByEmail(emailAluno)
                 .orElseGet(() -> {
                     Aluno novoAluno = Aluno.builder()
-                            .nome(dto.getAluno().getNome())
-                            .email(dto.getAluno().getEmail())
-                            .curso(dto.getAluno().getCurso())
+                            .nome(nomeAluno == null || nomeAluno.isBlank() ? emailAluno : nomeAluno.trim())
+                            .email(emailAluno)
+                            .curso(dto.getCurso().trim())
                             .build();
                     return alunoRepository.save(novoAluno);
                 });
