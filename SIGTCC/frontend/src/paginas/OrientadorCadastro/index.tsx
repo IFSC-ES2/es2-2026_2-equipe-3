@@ -11,8 +11,6 @@ export function OrientadorCadastroPage() {
   const [sucesso, setSucesso] = useState(false);
 
   const handleSucesso = (orientador: Orientador) => {
-    localStorage.setItem("orientadorId", String(orientador.id));
-    localStorage.setItem("orientadorNome", orientador.nome);
     setSucesso(true);
     setMensagem(
       `Bem-vindo, ${orientador.nome}! Perfil cadastrado com sucesso.`,
