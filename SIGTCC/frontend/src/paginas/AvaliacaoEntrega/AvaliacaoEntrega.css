@@ -1,0 +1,114 @@
+.avaliacao-page {
+  padding: clamp(24px, 5vw, 44px);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+}
+.avaliacao-heading {
+  margin-bottom: 28px;
+}
+.avaliacao-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.5fr);
+  gap: 28px;
+}
+.avaliacao-lista {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+}
+.entrega-opcao {
+  display: grid;
+  gap: 5px;
+  width: 100%;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: white;
+  text-align: left;
+  color: var(--ink);
+}
+.entrega-opcao span {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.entrega-opcao.selecionada {
+  border-color: var(--teal);
+  background: #eef6f4;
+}
+.avaliacao-detalhe {
+  min-width: 0;
+}
+.avaliacao-aluno {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+.avaliacao-aluno h3 {
+  margin: 0;
+  color: var(--ink);
+  font:
+    700 1.25rem "Space Grotesk",
+    sans-serif;
+}
+.avaliacao-aluno p:last-child {
+  margin: 6px 0 0;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.atraso-badge {
+  padding: 6px 9px;
+  background: var(--coral-soft);
+  color: #a13d2d;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.documento-link {
+  display: inline-block;
+  margin-bottom: 24px;
+  text-decoration: none;
+}
+.avaliacao-form {
+  display: grid;
+  gap: 18px;
+}
+.avaliacao-form select,
+.avaliacao-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 11px 12px;
+  color: var(--ink);
+  background: #fbfdfc;
+}
+.avaliacao-form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+.avaliacao-form select:focus,
+.avaliacao-form textarea:focus {
+  outline: 3px solid rgba(13, 104, 105, 0.14);
+  border-color: var(--teal);
+}
+.avaliacao-form [disabled] {
+  cursor: not-allowed;
+  color: var(--muted);
+  background: #f0f3f2;
+}
+.form-help {
+  margin: 0;
+  color: var(--muted);
+}
+@media (max-width: 700px) {
+  .avaliacao-layout {
+    grid-template-columns: 1fr;
+  }
+  .avaliacao-lista {
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  }
+  .avaliacao-aluno {
+    flex-direction: column;
+  }
+}
