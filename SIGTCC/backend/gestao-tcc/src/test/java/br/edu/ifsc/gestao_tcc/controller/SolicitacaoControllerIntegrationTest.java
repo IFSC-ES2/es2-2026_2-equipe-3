@@ -27,6 +27,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -96,6 +98,12 @@ class SolicitacaoControllerIntegrationTest {
                 .status(StatusSolicitacao.PENDENTE)
                 .build();
         return solicitacaoRepository.saveAndFlush(solicitacao);
+    }
+
+    private SolicitacaoOrientacao criarSolicitacaoParaAluno(String emailAluno) {
+        Aluno aluno = salvarAluno("Aluno de Teste", emailAluno);
+
+        return salvarSolicitacaoPendente(professorA, aluno);
     }
 
     private RequestPostProcessor tokenDe(String role, String email) {
@@ -315,5 +323,68 @@ class SolicitacaoControllerIntegrationTest {
 
         SolicitacaoOrientacao persistida = solicitacaoRepository.findById(solicitacaoDeProfessorA.getId()).orElseThrow();
         assertThat(persistida.getStatus()).isEqualTo(StatusSolicitacao.RECUSADA);
+    }
+
+    @Test
+    void buscarPorId_AlunoAutor_DeveRetornar200() throws Exception {
+        SolicitacaoOrientacao solicitacao =
+                criarSolicitacaoParaAluno(EMAIL_ALUNO);
+
+        mockMvc.perform(
+                        get("/api/v1/solicitacoes/" + solicitacao.getId())
+                                .with(jwt().jwt(jwt ->
+                                        jwt.claim("email", EMAIL_ALUNO)))
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void buscarPorId_UsuarioSemVinculo_DeveRetornar403() throws Exception {
+        SolicitacaoOrientacao solicitacao =
+                criarSolicitacaoParaAluno(EMAIL_ALUNO);
+
+        mockMvc.perform(
+                        get("/api/v1/solicitacoes/" + solicitacao.getId())
+                                .with(jwt().jwt(jwt ->
+                                        jwt.claim("email", EMAIL_PROFESSOR_B)))
+                )
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void buscarPorId_OrientadorResponsavel_DeveRetornar200() throws Exception {
+        SolicitacaoOrientacao solicitacao =
+                criarSolicitacaoParaAluno(EMAIL_ALUNO);
+
+        mockMvc.perform(
+                        get("/api/v1/solicitacoes/" + solicitacao.getId())
+                                .with(jwt().jwt(jwt ->
+                                        jwt.claim("email", EMAIL_PROFESSOR_A)))
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void listarPorOrientador_OrientadorResponsavel_DeveRetornar200() throws Exception {
+        criarSolicitacaoParaAluno(EMAIL_ALUNO);
+
+        mockMvc.perform(
+                        get("/api/v1/solicitacoes/orientador/" + professorA.getId())
+                                .with(jwt().jwt(jwt ->
+                                        jwt.claim("email", EMAIL_PROFESSOR_A)))
+                )
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void listarPorOrientador_OutroProfessor_DeveRetornar403() throws Exception {
+        criarSolicitacaoParaAluno(EMAIL_ALUNO);
+
+        mockMvc.perform(
+                        get("/api/v1/solicitacoes/orientador/" + professorA.getId())
+                                .with(jwt().jwt(jwt ->
+                                        jwt.claim("email", EMAIL_PROFESSOR_B)))
+                )
+                .andExpect(status().isForbidden());
     }
 }
