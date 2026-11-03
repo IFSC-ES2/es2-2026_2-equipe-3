@@ -184,7 +184,7 @@ class SolicitacaoServiceTest {
         when(orientadorRepository.findById(1L)).thenReturn(Optional.of(orientador));
         when(solicitacaoRepository.findByOrientadorIdOrderByCriadoEmDesc(1L)).thenReturn(List.of(solicitacao));
 
-        List<SolicitacaoResponseDTO> resultado = solicitacaoService.listarPorOrientador(1L, null);
+        List<SolicitacaoResponseDTO> resultado = solicitacaoService.listarPorOrientador(1L, null, "orientador@ifsc.edu.br");
 
         assertEquals(1, resultado.size());
         assertEquals(StatusSolicitacao.PENDENTE, resultado.get(0).status());
@@ -200,7 +200,7 @@ class SolicitacaoServiceTest {
         when(solicitacaoRepository.findByOrientadorIdAndStatusOrderByCriadoEmDesc(1L, StatusSolicitacao.ACEITA))
                 .thenReturn(List.of(solicitacao));
 
-        List<SolicitacaoResponseDTO> resultado = solicitacaoService.listarPorOrientador(1L, "ACEITA");
+        List<SolicitacaoResponseDTO> resultado = solicitacaoService.listarPorOrientador(1L, "ACEITA", "orientador@ifsc.edu.br");
 
         assertEquals(1, resultado.size());
         assertEquals(StatusSolicitacao.ACEITA, resultado.get(0).status());
@@ -329,6 +329,100 @@ class SolicitacaoServiceTest {
 
         assertThrows(SolicitacaoJaRespondidaException.class,
                 () -> solicitacaoService.atualizarStatus(100L, request, EMAIL_ORIENTADOR));
+    }
+
+    @Test
+    void listarPorOrientador_UsuarioDiferente_DeveLancarAcessoNegado() {
+        Orientador orientador = new Orientador();
+        orientador.setId(1L);
+        orientador.setEmail("orientador@ifsc.edu.br");
+
+        when(orientadorRepository.findById(1L))
+                .thenReturn(Optional.of(orientador));
+
+        assertThrows(
+                AcessoNegadoException.class,
+                () -> solicitacaoService.listarPorOrientador(
+                        1L,
+                        null,
+                        "outro@ifsc.edu.br"
+                )
+        );
+    }
+
+    @Test
+    void buscarPorId_AlunoAutor_DeveRetornarSolicitacao() {
+        Aluno aluno = new Aluno();
+        aluno.setEmail("aluno@ifsc.edu.br");
+
+        Orientador orientador = new Orientador();
+        orientador.setEmail("orientador@ifsc.edu.br");
+
+        SolicitacaoOrientacao solicitacao = SolicitacaoOrientacao.builder()
+                .aluno(aluno)
+                .orientador(orientador)
+                .build();
+
+        when(solicitacaoRepository.findById(1L))
+                .thenReturn(Optional.of(solicitacao));
+
+        SolicitacaoResponseDTO resultado =
+                solicitacaoService.buscarPorId(
+                        1L,
+                        "aluno@ifsc.edu.br"
+                );
+
+        assertNotNull(resultado);
+    }
+
+    @Test
+    void buscarPorId_OrientadorResponsavel_DeveRetornarSolicitacao() {
+        Aluno aluno = new Aluno();
+        aluno.setEmail("aluno@ifsc.edu.br");
+
+        Orientador orientador = new Orientador();
+        orientador.setEmail("orientador@ifsc.edu.br");
+
+        SolicitacaoOrientacao solicitacao = SolicitacaoOrientacao.builder()
+                .aluno(aluno)
+                .orientador(orientador)
+                .build();
+
+        when(solicitacaoRepository.findById(1L))
+                .thenReturn(Optional.of(solicitacao));
+
+        SolicitacaoResponseDTO resultado =
+                solicitacaoService.buscarPorId(
+                        1L,
+                        "orientador@ifsc.edu.br"
+                );
+
+        assertNotNull(resultado);
+    }
+
+    @Test
+    void buscarPorId_UsuarioSemVinculo_DeveLancarAcessoNegado() {
+        Aluno aluno = new Aluno();
+        aluno.setEmail("aluno@ifsc.edu.br");
+
+        Orientador orientador = new Orientador();
+        orientador.setEmail("orientador@ifsc.edu.br");
+
+        SolicitacaoOrientacao solicitacao = SolicitacaoOrientacao.builder()
+                .aluno(aluno)
+                .orientador(orientador)
+                .build();
+
+        when(solicitacaoRepository.findById(1L))
+                .thenReturn(Optional.of(solicitacao));
+
+        assertThrows(
+                AcessoNegadoException.class,
+                () -> solicitacaoService.buscarPorId(
+                        1L,
+                        "outro@ifsc.edu.br"
+                )
+        );
     }
 
     private SolicitacaoRequestDTO criarRequestDTO() {
