@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import type { Orientador } from "../../types/Orientador.ts";
 import { ApiError } from "../../utils/apiErro.ts";
 import { obterOrientador } from "../../utils/orientadorService.ts";
+import { obterPerfilProfessor } from "../../utils/professorService.ts";
 import { OrientadorForm } from "../../components/OrientadorForm";
 import { PageShell } from "../OrientadorCadastro";
 
@@ -18,23 +19,15 @@ export function OrientadorEdicaoPage() {
     let ativo = true;
 
     const carregarPerfil = async () => {
-      const id = Number(localStorage.getItem("orientadorId"));
-      if (!id) {
-        if (ativo) {
-          setErro("Você não está autenticado. Faça o cadastro primeiro.");
-          setCarregando(false);
-        }
-        return;
-      }
-
       try {
-        const dados = await obterOrientador(id);
+        const perfil = await obterPerfilProfessor();
+        const dados = await obterOrientador(perfil.id);
         if (ativo) setOrientador(dados);
       } catch (falha: unknown) {
         if (ativo) {
           setErro(
             falha instanceof ApiError && falha.status === 404
-              ? "Orientador não encontrado (404 Not Found)."
+              ? "Seu usuário não possui um perfil de orientador cadastrado."
               : falha instanceof Error
                 ? falha.message
                 : "Não foi possível carregar o perfil.",
@@ -67,7 +60,7 @@ export function OrientadorEdicaoPage() {
             type="button"
             onClick={() => navigate("/")}
           >
-            Voltar ao cadastro
+            Ir para o cadastro
           </button>
         </div>
       </PageShell>
