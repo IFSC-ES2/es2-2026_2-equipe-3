@@ -27,7 +27,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @SpringBootTest
@@ -326,65 +325,106 @@ class SolicitacaoControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("GET /solicitacoes/{id} - Aluno autor pode consultar sua solicitação (200)")
     void buscarPorId_AlunoAutor_DeveRetornar200() throws Exception {
         SolicitacaoOrientacao solicitacao =
                 criarSolicitacaoParaAluno(EMAIL_ALUNO);
 
         mockMvc.perform(
-                        get("/api/v1/solicitacoes/" + solicitacao.getId())
-                                .with(jwt().jwt(jwt ->
-                                        jwt.claim("email", EMAIL_ALUNO)))
+                        get(URL + "/" + solicitacao.getId())
+                                .with(tokenDe("ROLE_ALUNO", EMAIL_ALUNO))
                 )
                 .andExpect(status().isOk());
     }
 
     @Test
+    @DisplayName("GET /solicitacoes/{id} - Usuário sem vínculo não pode consultar solicitação (403)")
     void buscarPorId_UsuarioSemVinculo_DeveRetornar403() throws Exception {
         SolicitacaoOrientacao solicitacao =
                 criarSolicitacaoParaAluno(EMAIL_ALUNO);
 
         mockMvc.perform(
-                        get("/api/v1/solicitacoes/" + solicitacao.getId())
-                                .with(jwt().jwt(jwt ->
-                                        jwt.claim("email", EMAIL_PROFESSOR_B)))
+                        get(URL + "/" + solicitacao.getId())
+                                .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_B))
                 )
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.erro").value("Acesso negado"))
+                .andExpect(jsonPath("$.detalhes").value(
+                        "Você não tem permissão para acessar esta solicitação."
+                ));
     }
 
     @Test
+    @DisplayName("GET /solicitacoes/{id} - Orientador responsável pode consultar solicitação (200)")
     void buscarPorId_OrientadorResponsavel_DeveRetornar200() throws Exception {
         SolicitacaoOrientacao solicitacao =
                 criarSolicitacaoParaAluno(EMAIL_ALUNO);
 
         mockMvc.perform(
-                        get("/api/v1/solicitacoes/" + solicitacao.getId())
-                                .with(jwt().jwt(jwt ->
-                                        jwt.claim("email", EMAIL_PROFESSOR_A)))
+                        get(URL + "/" + solicitacao.getId())
+                                .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
                 )
                 .andExpect(status().isOk());
     }
 
     @Test
+    @DisplayName("GET /solicitacoes/orientador/{id} - Orientador responsável pode listar solicitações (200)")
     void listarPorOrientador_OrientadorResponsavel_DeveRetornar200() throws Exception {
         criarSolicitacaoParaAluno(EMAIL_ALUNO);
 
         mockMvc.perform(
-                        get("/api/v1/solicitacoes/orientador/" + professorA.getId())
-                                .with(jwt().jwt(jwt ->
-                                        jwt.claim("email", EMAIL_PROFESSOR_A)))
+                        get(URL + "/orientador/" + professorA.getId())
+                                .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
                 )
                 .andExpect(status().isOk());
     }
 
     @Test
+    @DisplayName("GET /solicitacoes/orientador/{id} - Outro professor não pode listar solicitações (403)")
     void listarPorOrientador_OutroProfessor_DeveRetornar403() throws Exception {
         criarSolicitacaoParaAluno(EMAIL_ALUNO);
 
         mockMvc.perform(
-                        get("/api/v1/solicitacoes/orientador/" + professorA.getId())
-                                .with(jwt().jwt(jwt ->
-                                        jwt.claim("email", EMAIL_PROFESSOR_B)))
+                        get(URL + "/orientador/" + professorA.getId())
+                                .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_B))
                 )
-                .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.erro").value("Acesso negado"))
+                .andExpect(jsonPath("$.detalhes").value(
+                        "Você não tem permissão para acessar as solicitações deste orientador."
+                ));
+    }
+
+    @Test
+    @DisplayName("GET /solicitacoes/{id} - Outro aluno não pode consultar solicitação de colega (403)")
+    void buscarPorId_OutroAluno_DeveRetornar403() throws Exception {
+        SolicitacaoOrientacao solicitacao =
+                criarSolicitacaoParaAluno(EMAIL_ALUNO);
+
+        mockMvc.perform(
+                        get(URL + "/" + solicitacao.getId())
+                                .with(tokenDe("ROLE_ALUNO", EMAIL_FORJADO))
+                )
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.erro").value("Acesso negado"))
+                .andExpect(jsonPath("$.detalhes").value(
+                        "Você não tem permissão para acessar esta solicitação."
+                ));
+    }
+
+    @Test
+    @DisplayName("GET /solicitacoes/orientador/{id} - Aluno não pode listar solicitações de orientador (403)")
+    void listarPorOrientador_Aluno_DeveRetornar403() throws Exception {
+        criarSolicitacaoParaAluno(EMAIL_ALUNO);
+
+        mockMvc.perform(
+                        get(URL + "/orientador/" + professorA.getId())
+                                .with(tokenDe("ROLE_ALUNO", EMAIL_ALUNO))
+                )
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.erro").value("Acesso negado"))
+                .andExpect(jsonPath("$.detalhes").value(
+                        "Você não tem permissão para acessar as solicitações deste orientador."
+                ));
     }
 }
