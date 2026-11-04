@@ -74,10 +74,32 @@ public class SolicitacaoService {
         return toResponse(solicitacaoSalva);
     }
 
+    private void validarAcessoPorOrientador(
+            Orientador orientador,
+            String emailUsuario
+    ) {
+        if (emailUsuario == null
+                || emailUsuario.isBlank()
+                || !emailUsuario.equalsIgnoreCase(orientador.getEmail())) {
+
+            throw new AcessoNegadoException(
+                    "Você não tem permissão para acessar as solicitações deste orientador."
+            );
+        }
+    }
+
     @Transactional(readOnly = true)
-    public List<SolicitacaoResponseDTO> listarPorOrientador(Long orientadorId, String status) {
+    public List<SolicitacaoResponseDTO> listarPorOrientador(
+            Long orientadorId,
+            String status,
+            String emailUsuario
+    ) {
         Orientador orientador = orientadorRepository.findById(orientadorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Orientador com identificador " + orientadorId + " não foi encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Orientador com identificador " + orientadorId + " não foi encontrado."
+                ));
+
+        validarAcessoPorOrientador(orientador, emailUsuario);
 
         List<SolicitacaoOrientacao> solicitacoes;
         if (status == null || status.isBlank()) {
@@ -92,12 +114,34 @@ public class SolicitacaoService {
                 .toList();
     }
 
+    private void validarAcessoPorSolicitacao(
+            SolicitacaoOrientacao solicitacao,
+            String emailUsuario
+    ) {
+        boolean ehAluno = emailUsuario != null
+                && solicitacao.getAluno().getEmail().equalsIgnoreCase(emailUsuario);
+
+        boolean ehOrientador = emailUsuario != null
+                && solicitacao.getOrientador().getEmail().equalsIgnoreCase(emailUsuario);
+
+        if (!ehAluno && !ehOrientador) {
+            throw new AcessoNegadoException(
+                    "Você não tem permissão para acessar esta solicitação."
+            );
+        }
+    }
+
     @Transactional(readOnly = true)
-    public SolicitacaoResponseDTO buscarPorId(Long solicitacaoId) {
+    public SolicitacaoResponseDTO buscarPorId(
+            Long solicitacaoId,
+            String emailUsuario
+    ) {
         SolicitacaoOrientacao solicitacao = solicitacaoRepository.findById(solicitacaoId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Solicitação com identificador " + solicitacaoId + " não foi encontrada."
                 ));
+
+        validarAcessoPorSolicitacao(solicitacao, emailUsuario);
 
         return toResponse(solicitacao);
     }
