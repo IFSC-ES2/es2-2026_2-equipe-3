@@ -129,6 +129,36 @@ async function solicitarToken(
   };
 }
 
+type ListenerSessao = (sessao: SessaoAutenticada | null) => void;
+const listenersSessao: Set<ListenerSessao> = new Set();
+
+export function subscreverMudancaSessao(listener: ListenerSessao): () => void {
+  listenersSessao.add(listener);
+  return () => {
+    listenersSessao.delete(listener);
+  };
+}
+
+export function notificarSessaoAtualizada(sessao: SessaoAutenticada): void {
+  listenersSessao.forEach((listener) => {
+    try {
+      listener(sessao);
+    } catch {
+      // Ignora erro em listener
+    }
+  });
+}
+
+export function notificarSessaoExpirada(): void {
+  listenersSessao.forEach((listener) => {
+    try {
+      listener(null);
+    } catch {
+      // Ignora erro em listener
+    }
+  });
+}
+
 export async function login(
   email: string,
   senha: string,
@@ -141,29 +171,48 @@ export async function login(
   });
 
   armazenarTokens(tokens);
-  return montarSessao(tokens.accessToken);
+  const novaSessao = montarSessao(tokens.accessToken);
+  notificarSessaoAtualizada(novaSessao);
+  return novaSessao;
 }
 
+let promiseRenovacaoEmAndamento: Promise<SessaoAutenticada | null> | null =
+  null;
+
 export async function renovarToken(): Promise<SessaoAutenticada | null> {
+  if (promiseRenovacaoEmAndamento) {
+    return promiseRenovacaoEmAndamento;
+  }
+
   const armazenado = lerTokensArmazenados();
   if (!armazenado) return null;
 
-  try {
-    const tokens = await solicitarToken({
-      grant_type: "refresh_token",
-      client_id: KEYCLOAK_CLIENT_ID,
-      refresh_token: armazenado.refreshToken,
-    });
-    armazenarTokens(tokens);
-    return montarSessao(tokens.accessToken);
-  } catch {
-    limparTokens();
-    return null;
-  }
+  promiseRenovacaoEmAndamento = (async () => {
+    try {
+      const tokens = await solicitarToken({
+        grant_type: "refresh_token",
+        client_id: KEYCLOAK_CLIENT_ID,
+        refresh_token: armazenado.refreshToken,
+      });
+      armazenarTokens(tokens);
+      const novaSessao = montarSessao(tokens.accessToken);
+      notificarSessaoAtualizada(novaSessao);
+      return novaSessao;
+    } catch {
+      limparTokens();
+      notificarSessaoExpirada();
+      return null;
+    } finally {
+      promiseRenovacaoEmAndamento = null;
+    }
+  })();
+
+  return promiseRenovacaoEmAndamento;
 }
 
 export function logout(): void {
   limparTokens();
+  notificarSessaoExpirada();
 }
 
 export function armazenarTokens(tokens: TokensArmazenados): void {

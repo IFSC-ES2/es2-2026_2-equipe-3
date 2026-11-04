@@ -10,6 +10,7 @@ import {
   logout as logoutService,
   recuperarSessaoArmazenada,
   renovarToken,
+  subscreverMudancaSessao,
   type Papel,
   type SessaoAutenticada,
 } from "./authService";
@@ -24,17 +25,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const haviaSessaoInicial = useRef(sessao !== null);
 
   useEffect(() => {
-    if (haviaSessaoInicial.current) return;
-
-    let cancelado = false;
-    renovarToken().then((sessaoRenovada) => {
-      if (cancelado) return;
-      setSessao(sessaoRenovada);
-      setCarregando(false);
+    const cancelarSubscricao = subscreverMudancaSessao((novaSessao) => {
+      setSessao(novaSessao);
     });
 
+    if (!haviaSessaoInicial.current) {
+      let cancelado = false;
+      renovarToken().then((sessaoRenovada) => {
+        if (cancelado) return;
+        setSessao(sessaoRenovada);
+        setCarregando(false);
+      });
+
+      return () => {
+        cancelado = true;
+        cancelarSubscricao();
+      };
+    }
+
     return () => {
-      cancelado = true;
+      cancelarSubscricao();
     };
   }, []);
 
