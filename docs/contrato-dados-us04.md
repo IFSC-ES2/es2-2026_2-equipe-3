@@ -571,11 +571,11 @@ Retornado quando o usuário autenticado não é o aluno autor nem o orientador r
 
 ### 6.2.1. `403 Forbidden`
 
-| Endpoint | Condição | `detalhes` |
-| :------- | :------- | :--------- |
-| `PATCH` | Usuário sem `ROLE_PROFESSOR` ou professor que não é o destinatário da solicitação | `Somente o orientador destinatário pode aceitar ou recusar esta solicitação.` |
-| `GET /{id}` | Usuário autenticado que não é o aluno autor nem o orientador responsável | `Você não tem permissão para acessar esta solicitação.` |
-| `GET .../orientador/{orientadorId}` | Usuário autenticado que não é o orientador correspondente ao identificador informado | `Você não tem permissão para acessar as solicitações deste orientador.` |
+| Endpoint                            | Condição                                                                             | `detalhes`                                                                    |
+| :---------------------------------- | :----------------------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
+| `PATCH`                             | Usuário sem `ROLE_PROFESSOR` ou professor que não é o destinatário da solicitação    | `Somente o orientador destinatário pode aceitar ou recusar esta solicitação.` |
+| `GET /{id}`                         | Usuário autenticado que não é o aluno autor nem o orientador responsável             | `Você não tem permissão para acessar esta solicitação.`                       |
+| `GET .../orientador/{orientadorId}` | Usuário autenticado que não é o orientador correspondente ao identificador informado | `Você não tem permissão para acessar as solicitações deste orientador.`       |
 
 ### 6.3. `404 Not Found`
 
