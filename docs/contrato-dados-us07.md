@@ -128,7 +128,7 @@ Retorna um array de `EntregaResponse` (ou `[]` caso nenhum orientando tenha subm
 
 ##### Erro: `403 Forbidden`
 
-Token sem a role `ROLE_PROFESSOR` (gerado pelo Spring Security).
+Token sem a role `ROLE_PROFESSOR` (gerado pelo Spring Security, sem corpo `ErroResponse`).
 
 ##### Erro: `404 Not Found`
 
@@ -151,7 +151,7 @@ O e-mail do token JWT não corresponde a nenhum orientador cadastrado:
 - **Método HTTP:** `GET`
 - **Rota:** `/api/v1/entregas/minhas`
 - **Permissão:** `ROLE_ALUNO`.
-- **Descrição:** Retorna as entregas submetidas pelo aluno autenticado (identificado pela claim `email` do JWT), ordenadas pela sequência da etapa (`PROJETO_TCC`, `TCC1`, `TCC2`), permitindo que o estudante acompanhe no painel o status de cada etapa e leia o parecer do orientador. Caso o aluno ainda não possua entregas registradas, retorna lista vazia `[]` (`200 OK`).
+- **Descrição:** Retorna as entregas submetidas pelo aluno autenticado (identificado pela claim `email` do JWT), ordenadas pela sequência da etapa (`PROJETO_TCC`, `TCC1`, `TCC2`), permitindo que o estudante acompanhe no painel o status de cada etapa e leia o parecer do orientador. Caso o aluno ainda não possua entregas registradas, retorna lista vazia `[]` (`200 OK`). O mesmo vale quando o e-mail do token ainda não corresponde a nenhum aluno cadastrado: a resposta é `[]`, e **não** `404` (ver decisão D6).
 
 #### Respostas Possíveis
 
@@ -161,7 +161,7 @@ Array de `EntregaResponse` (mesmo formato da seção 5.1).
 
 ##### Erro: `403 Forbidden`
 
-Token sem a role `ROLE_ALUNO` (gerado pelo Spring Security).
+Token sem a role `ROLE_ALUNO` (gerado pelo Spring Security, sem corpo `ErroResponse`).
 
 ---
 
@@ -178,9 +178,26 @@ Token sem a role `ROLE_ALUNO` (gerado pelo Spring Security).
 
 Corpo `EntregaResponse`.
 
-##### Erro: `403 Forbidden` (usuário autenticado não vinculado à entrega)
+##### Erro: `400 Bad Request` (identificador inválido)
 
-Retornado quando outro aluno ou outro professor (que não é o orientador da entrega) tenta consultar a entrega:
+Retornado quando `{id}` não é um número inteiro (ex.: `/api/v1/entregas/abc`), pelo handler de `MethodArgumentTypeMismatchException`:
+
+```json
+{
+  "timestamp": "2026-11-03T15:10:00Z",
+  "status": 400,
+  "erro": "Parâmetro de requisição inválido",
+  "caminho": "/api/v1/entregas/abc",
+  "detalhes": "Valor inválido para o parâmetro 'id'."
+}
+```
+
+##### Erro: `403 Forbidden`
+
+Há duas origens distintas para o `403`:
+
+- **Spring Security (sem corpo `ErroResponse`):** token válido, mas sem `ROLE_ALUNO` nem `ROLE_PROFESSOR`.
+- **Camada de serviço (`AcessoNegadoException`, com corpo `ErroResponse`):** outro aluno ou outro professor (que não é o orientador da entrega) tenta consultar a entrega:
 
 ```json
 {
@@ -280,7 +297,7 @@ Retorna a `EntregaResponse` atualizada com o novo `status` e o objeto `parecer` 
 
 ##### Erro de Validação: `400 Bad Request`
 
-Retornado quando `resultado` está ausente ou quando `comentario` ultrapassa 2000 caracteres:
+Retornado quando `resultado` está ausente ou quando `comentario` ultrapassa 2000 caracteres (validação de campos, `detalhes` em array):
 
 ```json
 {
@@ -297,9 +314,14 @@ Retornado quando `resultado` está ausente ou quando `comentario` ultrapassa 200
 }
 ```
 
+Também retorna `400`, com `detalhes` em `String`, quando o corpo JSON está mal formatado ou `resultado` contém um valor fora de `StatusEntrega` (`erro`: `Corpo da requisição inválido ou ilegível`), e quando `{id}` não é um número inteiro (`erro`: `Parâmetro de requisição inválido`).
+
 ##### Erro de Acesso Negado: `403 Forbidden`
 
-Retornado quando o usuário não tem `ROLE_PROFESSOR` ou quando o professor autenticado **não é o orientador vinculado** à entrega:
+Há duas origens distintas para o `403`:
+
+- **Spring Security (sem corpo `ErroResponse`):** token válido, mas sem a role `ROLE_PROFESSOR` (por exemplo, um aluno).
+- **Camada de serviço (`AcessoNegadoException`, com corpo `ErroResponse`):** o professor autenticado **não é o orientador vinculado** à entrega:
 
 ```json
 {
@@ -355,31 +377,48 @@ Retornado quando `resultado` é `AJUSTES_NECESSARIOS` ou `REPROVADO` e o `coment
 
 ## 6. Tabela Oficial de Códigos e Mensagens de Erro
 
-| Endpoint                      | Código | `campo` / Origem                          | Condição                                                                                  | Mensagem (`detalhes`)                                                                                             |
-| :---------------------------- | :----: | :---------------------------------------- | :---------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------- |
-| Todos                         | `401`  | Spring Security                           | Token JWT ausente, expirado ou inválido                                                   | _(Sem corpo `ErroResponse`)_                                                                                      |
-| `GET /entregas/orientador`    | `400`  | `MethodArgumentTypeMismatchException`     | Query param `status` fora de `StatusEntrega`                                              | `Valor inválido para o parâmetro 'status'. Valores aceitos: SUBMETIDO, AJUSTES_NECESSARIOS, APROVADO, REPROVADO.` |
-| `GET /entregas/orientador`    | `403`  | Spring Security                           | Usuário sem `ROLE_PROFESSOR`                                                              | _(Sem corpo `ErroResponse`)_                                                                                      |
-| `GET /entregas/orientador`    | `404`  | `ResourceNotFoundException`               | E-mail do token não pertence a nenhum orientador cadastrado                               | `Orientador com e-mail {email} não foi encontrado.`                                                               |
-| `GET /entregas/minhas`        | `403`  | Spring Security                           | Usuário sem `ROLE_ALUNO`                                                                  | _(Sem corpo `ErroResponse`)_                                                                                      |
-| `GET /entregas/{id}`          | `403`  | `AcessoNegadoException`                   | Usuário autenticado não é o aluno autor nem o orientador vinculado à entrega              | `Acesso permitido apenas ao aluno autor ou ao orientador vinculado a esta entrega.`                               |
-| `GET /entregas/{id}`, `POST`  | `404`  | `ResourceNotFoundException`               | Entrega inexistente                                                                       | `Entrega com identificador {id} não foi encontrada.`                                                              |
-| `POST /entregas/{id}/parecer` | `400`  | `resultado`                               | Ausente (`null`)                                                                          | `O resultado do parecer é obrigatório.`                                                                           |
-| `POST /entregas/{id}/parecer` | `400`  | `comentario`                              | Acima de 2000 caracteres                                                                  | `O comentário deve ter no máximo 2000 caracteres.`                                                                |
-| `POST /entregas/{id}/parecer` | `403`  | Spring Security / `AcessoNegadoException` | Usuário sem `ROLE_PROFESSOR` ou professor que não é o orientador vinculado à entrega      | `Somente o orientador vinculado à entrega pode registrar parecer.`                                                |
-| `POST /entregas/{id}/parecer` | `409`  | `ConflitoDeEstadoException`               | Entrega já avaliada com status `APROVADO` ou `REPROVADO`                                  | `Esta entrega já possui parecer definitivo ({status}) e não pode ser reavaliada.`                                 |
-| `POST /entregas/{id}/parecer` | `409`  | `ConflitoDeEstadoException`               | Entrega com status `AJUSTES_NECESSARIOS` (aguardando reenvio do aluno)                    | `Esta entrega aguarda reenvio do aluno antes de receber um novo parecer.`                                         |
-| `POST /entregas/{id}/parecer` | `422`  | `RegraDeNegocioException`                 | `resultado` em `AJUSTES_NECESSARIOS` ou `REPROVADO` com `comentario` ausente ou em branco | `O comentário com a justificativa é obrigatório quando o parecer exige ajustes ou reprova a entrega.`             |
-| `POST /entregas/{id}/parecer` | `422`  | `RegraDeNegocioException`                 | `resultado` enviado com valor `SUBMETIDO`                                                 | `O resultado do parecer deve ser APROVADO, AJUSTES_NECESSARIOS ou REPROVADO.`                                     |
+| Endpoint                      | Código | `campo` / Origem                      | Condição                                                                                  | Mensagem (`detalhes`)                                                                                             |
+| :---------------------------- | :----: | :------------------------------------ | :---------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------- |
+| Todos                         | `401`  | Spring Security                       | Token JWT ausente, expirado ou inválido                                                   | _(Sem corpo `ErroResponse`)_                                                                                      |
+| `GET /entregas/orientador`    | `400`  | `MethodArgumentTypeMismatchException` | Query param `status` fora de `StatusEntrega`                                              | `Valor inválido para o parâmetro 'status'. Valores aceitos: SUBMETIDO, AJUSTES_NECESSARIOS, APROVADO, REPROVADO.` |
+| `GET /entregas/orientador`    | `403`  | Spring Security                       | Usuário sem `ROLE_PROFESSOR`                                                              | _(Sem corpo `ErroResponse`)_                                                                                      |
+| `GET /entregas/orientador`    | `404`  | `ResourceNotFoundException`           | E-mail do token não pertence a nenhum orientador cadastrado                               | `Orientador com e-mail {email} não foi encontrado.`                                                               |
+| `GET /entregas/minhas`        | `403`  | Spring Security                       | Usuário sem `ROLE_ALUNO`                                                                  | _(Sem corpo `ErroResponse`)_                                                                                      |
+| `GET /entregas/{id}`, `POST`  | `400`  | `MethodArgumentTypeMismatchException` | `{id}` não é um número inteiro                                                            | `Valor inválido para o parâmetro 'id'.`                                                                           |
+| `GET /entregas/{id}`          | `403`  | Spring Security                       | Usuário sem `ROLE_ALUNO` e sem `ROLE_PROFESSOR`                                           | _(Sem corpo `ErroResponse`)_                                                                                      |
+| `GET /entregas/{id}`          | `403`  | `AcessoNegadoException`               | Usuário autenticado não é o aluno autor nem o orientador vinculado à entrega              | `Acesso permitido apenas ao aluno autor ou ao orientador vinculado a esta entrega.`                               |
+| `GET /entregas/{id}`, `POST`  | `404`  | `ResourceNotFoundException`           | Entrega inexistente                                                                       | `Entrega com identificador {id} não foi encontrada.`                                                              |
+| `POST /entregas/{id}/parecer` | `400`  | `resultado`                           | Ausente (`null`)                                                                          | `O resultado do parecer é obrigatório.`                                                                           |
+| `POST /entregas/{id}/parecer` | `400`  | `comentario`                          | Acima de 2000 caracteres                                                                  | `O comentário deve ter no máximo 2000 caracteres.`                                                                |
+| `POST /entregas/{id}/parecer` | `400`  | `HttpMessageNotReadableException`     | JSON mal formatado ou `resultado` fora da enumeração `StatusEntrega`                      | `O corpo da requisição está ausente, mal formatado ou contém um valor incompatível com o tipo esperado.`          |
+| `POST /entregas/{id}/parecer` | `403`  | Spring Security                       | Usuário sem `ROLE_PROFESSOR`                                                              | _(Sem corpo `ErroResponse`)_                                                                                      |
+| `POST /entregas/{id}/parecer` | `403`  | `AcessoNegadoException`               | Professor autenticado não é o orientador vinculado à entrega                              | `Somente o orientador vinculado à entrega pode registrar parecer.`                                                |
+| `POST /entregas/{id}/parecer` | `409`  | `ConflitoDeEstadoException`           | Entrega já avaliada com status `APROVADO` ou `REPROVADO`                                  | `Esta entrega já possui parecer definitivo ({status}) e não pode ser reavaliada.`                                 |
+| `POST /entregas/{id}/parecer` | `409`  | `ConflitoDeEstadoException`           | Entrega com status `AJUSTES_NECESSARIOS` (aguardando reenvio do aluno)                    | `Esta entrega aguarda reenvio do aluno antes de receber um novo parecer.`                                         |
+| `POST /entregas/{id}/parecer` | `422`  | `RegraDeNegocioException`             | `resultado` em `AJUSTES_NECESSARIOS` ou `REPROVADO` com `comentario` ausente ou em branco | `O comentário com a justificativa é obrigatório quando o parecer exige ajustes ou reprova a entrega.`             |
+| `POST /entregas/{id}/parecer` | `422`  | `RegraDeNegocioException`             | `resultado` enviado com valor `SUBMETIDO`                                                 | `O resultado do parecer deve ser APROVADO, AJUSTES_NECESSARIOS ou REPROVADO.`                                     |
+
+### 6.1. Matriz de Roles e Respostas de Erro por Endpoint
+
+| Endpoint                             | Role exigida (Keycloak)                 | `400`                          | `403` | `404`                          | `409`         | `422`         |
+| :----------------------------------- | :-------------------------------------- | :----------------------------- | :---: | :----------------------------- | :------------ | :------------ |
+| `GET /api/v1/entregas/orientador`    | `ROLE_PROFESSOR`                        | Sim (`status` inválido)        |  Sim  | Sim                            | Não se aplica | Não se aplica |
+| `GET /api/v1/entregas/minhas`        | `ROLE_ALUNO`                            | Não se aplica (sem parâmetros) |  Sim  | Não se aplica (ver decisão D6) | Não se aplica | Não se aplica |
+| `GET /api/v1/entregas/{id}`          | `ROLE_ALUNO` ou `ROLE_PROFESSOR`        | Sim (`id` inválido)            |  Sim  | Sim                            | Não se aplica | Não se aplica |
+| `POST /api/v1/entregas/{id}/parecer` | `ROLE_PROFESSOR` (orientador vinculado) | Sim                            |  Sim  | Sim                            | Sim           | Sim           |
+
+> "Não se aplica" indica que o endpoint é somente leitura (sem conflito de estado nem regra de negócio a violar) ou que a condição não existe para ele. `401 Unauthorized` (token ausente, expirado ou inválido) é gerado pelo Spring Security para todas as rotas, sem corpo `ErroResponse`.
 
 ---
 
 ## 7. Decisões Assumidas
 
-| #   | Decisão                                                                                                       | Justificativa                                                                                                                             |
-| :-- | :------------------------------------------------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | O acesso ao trabalho pelo orientador ocorre via `urlDocumento` nos endpoints `GET`, sem stream binário.       | Segue estritamente a [ADR-0013](adrs/ADR-0013.md) e os critérios da Issue #210.                                                           |
-| D2  | Comentário/justificativa ausente em `AJUSTES_NECESSARIOS` ou `REPROVADO` retorna `422`.                       | Exigência explícita do critério de aceitação da Issue #215 (`422` se ausente ou em branco).                                               |
-| D3  | Tentativa de avaliar entrega já em `APROVADO` ou `REPROVADO` retorna `409 Conflict`.                          | Exigência explícita da Issue #215; impede sobrescrita acidental de avaliações concluídas.                                                 |
-| D4  | A entidade `Parecer` (Flyway `V7`) guarda o histórico de pareceres, e `EntregaResponse` expõe o mais recente. | Permite que uma entrega reenviada após `AJUSTES_NECESSARIOS` receba novo parecer mantendo a rastreabilidade no banco de dados.            |
-| D5  | Sem envio de e-mail ou push ao registrar parecer.                                                             | Alinhado à Issue #215 e ao escopo do MVP; o aluno acompanha pelo painel via `GET /api/v1/entregas/minhas` ou `GET /api/v1/entregas/{id}`. |
+| #   | Decisão                                                                                                               | Justificativa                                                                                                                                 |
+| :-- | :-------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | O acesso ao trabalho pelo orientador ocorre via `urlDocumento` nos endpoints `GET`, sem stream binário.               | Segue estritamente a [ADR-0013](adrs/ADR-0013.md) e os critérios da Issue #210.                                                               |
+| D2  | Comentário/justificativa ausente em `AJUSTES_NECESSARIOS` ou `REPROVADO` retorna `422`.                               | Exigência explícita do critério de aceitação da Issue #215 (`422` se ausente ou em branco).                                                   |
+| D3  | Tentativa de avaliar entrega já em `APROVADO` ou `REPROVADO` retorna `409 Conflict`.                                  | Exigência explícita da Issue #215; impede sobrescrita acidental de avaliações concluídas.                                                     |
+| D4  | A entidade `Parecer` (Flyway `V7`) guarda o histórico de pareceres, e `EntregaResponse` expõe o mais recente.         | Permite que uma entrega reenviada após `AJUSTES_NECESSARIOS` receba novo parecer mantendo a rastreabilidade no banco de dados.                |
+| D5  | Sem envio de e-mail ou push ao registrar parecer.                                                                     | Alinhado à Issue #215 e ao escopo do MVP; o aluno acompanha pelo painel via `GET /api/v1/entregas/minhas` ou `GET /api/v1/entregas/{id}`.     |
+| D6  | `GET /api/v1/entregas/minhas` retorna `[]` (e não `404`) quando o e-mail do token não corresponde a aluno cadastrado. | O aluno só é cadastrado na primeira solicitação de orientação (US04); para o painel, "sem cadastro" e "sem entregas" têm o mesmo significado. |
+| D7  | Status de parecer `AJUSTES_NECESSARIOS` em vez de `RESSALVAS`, citado na [ADR-0013](adrs/ADR-0013.md).                | Valores definidos na Issue #209 e compartilhados com a máquina de estados da US06; prevalecem sobre o exemplo da ADR.                         |

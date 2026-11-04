@@ -89,7 +89,7 @@ Herdados dos contratos anteriores, sem alterações:
 - **Permissão:** `ROLE_ALUNO` (usuário autenticado deve possuir solicitação de orientação com status `ACEITA`).
 - **Descrição:** Registra a submissão do link externo de uma etapa do TCC na `Turma_TCC` vigente ou realiza o reenvio caso a entrega existente daquela etapa esteja com status `AJUSTES_NECESSARIOS`.
 - **Regras de Negócio:**
-  1. **Vínculo de orientação ativo (`403`):** O aluno autenticado (claim `email`) deve existir na base e possuir uma `SolicitacaoOrientacao` com `status = ACEITA`. Caso contrário, a operação é negada com `403 Forbidden`.
+  1. **Vínculo de orientação ativo (`403`):** O aluno autenticado (claim `email`) deve existir na base e possuir uma `SolicitacaoOrientacao` com `status = ACEITA`. Caso contrário, a operação é negada com `403 Forbidden`. Um aluno cujo e-mail ainda não está cadastrado também recebe `403` (e **não** `404`): o registro do aluno só é criado na primeira solicitação de orientação (US04), logo um aluno sem cadastro necessariamente não possui orientação aceita (ver decisão D6).
   2. **Turma vigente e prazo configurado (`422`):** Deve existir uma `Turma_TCC` com `vigente = true` e um `PrazoEntrega` cadastrado para o `tipo` informado nessa turma. Se não houver turma vigente ou se o prazo da etapa ainda não tiver sido cadastrado no calendário, retorna `422 Unprocessable Content`.
   3. **Cálculo da flag `atrasada`:** O backend compara a data atual no fuso `America/Sao_Paulo` (`LocalDate.now(clock)`) com a `dataLimite` do `PrazoEntrega` correspondente:
      - Se `dataAtual <= dataLimite` → `atrasada = false`.
@@ -154,7 +154,7 @@ Retorna `EntregaResponse` com `status: "SUBMETIDO"`, `urlDocumento` atualizado, 
 
 ##### Erro de Validação: `400 Bad Request`
 
-Retornado quando `tipo` ou `urlDocumento` estão ausentes, ou quando `urlDocumento` não é uma URL válida com protocolo `https://`:
+Retornado quando `tipo` ou `urlDocumento` estão ausentes, ou quando `urlDocumento` não é uma URL válida com protocolo `https://` (validação de campos, `detalhes` em array):
 
 ```json
 {
@@ -171,9 +171,24 @@ Retornado quando `tipo` ou `urlDocumento` estão ausentes, ou quando `urlDocumen
 }
 ```
 
+Quando o corpo JSON está mal formatado ou `tipo` contém um valor fora de `TipoEntrega`, o `400` é gerado pelo handler de `HttpMessageNotReadableException` e `detalhes` é uma `String`:
+
+```json
+{
+  "timestamp": "2026-11-03T14:25:00Z",
+  "status": 400,
+  "erro": "Corpo da requisição inválido ou ilegível",
+  "caminho": "/api/v1/entregas",
+  "detalhes": "O corpo da requisição está ausente, mal formatado ou contém um valor incompatível com o tipo esperado."
+}
+```
+
 ##### Erro de Acesso Negado: `403 Forbidden`
 
-Retornado pelo Spring Security quando o usuário não possui `ROLE_ALUNO`, ou pela camada de serviço (`AcessoNegadoException`) quando o aluno autenticado não possui orientação `ACEITA`:
+Há duas origens distintas para o `403`:
+
+- **Spring Security (sem corpo `ErroResponse`):** token válido, mas sem a role `ROLE_ALUNO` (por exemplo, um professor). A requisição é barrada antes de chegar ao controller.
+- **Camada de serviço (`AcessoNegadoException`, com corpo `ErroResponse`):** o aluno autenticado não está cadastrado ou não possui orientação `ACEITA`:
 
 ```json
 {
@@ -217,19 +232,27 @@ Retornado quando não há turma vigente ou quando o calendário da turma vigente
 
 ## 5. Tabela Oficial de Códigos e Mensagens de Erro
 
-| Código | `campo` / Origem            | Condição                                                                     | Mensagem (`detalhes`)                                                                                                               |
-| :----: | :-------------------------- | :--------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
-| `400`  | `tipo`                      | Ausente (`null`)                                                             | `O tipo de entrega é obrigatório.`                                                                                                  |
-| `400`  | `urlDocumento`              | Ausente ou em branco                                                         | `A URL do documento é obrigatória.`                                                                                                 |
-| `400`  | `urlDocumento`              | Formato inválido ou protocolo diferente de `https`                           | `A URL do documento deve ser válida e utilizar o protocolo https.`                                                                  |
-| `400`  | `urlDocumento`              | Acima de 2048 caracteres                                                     | `A URL do documento deve ter no máximo 2048 caracteres.`                                                                            |
-| `400`  | Corpo JSON                  | JSON mal formatado ou valor de `tipo` fora da enumeração `TipoEntrega`       | `O corpo da requisição está ausente, mal formatado ou contém um valor incompatível com o tipo esperado.`                            |
-| `401`  | Spring Security             | Token JWT ausente, expirado ou inválido                                      | _(Sem corpo `ErroResponse`)_                                                                                                        |
-| `403`  | Spring Security             | Token válido, mas sem a role `ROLE_ALUNO`                                    | _(Sem corpo `ErroResponse`)_                                                                                                        |
-| `403`  | `AcessoNegadoException`     | Aluno autenticado não possui solicitação de orientação `ACEITA`              | `Somente alunos com orientador vinculado (solicitação aceita) podem submeter entregas.`                                             |
-| `409`  | `ConflitoDeEstadoException` | Entrega da etapa já existe com status `SUBMETIDO`, `APROVADO` ou `REPROVADO` | `Já existe uma entrega para {descricaoTipo} com status {status}. O reenvio só é permitido quando o status for AJUSTES_NECESSARIOS.` |
-| `422`  | `RegraDeNegocioException`   | Não existe `Turma_TCC` com `vigente = true`                                  | `Não há turma de TCC vigente cadastrada para receber entregas.`                                                                     |
-| `422`  | `RegraDeNegocioException`   | Etapa ainda não possui `PrazoEntrega` cadastrado na turma vigente            | `Não há prazo cadastrado para {descricaoTipo} na turma vigente.`                                                                    |
+| Código | `campo` / Origem                                                                      | Condição                                                                     | Mensagem (`detalhes`)                                                                                                               |
+| :----: | :------------------------------------------------------------------------------------ | :--------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| `400`  | `tipo`                                                                                | Ausente (`null`)                                                             | `O tipo de entrega é obrigatório.`                                                                                                  |
+| `400`  | `urlDocumento`                                                                        | Ausente ou em branco                                                         | `A URL do documento é obrigatória.`                                                                                                 |
+| `400`  | `urlDocumento`                                                                        | Formato inválido ou protocolo diferente de `https`                           | `A URL do documento deve ser válida e utilizar o protocolo https.`                                                                  |
+| `400`  | `urlDocumento`                                                                        | Acima de 2048 caracteres                                                     | `A URL do documento deve ter no máximo 2048 caracteres.`                                                                            |
+| `400`  | Corpo JSON (`erro`: `Corpo da requisição inválido ou ilegível`; `detalhes` em String) | JSON mal formatado ou valor de `tipo` fora da enumeração `TipoEntrega`       | `O corpo da requisição está ausente, mal formatado ou contém um valor incompatível com o tipo esperado.`                            |
+| `401`  | Spring Security                                                                       | Token JWT ausente, expirado ou inválido                                      | _(Sem corpo `ErroResponse`)_                                                                                                        |
+| `403`  | Spring Security                                                                       | Token válido, mas sem a role `ROLE_ALUNO`                                    | _(Sem corpo `ErroResponse`)_                                                                                                        |
+| `403`  | `AcessoNegadoException`                                                               | Aluno autenticado não cadastrado ou sem solicitação de orientação `ACEITA`   | `Somente alunos com orientador vinculado (solicitação aceita) podem submeter entregas.`                                             |
+| `409`  | `ConflitoDeEstadoException`                                                           | Entrega da etapa já existe com status `SUBMETIDO`, `APROVADO` ou `REPROVADO` | `Já existe uma entrega para {descricaoTipo} com status {status}. O reenvio só é permitido quando o status for AJUSTES_NECESSARIOS.` |
+| `422`  | `RegraDeNegocioException`                                                             | Não existe `Turma_TCC` com `vigente = true`                                  | `Não há turma de TCC vigente cadastrada para receber entregas.`                                                                     |
+| `422`  | `RegraDeNegocioException`                                                             | Etapa ainda não possui `PrazoEntrega` cadastrado na turma vigente            | `Não há prazo cadastrado para {descricaoTipo} na turma vigente.`                                                                    |
+
+### 5.1. Matriz de Roles e Respostas de Erro por Endpoint
+
+| Endpoint                | Role exigida (Keycloak) | `400` | `403` | `404`                          | `409` | `422` |
+| :---------------------- | :---------------------- | :---: | :---: | :----------------------------- | :---: | :---: |
+| `POST /api/v1/entregas` | `ROLE_ALUNO`            |  Sim  |  Sim  | Não se aplica (ver decisão D6) |  Sim  |  Sim  |
+
+> `401 Unauthorized` (token ausente, expirado ou inválido) é gerado pelo Spring Security para qualquer rota, sem corpo `ErroResponse`.
 
 ---
 
@@ -250,10 +273,13 @@ Retornado quando não há turma vigente ou quando o calendário da turma vigente
 
 ## 7. Decisões Assumidas
 
-| #   | Decisão                                                                                             | Justificativa                                                                                                                                 |
-| :-- | :-------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------- |
-| D1  | Submissão via JSON com `urlDocumento` (`https://`) em vez de `multipart/form-data`.                 | Cumpre a [ADR-0013](adrs/ADR-0013.md), evitando custódia de binários e volumes extras de storage no Docker.                                   |
-| D2  | Validação de `urlDocumento` com `@URL(protocol = "https")` retorna `400 Bad Request`.               | É uma validação sintática de campo (Bean Validation), seguindo o padrão de `400` com array `[{campo, mensagem}]` do `GlobalExceptionHandler`. |
-| D3  | Envio após `dataLimite` não é bloqueado; define `atrasada = true`.                                  | Atende ao critério da Issue #216: permite que o aluno entregue com atraso devidamente registrado para avaliação do orientador.                |
-| D4  | Reenvio atualiza a `Entrega` existente quando `status == AJUSTES_NECESSARIOS`.                      | Mantém unicidade por `(aluno_id, turma_id, tipo)` na tabela `entregas` (Issue #208), evitando múltiplos registros órfãos para a mesma etapa.  |
-| D5  | Exigência de `PrazoEntrega` cadastrado na turma vigente para o `tipo` submetido (`422` se ausente). | O cálculo determinístico da flag `atrasada` depende da existência da `dataLimite` daquela etapa no calendário da turma vigente.               |
+| #   | Decisão                                                                                                                                                     | Justificativa                                                                                                                                           |
+| :-- | :---------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| D1  | Submissão via JSON com `urlDocumento` (`https://`) em vez de `multipart/form-data`.                                                                         | Cumpre a [ADR-0013](adrs/ADR-0013.md), evitando custódia de binários e volumes extras de storage no Docker.                                             |
+| D2  | Validação de `urlDocumento` com `@URL(protocol = "https")` retorna `400 Bad Request`.                                                                       | É uma validação sintática de campo (Bean Validation), seguindo o padrão de `400` com array `[{campo, mensagem}]` do `GlobalExceptionHandler`.           |
+| D3  | Envio após `dataLimite` não é bloqueado; define `atrasada = true`.                                                                                          | Atende ao critério da Issue #216: permite que o aluno entregue com atraso devidamente registrado para avaliação do orientador.                          |
+| D4  | Reenvio atualiza a `Entrega` existente quando `status == AJUSTES_NECESSARIOS`.                                                                              | Mantém unicidade por `(aluno_id, turma_id, tipo)` na tabela `entregas` (Issue #208), evitando múltiplos registros órfãos para a mesma etapa.            |
+| D5  | Exigência de `PrazoEntrega` cadastrado na turma vigente para o `tipo` submetido (`422` se ausente).                                                         | O cálculo determinístico da flag `atrasada` depende da existência da `dataLimite` daquela etapa no calendário da turma vigente.                         |
+| D6  | Aluno do token sem cadastro recebe `403`, não `404`; o endpoint não possui resposta `404`.                                                                  | O aluno é criado na primeira solicitação de orientação (US04). Sem cadastro não há orientação `ACEITA`, e o `403` não expõe se o e-mail existe na base. |
+| D7  | Critérios originais da Issue #13 (arquivo PDF de até 15 MB e mensagem `Apenas arquivos PDF são permitidos.`) substituídos pela validação de `urlDocumento`. | A [ADR-0013](adrs/ADR-0013.md) eliminou o upload de binários; o status `Submetido` do critério original corresponde a `SUBMETIDO`.                      |
+| D8  | Rota `POST /api/v1/entregas` e status `AJUSTES_NECESSARIOS` em vez de `POST /api/v1/submissoes` e `RESSALVAS`, citados na ADR-0013.                         | Nomenclatura definida na Issue #209 e alinhada à entidade `Entrega` da modelagem Flyway V6 (Issue #208); prevalece sobre os exemplos da ADR.            |
