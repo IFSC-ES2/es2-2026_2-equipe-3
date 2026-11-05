@@ -84,7 +84,7 @@ class SolicitacaoControllerTest {
         SolicitacaoResponseDTO response1 = criarResponseDTOMock(1L, StatusSolicitacao.PENDENTE);
         SolicitacaoResponseDTO response2 = criarResponseDTOMock(2L, StatusSolicitacao.ACEITA);
 
-        when(solicitacaoService.listarPorOrientador(1L, null)).thenReturn(List.of(response1, response2));
+        when(solicitacaoService.listarPorOrientador(1L, null, null)).thenReturn(List.of(response1, response2));
 
         mockMvc.perform(get("/api/v1/solicitacoes/orientador/1")
                         .accept(MediaType.APPLICATION_JSON))
@@ -99,7 +99,7 @@ class SolicitacaoControllerTest {
     void buscarPorId_DeveRetornar200_QuandoIdExiste() throws Exception {
         SolicitacaoResponseDTO responseMock = criarResponseDTOMock(1L, StatusSolicitacao.RECUSADA);
 
-        when(solicitacaoService.buscarPorId(1L)).thenReturn(responseMock);
+        when(solicitacaoService.buscarPorId(1L, null)).thenReturn(responseMock);
 
         mockMvc.perform(get("/api/v1/solicitacoes/1")
                         .accept(MediaType.APPLICATION_JSON))
@@ -111,7 +111,7 @@ class SolicitacaoControllerTest {
     @Test
     @DisplayName("GET /solicitacoes/{id} - Deve retornar 404 Not Found quando solicitação não existe")
     void buscarPorId_DeveRetornar404_QuandoIdNaoExiste() throws Exception {
-        when(solicitacaoService.buscarPorId(99L))
+        when(solicitacaoService.buscarPorId(99L, null))
                 .thenThrow(new ResourceNotFoundException("Solicitação com identificador 99 não foi encontrada."));
 
         mockMvc.perform(get("/api/v1/solicitacoes/99")
