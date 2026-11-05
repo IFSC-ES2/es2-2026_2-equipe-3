@@ -21,7 +21,7 @@
 | US03 - Busca e Filtragem de Orientadores        |        3 SP        | Concluída                   | Filtro por linha de pesquisa, por vagas disponíveis, combinação e estado vazio.              |
 | US04 - Solicitação e Aceite de Orientação       |        5 SP        | Concluída (Sprint 2)        | Envio, listagem, aceite/recusa e acompanhamento.                                             |
 | US05 - Calendário de Prazos                     |     A estimar      | Concluída                   | CRUD de prazos por tipo de entrega, vinculado à `Turma_TCC`, visível para aluno e professor. |
-| US06 - Submissão de Entregas do TCC | Não estimada | Não iniciada | Escopo retomado nesta sprint, com submissão por link externo HTTPS (seção 3). |
+| US06 - Submissão de Entregas do TCC             |    Não estimada    | Não iniciada                | Escopo retomado nesta sprint, com submissão por link externo HTTPS (seção 3).                |
 | US07 - Avaliação e Parecer das Entregas         |    Não estimada    | Não iniciada                | Escopo retomado nesta sprint (seção 3).                                                      |
 
 Ao final da Sprint 3, o MVP entrega o fluxo completo de autenticação, catálogo, solicitação/aceite de orientação e calendário de prazos. As duas histórias que faltam para fechar o ciclo de acompanhamento do TCC são a submissão do link externo do trabalho pelo aluno (US06) e a avaliação com emissão de parecer pelo orientador (US07), que haviam ficado no backlog desde a Sprint 2.
@@ -35,7 +35,7 @@ Situação registrada em [`docs/riscos.md`](../riscos.md) na revisão da Sprint 
 | R01 - Desistência ou baixa participação                       | Crítica (9) | Concretizado (baixa participação de um integrante durante a Sprint 3). Exige atenção na distribuição de carga da Sprint 4. |
 | R04 - Crescimento do escopo                                   | Crítica (9) | Concretizado (escopo maior que o baseline original). Reforça a necessidade de ajustar escopo à capacidade.                 |
 | R03 - Atraso de integração backend/frontend                   |  Média (3)  | Mitigado pela prática de contrato de dados no início da sprint; mantida na Sprint 4.                                       |
-| R05 - Divergência de ambientes (Docker) | Média (4) | Mitigado, com atenção à configuração do ambiente de staging e à padronização da infraestrutura nesta sprint. |
+| R05 - Divergência de ambientes (Docker)                       |  Média (4)  | Mitigado, com atenção à configuração do ambiente de staging e à padronização da infraestrutura nesta sprint.               |
 | R09 - Complexidade e instabilidade na integração com Keycloak | Crítica (9) | Ativo; acompanhado pelo DevOps/Infra e pela QA.                                                                            |
 
 R01 e R04 se reforçam: a equipe segue com menos capacidade do que o planejado no baseline, na mesma sprint em que o escopo de infraestrutura (staging e CI) aumenta. Por isso, o planejamento da Sprint 4 distribui o trabalho em issues pequenas, com responsáveis definidos por atividade e dependências explícitas, reduzindo a dependência de qualquer integrante isolado.
@@ -71,26 +71,26 @@ A equipe definiu as seguintes regras de negócio e decisões de implementação 
 
 Para permitir Pull Requests pequenos e rastreabilidade individual, as duas histórias foram fatiadas em 17 issues técnicas e de governança, distribuídas entre DevOps, Backend, Frontend e QA. Além dessas atividades, a issue #207 contempla o planejamento inicial e a condução da Sprint 4, sob responsabilidade do Scrum Master. O detalhamento das atividades, critérios de aceitação, estimativas, cronogramas, dependências e responsáveis está registrado nas respectivas issues do GitHub Projects.
 
-| Issue | Área | Responsável     | Início | Fim        |
-|---|---|-----------------|---|------------|
-| #207 — Planejamento inicial e condução da Sprint 4 | Scrum / Governança | Willian         | 03/11/2026 | 11/11/2026 |
-| #208 — Modelagem de dados: Entrega (Flyway V6) | Backend | Damares         | 03/11/2026 | 04/11/2026 |
-| #209 — Contratos de dados das APIs (US06 e US07) | Backend | Damares, Talles | 03/11/2026 | 04/11/2026 |
-| #218 — Configuração de validação de link e variáveis de ambiente (US06) | DevOps | Eduardo         | 03/11/2026 | 03/11/2026 |
-| #223 — Migration e entidades de submissão (US06) | Backend | Damares         | 03/11/2026 | 04/11/2026 |
-| #219 — CI pipeline para entrega-8 | DevOps | Eduardo         | 04/11/2026 | 05/11/2026 |
-| #216 — Service e endpoint de submissão por link (US06) | Backend | Talles          | 04/11/2026 | 06/11/2026 |
-| #226 — Tela de submissão de link de entrega (US06) | Frontend | Marcus          | 05/11/2026 | 06/11/2026 |
-| #220 — Configuração de ambiente de staging acessível | DevOps | Eduardo         | 06/11/2026 | 09/11/2026 |
-| #210 — Endpoint de consulta da submissão para o orientador (US07) | Backend | Talles          | 06/11/2026 | 09/11/2026 |
-| #228 — Cenários de integração: submissão por link (US06) | QA | Willian         | 06/11/2026 | 09/11/2026 |
-| #215 — Migration e endpoint de parecer (US07) | Backend | Damares, Talles | 09/11/2026 | 10/11/2026 |
-| #227 — Tela de avaliação e parecer do orientador (US07) | Frontend | Marcus          | 09/11/2026 | 10/11/2026 |
-| #221 — docs/DEPLOY.md com .env.example consolidado | DevOps | Eduardo         | 09/11/2026 | 10/11/2026 |
-| #230 — docs/METRICAS.md e métricas atualizados | Governança/Processo | Willian         | 10/11/2026 | 11/11/2026 |
-| #229 — Cenários de integração: avaliação e parecer (US07) | QA | Willian         | 10/11/2026 | 11/11/2026 |
-| #231 — Revisar docs/riscos.md para a Sprint 4 | Governança/Processo | Willian         | 10/11/2026 | 11/11/2026 |
-| #222 — Release v0.4.0 (Sprint 4 / Entrega 8) | DevOps | Eduardo         | 11/11/2026 | 11/11/2026 |
+| Issue                                                                   | Área                | Responsável     | Início     | Fim        |
+| ----------------------------------------------------------------------- | ------------------- | --------------- | ---------- | ---------- |
+| #207 — Planejamento inicial e condução da Sprint 4                      | Scrum / Governança  | Willian         | 03/11/2026 | 11/11/2026 |
+| #208 — Modelagem de dados: Entrega (Flyway V6)                          | Backend             | Damares         | 03/11/2026 | 04/11/2026 |
+| #209 — Contratos de dados das APIs (US06 e US07)                        | Backend             | Damares, Talles | 03/11/2026 | 04/11/2026 |
+| #218 — Configuração de validação de link e variáveis de ambiente (US06) | DevOps              | Eduardo         | 03/11/2026 | 03/11/2026 |
+| #223 — Migration e entidades de submissão (US06)                        | Backend             | Damares         | 03/11/2026 | 04/11/2026 |
+| #219 — CI pipeline para entrega-8                                       | DevOps              | Eduardo         | 04/11/2026 | 05/11/2026 |
+| #216 — Service e endpoint de submissão por link (US06)                  | Backend             | Talles          | 04/11/2026 | 06/11/2026 |
+| #226 — Tela de submissão de link de entrega (US06)                      | Frontend            | Marcus          | 05/11/2026 | 06/11/2026 |
+| #220 — Configuração de ambiente de staging acessível                    | DevOps              | Eduardo         | 06/11/2026 | 09/11/2026 |
+| #210 — Endpoint de consulta da submissão para o orientador (US07)       | Backend             | Talles          | 06/11/2026 | 09/11/2026 |
+| #228 — Cenários de integração: submissão por link (US06)                | QA                  | Willian         | 06/11/2026 | 09/11/2026 |
+| #215 — Migration e endpoint de parecer (US07)                           | Backend             | Damares, Talles | 09/11/2026 | 10/11/2026 |
+| #227 — Tela de avaliação e parecer do orientador (US07)                 | Frontend            | Marcus          | 09/11/2026 | 10/11/2026 |
+| #221 — docs/DEPLOY.md com .env.example consolidado                      | DevOps              | Eduardo         | 09/11/2026 | 10/11/2026 |
+| #230 — docs/METRICAS.md e métricas atualizados                          | Governança/Processo | Willian         | 10/11/2026 | 11/11/2026 |
+| #229 — Cenários de integração: avaliação e parecer (US07)               | QA                  | Willian         | 10/11/2026 | 11/11/2026 |
+| #231 — Revisar docs/riscos.md para a Sprint 4                           | Governança/Processo | Willian         | 10/11/2026 | 11/11/2026 |
+| #222 — Release v0.4.0 (Sprint 4 / Entrega 8)                            | DevOps              | Eduardo         | 11/11/2026 | 11/11/2026 |
 
 ---
 
@@ -127,13 +127,13 @@ A revisão completa será registrada em [`docs/riscos.md`](../riscos.md) ao fina
 
 ### 6.1. Papéis e Responsabilidades
 
-| Integrante | Papel na Sprint 4                           | Responsabilidades                                                                                                                                |
-| :--------- | :------------------------------------------ | :----------------------------------------------------------------------------------------------------------------------------------------------- |
-| Damares | Arquiteta de Software / Backend | Desenvolver as entidades e funcionalidades de backend relacionadas às submissões e aos pareceres. |
-| Eduardo | DevOps/Infraestrutura | Configurar as variáveis de ambiente para submissão por link, atualizar o pipeline de CI, preparar o ambiente de staging e documentar o processo de deploy. |
-| Marcus     | Frontend                                    | Desenvolver as telas de submissão e avaliação das entregas.                                                                                      |
-| Talles | Backend | Implementar os serviços e endpoints de submissão, consulta das entregas e avaliação por parecer. |
-| Willian    | Scrum Master e Engenheiro de Qualidade (QA) | Acompanhar a sprint, facilitar o processo, acompanhar o board, realizar os testes de integração e atualizar a documentação de métricas e riscos. |
+| Integrante | Papel na Sprint 4                           | Responsabilidades                                                                                                                                          |
+| :--------- | :------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Damares    | Arquiteta de Software / Backend             | Desenvolver as entidades e funcionalidades de backend relacionadas às submissões e aos pareceres.                                                          |
+| Eduardo    | DevOps/Infraestrutura                       | Configurar as variáveis de ambiente para submissão por link, atualizar o pipeline de CI, preparar o ambiente de staging e documentar o processo de deploy. |
+| Marcus     | Frontend                                    | Desenvolver as telas de submissão e avaliação das entregas.                                                                                                |
+| Talles     | Backend                                     | Implementar os serviços e endpoints de submissão, consulta das entregas e avaliação por parecer.                                                           |
+| Willian    | Scrum Master e Engenheiro de Qualidade (QA) | Acompanhar a sprint, facilitar o processo, acompanhar o board, realizar os testes de integração e atualizar a documentação de métricas e riscos.           |
 
 ---
 
