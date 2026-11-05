@@ -1,16 +1,57 @@
 name: Build Docker Images (Staging)
 
 on:
-  workflow_run:
-    workflows: ["Backend CI - Build e Testes Automatizados", "Frontend CI"]
-    types: [completed]
-    branches: ["entrega-8"]
+  push:
+    branches:
+      - "entrega-8"
 
 jobs:
+  test-backend:
+    name: Testar Backend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: "21"
+          distribution: "temurin"
+          cache: gradle
+
+      - name: Dar permissão e executar testes do backend
+        working-directory: SIGTCC/backend/gestao-tcc
+        run: |
+          chmod +x gradlew
+          ./gradlew test
+
+  test-frontend:
+    name: Testar Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SIGTCC/frontend
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "npm"
+          cache-dependency-path: "SIGTCC/frontend/package-lock.json"
+
+      - name: Instalar dependências e testar
+        run: |
+          npm ci
+          npm test
+
   build-and-push:
     name: Build e Push das Imagens Docker
+    needs: [test-backend, test-frontend]
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'success'
     permissions:
       contents: read
       packages: write

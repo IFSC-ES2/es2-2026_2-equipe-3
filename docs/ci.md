@@ -13,7 +13,7 @@ Para garantir que códigos problemáticos não cheguem à produção, os _workfl
 - `backend-ci.yml` e `verificacao-docs.yml`: Executados em `push` e `pull_request` apontando para o ramo principal (`main`) e branches de entrega (`entrega-*`).
 - `frontend-ci.yml`: Executado em `push` e `pull_request` em `main` e `entrega-*`, mas também em eventos de `push` para `feature/*`.
 - `verificar-formatacao.yml`: Executado apenas em `pull_request` para `main` e `entrega-*`.
-- `docker-build.yml`: Executado de forma encadeada (`workflow_run`) em eventos de conclusão com sucesso dos builds de backend e frontend na branch `entrega-8`.
+- `docker-build.yml`: Executado em `push` para a branch `entrega-8`. Inclui jobs internos de testes unitários (`needs`) que condicionam o build e publicação das imagens.
 
 ## 3. Workflows e Checks Obrigatórios
 
