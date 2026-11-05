@@ -1,14 +1,16 @@
 name: Build Docker Images (Staging)
 
 on:
-  push:
-    branches:
-      - "entrega-8"
+  workflow_run:
+    workflows: ["Backend CI - Build e Testes Automatizados", "Frontend CI"]
+    types: [completed]
+    branches: ["entrega-8"]
 
 jobs:
   build-and-push:
     name: Build e Push das Imagens Docker
     runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'success'
     permissions:
       contents: read
       packages: write
@@ -48,3 +50,6 @@ jobs:
             ghcr.io/ifsc-es2/sigtcc-frontend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            VITE_API_URL=${{ vars.STAGING_API_URL }}
+            VITE_KEYCLOAK_URL=${{ vars.STAGING_KEYCLOAK_URL }}
