@@ -41,6 +41,15 @@ A validação da aplicação web (React / TypeScript / Vite) inclui:
 - **Linting de Código:** ESLint para garantir as boas práticas do React.
 - **Testes:** Execução de testes de componentes com Vitest e Testing Library.
 
+### 3.4. Build de Imagens Docker (Staging)
+
+Para dar suporte à validação em ambiente de staging (a partir da `entrega-8`), o pipeline inclui a geração e publicação de imagens Docker automatizadas.
+
+- **Build e Push:** Utiliza o Docker Buildx para compilar as imagens do Backend e do Frontend simultaneamente.
+- **Registry:** As imagens são publicadas de forma privada/pública no GitHub Container Registry (GHCR), vinculadas ao repositório.
+- **Versionamento:** Cada build gera uma tag `latest` e uma tag com o SHA do commit (ex: `a1b2c3d`), garantindo rastreabilidade para o staging.
+- **Cache:** Utiliza a API de cache nativa do GitHub Actions (`type=gha`) para otimizar o tempo de construção das camadas do Docker.
+
 ## 4. Política de Bloqueio e Quality Gates
 
 A integração atua como a primeira linha de defesa contra bugs e erros (Risco R02 - Falhas de Regressão). Para que um Pull Request possa ser mesclado ao ramo principal, ele precisa obrigatoriamente:
