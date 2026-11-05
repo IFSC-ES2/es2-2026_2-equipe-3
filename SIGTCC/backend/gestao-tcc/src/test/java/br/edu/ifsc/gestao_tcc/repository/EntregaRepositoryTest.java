@@ -65,6 +65,7 @@ class EntregaRepositoryTest {
                 .status(status)
                 .urlDocumento(url)
                 .atrasada(atrasada)
+                .enviadoEm(Instant.parse("2026-11-03T14:20:00Z"))
                 .build();
         return entityManager.persistAndFlush(entrega);
     }
@@ -184,6 +185,7 @@ class EntregaRepositoryTest {
                 .status(StatusEntrega.SUBMETIDO)
                 .urlDocumento("https://link2.com")
                 .atrasada(true)
+                .enviadoEm(Instant.parse("2026-11-03T14:20:00Z"))
                 .build();
 
         assertThrows(Exception.class, () -> {
