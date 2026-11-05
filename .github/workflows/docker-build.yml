@@ -33,8 +33,8 @@ jobs:
           context: SIGTCC/backend/gestao-tcc
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/sigtcc-backend:latest
-            ghcr.io/${{ github.repository_owner }}/sigtcc-backend:${{ github.sha }}
+            ghcr.io/ifsc-es2/sigtcc-backend:latest
+            ghcr.io/ifsc-es2/sigtcc-backend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -44,7 +44,7 @@ jobs:
           context: SIGTCC/frontend
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/sigtcc-frontend:latest
-            ghcr.io/${{ github.repository_owner }}/sigtcc-frontend:${{ github.sha }}
+            ghcr.io/ifsc-es2/sigtcc-frontend:latest
+            ghcr.io/ifsc-es2/sigtcc-frontend:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
