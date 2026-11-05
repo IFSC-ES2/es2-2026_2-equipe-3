@@ -10,7 +10,7 @@ Para o contexto do projeto, os quatro atributos de qualidade mais relevantes sã
 
 ### 1.1 Adequação Funcional
 
-A adequação funcional mede o quão bem o sistema atende às necessidades e requisitos esperados pelos usuários. No MVP, esse atributo é prioritário porque o produto precisa validar o fluxo principal de TCC: autenticação, cadastro e busca de orientadores, solicitação de orientação, controle de prazos e upload de documentos.
+A adequação funcional mede o quão bem o sistema atende às necessidades e requisitos esperados pelos usuários. No MVP, esse atributo é prioritário porque o produto precisa validar o fluxo principal de TCC: autenticação, cadastro e busca de orientadores, solicitação de orientação, controle de prazos e submissão de entregas por link externo (ver [ADR-0013](./adrs/ADR-0013.md)).
 
 **Justificativa de prioridade**
 
@@ -84,7 +84,7 @@ A avaliação da qualidade será feita de forma incremental, com foco em critér
 #### Adequação Funcional
 
 - Validação de histórias de usuário por critérios de aceitação.
-- Testes automatizados de cenários críticos: login, cadastro de professor, busca de orientadores, solicitação de orientação e upload de arquivos.
+- Testes automatizados de cenários críticos: login, cadastro de professor, busca de orientadores, solicitação de orientação e submissão de entregas por link externo.
 - Verificação manual de fluxo principal em ambiente funcional.
 
 **Métricas preliminares**
