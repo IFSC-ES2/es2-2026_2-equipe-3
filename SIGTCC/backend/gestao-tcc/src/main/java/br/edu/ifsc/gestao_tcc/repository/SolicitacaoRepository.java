@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SolicitacaoRepository extends JpaRepository<SolicitacaoOrientacao, Long> {
@@ -15,4 +16,6 @@ public interface SolicitacaoRepository extends JpaRepository<SolicitacaoOrientac
     List<SolicitacaoOrientacao> findByOrientadorIdOrderByCriadoEmDesc(Long orientadorId);
     
     List<SolicitacaoOrientacao> findByOrientadorIdAndStatusOrderByCriadoEmDesc(Long orientadorId, StatusSolicitacao status);
+
+    Optional<SolicitacaoOrientacao> findFirstByAlunoIdAndStatusOrderByCriadoEmDesc(Long alunoId, StatusSolicitacao status);
 }

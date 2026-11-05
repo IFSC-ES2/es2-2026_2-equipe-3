@@ -2,7 +2,6 @@ package br.edu.ifsc.gestao_tcc.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
@@ -53,8 +52,7 @@ public class Entrega {
     @Column(nullable = false)
     private Boolean atrasada = false;
 
-    @CreationTimestamp
-    @Column(name = "enviado_em", nullable = false, updatable = false)
+    @Column(name = "enviado_em", nullable = false)
     private Instant enviadoEm;
 
     @UpdateTimestamp
