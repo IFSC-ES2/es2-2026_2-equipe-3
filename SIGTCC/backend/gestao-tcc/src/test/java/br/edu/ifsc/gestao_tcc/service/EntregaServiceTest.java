@@ -2,6 +2,7 @@ package br.edu.ifsc.gestao_tcc.service;
 
 import br.edu.ifsc.gestao_tcc.dto.EntregaRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.EntregaResponseDTO;
+import br.edu.ifsc.gestao_tcc.dto.ParecerRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.SubmissaoEntregaResultado;
 import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.ConflitoDeEstadoException;
@@ -10,6 +11,7 @@ import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.model.Aluno;
 import br.edu.ifsc.gestao_tcc.model.Entrega;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
+import br.edu.ifsc.gestao_tcc.model.Parecer;
 import br.edu.ifsc.gestao_tcc.model.PrazoEntrega;
 import br.edu.ifsc.gestao_tcc.model.SolicitacaoOrientacao;
 import br.edu.ifsc.gestao_tcc.model.StatusEntrega;
@@ -19,6 +21,7 @@ import br.edu.ifsc.gestao_tcc.model.TurmaTCC;
 import br.edu.ifsc.gestao_tcc.repository.AlunoRepository;
 import br.edu.ifsc.gestao_tcc.repository.EntregaRepository;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
+import br.edu.ifsc.gestao_tcc.repository.ParecerRepository;
 import br.edu.ifsc.gestao_tcc.repository.PrazoEntregaRepository;
 import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
 import br.edu.ifsc.gestao_tcc.repository.TurmaTCCRepository;
@@ -28,9 +31,11 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -61,11 +66,15 @@ class EntregaServiceTest {
     private static final String EMAIL_ORIENTADOR = "orientador@ifsc.edu.br";
     private static final String URL_DOCUMENTO = "https://docs.google.com/document/d/123/edit";
     private static final String NOVA_URL = "https://github.com/org/tcc";
+    private static final String COMENTARIO = "Detalhar melhor a seção de metodologia.";
     private static final String MENSAGEM_ACESSO_NEGADO =
             "Somente alunos com orientador vinculado (solicitação aceita) podem submeter entregas.";
 
     @Mock
     private EntregaRepository entregaRepository;
+
+    @Mock
+    private ParecerRepository parecerRepository;
 
     @Mock
     private AlunoRepository alunoRepository;
@@ -114,7 +123,8 @@ class EntregaServiceTest {
     }
 
     private EntregaService servicoCom(Clock clock) {
-        return new EntregaService(entregaRepository, alunoRepository, orientadorRepository, solicitacaoRepository,
+        return new EntregaService(entregaRepository, parecerRepository, alunoRepository, orientadorRepository,
+                solicitacaoRepository,
                 turmaTCCRepository, prazoEntregaRepository, clock);
     }
 
@@ -567,6 +577,235 @@ class EntregaServiceTest {
             assertThat(service.listarDoAluno(email)).isEmpty();
 
             verify(alunoRepository, never()).findByEmail(any());
+        }
+    }
+
+    private Entrega comEntregaParaParecer(StatusEntrega status) {
+        Entrega entrega = entregaSalva(TipoEntrega.PROJETO_TCC, status);
+        when(entregaRepository.findByIdParaAtualizacao(100L)).thenReturn(Optional.of(entrega));
+        return entrega;
+    }
+
+    private void comSalvamentoDeParecer() {
+        when(parecerRepository.save(any(Parecer.class))).thenAnswer(invocacao -> {
+            Parecer salvo = invocacao.getArgument(0);
+            salvo.setId(50L);
+            return salvo;
+        });
+    }
+
+    private void verificarQueNadaFoiGravado() {
+        verify(parecerRepository, never()).save(any());
+        verify(entregaRepository, never()).save(any());
+    }
+
+    @Nested
+    @DisplayName("Registro de parecer")
+    class RegistrarParecer {
+
+        @ParameterizedTest
+        @EnumSource(value = StatusEntrega.class, names = {"APROVADO", "AJUSTES_NECESSARIOS", "REPROVADO"})
+        @DisplayName("Deve gravar o parecer e atualizar o status da entrega")
+        void registrarParecer_ComResultadoValido_DeveGravarEAtualizarStatus(StatusEntrega resultado) {
+            Entrega entrega = comEntregaParaParecer(StatusEntrega.SUBMETIDO);
+            comSalvamentoDeParecer();
+
+            EntregaResponseDTO resposta = service.registrarParecer(EMAIL_ORIENTADOR, 100L,
+                    new ParecerRequestDTO(resultado, COMENTARIO));
+
+            ArgumentCaptor<Parecer> captor = ArgumentCaptor.forClass(Parecer.class);
+            verify(parecerRepository).save(captor.capture());
+            assertThat(captor.getValue().getEntrega()).isSameAs(entrega);
+            assertThat(captor.getValue().getOrientador()).isSameAs(orientador);
+            assertThat(captor.getValue().getResultado()).isEqualTo(resultado);
+            assertThat(captor.getValue().getComentario()).isEqualTo(COMENTARIO);
+            assertThat(captor.getValue().getRegistradoEm()).isEqualTo(AGORA);
+
+            verify(entregaRepository).save(entrega);
+            assertThat(entrega.getStatus()).isEqualTo(resultado);
+
+            assertThat(resposta.status()).isEqualTo(resultado);
+            assertThat(resposta.parecer().id()).isEqualTo(50L);
+            assertThat(resposta.parecer().resultado()).isEqualTo(resultado);
+            assertThat(resposta.parecer().comentario()).isEqualTo(COMENTARIO);
+            assertThat(resposta.parecer().registradoEm()).isEqualTo(AGORA);
+        }
+
+        @Test
+        @DisplayName("Deve identificar o orientador sem diferenciar maiúsculas e minúsculas no e-mail")
+        void registrarParecer_EmailComCaixaDiferente_DeveAceitar() {
+            comEntregaParaParecer(StatusEntrega.SUBMETIDO);
+            comSalvamentoDeParecer();
+
+            EntregaResponseDTO resposta = service.registrarParecer("ORIENTADOR@IFSC.EDU.BR", 100L,
+                    new ParecerRequestDTO(StatusEntrega.APROVADO, null));
+
+            assertThat(resposta.status()).isEqualTo(StatusEntrega.APROVADO);
+        }
+
+        @ParameterizedTest
+        @NullSource
+        @ValueSource(strings = {"", "   "})
+        @DisplayName("Deve aceitar aprovação sem comentário, gravando o comentário como nulo")
+        void registrarParecer_AprovadoSemComentario_DeveGravarComentarioNulo(String comentario) {
+            comEntregaParaParecer(StatusEntrega.SUBMETIDO);
+            comSalvamentoDeParecer();
+
+            EntregaResponseDTO resposta = service.registrarParecer(EMAIL_ORIENTADOR, 100L,
+                    new ParecerRequestDTO(StatusEntrega.APROVADO, comentario));
+
+            assertThat(resposta.status()).isEqualTo(StatusEntrega.APROVADO);
+            assertThat(resposta.parecer().comentario()).isNull();
+        }
+
+        @Test
+        @DisplayName("Deve lançar não encontrado quando a entrega não existe")
+        void registrarParecer_EntregaInexistente_DeveLancarNaoEncontrado() {
+            when(entregaRepository.findByIdParaAtualizacao(99L)).thenReturn(Optional.empty());
+
+            ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class,
+                    () -> service.registrarParecer(EMAIL_ORIENTADOR, 99L,
+                            new ParecerRequestDTO(StatusEntrega.APROVADO, null)));
+
+            assertThat(ex.getMessage()).isEqualTo("Entrega com identificador 99 não foi encontrada.");
+            verificarQueNadaFoiGravado();
+        }
+
+        @ParameterizedTest
+        @NullSource
+        @ValueSource(strings = {"", "outro.professor@ifsc.edu.br", EMAIL_ALUNO})
+        @DisplayName("Deve negar quem não é o orientador vinculado à entrega")
+        void registrarParecer_SemVinculo_DeveLancarAcessoNegado(String email) {
+            Entrega entrega = comEntregaParaParecer(StatusEntrega.SUBMETIDO);
+
+            AcessoNegadoException ex = assertThrows(AcessoNegadoException.class,
+                    () -> service.registrarParecer(email, 100L,
+                            new ParecerRequestDTO(StatusEntrega.APROVADO, null)));
+
+            assertThat(ex.getMessage()).isEqualTo("Somente o orientador vinculado à entrega pode registrar parecer.");
+            assertThat(entrega.getStatus()).isEqualTo(StatusEntrega.SUBMETIDO);
+            verificarQueNadaFoiGravado();
+        }
+
+        @ParameterizedTest
+        @EnumSource(value = StatusEntrega.class, names = {"APROVADO", "REPROVADO"})
+        @DisplayName("Deve bloquear novo parecer em entrega com decisão definitiva")
+        void registrarParecer_ComParecerDefinitivo_DeveLancarConflito(StatusEntrega status) {
+            Entrega entrega = comEntregaParaParecer(status);
+
+            ConflitoDeEstadoException ex = assertThrows(ConflitoDeEstadoException.class,
+                    () -> service.registrarParecer(EMAIL_ORIENTADOR, 100L,
+                            new ParecerRequestDTO(StatusEntrega.AJUSTES_NECESSARIOS, COMENTARIO)));
+
+            assertThat(ex.getMessage()).isEqualTo("Esta entrega já possui parecer definitivo (" + status
+                    + ") e não pode ser reavaliada.");
+            assertThat(entrega.getStatus()).isEqualTo(status);
+            verificarQueNadaFoiGravado();
+        }
+
+        @Test
+        @DisplayName("Deve bloquear novo parecer enquanto a entrega aguarda reenvio do aluno")
+        void registrarParecer_AguardandoReenvio_DeveLancarConflito() {
+            comEntregaParaParecer(StatusEntrega.AJUSTES_NECESSARIOS);
+
+            ConflitoDeEstadoException ex = assertThrows(ConflitoDeEstadoException.class,
+                    () -> service.registrarParecer(EMAIL_ORIENTADOR, 100L,
+                            new ParecerRequestDTO(StatusEntrega.APROVADO, null)));
+
+            assertThat(ex.getMessage()).isEqualTo(
+                    "Esta entrega aguarda reenvio do aluno antes de receber um novo parecer.");
+            verificarQueNadaFoiGravado();
+        }
+
+        @Test
+        @DisplayName("Deve responder conflito antes de validar o conteúdo quando a entrega já foi encerrada")
+        void registrarParecer_EncerradaEConteudoInvalido_DevePriorizarConflito() {
+            comEntregaParaParecer(StatusEntrega.APROVADO);
+
+            assertThrows(ConflitoDeEstadoException.class,
+                    () -> service.registrarParecer(EMAIL_ORIENTADOR, 100L,
+                            new ParecerRequestDTO(StatusEntrega.REPROVADO, null)));
+        }
+
+        @Test
+        @DisplayName("Deve rejeitar SUBMETIDO como resultado do parecer")
+        void registrarParecer_ResultadoSubmetido_DeveLancarRegraDeNegocio() {
+            comEntregaParaParecer(StatusEntrega.SUBMETIDO);
+
+            RegraDeNegocioException ex = assertThrows(RegraDeNegocioException.class,
+                    () -> service.registrarParecer(EMAIL_ORIENTADOR, 100L,
+                            new ParecerRequestDTO(StatusEntrega.SUBMETIDO, COMENTARIO)));
+
+            assertThat(ex.getMessage()).isEqualTo(
+                    "O resultado do parecer deve ser APROVADO, AJUSTES_NECESSARIOS ou REPROVADO.");
+            verificarQueNadaFoiGravado();
+        }
+
+        @ParameterizedTest
+        @CsvSource(value = {
+                "AJUSTES_NECESSARIOS,NULL", "AJUSTES_NECESSARIOS,''", "AJUSTES_NECESSARIOS,'   '",
+                "REPROVADO,NULL", "REPROVADO,''", "REPROVADO,'   '"
+        }, nullValues = "NULL")
+        @DisplayName("Deve exigir comentário em ajustes e reprovação")
+        void registrarParecer_SemComentarioObrigatorio_DeveLancarRegraDeNegocio(StatusEntrega resultado,
+                                                                                String comentario) {
+            Entrega entrega = comEntregaParaParecer(StatusEntrega.SUBMETIDO);
+
+            RegraDeNegocioException ex = assertThrows(RegraDeNegocioException.class,
+                    () -> service.registrarParecer(EMAIL_ORIENTADOR, 100L,
+                            new ParecerRequestDTO(resultado, comentario)));
+
+            assertThat(ex.getMessage()).isEqualTo("O comentário com a justificativa é obrigatório "
+                    + "quando o parecer exige ajustes ou reprova a entrega.");
+            assertThat(entrega.getStatus()).isEqualTo(StatusEntrega.SUBMETIDO);
+            verificarQueNadaFoiGravado();
+        }
+    }
+
+    @Nested
+    @DisplayName("Parecer nas respostas")
+    class ParecerNasRespostas {
+
+        private Parecer parecerSalvo(StatusEntrega resultado) {
+            return Parecer.builder()
+                    .id(50L)
+                    .resultado(resultado)
+                    .comentario(COMENTARIO)
+                    .registradoEm(AGORA)
+                    .build();
+        }
+
+        @Test
+        @DisplayName("A consulta deve expor o parecer mais recente da entrega")
+        void buscarPorId_ComParecer_DeveRetornarParecerMaisRecente() {
+            when(entregaRepository.findById(100L))
+                    .thenReturn(Optional.of(entregaSalva(TipoEntrega.PROJETO_TCC, StatusEntrega.APROVADO)));
+            when(parecerRepository.findFirstByEntregaIdOrderByRegistradoEmDescIdDesc(100L))
+                    .thenReturn(Optional.of(parecerSalvo(StatusEntrega.APROVADO)));
+
+            EntregaResponseDTO resposta = service.buscarPorId(EMAIL_ALUNO, 100L);
+
+            assertThat(resposta.parecer().id()).isEqualTo(50L);
+            assertThat(resposta.parecer().resultado()).isEqualTo(StatusEntrega.APROVADO);
+            assertThat(resposta.parecer().comentario()).isEqualTo(COMENTARIO);
+            assertThat(resposta.parecer().registradoEm()).isEqualTo(AGORA);
+        }
+
+        @Test
+        @DisplayName("O reenvio deve voltar para SUBMETIDO mantendo o último parecer registrado")
+        void submeter_Reenvio_DeveManterUltimoParecer() {
+            comVinculoAceito();
+            comPrazo(HOJE.plusDays(10));
+            Entrega existente = comEntregaExistente(StatusEntrega.AJUSTES_NECESSARIOS);
+            when(entregaRepository.save(existente)).thenReturn(existente);
+            when(parecerRepository.findFirstByEntregaIdOrderByRegistradoEmDescIdDesc(100L))
+                    .thenReturn(Optional.of(parecerSalvo(StatusEntrega.AJUSTES_NECESSARIOS)));
+
+            SubmissaoEntregaResultado resultado = service.submeter(EMAIL_ALUNO,
+                    new EntregaRequestDTO(TipoEntrega.PROJETO_TCC, NOVA_URL));
+
+            assertThat(resultado.entrega().status()).isEqualTo(StatusEntrega.SUBMETIDO);
+            assertThat(resultado.entrega().parecer().resultado()).isEqualTo(StatusEntrega.AJUSTES_NECESSARIOS);
         }
     }
 }

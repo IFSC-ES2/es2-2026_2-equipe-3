@@ -4,6 +4,7 @@ import br.edu.ifsc.gestao_tcc.config.ClockConfig;
 import br.edu.ifsc.gestao_tcc.model.Aluno;
 import br.edu.ifsc.gestao_tcc.model.Entrega;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
+import br.edu.ifsc.gestao_tcc.model.Parecer;
 import br.edu.ifsc.gestao_tcc.model.PrazoEntrega;
 import br.edu.ifsc.gestao_tcc.model.SolicitacaoOrientacao;
 import br.edu.ifsc.gestao_tcc.model.StatusEntrega;
@@ -13,6 +14,7 @@ import br.edu.ifsc.gestao_tcc.model.TurmaTCC;
 import br.edu.ifsc.gestao_tcc.repository.AlunoRepository;
 import br.edu.ifsc.gestao_tcc.repository.EntregaRepository;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
+import br.edu.ifsc.gestao_tcc.repository.ParecerRepository;
 import br.edu.ifsc.gestao_tcc.repository.PrazoEntregaRepository;
 import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
 import br.edu.ifsc.gestao_tcc.repository.TurmaTCCRepository;
@@ -64,6 +66,7 @@ class EntregaControllerIntegrationTest {
     private static final String URL_DOCUMENTO = "https://docs.google.com/document/d/123/edit?usp=sharing";
     private static final String NOVA_URL = "https://github.com/org/tcc";
     private static final Instant ENVIO_ANTERIOR = Instant.parse("2026-01-10T10:00:00Z");
+    private static final String COMENTARIO_PARECER = "Detalhar melhor a seção de metodologia.";
     private static final String MENSAGEM_URL_INVALIDA =
             "A URL do documento deve ser válida e utilizar o protocolo https.";
 
@@ -90,6 +93,9 @@ class EntregaControllerIntegrationTest {
 
     @Autowired
     private EntregaRepository entregaRepository;
+
+    @Autowired
+    private ParecerRepository parecerRepository;
 
     private Orientador orientador;
     private Aluno aluno;
@@ -673,5 +679,282 @@ class EntregaControllerIntegrationTest {
         mockMvc.perform(get(URL + "/minhas").with(tokenDe("ROLE_PROFESSOR", EMAIL_ORIENTADOR)))
                 .andExpect(status().isForbidden())
                 .andExpect(content().string(""));
+    }
+
+    private ResultActions registrarParecer(Long id, String payload) throws Exception {
+        return mockMvc.perform(post(URL + "/" + id + "/parecer")
+                .with(tokenDe("ROLE_PROFESSOR", EMAIL_ORIENTADOR))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(payload));
+    }
+
+    private String corpoParecer(String resultado, String comentario) {
+        return """
+                {
+                  "resultado": "%s",
+                  "comentario": "%s"
+                }
+                """.formatted(resultado, comentario);
+    }
+
+    private String corpoParecerSemComentario(String resultado) {
+        return """
+                { "resultado": "%s" }
+                """.formatted(resultado);
+    }
+
+    private Entrega comEntregaSubmetida() {
+        return comEntrega(comTurmaVigente(), StatusEntrega.SUBMETIDO);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"APROVADO", "AJUSTES_NECESSARIOS", "REPROVADO"})
+    @DisplayName("POST /entregas/{id}/parecer - Deve gravar o parecer e atualizar o status (200 OK)")
+    void registrarParecer_ResultadoValido_DeveRetornar200EPersistir(String resultado) throws Exception {
+        Entrega entrega = comEntregaSubmetida();
+
+        registrarParecer(entrega.getId(), corpoParecer(resultado, COMENTARIO_PARECER))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(entrega.getId()))
+                .andExpect(jsonPath("$.status").value(resultado))
+                .andExpect(jsonPath("$.parecer.id").isNumber())
+                .andExpect(jsonPath("$.parecer.resultado").value(resultado))
+                .andExpect(jsonPath("$.parecer.comentario").value(COMENTARIO_PARECER))
+                .andExpect(jsonPath("$.parecer.registradoEm").isNotEmpty());
+
+        // Descarta o cache da sessão para ler o que realmente foi gravado no banco.
+        entityManager.flush();
+        entityManager.clear();
+
+        Entrega gravada = entregaRepository.findById(entrega.getId()).orElseThrow();
+        assertThat(gravada.getStatus()).isEqualTo(StatusEntrega.valueOf(resultado));
+        assertThat(gravada.getEnviadoEm()).isEqualTo(ENVIO_ANTERIOR);
+
+        Parecer parecer = parecerRepository.findFirstByEntregaIdOrderByRegistradoEmDescIdDesc(entrega.getId())
+                .orElseThrow();
+        assertThat(parecer.getResultado()).isEqualTo(StatusEntrega.valueOf(resultado));
+        assertThat(parecer.getComentario()).isEqualTo(COMENTARIO_PARECER);
+        assertThat(parecer.getOrientador().getId()).isEqualTo(orientador.getId());
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve aceitar aprovação sem comentário (200 OK)")
+    void registrarParecer_AprovadoSemComentario_DeveRetornar200() throws Exception {
+        Entrega entrega = comEntregaSubmetida();
+
+        registrarParecer(entrega.getId(), corpoParecerSemComentario("APROVADO"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("APROVADO"))
+                .andExpect(jsonPath("$.parecer.comentario").value(nullValue()));
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve percorrer ajustes, reenvio e aprovação expondo o parecer mais recente")
+    void registrarParecer_FluxoCompleto_DeveExporParecerMaisRecente() throws Exception {
+        comSolicitacao(StatusSolicitacao.ACEITA);
+        comPrazoProjeto(hoje.plusDays(5));
+        enviar(corpo(URL_DOCUMENTO)).andExpect(status().isCreated());
+        Long id = entregaRepository.findByAlunoIdOrderByTipoAsc(aluno.getId()).getFirst().getId();
+
+        registrarParecer(id, corpoParecer("AJUSTES_NECESSARIOS", COMENTARIO_PARECER))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("AJUSTES_NECESSARIOS"));
+
+        enviar(corpo(NOVA_URL))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("SUBMETIDO"))
+                .andExpect(jsonPath("$.urlDocumento").value(NOVA_URL))
+                .andExpect(jsonPath("$.parecer.resultado").value("AJUSTES_NECESSARIOS"))
+                .andExpect(jsonPath("$.parecer.comentario").value(COMENTARIO_PARECER));
+
+        registrarParecer(id, corpoParecer("APROVADO", "Ajustes atendidos."))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("APROVADO"))
+                .andExpect(jsonPath("$.parecer.resultado").value("APROVADO"));
+
+        registrarParecer(id, corpoParecer("REPROVADO", COMENTARIO_PARECER))
+                .andExpect(status().isConflict());
+
+        // Os dois pareceres são registrados no mesmo segundo, então isto também exercita o desempate por id.
+        entityManager.flush();
+        entityManager.clear();
+
+        mockMvc.perform(get(URL + "/" + id).with(tokenDe("ROLE_ALUNO", EMAIL_ALUNO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("APROVADO"))
+                .andExpect(jsonPath("$.parecer.resultado").value("APROVADO"))
+                .andExpect(jsonPath("$.parecer.comentario").value("Ajustes atendidos."));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "/{id},ROLE_PROFESSOR," + EMAIL_ORIENTADOR + ",$.parecer.resultado",
+            "/{id},ROLE_ALUNO," + EMAIL_ALUNO + ",$.parecer.resultado",
+            "/orientador,ROLE_PROFESSOR," + EMAIL_ORIENTADOR + ",$[0].parecer.resultado",
+            "/minhas,ROLE_ALUNO," + EMAIL_ALUNO + ",$[0].parecer.resultado"
+    })
+    @DisplayName("GET /entregas/* - Deve expor o parecer registrado nas consultas (200 OK)")
+    void consultas_ComParecer_DevemExporParecer(String rota, String role, String email, String caminho)
+            throws Exception {
+        Entrega entrega = comEntregaSubmetida();
+        registrarParecer(entrega.getId(), corpoParecer("REPROVADO", COMENTARIO_PARECER))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get(URL + rota.replace("{id}", entrega.getId().toString())).with(tokenDe(role, email)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(caminho).value("REPROVADO"));
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve rejeitar resultado ausente (400 Bad Request)")
+    void registrarParecer_ResultadoAusente_DeveRetornar400() throws Exception {
+        registrarParecer(1L, "{}")
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erro").value("Erro de validação nos dados enviados"))
+                .andExpect(jsonPath("$.detalhes[0].campo").value("resultado"))
+                .andExpect(jsonPath("$.detalhes[0].mensagem").value("O resultado do parecer é obrigatório."));
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve rejeitar resultado fora da enumeração (400 Bad Request)")
+    void registrarParecer_ResultadoInvalido_DeveRetornar400() throws Exception {
+        registrarParecer(1L, corpoParecerSemComentario("RESSALVAS"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erro").value("Corpo da requisição inválido ou ilegível"))
+                .andExpect(jsonPath("$.detalhes").value("O corpo da requisição está ausente, mal formatado "
+                        + "ou contém um valor incompatível com o tipo esperado."));
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve rejeitar comentário com mais de 2000 caracteres (400 Bad Request)")
+    void registrarParecer_ComentarioMuitoLongo_DeveRetornar400() throws Exception {
+        registrarParecer(1L, corpoParecer("APROVADO", "a".repeat(2001)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detalhes[0].campo").value("comentario"))
+                .andExpect(jsonPath("$.detalhes[0].mensagem").value("O comentário deve ter no máximo 2000 caracteres."));
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve aceitar comentário com exatamente 2000 caracteres (200 OK)")
+    void registrarParecer_ComentarioNoLimite_DeveRetornar200() throws Exception {
+        Entrega entrega = comEntregaSubmetida();
+
+        registrarParecer(entrega.getId(), corpoParecer("APROVADO", "a".repeat(2000)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve rejeitar identificador não numérico (400 Bad Request)")
+    void registrarParecer_IdInvalido_DeveRetornar400() throws Exception {
+        mockMvc.perform(post(URL + "/abc/parecer")
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_ORIENTADOR))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(corpoParecerSemComentario("APROVADO")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.erro").value("Parâmetro de requisição inválido"))
+                .andExpect(jsonPath("$.detalhes").value("Valor inválido para o parâmetro 'id'."));
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve negar professor não vinculado, com corpo (403 Forbidden)")
+    void registrarParecer_ProfessorNaoVinculado_DeveRetornar403ComCorpo() throws Exception {
+        Entrega entrega = comEntregaSubmetida();
+        String caminho = URL + "/" + entrega.getId() + "/parecer";
+
+        mockMvc.perform(post(caminho)
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_OUTRO_ORIENTADOR))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(corpoParecerSemComentario("APROVADO")))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.erro").value("Acesso negado"))
+                .andExpect(jsonPath("$.caminho").value(caminho))
+                .andExpect(jsonPath("$.detalhes").value(
+                        "Somente o orientador vinculado à entrega pode registrar parecer."));
+
+        assertThat(parecerRepository.findByEntregaIdOrderByRegistradoEmDesc(entrega.getId())).isEmpty();
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve negar aluno, sem corpo (403 Forbidden)")
+    void registrarParecer_ComoAluno_DeveRetornar403SemCorpo() throws Exception {
+        Entrega entrega = comEntregaSubmetida();
+
+        mockMvc.perform(post(URL + "/" + entrega.getId() + "/parecer")
+                        .with(tokenDe("ROLE_ALUNO", EMAIL_ALUNO))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(corpoParecerSemComentario("APROVADO")))
+                .andExpect(status().isForbidden())
+                .andExpect(content().string(""));
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve exigir token (401 Unauthorized)")
+    void registrarParecer_SemToken_DeveRetornar401() throws Exception {
+        mockMvc.perform(post(URL + "/1/parecer")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(corpoParecerSemComentario("APROVADO")))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve informar entrega inexistente (404 Not Found)")
+    void registrarParecer_EntregaInexistente_DeveRetornar404() throws Exception {
+        registrarParecer(99L, corpoParecerSemComentario("APROVADO"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.erro").value("Recurso não encontrado"))
+                .andExpect(jsonPath("$.detalhes").value("Entrega com identificador 99 não foi encontrada."));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"APROVADO", "REPROVADO"})
+    @DisplayName("POST /entregas/{id}/parecer - Deve bloquear entrega com parecer definitivo (409 Conflict)")
+    void registrarParecer_ComParecerDefinitivo_DeveRetornar409(String statusAtual) throws Exception {
+        Entrega entrega = comEntrega(comTurmaVigente(), StatusEntrega.valueOf(statusAtual));
+
+        registrarParecer(entrega.getId(), corpoParecer("AJUSTES_NECESSARIOS", COMENTARIO_PARECER))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.erro").value("Conflito de dados"))
+                .andExpect(jsonPath("$.detalhes").value("Esta entrega já possui parecer definitivo ("
+                        + statusAtual + ") e não pode ser reavaliada."));
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve bloquear entrega aguardando reenvio (409 Conflict)")
+    void registrarParecer_AguardandoReenvio_DeveRetornar409() throws Exception {
+        Entrega entrega = comEntrega(comTurmaVigente(), StatusEntrega.AJUSTES_NECESSARIOS);
+
+        registrarParecer(entrega.getId(), corpoParecerSemComentario("APROVADO"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.detalhes").value(
+                        "Esta entrega aguarda reenvio do aluno antes de receber um novo parecer."));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"AJUSTES_NECESSARIOS", "REPROVADO"})
+    @DisplayName("POST /entregas/{id}/parecer - Deve exigir comentário em ajustes e reprovação (422 Unprocessable Content)")
+    void registrarParecer_SemComentarioObrigatorio_DeveRetornar422(String resultado) throws Exception {
+        Entrega entrega = comEntregaSubmetida();
+        String mensagem = "O comentário com a justificativa é obrigatório "
+                + "quando o parecer exige ajustes ou reprova a entrega.";
+
+        registrarParecer(entrega.getId(), corpoParecerSemComentario(resultado))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.erro").value("Regra de negócio violada"))
+                .andExpect(jsonPath("$.detalhes").value(mensagem));
+
+        registrarParecer(entrega.getId(), corpoParecer(resultado, "   "))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.detalhes").value(mensagem));
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Deve rejeitar SUBMETIDO como resultado (422 Unprocessable Content)")
+    void registrarParecer_ResultadoSubmetido_DeveRetornar422() throws Exception {
+        Entrega entrega = comEntregaSubmetida();
+
+        registrarParecer(entrega.getId(), corpoParecer("SUBMETIDO", COMENTARIO_PARECER))
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.detalhes").value(
+                        "O resultado do parecer deve ser APROVADO, AJUSTES_NECESSARIOS ou REPROVADO."));
     }
 }
