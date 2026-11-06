@@ -6,6 +6,7 @@ import br.edu.ifsc.gestao_tcc.dto.SubmissaoEntregaResultado;
 import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.ConflitoDeEstadoException;
 import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
+import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.model.Aluno;
 import br.edu.ifsc.gestao_tcc.model.Entrega;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
@@ -17,6 +18,7 @@ import br.edu.ifsc.gestao_tcc.model.TipoEntrega;
 import br.edu.ifsc.gestao_tcc.model.TurmaTCC;
 import br.edu.ifsc.gestao_tcc.repository.AlunoRepository;
 import br.edu.ifsc.gestao_tcc.repository.EntregaRepository;
+import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
 import br.edu.ifsc.gestao_tcc.repository.PrazoEntregaRepository;
 import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
 import br.edu.ifsc.gestao_tcc.repository.TurmaTCCRepository;
@@ -29,6 +31,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -37,9 +40,12 @@ public class EntregaService {
 
     private static final String MENSAGEM_ACESSO_NEGADO =
             "Somente alunos com orientador vinculado (solicitação aceita) podem submeter entregas.";
+    private static final String MENSAGEM_CONSULTA_NEGADA =
+            "Acesso permitido apenas ao aluno autor ou ao orientador vinculado a esta entrega.";
 
     private final EntregaRepository entregaRepository;
     private final AlunoRepository alunoRepository;
+    private final OrientadorRepository orientadorRepository;
     private final SolicitacaoRepository solicitacaoRepository;
     private final TurmaTCCRepository turmaTCCRepository;
     private final PrazoEntregaRepository prazoEntregaRepository;
@@ -81,6 +87,52 @@ public class EntregaService {
                 .build();
 
         return new SubmissaoEntregaResultado(toResponse(salvarNova(nova)), true);
+    }
+
+    @Transactional(readOnly = true)
+    public EntregaResponseDTO buscarPorId(String email, Long id) {
+        Entrega entrega = entregaRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Entrega com identificador " + id + " não foi encontrada."));
+
+        boolean autor = entrega.getAluno().getEmail().equalsIgnoreCase(email);
+        boolean orientadorVinculado = entrega.getOrientador().getEmail().equalsIgnoreCase(email);
+
+        if (!autor && !orientadorVinculado) {
+            throw new AcessoNegadoException(MENSAGEM_CONSULTA_NEGADA);
+        }
+
+        return toResponse(entrega);
+    }
+
+    @Transactional(readOnly = true)
+    public List<EntregaResponseDTO> listarDoOrientador(String email, StatusEntrega status) {
+        if (email == null || email.isBlank()) {
+            throw new ResourceNotFoundException("Não foi possível identificar o professor autenticado.");
+        }
+
+        Orientador orientador = orientadorRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Orientador com e-mail " + email + " não foi encontrado."));
+
+        List<Entrega> entregas = status == null
+                ? entregaRepository.findByOrientadorIdOrderByEnviadoEmDesc(orientador.getId())
+                : entregaRepository.findByOrientadorIdAndStatusOrderByEnviadoEmDesc(orientador.getId(), status);
+
+        return entregas.stream().map(this::toResponse).toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<EntregaResponseDTO> listarDoAluno(String email) {
+        if (email == null || email.isBlank()) {
+            return List.of();
+        }
+
+        return alunoRepository.findByEmail(email)
+                .map(aluno -> entregaRepository.findByAlunoIdOrderByTipoAsc(aluno.getId()).stream()
+                        .map(this::toResponse)
+                        .toList())
+                .orElse(List.of());
     }
 
     private SolicitacaoOrientacao buscarVinculoAtivo(String emailAluno) {
