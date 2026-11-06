@@ -2,6 +2,7 @@ package br.edu.ifsc.gestao_tcc.service;
 
 import br.edu.ifsc.gestao_tcc.dto.EntregaRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.EntregaResponseDTO;
+import br.edu.ifsc.gestao_tcc.dto.ParecerRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.SubmissaoEntregaResultado;
 import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.ConflitoDeEstadoException;
@@ -10,6 +11,7 @@ import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.model.Aluno;
 import br.edu.ifsc.gestao_tcc.model.Entrega;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
+import br.edu.ifsc.gestao_tcc.model.Parecer;
 import br.edu.ifsc.gestao_tcc.model.PrazoEntrega;
 import br.edu.ifsc.gestao_tcc.model.SolicitacaoOrientacao;
 import br.edu.ifsc.gestao_tcc.model.StatusEntrega;
@@ -19,6 +21,7 @@ import br.edu.ifsc.gestao_tcc.model.TurmaTCC;
 import br.edu.ifsc.gestao_tcc.repository.AlunoRepository;
 import br.edu.ifsc.gestao_tcc.repository.EntregaRepository;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
+import br.edu.ifsc.gestao_tcc.repository.ParecerRepository;
 import br.edu.ifsc.gestao_tcc.repository.PrazoEntregaRepository;
 import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
 import br.edu.ifsc.gestao_tcc.repository.TurmaTCCRepository;
@@ -42,8 +45,11 @@ public class EntregaService {
             "Somente alunos com orientador vinculado (solicitação aceita) podem submeter entregas.";
     private static final String MENSAGEM_CONSULTA_NEGADA =
             "Acesso permitido apenas ao aluno autor ou ao orientador vinculado a esta entrega.";
+    private static final String MENSAGEM_PARECER_NEGADO =
+            "Somente o orientador vinculado à entrega pode registrar parecer.";
 
     private final EntregaRepository entregaRepository;
+    private final ParecerRepository parecerRepository;
     private final AlunoRepository alunoRepository;
     private final OrientadorRepository orientadorRepository;
     private final SolicitacaoRepository solicitacaoRepository;
@@ -135,6 +141,33 @@ public class EntregaService {
                 .orElse(List.of());
     }
 
+    @Transactional
+    public EntregaResponseDTO registrarParecer(String email, Long id, ParecerRequestDTO dto) {
+        Entrega entrega = entregaRepository.findByIdParaAtualizacao(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Entrega com identificador " + id + " não foi encontrada."));
+
+        if (!entrega.getOrientador().getEmail().equalsIgnoreCase(email)) {
+            throw new AcessoNegadoException(MENSAGEM_PARECER_NEGADO);
+        }
+
+        validarStatusParaParecer(entrega);
+        validarConteudoDoParecer(dto);
+
+        Parecer parecer = parecerRepository.save(Parecer.builder()
+                .entrega(entrega)
+                .orientador(entrega.getOrientador())
+                .resultado(dto.resultado())
+                .comentario(comentarioEmBranco(dto.comentario()) ? null : dto.comentario())
+                .registradoEm(Instant.now(clock).truncatedTo(ChronoUnit.SECONDS))
+                .build());
+
+        entrega.setStatus(dto.resultado());
+        entregaRepository.save(entrega);
+
+        return toResponse(entrega, parecer);
+    }
+
     private SolicitacaoOrientacao buscarVinculoAtivo(String emailAluno) {
         if (emailAluno == null || emailAluno.isBlank()) {
             throw new AcessoNegadoException(MENSAGEM_ACESSO_NEGADO);
@@ -171,7 +204,41 @@ public class EntregaService {
                 + " com status " + status + ". O reenvio só é permitido quando o status for AJUSTES_NECESSARIOS.");
     }
 
+    private void validarStatusParaParecer(Entrega entrega) {
+        if (entrega.getStatus() == StatusEntrega.AJUSTES_NECESSARIOS) {
+            throw new ConflitoDeEstadoException(
+                    "Esta entrega aguarda reenvio do aluno antes de receber um novo parecer.");
+        }
+
+        if (entrega.getStatus() != StatusEntrega.SUBMETIDO) {
+            throw new ConflitoDeEstadoException("Esta entrega já possui parecer definitivo ("
+                    + entrega.getStatus() + ") e não pode ser reavaliada.");
+        }
+    }
+
+    private void validarConteudoDoParecer(ParecerRequestDTO dto) {
+        if (dto.resultado() == StatusEntrega.SUBMETIDO) {
+            throw new RegraDeNegocioException(
+                    "O resultado do parecer deve ser APROVADO, AJUSTES_NECESSARIOS ou REPROVADO.");
+        }
+
+        if (dto.resultado() != StatusEntrega.APROVADO && comentarioEmBranco(dto.comentario())) {
+            throw new RegraDeNegocioException("O comentário com a justificativa é obrigatório "
+                    + "quando o parecer exige ajustes ou reprova a entrega.");
+        }
+    }
+
+    private boolean comentarioEmBranco(String comentario) {
+        return comentario == null || comentario.isBlank();
+    }
+
     private EntregaResponseDTO toResponse(Entrega entrega) {
+        return toResponse(entrega, parecerRepository
+                .findFirstByEntregaIdOrderByRegistradoEmDescIdDesc(entrega.getId())
+                .orElse(null));
+    }
+
+    private EntregaResponseDTO toResponse(Entrega entrega, Parecer parecer) {
         Aluno aluno = entrega.getAluno();
         Orientador orientador = entrega.getOrientador();
 
@@ -188,7 +255,8 @@ public class EntregaService {
                         aluno.getId(), aluno.getNome(), aluno.getEmail(), aluno.getCurso()),
                 new EntregaResponseDTO.OrientadorResponse(
                         orientador.getId(), orientador.getNome(), orientador.getEmail()),
-                null
+                parecer == null ? null : new EntregaResponseDTO.ParecerResumoResponse(
+                        parecer.getId(), parecer.getResultado(), parecer.getComentario(), parecer.getRegistradoEm())
         );
     }
 }

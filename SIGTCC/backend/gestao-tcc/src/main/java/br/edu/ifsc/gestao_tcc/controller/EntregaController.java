@@ -2,6 +2,7 @@ package br.edu.ifsc.gestao_tcc.controller;
 
 import br.edu.ifsc.gestao_tcc.dto.EntregaRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.EntregaResponseDTO;
+import br.edu.ifsc.gestao_tcc.dto.ParecerRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.SubmissaoEntregaResultado;
 import br.edu.ifsc.gestao_tcc.model.StatusEntrega;
 import br.edu.ifsc.gestao_tcc.service.EntregaService;
@@ -69,5 +70,14 @@ public class EntregaController {
             @PathVariable Long id) {
 
         return ResponseEntity.ok(entregaService.buscarPorId(jwt.getClaimAsString(CLAIM_EMAIL), id));
+    }
+
+    @PostMapping("/{id}/parecer")
+    public ResponseEntity<EntregaResponseDTO> registrarParecer(
+            @AuthenticationPrincipal Jwt jwt,
+            @PathVariable Long id,
+            @RequestBody @Valid ParecerRequestDTO dto) {
+
+        return ResponseEntity.ok(entregaService.registrarParecer(jwt.getClaimAsString(CLAIM_EMAIL), id, dto));
     }
 }
