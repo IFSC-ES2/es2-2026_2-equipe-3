@@ -1,10 +1,12 @@
 package br.edu.ifsc.gestao_tcc.service;
 
 import br.edu.ifsc.gestao_tcc.dto.EntregaRequestDTO;
+import br.edu.ifsc.gestao_tcc.dto.EntregaResponseDTO;
 import br.edu.ifsc.gestao_tcc.dto.SubmissaoEntregaResultado;
 import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.ConflitoDeEstadoException;
 import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
+import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.model.Aluno;
 import br.edu.ifsc.gestao_tcc.model.Entrega;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
@@ -16,6 +18,7 @@ import br.edu.ifsc.gestao_tcc.model.TipoEntrega;
 import br.edu.ifsc.gestao_tcc.model.TurmaTCC;
 import br.edu.ifsc.gestao_tcc.repository.AlunoRepository;
 import br.edu.ifsc.gestao_tcc.repository.EntregaRepository;
+import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
 import br.edu.ifsc.gestao_tcc.repository.PrazoEntregaRepository;
 import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
 import br.edu.ifsc.gestao_tcc.repository.TurmaTCCRepository;
@@ -36,6 +39,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,6 +58,7 @@ class EntregaServiceTest {
     private static final LocalDate HOJE = LocalDate.of(2026, 10, 15);
 
     private static final String EMAIL_ALUNO = "aluno@ifsc.edu.br";
+    private static final String EMAIL_ORIENTADOR = "orientador@ifsc.edu.br";
     private static final String URL_DOCUMENTO = "https://docs.google.com/document/d/123/edit";
     private static final String NOVA_URL = "https://github.com/org/tcc";
     private static final String MENSAGEM_ACESSO_NEGADO =
@@ -64,6 +69,9 @@ class EntregaServiceTest {
 
     @Mock
     private AlunoRepository alunoRepository;
+
+    @Mock
+    private OrientadorRepository orientadorRepository;
 
     @Mock
     private SolicitacaoRepository solicitacaoRepository;
@@ -95,7 +103,7 @@ class EntregaServiceTest {
         orientador = new Orientador();
         orientador.setId(1L);
         orientador.setNome("Professor Orientador");
-        orientador.setEmail("orientador@ifsc.edu.br");
+        orientador.setEmail(EMAIL_ORIENTADOR);
 
         turma = TurmaTCC.builder()
                 .id(10L)
@@ -106,7 +114,7 @@ class EntregaServiceTest {
     }
 
     private EntregaService servicoCom(Clock clock) {
-        return new EntregaService(entregaRepository, alunoRepository, solicitacaoRepository,
+        return new EntregaService(entregaRepository, alunoRepository, orientadorRepository, solicitacaoRepository,
                 turmaTCCRepository, prazoEntregaRepository, clock);
     }
 
@@ -400,6 +408,165 @@ class EntregaServiceTest {
                     () -> service.submeter(EMAIL_ALUNO, requisicao));
 
             assertThat(ex.getMessage()).isEqualTo("Não há prazo cadastrado para Projeto de TCC na turma vigente.");
+        }
+    }
+
+    private Entrega entregaSalva(TipoEntrega tipo, StatusEntrega status) {
+        return Entrega.builder()
+                .id(100L)
+                .aluno(aluno)
+                .orientador(orientador)
+                .turma(turma)
+                .tipo(tipo)
+                .status(status)
+                .urlDocumento(URL_DOCUMENTO)
+                .atrasada(true)
+                .enviadoEm(AGORA)
+                .build();
+    }
+
+    @Nested
+    @DisplayName("Consulta por identificador")
+    class BuscarPorId {
+
+        @ParameterizedTest
+        @ValueSource(strings = {EMAIL_ALUNO, EMAIL_ORIENTADOR, "ALUNO@IFSC.EDU.BR", "Orientador@Ifsc.Edu.Br"})
+        @DisplayName("Deve retornar os dados da entrega ao aluno autor e ao orientador vinculado")
+        void buscarPorId_AutorOuOrientador_DeveRetornarEntrega(String email) {
+            when(entregaRepository.findById(100L))
+                    .thenReturn(Optional.of(entregaSalva(TipoEntrega.PROJETO_TCC, StatusEntrega.SUBMETIDO)));
+
+            EntregaResponseDTO resposta = service.buscarPorId(email, 100L);
+
+            assertThat(resposta.id()).isEqualTo(100L);
+            assertThat(resposta.urlDocumento()).isEqualTo(URL_DOCUMENTO);
+            assertThat(resposta.status()).isEqualTo(StatusEntrega.SUBMETIDO);
+            assertThat(resposta.atrasada()).isTrue();
+            assertThat(resposta.enviadoEm()).isEqualTo(AGORA);
+            assertThat(resposta.parecer()).isNull();
+        }
+
+        @ParameterizedTest
+        @NullSource
+        @ValueSource(strings = {"", "outro.aluno@ifsc.edu.br", "outro.professor@ifsc.edu.br"})
+        @DisplayName("Deve negar o acesso a quem não é o aluno autor nem o orientador vinculado")
+        void buscarPorId_SemVinculo_DeveLancarAcessoNegado(String email) {
+            when(entregaRepository.findById(100L))
+                    .thenReturn(Optional.of(entregaSalva(TipoEntrega.PROJETO_TCC, StatusEntrega.SUBMETIDO)));
+
+            AcessoNegadoException ex = assertThrows(AcessoNegadoException.class,
+                    () -> service.buscarPorId(email, 100L));
+
+            assertThat(ex.getMessage()).isEqualTo(
+                    "Acesso permitido apenas ao aluno autor ou ao orientador vinculado a esta entrega.");
+        }
+
+        @Test
+        @DisplayName("Deve lançar não encontrado quando a entrega não existe")
+        void buscarPorId_Inexistente_DeveLancarNaoEncontrado() {
+            when(entregaRepository.findById(99L)).thenReturn(Optional.empty());
+
+            ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class,
+                    () -> service.buscarPorId(EMAIL_ALUNO, 99L));
+
+            assertThat(ex.getMessage()).isEqualTo("Entrega com identificador 99 não foi encontrada.");
+        }
+    }
+
+    @Nested
+    @DisplayName("Listagem do orientador")
+    class ListarDoOrientador {
+
+        @Test
+        @DisplayName("Sem filtro, deve listar todas as entregas do orientador")
+        void listarDoOrientador_SemStatus_DeveListarTodas() {
+            when(orientadorRepository.findByEmailIgnoreCase(EMAIL_ORIENTADOR)).thenReturn(Optional.of(orientador));
+            when(entregaRepository.findByOrientadorIdOrderByEnviadoEmDesc(1L))
+                    .thenReturn(List.of(entregaSalva(TipoEntrega.PROJETO_TCC, StatusEntrega.APROVADO)));
+
+            List<EntregaResponseDTO> resposta = service.listarDoOrientador(EMAIL_ORIENTADOR, null);
+
+            assertThat(resposta).extracting(EntregaResponseDTO::status).containsExactly(StatusEntrega.APROVADO);
+            verify(entregaRepository, never()).findByOrientadorIdAndStatusOrderByEnviadoEmDesc(any(), any());
+        }
+
+        @Test
+        @DisplayName("Com filtro, deve consultar pelo status informado")
+        void listarDoOrientador_ComStatus_DeveFiltrar() {
+            when(orientadorRepository.findByEmailIgnoreCase(EMAIL_ORIENTADOR)).thenReturn(Optional.of(orientador));
+            when(entregaRepository.findByOrientadorIdAndStatusOrderByEnviadoEmDesc(1L, StatusEntrega.SUBMETIDO))
+                    .thenReturn(List.of(entregaSalva(TipoEntrega.TCC1, StatusEntrega.SUBMETIDO)));
+
+            List<EntregaResponseDTO> resposta = service.listarDoOrientador(EMAIL_ORIENTADOR, StatusEntrega.SUBMETIDO);
+
+            assertThat(resposta).extracting(EntregaResponseDTO::tipo).containsExactly(TipoEntrega.TCC1);
+            verify(entregaRepository, never()).findByOrientadorIdOrderByEnviadoEmDesc(any());
+        }
+
+        @Test
+        @DisplayName("Deve lançar não encontrado quando o e-mail não pertence a um orientador")
+        void listarDoOrientador_Desconhecido_DeveLancarNaoEncontrado() {
+            when(orientadorRepository.findByEmailIgnoreCase("desconhecido@example.com"))
+                    .thenReturn(Optional.empty());
+
+            ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class,
+                    () -> service.listarDoOrientador("desconhecido@example.com", null));
+
+            assertThat(ex.getMessage()).isEqualTo("Orientador com e-mail desconhecido@example.com não foi encontrado.");
+        }
+
+        @ParameterizedTest
+        @NullSource
+        @ValueSource(strings = {"", "   "})
+        @DisplayName("Deve lançar não encontrado sem consultar o banco quando o token não traz e-mail")
+        void listarDoOrientador_SemEmail_DeveLancarNaoEncontrado(String email) {
+            assertThrows(ResourceNotFoundException.class, () -> service.listarDoOrientador(email, null));
+
+            verify(orientadorRepository, never()).findByEmailIgnoreCase(any());
+        }
+    }
+
+    @Nested
+    @DisplayName("Listagem do aluno")
+    class ListarDoAluno {
+
+        @Test
+        @DisplayName("Deve listar as entregas do aluno autenticado")
+        void listarDoAluno_ComEntregas_DeveListar() {
+            when(alunoRepository.findByEmail(EMAIL_ALUNO)).thenReturn(Optional.of(aluno));
+            when(entregaRepository.findByAlunoIdOrderByTipoAsc(7L))
+                    .thenReturn(List.of(entregaSalva(TipoEntrega.PROJETO_TCC, StatusEntrega.SUBMETIDO)));
+
+            assertThat(service.listarDoAluno(EMAIL_ALUNO))
+                    .extracting(EntregaResponseDTO::tipo)
+                    .containsExactly(TipoEntrega.PROJETO_TCC);
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia quando o aluno ainda não tem entregas")
+        void listarDoAluno_SemEntregas_DeveRetornarVazio() {
+            when(alunoRepository.findByEmail(EMAIL_ALUNO)).thenReturn(Optional.of(aluno));
+            when(entregaRepository.findByAlunoIdOrderByTipoAsc(7L)).thenReturn(List.of());
+
+            assertThat(service.listarDoAluno(EMAIL_ALUNO)).isEmpty();
+        }
+
+        @Test
+        @DisplayName("Deve retornar lista vazia, e não erro, quando o aluno não está cadastrado (D6)")
+        void listarDoAluno_SemCadastro_DeveRetornarVazio() {
+            when(alunoRepository.findByEmail(EMAIL_ALUNO)).thenReturn(Optional.empty());
+
+            assertThat(service.listarDoAluno(EMAIL_ALUNO)).isEmpty();
+        }
+
+        @ParameterizedTest
+        @NullSource
+        @ValueSource(strings = {"", "   "})
+        @DisplayName("Deve retornar lista vazia sem consultar o banco quando o token não traz e-mail")
+        void listarDoAluno_SemEmail_DeveRetornarVazio(String email) {
+            assertThat(service.listarDoAluno(email)).isEmpty();
+
+            verify(alunoRepository, never()).findByEmail(any());
         }
     }
 }
