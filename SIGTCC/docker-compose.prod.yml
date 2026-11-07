@@ -1,3 +1,7 @@
+# Nome próprio do projeto: sem isto, o Compose usa o nome da pasta (sigtcc), o mesmo do
+# docker-compose.yml de desenvolvimento, e os dois arquivos passam a recriar os containers um do outro.
+name: sigtcc-prod
+
 services:
   db:
     image: mysql:8.0
@@ -8,8 +12,6 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-    ports:
-      - "3306:3306"
     healthcheck:
       test:
         [
@@ -33,7 +35,7 @@ services:
     image: quay.io/keycloak/keycloak:26.8.0
     container_name: gestao_tcc_keycloak
     restart: always
-    command: start --import-realm --hostname=${KEYCLOAK_HOSTNAME:-localhost}
+    command: start --import-realm --hostname=${KEYCLOAK_PUBLIC_URL:-http://localhost:8081} --proxy-headers=xforwarded
     environment:
       KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_ADMIN_USERNAME}
       KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
@@ -67,6 +69,7 @@ services:
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
       APP_SUBMISSAO_DOMINIOS_SUGERIDOS: ${APP_SUBMISSAO_DOMINIOS_SUGERIDOS:-drive.google.com,github.com,onedrive.live.com}
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://keycloak:8080/realms/sigtcc/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: ${KEYCLOAK_PUBLIC_URL:-http://localhost:8081}/realms/sigtcc
       APP_CORS_ALLOWED_ORIGINS: ${APP_CORS_ALLOWED_ORIGINS:-http://localhost}
     depends_on:
       db:
