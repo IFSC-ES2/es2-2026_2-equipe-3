@@ -586,10 +586,11 @@ Retornado quando o usuário autenticado não é o aluno autor nem o orientador r
 
 ### 6.4. `409 Conflict`
 
-| Endpoint | Condição                                                       | `detalhes`                                                      |
-| :------- | :------------------------------------------------------------- | :-------------------------------------------------------------- |
-| `POST`   | Aluno já possui solicitação `PENDENTE` para o mesmo orientador | `Você já possui uma solicitação pendente para este orientador.` |
-| `PATCH`  | Solicitação com status diferente de `PENDENTE`                 | `Esta solicitação já foi respondida e não pode ser alterada.`   |
+| Endpoint | Condição                                                                  | `detalhes`                                                                                         |
+| :------- | :------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------- |
+| `POST`   | Aluno já possui solicitação `PENDENTE` para o mesmo orientador            | `Você já possui uma solicitação pendente para este orientador.`                                    |
+| `PATCH`  | Solicitação com status diferente de `PENDENTE`                            | `Esta solicitação já foi respondida e não pode ser alterada.`                                      |
+| `PATCH`  | Aceite em conflito com outra alteração simultânea do perfil do orientador | `Os dados foram alterados por outra operação ao mesmo tempo. Atualize a página e tente novamente.` |
 
 > **Removido na v1.1.0:** a regra "e-mail informado já pertence a um usuário
 > que não é aluno" foi retirada do escopo desta sprint (não estava coberta
@@ -655,7 +656,7 @@ Ao preparar este documento, foram encontradas diferenças entre o contrato da US
 ### 8.3. Limitações conhecidas
 
 - **Sem autenticação (US01 postergada):** qualquer cliente pode chamar `PATCH` como se fosse o orientador, e os `id` de solicitação são sequenciais e enumeráveis. Aceito para o MVP da Sprint 2 e deve constar em `docs/riscos.md`.
-- **Concorrência no aceite:** duas aceitações simultâneas da última vaga devem resultar em uma delas recebendo `422` (ou `409`, por conflito de versão). O backend deve fazer a verificação de vagas e o decremento dentro da mesma transação.
+- **Concorrência no aceite:** `PerfilOrientador` usa lock otimista (`@Version`). Quando dois aceites do mesmo orientador se sobrepõem, um retorna `200` e o outro `409`, mesmo que ainda haja vagas, e o orientador pode repetir a ação. Um aceite iniciado depois do commit do anterior já lê o valor atualizado e, sem vagas, recebe `422`.
 
 ---
 
