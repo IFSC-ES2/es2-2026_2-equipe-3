@@ -296,6 +296,20 @@ Retornado quando o token não possui `ROLE_PROFESSOR` ou quando o professor aute
 
 Retornado caso o ID do orientador não exista.
 
+##### Conflito: `409 Conflict`
+
+Retornado quando o perfil foi alterado por outra operação ao mesmo tempo, como o aceite de uma solicitação. Nenhuma alteração é gravada, e o professor pode repetir a ação.
+
+```json
+{
+  "timestamp": "2026-09-11T09:30:00Z",
+  "status": 409,
+  "erro": "Conflito de dados",
+  "caminho": "/api/v1/orientadores/1",
+  "detalhes": "Os dados foram alterados por outra operação ao mesmo tempo. Atualize a página e tente novamente."
+}
+```
+
 ##### Regra de Negócio: `422 Unprocessable Content`
 
 Retornado quando o campo `email` é enviado com um valor diferente do e-mail atual. O e-mail identifica o professor no Keycloak e não pode ser alterado por este endpoint. Enviar o mesmo e-mail é aceito e não altera nada.
