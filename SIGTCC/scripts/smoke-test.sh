@@ -122,7 +122,7 @@ esperar "professor responsável cadastra o prazo" "201"
 
 echo; echo "4) Entrega por link (ADR-0013)"
 chamar POST /api/v1/entregas "$TK_ALUNO" '{"tipo":"PROJETO_TCC","urlDocumento":"http://drive.google.com/arquivo"}'
-esperar "link http:// é rejeitado" "400|422"
+esperar "link http:// é rejeitado" "400"
 chamar POST /api/v1/entregas "$TK_ALUNO" '{"tipo":"PROJETO_TCC","urlDocumento":"https://drive.google.com/file/d/smoke-test"}'
 esperar "link https:// é aceito" "201"
 conter "status inicial é SUBMETIDO" '"status":"SUBMETIDO"'
