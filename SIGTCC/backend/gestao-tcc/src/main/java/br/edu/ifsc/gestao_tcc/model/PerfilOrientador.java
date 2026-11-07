@@ -18,6 +18,10 @@ public class PerfilOrientador {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    @Column(nullable = false)
+    private Long versao;
+
     @Column(name = "vagas_disponiveis", nullable = false)
     private int vagasDisponiveis;
 
