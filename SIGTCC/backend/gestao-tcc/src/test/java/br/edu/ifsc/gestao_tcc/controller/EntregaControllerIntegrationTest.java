@@ -41,6 +41,8 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.hasItem;
@@ -224,17 +226,36 @@ class EntregaControllerIntegrationTest {
         TurmaTCC turma = comPrazoProjeto(hoje.minusDays(1));
         Entrega existente = comEntrega(turma, StatusEntrega.AJUSTES_NECESSARIOS);
 
+        Parecer parecerAnterior = parecerRepository.saveAndFlush(Parecer.builder()
+                .entrega(existente)
+                .orientador(orientador)
+                .resultado(StatusEntrega.AJUSTES_NECESSARIOS)
+                .comentario(COMENTARIO_PARECER)
+                .build());
+
         enviar(corpo(NOVA_URL))
                 .andExpect(status().isOk())
                 .andExpect(header().doesNotExist(HttpHeaders.LOCATION))
                 .andExpect(jsonPath("$.id").value(existente.getId()))
                 .andExpect(jsonPath("$.urlDocumento").value(NOVA_URL))
                 .andExpect(jsonPath("$.status").value("SUBMETIDO"))
-                .andExpect(jsonPath("$.atrasada").value(true));
+                .andExpect(jsonPath("$.atrasada").value(true))
+                .andExpect(jsonPath("$.parecer.resultado").value("AJUSTES_NECESSARIOS"))
+                .andExpect(jsonPath("$.parecer.comentario").value(COMENTARIO_PARECER));
 
         // Descarta o cache da sessão para ler o que realmente foi gravado no banco.
         entityManager.flush();
         entityManager.clear();
+
+        List<Parecer> historico = parecerRepository
+                .findByEntregaIdOrderByRegistradoEmDesc(existente.getId());
+
+        assertThat(historico).hasSize(1);
+        assertThat(historico.getFirst().getId()).isEqualTo(parecerAnterior.getId());
+        assertThat(historico.getFirst().getResultado())
+                .isEqualTo(StatusEntrega.AJUSTES_NECESSARIOS);
+        assertThat(historico.getFirst().getComentario())
+                .isEqualTo(COMENTARIO_PARECER);
 
         Entrega gravada = entregaRepository.findById(existente.getId()).orElseThrow();
         assertThat(gravada.getUrlDocumento()).isEqualTo(NOVA_URL);
