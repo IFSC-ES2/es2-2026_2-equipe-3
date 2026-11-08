@@ -217,6 +217,53 @@ class EntregaControllerIntegrationTest {
                 .andExpect(jsonPath("$.parecer").value(nullValue()));
     }
 
+
+    @Test
+    @DisplayName("POST /entregas - Deve criar a entrega de TCC1 no prazo (201 Created)")
+    void submeter_Tcc1_NoPrazo_DeveRetornar201() throws Exception {
+        comSolicitacao(StatusSolicitacao.ACEITA);
+        comPrazo(TipoEntrega.TCC1, hoje.plusDays(5));
+
+        enviar(corpo(TipoEntrega.TCC1, URL_DOCUMENTO))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.tipo").value("TCC1"))
+                .andExpect(jsonPath("$.urlDocumento").value(URL_DOCUMENTO))
+                .andExpect(jsonPath("$.status").value("SUBMETIDO"))
+                .andExpect(jsonPath("$.atrasada").value(false))
+                .andExpect(jsonPath("$.enviadoEm").isNotEmpty())
+                .andExpect(jsonPath("$.aluno.email").value(EMAIL_ALUNO))
+                .andExpect(jsonPath("$.orientador.email").value(EMAIL_ORIENTADOR));
+    }
+
+    @Test
+    @DisplayName("POST /entregas - Deve criar a entrega de TCC2 no prazo (201 Created)")
+    void submeter_Tcc2_NoPrazo_DeveRetornar201() throws Exception {
+        comSolicitacao(StatusSolicitacao.ACEITA);
+        comPrazo(TipoEntrega.TCC2, hoje.plusDays(5));
+
+        enviar(corpo(TipoEntrega.TCC2, URL_DOCUMENTO))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.tipo").value("TCC2"))
+                .andExpect(jsonPath("$.urlDocumento").value(URL_DOCUMENTO))
+                .andExpect(jsonPath("$.status").value("SUBMETIDO"))
+                .andExpect(jsonPath("$.atrasada").value(false))
+                .andExpect(jsonPath("$.enviadoEm").isNotEmpty())
+                .andExpect(jsonPath("$.aluno.email").value(EMAIL_ALUNO))
+                .andExpect(jsonPath("$.orientador.email").value(EMAIL_ORIENTADOR));
+    }
+
+    @Test
+    @DisplayName("POST /entregas - Deve considerar a submissão na data limite como dentro do prazo (201 Created)")
+    void submeter_NaDataLimite_DeveRetornar201SemAtraso() throws Exception {
+        comSolicitacao(StatusSolicitacao.ACEITA);
+        comPrazoProjeto(hoje);
+
+        enviar(corpo(URL_DOCUMENTO))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("SUBMETIDO"))
+                .andExpect(jsonPath("$.atrasada").value(false));
+    }
+
     @Test
     @DisplayName("POST /entregas - Deve aceitar o envio após o prazo marcando atraso (201 Created)")
     void submeter_AposOPrazo_DeveRetornar201ComAtraso() throws Exception {
