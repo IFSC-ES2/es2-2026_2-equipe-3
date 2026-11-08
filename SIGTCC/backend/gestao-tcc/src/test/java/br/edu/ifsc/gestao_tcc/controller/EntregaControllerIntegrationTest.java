@@ -139,14 +139,20 @@ class EntregaControllerIntegrationTest {
                 .build());
     }
 
-    private TurmaTCC comPrazoProjeto(LocalDate dataLimite) {
+    private TurmaTCC comPrazo(TipoEntrega tipo, LocalDate dataLimite) {
         TurmaTCC turma = comTurmaVigente();
+
         prazoEntregaRepository.saveAndFlush(PrazoEntrega.builder()
                 .turma(turma)
-                .tipo(TipoEntrega.PROJETO_TCC)
+                .tipo(tipo)
                 .dataLimite(dataLimite)
                 .build());
+
         return turma;
+    }
+
+    private TurmaTCC comPrazoProjeto(LocalDate dataLimite) {
+        return comPrazo(TipoEntrega.PROJETO_TCC, dataLimite);
     }
 
     private Entrega comEntrega(TurmaTCC turma, StatusEntrega status) {
@@ -176,12 +182,16 @@ class EntregaControllerIntegrationTest {
     }
 
     private String corpo(String url) {
+        return corpo(TipoEntrega.PROJETO_TCC, url);
+    }
+
+    private String corpo(TipoEntrega tipo, String url) {
         return """
-                {
-                  "tipo": "PROJETO_TCC",
-                  "urlDocumento": "%s"
-                }
-                """.formatted(url);
+            {
+              "tipo": "%s",
+              "urlDocumento": "%s"
+            }
+            """.formatted(tipo.name(), url);
     }
 
     @Test
