@@ -33,6 +33,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PATCH, "/api/v1/orientadores/**").hasAuthority("ROLE_PROFESSOR")
                         .requestMatchers(HttpMethod.DELETE, "/api/v1/orientadores/**").hasAuthority("ROLE_PROFESSOR")
                         .requestMatchers(HttpMethod.POST, "/api/v1/solicitacoes").hasAuthority("ROLE_ALUNO")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/entregas").hasAuthority("ROLE_ALUNO")
+                        .requestMatchers(HttpMethod.POST, "/api/v1/entregas/*/parecer").hasAuthority("ROLE_PROFESSOR")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/entregas/orientador").hasAuthority("ROLE_PROFESSOR")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/entregas/minhas").hasAuthority("ROLE_ALUNO")
+                        .requestMatchers(HttpMethod.GET, "/api/v1/entregas/*").hasAnyAuthority("ROLE_ALUNO", "ROLE_PROFESSOR")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));

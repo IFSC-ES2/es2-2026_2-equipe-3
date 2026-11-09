@@ -41,16 +41,29 @@ public class SolicitacaoController {
     @GetMapping("/orientador/{orientadorId}")
     public ResponseEntity<List<SolicitacaoResponseDTO>> listarPorOrientador(
             @PathVariable Long orientadorId,
-            @RequestParam(required = false) String status
+            @RequestParam(required = false) String status,
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        return ResponseEntity.ok(solicitacaoService.listarPorOrientador(orientadorId, status));
+        return ResponseEntity.ok(
+                solicitacaoService.listarPorOrientador(
+                        orientadorId,
+                        status,
+                        jwt == null ? null : jwt.getClaimAsString(CLAIM_EMAIL)
+                )
+        );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<SolicitacaoResponseDTO> buscarPorId(
-            @PathVariable Long id
+            @PathVariable Long id,
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        return ResponseEntity.ok(solicitacaoService.buscarPorId(id));
+        return ResponseEntity.ok(
+                solicitacaoService.buscarPorId(
+                        id,
+                        jwt == null ? null : jwt.getClaimAsString(CLAIM_EMAIL)
+                )
+        );
     }
 
     @PatchMapping("/{id}/status")

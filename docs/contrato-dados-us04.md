@@ -239,6 +239,7 @@ Orientador sem vagas ou inativo.
 - **Rota:** `/api/v1/solicitacoes/orientador/{orientadorId}`
 - **Descrição:** Retorna as solicitações endereçadas ao orientador, ordenadas por `criadoEm` decrescente (mais recentes primeiro). Sem paginação nesta sprint.
 - **Uso no painel do orientador:** o "painel" de notificações da #11 é esta listagem com `?status=PENDENTE`, consultada quando o orientador abre a tela (e ao recarregar/atualizar a lista após aceitar ou recusar). **Não há notificação real nesta sprint** - sem push, WebSocket ou e-mail. O único observer implementado é o `AtualizadorVagasObserver` (decremento de vagas); nenhum observer de notificação deve ser criado apenas para "ilustrar" o padrão sem um consumidor real.
+- **Autorização:** somente o orientador autenticado cujo e-mail corresponde ao e-mail do `orientadorId` pode consultar a listagem. Outros usuários autenticados recebem `403 Forbidden`.
 
 #### Cabeçalhos da Requisição
 
@@ -282,6 +283,20 @@ Array de `SolicitacaoResponse`. Se não houver solicitações, retorna `[]` (nã
     }
   }
 ]
+```
+
+##### Acesso Negado: `403 Forbidden`
+
+Retornado quando o usuário autenticado não é o orientador correspondente ao `orientadorId`. Isso inclui alunos e outros orientadores.
+
+```json
+{
+  "timestamp": "2026-11-03T14:00:00Z",
+  "status": 403,
+  "erro": "Acesso negado",
+  "caminho": "/api/v1/solicitacoes/orientador/1",
+  "detalhes": "Você não tem permissão para acessar as solicitações deste orientador."
+}
 ```
 
 ##### Erro de Validação: `400 Bad Request`
@@ -459,6 +474,7 @@ Aceite com orientador sem vagas, ou status de destino não permitido neste endpo
 - **Método HTTP:** `GET`
 - **Rota:** `/api/v1/solicitacoes/{id}`
 - **Descrição:** Recupera uma solicitação pelo identificador. É o endpoint que o aluno usa para **acompanhar o status** (`PENDENTE`, `ACEITA`, `RECUSADA`, `CANCELADA`) a partir do `id` recebido no `POST`.
+- **Autorização:** somente o aluno autor da solicitação ou o orientador responsável pode consultar seus dados. Outros usuários autenticados recebem `403 Forbidden`.
 
 #### Cabeçalhos da Requisição
 
@@ -492,6 +508,20 @@ Retorna um `SolicitacaoResponse` (mesmo formato do exemplo da seção 5.3). Para
     "email": "adriano.lima@ifsc.edu.br",
     "vagasDisponiveis": 2
   }
+}
+```
+
+##### Acesso Negado: `403 Forbidden`
+
+Retornado quando o usuário autenticado não é o aluno autor nem o orientador responsável pela solicitação.
+
+```json
+{
+  "timestamp": "2026-11-03T14:00:00Z",
+  "status": 403,
+  "erro": "Acesso negado",
+  "caminho": "/api/v1/solicitacoes/1",
+  "detalhes": "Você não tem permissão para acessar esta solicitação."
 }
 ```
 
@@ -541,9 +571,11 @@ Retorna um `SolicitacaoResponse` (mesmo formato do exemplo da seção 5.3). Para
 
 ### 6.2.1. `403 Forbidden`
 
-| Endpoint | Condição                                                                          | `detalhes`                                                                    |
-| :------- | :-------------------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
-| `PATCH`  | Usuário sem `ROLE_PROFESSOR` ou professor que não é o destinatário da solicitação | `Somente o orientador destinatário pode aceitar ou recusar esta solicitação.` |
+| Endpoint                            | Condição                                                                             | `detalhes`                                                                    |
+| :---------------------------------- | :----------------------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
+| `PATCH`                             | Usuário sem `ROLE_PROFESSOR` ou professor que não é o destinatário da solicitação    | `Somente o orientador destinatário pode aceitar ou recusar esta solicitação.` |
+| `GET /{id}`                         | Usuário autenticado que não é o aluno autor nem o orientador responsável             | `Você não tem permissão para acessar esta solicitação.`                       |
+| `GET .../orientador/{orientadorId}` | Usuário autenticado que não é o orientador correspondente ao identificador informado | `Você não tem permissão para acessar as solicitações deste orientador.`       |
 
 ### 6.3. `404 Not Found`
 
@@ -554,10 +586,11 @@ Retorna um `SolicitacaoResponse` (mesmo formato do exemplo da seção 5.3). Para
 
 ### 6.4. `409 Conflict`
 
-| Endpoint | Condição                                                       | `detalhes`                                                      |
-| :------- | :------------------------------------------------------------- | :-------------------------------------------------------------- |
-| `POST`   | Aluno já possui solicitação `PENDENTE` para o mesmo orientador | `Você já possui uma solicitação pendente para este orientador.` |
-| `PATCH`  | Solicitação com status diferente de `PENDENTE`                 | `Esta solicitação já foi respondida e não pode ser alterada.`   |
+| Endpoint | Condição                                                                  | `detalhes`                                                                                         |
+| :------- | :------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------- |
+| `POST`   | Aluno já possui solicitação `PENDENTE` para o mesmo orientador            | `Você já possui uma solicitação pendente para este orientador.`                                    |
+| `PATCH`  | Solicitação com status diferente de `PENDENTE`                            | `Esta solicitação já foi respondida e não pode ser alterada.`                                      |
+| `PATCH`  | Aceite em conflito com outra alteração simultânea do perfil do orientador | `Os dados foram alterados por outra operação ao mesmo tempo. Atualize a página e tente novamente.` |
 
 > **Removido na v1.1.0:** a regra "e-mail informado já pertence a um usuário
 > que não é aluno" foi retirada do escopo desta sprint (não estava coberta
@@ -623,7 +656,7 @@ Ao preparar este documento, foram encontradas diferenças entre o contrato da US
 ### 8.3. Limitações conhecidas
 
 - **Sem autenticação (US01 postergada):** qualquer cliente pode chamar `PATCH` como se fosse o orientador, e os `id` de solicitação são sequenciais e enumeráveis. Aceito para o MVP da Sprint 2 e deve constar em `docs/riscos.md`.
-- **Concorrência no aceite:** duas aceitações simultâneas da última vaga devem resultar em uma delas recebendo `422` (ou `409`, por conflito de versão). O backend deve fazer a verificação de vagas e o decremento dentro da mesma transação.
+- **Concorrência no aceite:** `PerfilOrientador` usa lock otimista (`@Version`). Quando dois aceites do mesmo orientador se sobrepõem, um retorna `200` e o outro `409`, mesmo que ainda haja vagas, e o orientador pode repetir a ação. Um aceite iniciado depois do commit do anterior já lê o valor atualizado e, sem vagas, recebe `422`.
 
 ---
 
