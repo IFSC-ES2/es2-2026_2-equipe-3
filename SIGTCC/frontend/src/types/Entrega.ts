@@ -3,16 +3,25 @@ import type { TipoEntrega } from "./PrazoEntrega";
 export type StatusEntrega =
   "SUBMETIDO" | "AJUSTES_NECESSARIOS" | "APROVADO" | "REPROVADO";
 
+export interface ParecerEntrega {
+  id: number;
+  resultado: Exclude<StatusEntrega, "SUBMETIDO">;
+  comentario: string | null;
+  registradoEm: string;
+}
+
 export interface Entrega {
   id: number;
+  semestre: string;
   tipo: TipoEntrega;
-  status: StatusEntrega;
+  descricaoTipo: string;
   urlDocumento: string;
-  dataEnvio: string;
+  status: StatusEntrega;
   atrasada: boolean;
-  prazoDataLimite?: string | null;
-  aluno?: { id: number; nome: string; email: string };
-  comentarioParecer?: string | null;
+  enviadoEm: string;
+  aluno: { id: number; nome: string; email: string; curso: string };
+  orientador: { id: number; nome: string; email: string };
+  parecer: ParecerEntrega | null;
 }
 
 export interface NovaEntrega {
@@ -21,6 +30,6 @@ export interface NovaEntrega {
 }
 
 export interface NovoParecer {
-  status: Exclude<StatusEntrega, "SUBMETIDO">;
+  resultado: Exclude<StatusEntrega, "SUBMETIDO">;
   comentario: string;
 }

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { PageShell } from "../OrientadorCadastro";
-import { obterPerfilProfessor } from "../../utils/professorService";
 import {
   listarEntregasDoOrientador,
   registrarParecer,
@@ -35,8 +34,7 @@ export function AvaliacaoEntregaPage() {
     let ativo = true;
     async function carregar() {
       try {
-        const perfil = await obterPerfilProfessor();
-        const dados = await listarEntregasDoOrientador(perfil.id);
+        const dados = await listarEntregasDoOrientador();
         if (ativo) {
           setEntregas(dados);
           setEntregaSelecionada(dados[0]?.id ?? null);
@@ -57,8 +55,11 @@ export function AvaliacaoEntregaPage() {
   }, []);
 
   const entrega = entregas.find((item) => item.id === entregaSelecionada);
+  const aguardandoReenvio = entrega?.status === "AJUSTES_NECESSARIOS";
   const somenteLeitura =
-    entrega?.status === "APROVADO" || entrega?.status === "REPROVADO";
+    aguardandoReenvio ||
+    entrega?.status === "APROVADO" ||
+    entrega?.status === "REPROVADO";
   const exigeComentario =
     status === "AJUSTES_NECESSARIOS" || status === "REPROVADO";
 
@@ -75,7 +76,7 @@ export function AvaliacaoEntregaPage() {
     setSalvando(true);
     try {
       const atualizada = await registrarParecer(entrega.id, {
-        status,
+        resultado: status,
         comentario: texto,
       });
       setEntregas((anteriores) =>
@@ -84,7 +85,7 @@ export function AvaliacaoEntregaPage() {
         ),
       );
       if (atualizada.status !== "SUBMETIDO") setStatus(atualizada.status);
-      setComentario(atualizada.comentarioParecer ?? texto);
+      setComentario(atualizada.parecer?.comentario ?? texto);
       setMensagem("Parecer registrado.");
       setSucesso(true);
     } catch (erro) {
@@ -139,7 +140,7 @@ export function AvaliacaoEntregaPage() {
                     setStatus(
                       item.status === "SUBMETIDO" ? "APROVADO" : item.status,
                     );
-                    setComentario(item.comentarioParecer ?? "");
+                    setComentario(item.parecer?.comentario ?? "");
                     setMensagem("");
                   }}
                 >
@@ -216,7 +217,9 @@ export function AvaliacaoEntregaPage() {
                   </label>
                   {somenteLeitura ? (
                     <p className="form-help">
-                      Parecer definitivo. Os campos estão somente para leitura.
+                      {aguardandoReenvio
+                        ? "Aguardando o reenvio do aluno; não é possível registrar outro parecer agora."
+                        : "Parecer definitivo. Os campos estão somente para leitura."}
                     </p>
                   ) : (
                     <button

@@ -1,10 +1,15 @@
 import { apiFetch } from "./api";
 import { garantirResposta, normalizarErroGenerico } from "./apiErro";
-import type { Entrega, NovaEntrega, NovoParecer } from "../types/Entrega";
+import type {
+  Entrega,
+  NovaEntrega,
+  NovoParecer,
+  StatusEntrega,
+} from "../types/Entrega";
 
 export async function listarEntregasDoAluno(): Promise<Entrega[]> {
   try {
-    const response = await apiFetch("/submissoes/aluno/me");
+    const response = await apiFetch("/entregas/minhas");
     return (await garantirResposta(response, 200)).json();
   } catch (erro) {
     throw normalizarErro(erro);
@@ -13,21 +18,22 @@ export async function listarEntregasDoAluno(): Promise<Entrega[]> {
 
 export async function criarEntrega(dados: NovaEntrega): Promise<Entrega> {
   try {
-    const response = await apiFetch("/submissoes", {
+    const response = await apiFetch("/entregas", {
       method: "POST",
       body: JSON.stringify(dados),
     });
-    return (await garantirResposta(response, 201)).json();
+    return (await garantirResposta(response)).json();
   } catch (erro) {
     throw normalizarErro(erro);
   }
 }
 
 export async function listarEntregasDoOrientador(
-  orientadorId: number,
+  status?: StatusEntrega,
 ): Promise<Entrega[]> {
   try {
-    const response = await apiFetch(`/submissoes/orientador/${orientadorId}`);
+    const query = status ? `?status=${encodeURIComponent(status)}` : "";
+    const response = await apiFetch(`/entregas/orientador${query}`);
     return (await garantirResposta(response, 200)).json();
   } catch (erro) {
     throw normalizarErro(erro);
@@ -39,7 +45,7 @@ export async function registrarParecer(
   dados: NovoParecer,
 ): Promise<Entrega> {
   try {
-    const response = await apiFetch(`/submissoes/${entregaId}/parecer`, {
+    const response = await apiFetch(`/entregas/${entregaId}/parecer`, {
       method: "POST",
       body: JSON.stringify(dados),
     });

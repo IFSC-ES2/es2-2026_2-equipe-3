@@ -30,6 +30,7 @@ export function SubmissaoEntregaPage() {
   const [tipo, setTipo] = useState<TipoEntrega>("PROJETO_TCC");
   const [urlDocumento, setUrlDocumento] = useState("");
   const [carregando, setCarregando] = useState(true);
+  const [erroCarregamento, setErroCarregamento] = useState("");
   const [enviando, setEnviando] = useState(false);
   const [mensagem, setMensagem] = useState("");
   const [sucesso, setSucesso] = useState(false);
@@ -43,7 +44,7 @@ export function SubmissaoEntregaPage() {
       })
       .catch((erro: unknown) => {
         if (ativo) {
-          setMensagem(
+          setErroCarregamento(
             erro instanceof Error ? erro.message : "Erro ao carregar entregas.",
           );
         }
@@ -120,6 +121,11 @@ export function SubmissaoEntregaPage() {
             orientador.
           </p>
         </div>
+        {erroCarregamento && (
+          <p className="feedback erro" role="alert">
+            Não foi possível carregar suas entregas: {erroCarregamento}
+          </p>
+        )}
 
         {carregando ? (
           <p className="feedback loading" role="status">
@@ -151,14 +157,6 @@ export function SubmissaoEntregaPage() {
                   <strong>{rotuloStatus[entregaAtual.status]}</strong>
                   {entregaAtual.atrasada && <span>Entregue com atraso</span>}
                 </div>
-              )}
-              {entregaAtual?.prazoDataLimite && (
-                <p className="entrega-prazo">
-                  Prazo:{" "}
-                  {new Date(
-                    `${entregaAtual.prazoDataLimite}T00:00:00`,
-                  ).toLocaleDateString("pt-BR")}
-                </p>
               )}
               <label className="form-group" htmlFor="url-documento">
                 Link do documento
@@ -205,12 +203,14 @@ export function SubmissaoEntregaPage() {
 
             <aside className="entrega-historico" aria-label="Entrega atual">
               <h3>Entrega da etapa</h3>
-              {entregaAtual ? (
+              {erroCarregamento ? (
+                <p>Não foi possível consultar a entrega atual.</p>
+              ) : entregaAtual ? (
                 <>
                   <p>{rotuloStatus[entregaAtual.status]}</p>
-                  <time dateTime={entregaAtual.dataEnvio}>
+                  <time dateTime={entregaAtual.enviadoEm}>
                     Enviada em{" "}
-                    {new Date(entregaAtual.dataEnvio).toLocaleString("pt-BR")}
+                    {new Date(entregaAtual.enviadoEm).toLocaleString("pt-BR")}
                   </time>
                   <a
                     href={entregaAtual.urlDocumento}
