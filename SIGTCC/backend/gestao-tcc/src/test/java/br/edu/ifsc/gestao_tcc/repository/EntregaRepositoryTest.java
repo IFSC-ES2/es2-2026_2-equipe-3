@@ -157,6 +157,22 @@ class EntregaRepositoryTest {
     }
 
     @Test
+    @DisplayName("Deve retornar primeiro a entrega enviada mais recentemente")
+    void findByOrientadorIdOrderByEnviadoEmDesc_DeveOrdenarDaMaisRecenteParaAMaisAntiga() {
+        Entrega antiga = salvarEntrega(aluno, orientador, turma, TipoEntrega.PROJETO_TCC, StatusEntrega.APROVADO, "https://antiga.com", false);
+        Entrega recente = salvarEntrega(aluno, orientador, turma, TipoEntrega.TCC1, StatusEntrega.SUBMETIDO, "https://recente.com", false);
+        antiga.setEnviadoEm(Instant.parse("2026-10-01T10:00:00Z"));
+        recente.setEnviadoEm(Instant.parse("2026-11-01T10:00:00Z"));
+        entityManager.flush();
+        entityManager.clear();
+
+        List<Entrega> entregas = entregaRepository.findByOrientadorIdOrderByEnviadoEmDesc(orientador.getId());
+
+        assertThat(entregas).extracting(Entrega::getUrlDocumento)
+                .containsExactly("https://recente.com", "https://antiga.com");
+    }
+
+    @Test
     @DisplayName("Deve filtrar entregas do orientador pelo status")
     void findByOrientadorIdAndStatusOrderByEnviadoEmDesc_DeveFiltrarPorStatus() {
         salvarEntrega(aluno, orientador, turma, TipoEntrega.PROJETO_TCC, StatusEntrega.AJUSTES_NECESSARIOS, "https://link1.com", false);
