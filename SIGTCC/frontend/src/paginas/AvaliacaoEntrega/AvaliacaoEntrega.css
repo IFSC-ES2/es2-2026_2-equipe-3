@@ -7,6 +7,23 @@
 .avaliacao-heading {
   margin-bottom: 28px;
 }
+.avaliacao-filtro {
+  max-width: 320px;
+  margin-bottom: 20px;
+}
+.avaliacao-filtro select {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 10px 12px;
+  background: #fbfdfc;
+  color: var(--ink);
+}
+.avaliacao-filtro select:focus {
+  outline: 3px solid rgba(13, 104, 105, 0.14);
+  border-color: var(--teal);
+}
 .avaliacao-layout {
   display: grid;
   grid-template-columns: minmax(220px, 0.75fr) minmax(0, 1.5fr);
@@ -26,6 +43,23 @@
   border-radius: 7px;
   background: white;
   text-align: left;
+  .avaliacao-filtro {
+    max-width: 320px;
+    margin-bottom: 20px;
+  }
+  .avaliacao-filtro select {
+    width: 100%;
+    min-height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 10px 12px;
+    background: #fbfdfc;
+    color: var(--ink);
+  }
+  .avaliacao-filtro select:focus {
+    outline: 3px solid rgba(13, 104, 105, 0.14);
+    border-color: var(--teal);
+  }
   color: var(--ink);
 }
 .entrega-opcao span {

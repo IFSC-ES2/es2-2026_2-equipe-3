@@ -9,6 +9,7 @@ import { ApiError } from "../../utils/apiErro";
 import "./AvaliacaoEntrega.css";
 
 type StatusParecer = Exclude<StatusEntrega, "SUBMETIDO">;
+type FiltroStatusEntrega = "TODAS" | StatusEntrega;
 
 const opcoesParecer: { valor: StatusParecer; rotulo: string }[] = [
   { valor: "APROVADO", rotulo: "Aprovado" },
@@ -22,6 +23,8 @@ export function AvaliacaoEntregaPage() {
     null,
   );
   const [status, setStatus] = useState<StatusParecer>("APROVADO");
+  const [filtroStatus, setFiltroStatus] =
+    useState<FiltroStatusEntrega>("TODAS");
   const [comentario, setComentario] = useState("");
   const [carregando, setCarregando] = useState(true);
   const [erroCarregamento, setErroCarregamento] = useState("");
@@ -34,7 +37,9 @@ export function AvaliacaoEntregaPage() {
     let ativo = true;
     async function carregar() {
       try {
-        const dados = await listarEntregasDoOrientador();
+        const dados = await listarEntregasDoOrientador(
+          filtroStatus === "TODAS" ? undefined : filtroStatus,
+        );
         if (ativo) {
           setEntregas(dados);
           setEntregaSelecionada(dados[0]?.id ?? null);
@@ -52,7 +57,7 @@ export function AvaliacaoEntregaPage() {
     return () => {
       ativo = false;
     };
-  }, []);
+  }, [filtroStatus]);
 
   const entrega = entregas.find((item) => item.id === entregaSelecionada);
   const aguardandoReenvio = entrega?.status === "AJUSTES_NECESSARIOS";
@@ -77,7 +82,7 @@ export function AvaliacaoEntregaPage() {
     try {
       const atualizada = await registrarParecer(entrega.id, {
         resultado: status,
-        comentario: texto,
+        comentario: texto || null,
       });
       setEntregas((anteriores) =>
         anteriores.map((item) =>
@@ -113,6 +118,27 @@ export function AvaliacaoEntregaPage() {
           <p className="section-kicker">Área do orientador</p>
           <h2>Avaliação de entregas</h2>
         </header>
+        <div className="avaliacao-filtro">
+          <label className="form-group" htmlFor="filtro-status-entrega">
+            Filtrar por status
+            <select
+              id="filtro-status-entrega"
+              value={filtroStatus}
+              onChange={(event) => {
+                setFiltroStatus(event.target.value as FiltroStatusEntrega);
+                setCarregando(true);
+                setErroCarregamento("");
+                setMensagem("");
+              }}
+            >
+              <option value="TODAS">Todas</option>
+              <option value="SUBMETIDO">Aguardando parecer</option>
+              <option value="AJUSTES_NECESSARIOS">Ajustes necessários</option>
+              <option value="APROVADO">Aprovadas</option>
+              <option value="REPROVADO">Reprovadas</option>
+            </select>
+          </label>
+        </div>
         {carregando ? (
           <p className="feedback loading" role="status">
             Carregando entregas...

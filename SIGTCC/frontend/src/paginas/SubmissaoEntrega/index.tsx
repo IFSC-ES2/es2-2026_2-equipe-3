@@ -92,6 +92,8 @@ export function SubmissaoEntregaPage() {
         );
       } else if (erro instanceof ApiError && erro.status === 422) {
         setMensagem(erro.message || "O link informado não foi aceito.");
+      } else if (erro instanceof ApiError && erro.status === 400) {
+        setMensagem(erro.message || "O link informado não é válido.");
       } else {
         setMensagem(
           erro instanceof Error

@@ -31,5 +31,5 @@ export interface NovaEntrega {
 
 export interface NovoParecer {
   resultado: Exclude<StatusEntrega, "SUBMETIDO">;
-  comentario: string;
+  comentario?: string | null;
 }
