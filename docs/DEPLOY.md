@@ -28,24 +28,24 @@ _(Ajuste as senhas locais no arquivo `SIGTCC/.env` gerado, se desejar. O arquivo
 
 ### 1.2. Referência de Variáveis de Ambiente
 
-| Variável                           | Descrição                                                                       | Exemplo Seguro (Local)                                                                         |
-| :--------------------------------- | :------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------- |
-| `MYSQL_DATABASE`                   | Nome do banco de dados criado na inicialização do contêiner MySQL               | `gestao_tcc`                                                                                   |
-| `MYSQL_USER`                       | Usuário da aplicação no MySQL                                                   | `tcc_user`                                                                                     |
-| `MYSQL_PASSWORD`                   | Senha do usuário da aplicação no MySQL                                          | `senha_exemplo_db`                                                                             |
-| `MYSQL_ROOT_PASSWORD`              | Senha do usuário `root` do MySQL                                                | `senha_exemplo_root`                                                                           |
-| `SPRING_DATASOURCE_URL`            | URL JDBC de conexão do backend com o contêiner `db`                             | `jdbc:mysql://db:3306/gestao_tcc?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC` |
-| `SPRING_DATASOURCE_USERNAME`       | Usuário JDBC utilizado pelo Spring Boot (deve coincidir com `MYSQL_USER`)       | `tcc_user`                                                                                     |
-| `SPRING_DATASOURCE_PASSWORD`       | Senha JDBC utilizada pelo Spring Boot (deve coincidir com `MYSQL_PASSWORD`)     | `senha_exemplo_db`                                                                             |
-| `KEYCLOAK_ADMIN_USERNAME`          | Usuário administrador inicial do console do Keycloak                            | `admin`                                                                                        |
-| `KEYCLOAK_ADMIN_PASSWORD`          | Senha do administrador inicial do console do Keycloak                           | `admin_senha`                                                                                  |
-| `VITE_KEYCLOAK_URL`                | URL pública/acessível do Keycloak consumida pelo navegador no frontend          | `http://localhost:8081`                                                                        |
-| `VITE_KEYCLOAK_REALM`              | Nome do Realm do Keycloak utilizado pelo SIGTCC                                 | `sigtcc`                                                                                       |
-| `VITE_KEYCLOAK_CLIENT_ID`          | Client ID público configurado no Keycloak para a SPA React                      | `sigtcc-frontend`                                                                              |
-| `APP_SUBMISSAO_DOMINIOS_SUGERIDOS` | Lista de domínios sugeridos como dica de UX na submissão por link (US06)        | `drive.google.com,github.com,onedrive.live.com`                                                |
-| `VITE_API_URL`                     | URL base da API do backend injetada no build do frontend                        | `http://localhost:8080`                                                                        |
-| `KEYCLOAK_HOSTNAME`                | Hostname ou URL pública configurada no Keycloak em modo produção (`--hostname`) | `localhost`                                                                                    |
-| `APP_CORS_ALLOWED_ORIGINS`         | Origens permitidas no CORS do backend Spring Boot (separadas por vírgula)       | `http://localhost`                                                                             |
+| Variável                           | Descrição                                                                         | Exemplo Seguro (Local)                                                                         |
+| :--------------------------------- | :-------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------- |
+| `MYSQL_DATABASE`                   | Nome do banco de dados criado na inicialização do contêiner MySQL                 | `gestao_tcc`                                                                                   |
+| `MYSQL_USER`                       | Usuário da aplicação no MySQL                                                     | `tcc_user`                                                                                     |
+| `MYSQL_PASSWORD`                   | Senha do usuário da aplicação no MySQL                                            | `senha_exemplo_db`                                                                             |
+| `MYSQL_ROOT_PASSWORD`              | Senha do usuário `root` do MySQL                                                  | `senha_exemplo_root`                                                                           |
+| `SPRING_DATASOURCE_URL`            | URL JDBC de conexão do backend com o contêiner `db`                               | `jdbc:mysql://db:3306/gestao_tcc?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC` |
+| `SPRING_DATASOURCE_USERNAME`       | Usuário JDBC utilizado pelo Spring Boot (deve coincidir com `MYSQL_USER`)         | `tcc_user`                                                                                     |
+| `SPRING_DATASOURCE_PASSWORD`       | Senha JDBC utilizada pelo Spring Boot (deve coincidir com `MYSQL_PASSWORD`)       | `senha_exemplo_db`                                                                             |
+| `KEYCLOAK_ADMIN_USERNAME`          | Usuário administrador inicial do console do Keycloak                              | `admin`                                                                                        |
+| `KEYCLOAK_ADMIN_PASSWORD`          | Senha do administrador inicial do console do Keycloak                             | `admin_senha`                                                                                  |
+| `VITE_KEYCLOAK_URL`                | URL pública/acessível do Keycloak consumida pelo navegador no frontend            | `http://localhost:8081`                                                                        |
+| `VITE_KEYCLOAK_REALM`              | Nome do Realm do Keycloak utilizado pelo SIGTCC                                   | `sigtcc`                                                                                       |
+| `VITE_KEYCLOAK_CLIENT_ID`          | Client ID público configurado no Keycloak para a SPA React                        | `sigtcc-frontend`                                                                              |
+| `APP_SUBMISSAO_DOMINIOS_SUGERIDOS` | Lista de domínios sugeridos como dica de UX na submissão por link (US06)          | `drive.google.com,github.com,onedrive.live.com`                                                |
+| `VITE_API_URL`                     | URL base da API do backend injetada no build do frontend                          | `http://localhost:8080`                                                                        |
+| `KEYCLOAK_PUBLIC_URL`              | URL pública base do Keycloak no staging/produção para o issuer JWT e `--hostname` | `http://localhost:8081`                                                                        |
+| `APP_CORS_ALLOWED_ORIGINS`         | Origens permitidas no CORS do backend Spring Boot (separadas por vírgula)         | `http://localhost`                                                                             |
 
 ---
 
@@ -139,7 +139,7 @@ cloudflared tunnel --url http://localhost:80
 ```dotenv
 VITE_API_URL=https://<url-gerada-para-8080>.trycloudflare.com
 VITE_KEYCLOAK_URL=https://<url-gerada-para-8081>.trycloudflare.com
-KEYCLOAK_HOSTNAME=https://<url-gerada-para-8081>.trycloudflare.com
+KEYCLOAK_PUBLIC_URL=https://<url-gerada-para-8081>.trycloudflare.com
 APP_CORS_ALLOWED_ORIGINS=https://<url-gerada-para-80>.trycloudflare.com
 ```
 
@@ -150,12 +150,19 @@ cd SIGTCC
 docker compose -f docker-compose.prod.yml --env-file .env up -d --build
 ```
 
-5. **Libere a origem pública no Keycloak (Web Origins):**
-   - Acesse o console administrativo do Keycloak em `http://localhost:8081` (ou pela URL do túnel 2) com as credenciais definidas em `KEYCLOAK_ADMIN_USERNAME` e `KEYCLOAK_ADMIN_PASSWORD`.
-   - Selecione o realm **`sigtcc`** -> **Clients** -> **`sigtcc-frontend`**.
-   - Em **Web origins**, adicione a URL pública do frontend (`https://<url-gerada-para-80>.trycloudflare.com`) ou `+` / `*` durante a sessão de validação, e clique em **Save**.
+5. **Verificação de Web Origins no Keycloak (se necessário):**
+   - O arquivo `SIGTCC/keycloak/realm-import.json` já vem configurado com `webOrigins: ["*"]` para staging, de modo que o client `sigtcc-frontend` já aceita requisições da URL do túnel automaticamente em novos volumes.
+   - Essa intervenção manual só é necessária caso exista um volume antigo do Keycloak que não tenha sido recriado com `docker compose down -v`. Nesse cenário:
+     - Acesse o console administrativo do Keycloak em `http://localhost:8081` (ou pela URL do túnel 2) com as credenciais definidas em `KEYCLOAK_ADMIN_USERNAME` e `KEYCLOAK_ADMIN_PASSWORD`.
+     - Selecione o realm **`sigtcc`** -> **Clients** -> **`sigtcc-frontend`**.
+     - Em **Web origins**, adicione a URL pública do frontend (`https://<url-gerada-para-80>.trycloudflare.com`) ou `*`, e clique em **Save**.
 
 6. **Validação (Smoke Test) e Compartilhamento:**
+   - Execute o comando oficial do smoke test automatizado (criado na Issue #220) para validação da API e autenticação em staging:
+     ```bash
+     KEYCLOAK_URL=<url-do-keycloak> API_URL=<url-do-backend> bash SIGTCC/scripts/smoke-test.sh
+     ```
+     _(Exemplo: `KEYCLOAK_URL=https://<url-gerada-para-8081>.trycloudflare.com API_URL=https://<url-gerada-para-8080>.trycloudflare.com bash SIGTCC/scripts/smoke-test.sh`)_
    - Acesse a URL pública do Frontend (`https://<url-gerada-para-80>.trycloudflare.com`), realize login com um usuário de teste e compartilhe o link com a equipe.
 
 ---
@@ -195,6 +202,6 @@ _(Alternativamente, é possível referenciar diretamente a imagem estável anter
 ## 5. Limitações Conhecidas (Staging)
 
 - **URLs Efêmeras do Cloudflare Quick Tunnels:** As URLs gratuitas geradas pelo `trycloudflare.com` mudam a cada reinício do processo `cloudflared`. Como o Vite embute `VITE_API_URL` e `VITE_KEYCLOAK_URL` estaticamente durante o `npm run build` no `Dockerfile` do frontend, sempre que um túnel da API ou do Keycloak for reiniciado é obrigatório atualizar o `.env` e reexecutar `docker compose -f docker-compose.prod.yml --env-file .env up -d --build frontend`.
-- **Web Origins do Keycloak:** O arquivo `SIGTCC/keycloak/realm-import.json` configura por padrão `webOrigins: ["http://localhost:5173", "http://localhost"]`. Para que o login via Direct Access Grant funcione a partir de um domínio externo (`*.trycloudflare.com`), é necessário autorizar a URL pública do frontend em **Web origins** do client `sigtcc-frontend` no painel do Keycloak (ou usar `["*"]` apenas durante sessões temporárias de validação; em produção real, deve-se restringir estritamente ao domínio oficial).
+- **Web Origins do Keycloak:** O arquivo `SIGTCC/keycloak/realm-import.json` vem configurado com `webOrigins: ["*"]` para staging. Essa intervenção manual só é necessária se existir um volume legado persistido do Keycloak sem ter executado `docker compose down -v`. Em produção final, o curinga `*` deve ser substituído estritamente pelo domínio corporativo homologado.
 - **Importação Inicial do Realm (`realm-import.json`):** O Keycloak só executa o `--import-realm` quando o volume `keycloak_data` está vazio. Caso o arquivo `realm-import.json` seja atualizado no repositório, é necessário remover o volume do Keycloak (`docker compose down -v` ou remoção específica do volume) ou aplicar a alteração pelo console administrativo.
 - **Ausência de SLA no Túnel Gratuito:** Os Quick Tunnels do Cloudflare destinam-se exclusivamente a testes e homologação temporária, não possuindo garantia de disponibilidade contínua e estando sujeitos a limites de conexões simultâneas.
