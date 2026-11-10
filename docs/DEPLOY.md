@@ -111,7 +111,7 @@ O Keycloak importa automaticamente o arquivo `SIGTCC/keycloak/realm-import.json`
 
 O ambiente de _staging_ utiliza o arquivo `SIGTCC/docker-compose.prod.yml` (com builds multi-stage otimizados: JRE 21 para o backend e Nginx na porta `80` para o frontend) aliado ao **Cloudflare Quick Tunnels** (`trycloudflare.com`) para expor a aplicação temporariamente à equipe durante validações de entrega.
 
-> Para instruções operacionais adicionais, comandos complementares e histórico de validação da Sprint 4 (Issue #220), consulte também [`docs/staging.md`](file:///docs/staging.md).
+> Para instruções operacionais adicionais, comandos complementares e histórico de validação da Sprint 4 (Issue #220), consulte também [`docs/staging.md`](staging.md).
 
 > **Nota sobre CI/CD (GHCR):** A cada push aprovado na branch `entrega-8`, o workflow `.github/workflows/docker-build.yml` também compila e publica automaticamente as imagens `ghcr.io/ifsc-es2/sigtcc-backend` e `ghcr.io/ifsc-es2/sigtcc-frontend` (tags `latest` e `<git-sha>`) no GitHub Container Registry. O staging com túnel dinâmico não utiliza essas imagens diretamente porque o frontend precisa embutir as URLs efêmeras geradas a cada execução.
 
