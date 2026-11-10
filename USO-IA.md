@@ -314,3 +314,55 @@ Todo o conteúdo, código e documentação gerados com o apoio da IA foram lidos
 #### Validação e Responsabilidade Técnica:
 
 Todo o conteúdo, código, configurações e documentação gerados ou revisados com o apoio da IA foram lidos, compreendidos, conferidos e validados pelo integrante antes da integração aos respectivos Pull Requests. A IA foi utilizada como ferramenta de apoio à análise, implementação, revisão e documentação, não substituindo a tomada de decisões técnicas. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
+
+---
+
+## Entrega 8 (Sprint 4):
+
+Em conformidade com as diretrizes da disciplina e visando garantir a transparência e a rastreabilidade exigidas, apresentamos as declarações de uso de Inteligência Artificial generativa referentes à Sprint 4 (23/10/2026 a 11/11/2026), organizadas por integrante responsável:
+
+---
+
+### Damares do Socorro Gonçalves Gaia (Arquiteta de Software)
+
+**Ferramenta utilizada:** Google Gemini (versão Advanced)  
+**Período:** 01/11/2026 a 10/11/2026
+
+#### Detalhamento de Usos por Artefato e Atividade:
+
+- **Modelagem da Entidade Entrega e Migração Flyway V6 (Issue #208 / PR #233):**
+  - **Data:** 04/11/2026.
+  - **Ferramenta:** Google Gemini Advanced.
+  - **Artefatos:** `V6__criar_tabela_entregas.sql`, `Entrega.java`, `StatusEntrega.java`, `EntregaRepository.java` e `EntregaRepositoryTest.java`.
+  - **Aproveitamento:** Auxílio na sintaxe DDL da tabela `entregas` com campo `url_documento VARCHAR(2048)`, enum `StatusEntrega`, constraint de unicidade por aluno/turma/tipo e estrutura inicial dos testes de repositório.
+  - **Adaptação/Descarte:** A Arquiteta ajustou as constraints de chave estrangeira com integridade referencial estrita e configurou os testes de repositório com validação de esquema Flyway.
+  - **Validação Técnica:** Execução dos testes automatizados e integração aprovada no **PR #233** em 04/11/2026.
+
+- **Modelagem da Entidade Parecer e Migração Flyway V7 (Issue #215 / PR #237):**
+  - **Data:** 05/11/2026 a 06/11/2026.
+  - **Ferramenta:** Google Gemini Advanced.
+  - **Artefatos:** `V7__criar_tabela_pareceres.sql`, `Parecer.java`, `ParecerRepository.java` e `ParecerRepositoryTest.java`.
+  - **Aproveitamento:** Auxílio na estruturação inicial da entidade JPA `Parecer`, na sintaxe DDL do script Flyway com integridade referencial para `entregas` e `orientadores`, e no esqueleto da classe de repositório Spring Data JPA.
+  - **Adaptação/Descarte:** A Arquiteta realizou a correção manual de incompatibilidade da suíte `@DataJpaTest` com H2 (`DATETIME` não reconhecido em modo padrão). Configurou explicitamente `@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)` e `MODE=MySQL`, habilitando a execução das migrações reais Flyway (`V1` a `V7`) com validação de esquema estrita (`spring.jpa.hibernate.ddl-auto=validate`) para atender ao Achado A6 da Entrega 6.
+  - **Validação Técnica:** Commit `de2f00f` em 05/11/2026, execução dos testes no CI e merge no **PR #237** em 06/11/2026.
+
+- **Consolidação de Arquitetura, Padrões de Projeto e ADRs (Issue #239):**
+  - **Data:** 06/11/2026 a 07/11/2026.
+  - **Ferramenta:** Google Gemini Advanced.
+  - **Artefatos:** `docs/ARQUITETURA.md`, `docs/PADROES-DE-PROJETO.md`, `docs/diagramas/c1-contexto.md`, `docs/diagramas/c2-conteineres.md` e ADRs (`ADR-0007`, `ADR-0008`, `ADR-0009`, `ADR-0012` e `ADR-0013`).
+  - **Aproveitamento:** Apoio na estruturação da documentação arquitetural para o marco `v0.4.0` (Sprint 4), formatação de tabelas comparativas, alinhamento de diagramas C4 em sintaxe Mermaid e formatação geral em Markdown.
+  - **Adaptação/Descarte:** Foram descartadas classes não existentes no código real (`SolicitacaoContexto`, `LogAuditoriaObserver`) e atualizados os nomes de pacotes e classes de validação e eventos para refletir a implementação do backend (`validation.ValidacaoSolicitacaoOrientacao` e `observer.AtualizadorVagasObserver`), sanando o Achado A7 da Entrega 6. Todos os links absolutos (`file:///`) foram convertidos manualmente para links relativos (Achado A12). Foi documentada a evolução Flyway até `V8` e a mitigação de condições de corrida via bloqueio otimista (`@Version` em `PerfilOrientador`).
+  - **Validação Técnica:** Commits `d1791f1`, `4f393c1` e `ba37f58` em 06/11/2026; commits `a8fbf50`, `6be30e6`, `f66790e` e `e3e54b5` em 07/11/2026; abertura e submissão do **PR #245** em 10/11/2026.
+
+- **Revisão Técnica Qualificada de Pull Requests (PR #238, PR #240 e PR #243):**
+  - **Data:** 05/11/2026 a 10/11/2026.
+  - **Ferramenta:** Google Gemini Advanced.
+  - **Artefatos:** PR #238 (`docs/219-atualiza-ci`), PR #240 (`feature/210-consulta-submissao`) e PR #243 (`docs/221-criar-documento-deploy`).
+  - **Aproveitamento:** Utilização da IA para inspeção estática comparativa de diffs contra branch base e conferência cruzada entre contratos de dados, arquivos Compose e documentação operacional.
+  - **Adaptação/Descarte:** Todas as solicitações de alteração foram validadas pela Arquiteta: no PR #238 (05/11) exigiu o alinhamento de tags minúsculas no GHCR, `KC_HTTP_ENABLED` e `validate` no `docker-compose.prod.yml`; no PR #240 (06/11 e 09/11) verificou a aderência ao contrato US06 e autorizações de segurança; no PR #243 (10/11) apontou o alinhamento da variável `KEYCLOAK_PUBLIC_URL` e smoke test.
+  - **Validação Técnica:** Acompanhamento das correções submetidas pelos autores e aprovação formal registrada nos Pull Requests correspondentes.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo técnico, código, migrações Flyway, diagramas C4, especificações de padrões de projeto e decisões de arquitetura gerados ou refinados com o apoio da IA foram minuciosamente lidos, compreendidos, testados contra a base de dados MySQL/H2 e validados pela Arquiteta de Software responsável. A integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
+
