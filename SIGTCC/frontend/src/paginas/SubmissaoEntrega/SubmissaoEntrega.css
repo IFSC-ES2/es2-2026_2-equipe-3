@@ -1,0 +1,108 @@
+.entregas-page {
+  padding: clamp(24px, 5vw, 44px);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--paper);
+}
+.entregas-heading {
+  max-width: 720px;
+  margin-bottom: 30px;
+}
+.entregas-heading > p:last-child,
+.form-help,
+.field-help,
+.entrega-historico {
+  color: var(--muted);
+  line-height: 1.55;
+}
+.entregas-heading > p:last-child {
+  margin: 10px 0 0;
+}
+.entregas-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(230px, 0.8fr);
+  gap: 30px;
+}
+.entrega-form {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+}
+.entrega-form select,
+.entrega-form input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 10px 12px;
+  background: #fbfdfc;
+  color: var(--ink);
+}
+.entrega-form input:focus,
+.entrega-form select:focus {
+  outline: 3px solid rgba(13, 104, 105, 0.14);
+  border-color: var(--teal);
+}
+.entrega-form input[aria-invalid="true"] {
+  border-color: #bd3f2d;
+}
+.field-help,
+.erro-texto {
+  font-size: 0.8rem;
+}
+.form-help {
+  margin: 0;
+  font-size: 0.88rem;
+}
+.entrega-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  align-items: center;
+  padding: 12px 14px;
+  border-left: 4px solid var(--teal);
+  background: #eef6f4;
+  color: var(--teal-dark);
+}
+.entrega-status span {
+  color: #a13d2d;
+  font-weight: 700;
+}
+.status-entrega-reprovado {
+  border-color: var(--coral);
+  background: var(--coral-soft);
+  color: #a13d2d;
+}
+.entrega-historico {
+  align-self: start;
+  padding: 20px;
+  border-left: 1px solid var(--line);
+}
+.entrega-historico h3 {
+  margin: 0 0 14px;
+  color: var(--ink);
+  font:
+    700 1.1rem "Space Grotesk",
+    sans-serif;
+}
+.entrega-historico p,
+.entrega-historico time,
+.entrega-historico a {
+  display: block;
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+}
+.entrega-historico a {
+  color: var(--teal);
+  font-weight: 700;
+}
+@media (max-width: 700px) {
+  .entregas-grid {
+    grid-template-columns: 1fr;
+  }
+  .entrega-historico {
+    border-top: 1px solid var(--line);
+    border-left: 0;
+    padding: 20px 0 0;
+  }
+}

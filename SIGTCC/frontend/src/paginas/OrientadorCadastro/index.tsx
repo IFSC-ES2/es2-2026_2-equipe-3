@@ -32,7 +32,8 @@ export function OrientadorCadastroPage() {
 }
 
 interface PageShellProps {
-  active?: "cadastro" | "catalogo" | "perfil" | "painel";
+  active?:
+    "cadastro" | "catalogo" | "perfil" | "painel" | "submissao" | "avaliacao";
   mensagem?: string;
   sucesso?: boolean;
   children: ReactNode;
@@ -96,6 +97,23 @@ export function PageShell({
               onClick={() => navigate("/painel-orientador")}
             >
               Painel do Professor
+            </button>
+          )}
+          {ehProfessor ? (
+            <button
+              className={active === "avaliacao" ? "active" : ""}
+              type="button"
+              onClick={() => navigate("/avaliar-entregas")}
+            >
+              Avaliar entregas
+            </button>
+          ) : (
+            <button
+              className={active === "submissao" ? "active" : ""}
+              type="button"
+              onClick={() => navigate("/minhas-entregas")}
+            >
+              Minhas entregas
             </button>
           )}
           <button type="button" className="sair-button" onClick={handleSair}>
