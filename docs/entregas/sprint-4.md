@@ -231,7 +231,73 @@ De modo geral, a Sprint 4 ampliou a maturidade técnica do projeto, não apenas 
 
 ## 10. Incremento Entregue
 
-> Seção a ser preenchida ao final da sprint, com os itens efetivamente entregues, os itens postergados ou removidos e as respectivas justificativas.
+Ao final da Sprint 4, foi integrado à branch `entrega-8` o incremento correspondente ao ciclo, contemplando as funcionalidades previstas para as US06 e US07, melhorias de infraestrutura, documentação técnica, testes e correções de bugs. Durante a execução, a equipe também realizou uma revisão de prioridades, considerando a capacidade disponível, os riscos de integração e a necessidade de preservar a qualidade das entregas.
+
+### 10.1. Funcionalidades entregues
+
+| Item | Entrega | Resultado |
+| :--- | :--- | :--- |
+| **US06 - Submissão de Entregas do TCC** | Submissão de trabalho por link externo HTTPS, com identificação da etapa, registro da data de envio e indicação de atraso. | Concluída |
+| **US07 - Avaliação e Parecer das Entregas** | Consulta da entrega pelo orientador e registro de parecer com os resultados `APROVADO`, `REPROVADO` e `AJUSTES_NECESSARIOS`. | Concluída |
+| **Reenvio de entrega** | Possibilidade de substituir o link após um parecer `AJUSTES_NECESSARIOS`, respeitando as regras de encerramento da etapa. | Concluída |
+| **Painel do aluno** | Exibição do status da entrega e do parecer registrado pelo orientador. | Concluída |
+| **Tela do orientador** | Consulta do documento por link externo e registro de avaliação, com restrições para pareceres definitivos e entregas aguardando reenvio. | Concluída |
+
+### 10.2. Infraestrutura e documentação
+
+| Item | Entrega | Resultado |
+| :--- | :--- | :--- |
+| **CI** | Atualização do pipeline de integração contínua para a branch `entrega-8`. | Concluída |
+| **Staging** | Configuração do ambiente de staging acessível externamente, utilizando Docker e Cloudflare Tunnel. | Concluída |
+| **Deploy** | Criação de `docs/DEPLOY.md` e consolidação do `.env.example`. | Concluída |
+| **Arquitetura** | Atualização da documentação de arquitetura e dos padrões adotados no projeto. | Concluída |
+| **Contratos de dados** | Documentação dos contratos das APIs das US06 e US07. | Concluída |
+| **Métricas e riscos** | Atualização dos documentos de acompanhamento e governança do projeto. | Concluída |
+
+### 10.3. Qualidade e correção de bugs
+
+Durante a Sprint 4, foram concluídas oito issues de correção de bugs, com integração das respectivas alterações à branch `entrega-8`:
+
+| Issue | Correção realizada |
+| :---: | :--- |
+| #199 | Restrição da autorização para aceitar ou recusar solicitações. |
+| #200 | Restrição do acesso ao CRUD de orientadores conforme as permissões do usuário. |
+| #201 | Utilização da identidade do usuário autenticado na criação de solicitações. |
+| #202 | Restrição da leitura de solicitações aos usuários autorizados. |
+| #203 | Correção da consulta de solicitações exibidas no painel do professor. |
+| #204 | Correção do controle de acesso à edição do perfil, eliminando a dependência indevida do `localStorage`. |
+| #205 | Renovação do token e tratamento da expiração da sessão, evitando falhas de autenticação após o vencimento. |
+| #206 | Correção da condição de corrida no controle de vagas do orientador. |
+
+Além das correções, foram implementados cenários de integração para as US06 e US07, contemplando os principais fluxos funcionais, regras de negócio e restrições de autorização.
+
+### 10.4. Itens não entregues ou postergados
+
+**US08 - Agendamento e Organização de Banca (#15): Postergada.**
+
+A equipe decidiu postergar a implementação da US08, que prevê o agendamento e a organização das bancas de defesa do TCC. A funcionalidade permite que o professor ou orientador informe a data, o horário e o local da defesa — ou um link de videoconferência —, convide professores examinadores e disponibilize o agendamento nos painéis dos membros convidados.
+
+A decisão de não incluir essa história no incremento da Sprint 4 (Entrega 8) foi tomada após avaliar o escopo das entregas em andamento, a capacidade disponível da equipe e os riscos associados à implementação de novas funcionalidades em um período limitado. Os principais fatores considerados foram:
+
+- **Capacidade de desenvolvimento e prazo disponível:** a Sprint 4 teve um período de execução de 03/11/2026 a 11/11/2026 e já contemplava a implementação e a integração das US06 e US07, além de atividades de infraestrutura, documentação, testes e governança. Durante o ciclo, também foi necessário absorver oito correções de bugs em funcionalidades existentes, ampliando a demanda de trabalho em relação às atividades inicialmente previstas.
+
+- **Complexidade funcional da US08:** embora a história tenha como objetivo principal o agendamento de uma banca, sua implementação envolve mais do que o simples cadastro de data e horário. Seria necessário desenvolver mecanismos para registrar as informações do evento, associá-lo ao TCC do aluno, permitir a inclusão de professores examinadores, controlar os convites e disponibilizar os agendamentos nos painéis dos membros convidados. Isso exigiria alterações integradas no backend e no frontend, além de validações e testes dos diferentes comportamentos envolvidos.
+
+- **Dependência do fluxo de avaliação do TCC:** o critério de aceitação da US08 estabelece que o agendamento ocorre quando o TCC do aluno já foi pré-aprovado para defesa. Portanto, a funcionalidade está relacionada a uma etapa posterior do processo de acompanhamento do trabalho. A equipe considerou mais adequado concluir e validar primeiro o fluxo de submissão e avaliação, desenvolvido nas US06 e US07, antes de avançar para a organização das bancas.
+
+- **Necessidade de integração e validação:** a inclusão de uma nova história exigiria tempo adicional para implementar, revisar e integrar seus componentes, além de verificar o funcionamento dos convites e a visualização dos agendamentos pelos professores envolvidos. Com o prazo restante, assumir essa demanda poderia comprometer a profundidade dos testes e a validação das funcionalidades já desenvolvidas.
+
+- **Mitigação dos riscos de crescimento do escopo e de perda de qualidade:** considerando os riscos de crescimento do escopo (R04), baixa capacidade disponível (R01) e concentração das atividades no encerramento da sprint, a equipe optou por não ampliar o conjunto de funcionalidades sem tempo suficiente para garantir sua implementação completa e validação adequada. Essa decisão buscou evitar a entrega de um volume maior de funcionalidades com possibilidade de apresentarem falhas, integrações incompletas ou comportamentos não verificados.
+
+Dessa forma, a postergação da US08 foi uma decisão consciente de gerenciamento de escopo, priorização e qualidade. A equipe optou por concentrar os esforços na conclusão das US06 e US07, nas correções necessárias e na preparação da infraestrutura de validação, em vez de assumir uma nova funcionalidade sem capacidade suficiente para assegurar sua entrega com a qualidade esperada.
+
+A US08 não foi descartada. Ela permanece no backlog do produto para ser reavaliada e priorizada em um ciclo posterior, considerando a capacidade da equipe, as dependências funcionais e o planejamento das próximas entregas.
+
+### 10.5. Resultado final
+
+O incremento da Sprint 4 consolida o fluxo de acompanhamento do TCC, permitindo que o aluno submeta seu trabalho por meio de um link externo seguro e acompanhe o parecer emitido pelo orientador. Também foram reforçados os mecanismos de autorização e integridade das operações, ampliadas as possibilidades de validação por testes automatizados e preparados os recursos de infraestrutura e documentação necessários à execução e validação do sistema.
+
+A equipe priorizou a entrega de um conjunto funcional integrado e validado, postergando a US08 para evitar a ampliação do escopo além da capacidade disponível e preservar a qualidade do incremento. A branch `entrega-8` reúne as implementações e correções integradas durante a sprint, tendo como marco de release planejado a versão `v0.4.0`.
 
 ---
 
