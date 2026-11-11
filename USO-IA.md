@@ -366,6 +366,44 @@ Em conformidade com as diretrizes da disciplina e visando garantir a transparên
 
 Todo o conteúdo técnico, código, migrações Flyway, diagramas C4, especificações de padrões de projeto e decisões de arquitetura gerados ou refinados com o apoio da IA foram minuciosamente lidos, compreendidos, testados contra a base de dados MySQL/H2 e validados pela Arquiteta de Software responsável. A integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
 
+---
+
+### Talles Souza da Cruz (Desenvolvedor Backend)
+
+**Ferramenta utilizada:** Claude (Anthropic)  
+**Período:** 01/11/2026 a 11/11/2026
+
+#### Detalhamento de Usos por Artefato e Atividade:
+
+- **Identificação e Correção de Defeitos (Issues #199 a #206):**
+  - **Data:** 30/10/2026 a 07/11/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Artefatos:** relatório interno de bugs (não versionado); `SecurityConfig.java`, `OrientadorService.java`, `SolicitacaoService.java`, `PerfilOrientador.java`, `GlobalExceptionHandler.java` e a migração `V8__adicionar_versao_perfil_orientador.sql`; no frontend, `SolicitacaoForm` e `OrientadorEdicao`; contratos de dados da US02 e da US04; e os testes correspondentes.
+  - **Aproveitamento:** Apoio na revisão estática do sistema, que registrou 22 possíveis defeitos classificados por severidade, e na correção dos defeitos sob responsabilidade do integrante: restrição da escrita de orientadores ao próprio professor (#200), identificação do aluno pelo usuário autenticado (#201), remoção da dependência do `localStorage` em "Meu perfil" (#204) e condição de corrida no controle de vagas (#206), além da escrita dos testes e de roteiros de teste manual.
+  - **Adaptação/Descarte:** Cada defeito foi conferido manualmente no código, e os 8 mais graves viraram as issues #199 a #206. Na #206, o integrante escolheu o lock otimista (`@Version`) em vez da trava pessimista, porque a issue exigia `409` no aceite concorrente, e deixou para uma issue separada o caso de aceite e recusa simultâneos.
+  - **Validação Técnica:** Execução local das suítes do backend e do frontend; na #206, o teste de concorrência falhou antes da correção e passou depois, e o teste manual com MySQL real resultou em 1 aceite e 4 conflitos para 1 vaga. Revisão e aprovação nos **PRs #211, #213, #217 e #241**.
+
+- **Implementação das APIs de Submissão e Avaliação de Entregas (US06 e US07 - Issues #209, #216, #210 e #215):**
+  - **Data:** 04/11/2026 a 06/11/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Artefatos:** `docs/contrato-dados-us06.md`, `docs/contrato-dados-us07.md`, DTOs de entrega e parecer, `Entrega.java`, `EntregaRepository.java`, `EntregaService.java`, `EntregaController.java`, `SecurityConfig.java`, `EntregaServiceTest.java` e `EntregaControllerIntegrationTest.java`.
+  - **Aproveitamento:** Apoio no detalhamento das roles e respostas de erro nos contratos, na implementação da submissão por link (`POST /api/v1/entregas`), das consultas para orientador e aluno (`GET /orientador`, `/minhas` e `/{id}`) e do registro de parecer (`POST /{id}/parecer`, com trava pessimista contra pareceres simultâneos), e na escrita dos testes unitários e de integração.
+  - **Adaptação/Descarte:** O código foi conferido contra os contratos e adaptado aos padrões do projeto (camadas, DTOs, exceções de domínio e `Clock` injetável). Decisões tomadas pelo integrante: verificar o conflito de estado (`409`) antes da regra de negócio (`422`) e representar "aprovado com ressalvas" como `APROVADO` com comentário, conforme a decisão D7 do contrato da US07.
+  - **Validação Técnica:** Execução local do `./gradlew build` e teste manual com MySQL e Keycloak reais do fluxo completo de submissão, ajustes, reenvio e aprovação; de 8 pareceres simultâneos, apenas 1 foi gravado. Revisão e aprovação nos **PRs #234, #236, #240 e #237**.
+
+- **Revisão de Pull Requests (PRs #212, #214, #232, #235, #238 e #246):**
+  - **Data:** 02/11/2026 a 11/11/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Aproveitamento:** Apoio na leitura dos diffs e na conferência das alterações contra os contratos de dados, as issues e os padrões do projeto.
+  - **Adaptação/Descarte:** Os apontamentos sugeridos foram conferidos pelo integrante antes de serem considerados na revisão.
+  - **Validação Técnica:** Aprovação e integração dos PRs à `entrega-8` após a conferência do CI.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código e documentação gerados com o apoio da IA foram lidos, compreendidos, executados, testados e revisados pelo integrante antes da integração aos respectivos pull requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
+
+---
+
 ### Marcus Jhuan Epifanio Lima (Designer UX/UI / Frontend)
 
 Apoio no planejamento e estruturação das funcionalidades US06 e US07:
