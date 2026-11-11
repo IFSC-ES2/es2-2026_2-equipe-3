@@ -189,7 +189,48 @@ Cada integrante registra abaixo suas contribuições da Sprint 4, com as issues 
 
 ### 11.2 Eduardo Cardoso Oliveira
 
-> Seção a ser preenchida pelo integrante.
+- **Papel:** Engenheiro de DevOps / Infraestrutura.
+- **Identificadores Git:** `Eduardo Cardoso <eduardo.co22@aluno.ifsc.edu.br>` (usuário GitHub: `EduCardoso22`).
+- **Atividades e Entregas na Sprint 4:**
+  - **Validação de Links e Variáveis de Ambiente da US06 (Issue #218 - PR #235):**
+    - Configuração e propagação segura da variável `APP_SUBMISSAO_DOMINIOS_SUGERIDOS` no backend Spring Boot (`application.properties`) e no `.env.example`, sem introduzir acoplamentos ou dependências desnecessárias de volume.
+    - Atualização do [`docs/contrato-dados-us06.md`](../contrato-dados-us06.md), [`docs/ARQUITETURA.md`](../ARQUITETURA.md) e [`docs/qualidade.md`](../qualidade.md) para refletir a estratégia de submissão por link externo HTTPS (ADR-0013) com validação estrita `@URL(protocol = "https")` e persistência em coluna de 2048 caracteres.
+    - Implementação de testes automatizados de validação de protocolo HTTPS, persistência e suporte a CORS.
+    - Adequação das regras de segurança no `SecurityConfig.java` para o endpoint `/api/v1/entregas/**` com exigência de `ROLE_ALUNO`.
+  - **Atualização do Pipeline de CI e Publicação de Imagens no GHCR (Issue #219 - PR #238):**
+    - Criação do workflow [`.github/workflows/docker-build.yml`](../../.github/workflows/docker-build.yml) para automação do build multi-stage e publicação das imagens de Backend e Frontend no GitHub Container Registry (GHCR), com tagueamento determinístico (`latest` e SHA do commit).
+    - Otimização do cache das camadas Docker utilizando a API nativa do GitHub Actions (`type=gha`), reduzindo expressivamente o tempo de build.
+    - Configuração de isolamento de dependências com a diretiva `needs` interna no workflow, garantindo que o build e push de contêineres ocorram somente após a aprovação com sucesso dos jobs de testes unitários.
+    - Atualização completa de [`docs/ci.md`](../ci.md), documentando os 5 workflows ativos, gatilhos de execução, políticas de bloqueio de branch e Quality Gates obrigatórios da `entrega-8`.
+    - Atualização do template de Pull Request ([`.github/PULL_REQUEST_TEMPLATE.md`](../../.github/PULL_REQUEST_TEMPLATE.md)) para inclusão das verificações de CI e evidências da Sprint 4.
+  - **Configuração e Provisionamento do Ambiente de Staging Acessível (Issue #220 - PR #244):**
+    - Criação da orquestração de homologação/produção em [`SIGTCC/docker-compose.prod.yml`](../../SIGTCC/docker-compose.prod.yml), parametrizando variáveis de segurança do Keycloak (`KC_HTTP_ENABLED`, `KC_HOSTNAME_STRICT`, `KC_HOSTNAME`) e validação de schema do Hibernate (`hibernate.ddl-auto=validate`).
+    - Integração e provisionamento de tunelamento seguro via **Cloudflare Tunnels**, expondo os serviços conteinerizados da VPS sob domínio seguro HTTPS (`staging.sigtcc.online`) sem necessidade de liberação de portas de firewall ou IPs públicos dedicados.
+    - Elaboração do artefato oficial [`docs/staging.md`](../staging.md), documentando a arquitetura remota, credenciais administrativas, consumo de imagens GHCR e um roteiro executável de _Smoke Test_ via cURL/PowerShell para validação automatizada de saúde dos 4 componentes (MySQL 8.0, Keycloak 24 IAM, Backend API REST e Frontend SPA).
+  - **Guia Oficial de Deploy e Consolidação de Variáveis de Ambiente (Issue #221 - PR #243):**
+    - Redação integral e publicação do guia oficial de implantação [`docs/DEPLOY.md`](../DEPLOY.md), contemplando pré-requisitos, instruções passo a passo para deploy local e em staging a partir de ambiente limpo, configuração de `KEYCLOAK_PUBLIC_URL` e `webOrigins`, rotinas de smoke test e plano de rollback com comandos detalhados.
+    - Consolidação definitiva do arquivo de referência [`.env.example`](../../.env.example), unificando todas as variáveis de configuração de ambiente de forma consistente, rastreável e auditável, eliminando valores sensíveis expostos.
+    - Alinhamento de referências cruzadas entre `DEPLOY.md`, `staging.md` e os arquivos compose do projeto.
+  - **Acompanhamento da Métrica de Processo M-04 — Lead Time de Pull Requests (Issue #230):**
+    - Atualização da ficha técnica [`docs/metricas/M-04.md`](../metricas/M-04.md) com o histórico completo de Pull Requests da sprint (PRs #211 a #245), calculando os tempos exatos de ciclo entre criação e merge.
+    - Elaboração da memória de cálculo da Sprint 4: média de **12,3h**, mediana de **5,7h**, 80% dos PRs Dentro da Meta ($\le 24$h), 20% na Faixa Aceitável ($24$h a $48$h) e **0% em Zona de Alerta**, alcançando **100% de conformidade com o SLA** e demonstrando a eficácia dos Quality Gates automatizados no GitHub Actions.
+    - Análise histórica comparativa frente ao Baseline e às Sprints 1, 2 e 3, com diagnóstico específico do Lead Time das entregas de infraestrutura (média de 18,2h).
+  - **Reavaliação dos Riscos Técnicos de DevOps e Infraestrutura (Issue #231):**
+    - Reavaliação formal dos riscos sob responsabilidade de DevOps em [`docs/riscos.md`](../riscos.md): **R05** (Divergência de Ambientes e Instabilidade Docker) mitigado definitivamente pela padronização dos contêineres e documentação de deploy, e **R10** (Indisponibilidade do Ambiente de Staging) mitigado pela alta disponibilidade do Cloudflare Tunnels e roteiro de smoke tests.
+  - **Revisão de Código (Code Review) e Governança:**
+    - Atuação contínua na revisão técnica, verificação de qualidade de código, conformidade com os pipelines de CI e aprovação de Pull Requests de todos os integrantes integrados à `entrega-8`:
+      - **PR #211 (Issue #200):** Fix de fechamento de endpoints abertos de usuário (Talles Souza).
+      - **PR #213 (Issue #201):** Fix de extração de e-mail do aluno logado via token JWT (Talles Souza).
+      - **PR #217 (Issue #204):** Fix de integridade de dados do usuário em LocalStorage (Talles Souza).
+      - **PR #224 (Issue #202):** Fix de restrição de leitura de solicitações com validação de vínculo (Willian Ferreira).
+      - **PR #233 (Issue #208):** Modelagem JPA, constraints e migração Flyway V6 da entidade Entrega (Damares Gaia).
+      - **PR #234 (Issue #209):** Especificação dos contratos de dados das APIs de US06 e US07 (Damares Gaia / Talles Souza).
+      - **PR #236 (Issue #216):** Service e endpoint `POST /api/v1/entregas` de submissão por link HTTPS (Talles Souza).
+      - **PR #237 (Issue #215):** Modelagem da entidade Parecer, enum de resultado e migração Flyway V7 (Damares Gaia).
+      - **PR #240 (Issue #210):** Endpoints de consulta de submissão para orientador e aluno (Talles Souza).
+      - **PR #241 (Issue #206):** Tratamento de condição de corrida com bloqueio otimista `@Version` e migração Flyway V8 (Talles Souza).
+      - **PR #242 (Issues #226/#227):** Interface frontend para submissão de link e avaliação de parecer com testes Vitest (Marcus Jhuan).
+      - **PR #245 (Issue #239):** Atualização da documentação arquitetural C4 e padrões estruturais do sistema (Damares Gaia).
 
 ### 11.3 Marcus Jhuan Epifanio Lima
 
