@@ -164,3 +164,41 @@ A revisão completa dos riscos será registrada em [`docs/riscos.md`](../riscos.
 ## 10. Incremento Entregue
 
 > Seção a ser preenchida ao final da sprint, com os itens efetivamente entregues, os itens postergados ou removidos e as respectivas justificativas.
+
+---
+
+## 11. Contribuições Individuais Detalhadas
+
+Cada integrante registra abaixo suas contribuições da Sprint 4, com as issues e os PRs como evidência. O detalhamento do uso de IA em cada artefato está em [`USO-IA.md`](../../USO-IA.md) (Entrega 8).
+
+### 11.1 Damares do Socorro Gonçalves Gaia
+
+- **Papel:** Arquiteta de Software / Backend.
+- **Identificadores Git:** `Damares Gaia <damaresgaia@gmail.com>`, `121111955+damaresgaia@users.noreply.github.com` (usuária GitHub: `damaresgaia`).
+- **Atividades e Entregas na Sprint 4:**
+  - **Modelagem de Dados e Migração da Entidade Entrega (Issue #208 - PR #233):** Criação da migration Flyway `V6__criar_tabela_entrega.sql` modelando a tabela `entrega` vinculada à `turma_tcc`, suporte à URL externa HTTPS (ADR-0013), flag de submissão atrasada, anotações de validação e repositório `EntregaRepository`.
+  - **Modelagem de Dados e Migração da Entidade Parecer (Issue #215 - PR #237):** Concepção da migration Flyway `V7__criar_tabela_parecer.sql` estruturando a entidade `Parecer`, enum `ResultadoParecer` (`APROVADO`, `REPROVADO`, `AJUSTES_NECESSARIOS`), relacionamento com `Entrega` e `Professor`, e cobertura completa com testes automatizados de integração JPA (`ParecerRepositoryTest`) validando integridade referencial, constraints e aplicação das migrations Flyway em ambiente de testes H2 configurado em modo de compatibilidade MySQL (`MODE=MySQL`).
+  - **Especificação dos Contratos de Dados das APIs de US06 e US07 (Issue #209 - PR #234):** Elaboração dos documentos de especificação de contrato de API [`docs/contrato-dados-us06.md`](../contrato-dados-us06.md) (submissão de entregas por link externo HTTPS) e [`docs/contrato-dados-us07.md`](../contrato-dados-us07.md) (avaliação e emissão de parecer), definindo schemas de request/response, validações, códigos de status HTTP e cenários de teste BDD em colaboração com o backend.
+  - **Correção da Renovação Automática de Token e Interceptor Frontend (Issue #205 - PR #225):** Atuação conjunta na identificação da causa raiz do loop infinito de requisições no `api.ts`, implementação do mecanismo de fila de requisições pendentes durante o refresh de token e configuração da renovação silenciosa transparente com tratamento seguro de concorrência.
+  - **Atualização da Arquitetura do Sistema Real e Padrões de Projeto (Issue #239 - PR #245):** Atualização dos diagramas arquiteturais C4 ([`docs/diagramas/c2-conteineres.md`](../diagramas/c2-conteineres.md)) incorporando as rotas da release `v0.4.0` (US06 e US07), atualização do fluxo de refresh token e separação arquitetural de responsabilidades em [`docs/ARQUITETURA.md`](../ARQUITETURA.md) e [`ADR-0012`](../adrs/ADR-0012.md), além da documentação dos novos padrões estruturais (Value Object com `@Embeddable` e Interceptor com retry queue) em [`docs/PADROES-DE-PROJETO.md`](../PADROES-DE-PROJETO.md).
+  - **Acompanhamento e Memória de Cálculo de Métricas (Issue #230):** Atualização da métrica [`M-06: Cumprimento da Capacidade`](../metricas/M-06.md) para a Sprint 4, com registro histórico nominal por integrante e consolidação de 41h executadas de 42h planejadas (97,6% de aderência - Meta Desejada).
+  - **Revisão de Código (Code Review) e Governança:** Revisão técnica formal, validação de segurança e aprovação de Pull Requests fundamentais da sprint:
+    - **PR #238 (Issue #216):** Service e endpoint de submissão de entrega por link (US06), revisado e aprovado com validação das regras de negócio de entrega atrasada e verificação de URL HTTPS.
+    - **PR #240 (Issue #210):** Endpoint de consulta de submissão para orientador (US07), revisado e aprovado com validação de permissões de acesso do orientador.
+    - **PR #243 (Issue #221):** Documentação de deploy (`docs/DEPLOY.md`) e script de smoke test, revisado em duas iterações técnicas rigorosas com apontamentos sobre a URL pública do Keycloak e alinhamento de variáveis de ambiente.
+
+### 11.2 Eduardo Cardoso Oliveira
+
+> Seção a ser preenchida pelo integrante.
+
+### 11.3 Marcus Jhuan Epifanio Lima
+
+> Seção a ser preenchida pelo integrante.
+
+### 11.4 Talles Souza da Cruz
+
+> Seção a ser preenchida pelo integrante.
+
+### 11.5 Willian Ferreira dos Santos
+
+> Seção a ser preenchida pelo integrante.
