@@ -1,19 +1,26 @@
-
 package br.edu.ifsc.gestao_tcc.controller;
 
 import br.edu.ifsc.gestao_tcc.model.Aluno;
 import br.edu.ifsc.gestao_tcc.model.Entrega;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
+import br.edu.ifsc.gestao_tcc.model.PrazoEntrega;
+import br.edu.ifsc.gestao_tcc.model.SolicitacaoOrientacao;
 import br.edu.ifsc.gestao_tcc.model.StatusEntrega;
+import br.edu.ifsc.gestao_tcc.model.StatusSolicitacao;
 import br.edu.ifsc.gestao_tcc.model.TipoEntrega;
 import br.edu.ifsc.gestao_tcc.model.TurmaTCC;
 import br.edu.ifsc.gestao_tcc.repository.AlunoRepository;
 import br.edu.ifsc.gestao_tcc.repository.EntregaRepository;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
+import br.edu.ifsc.gestao_tcc.repository.ParecerRepository;
+import br.edu.ifsc.gestao_tcc.repository.PrazoEntregaRepository;
+import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
 import br.edu.ifsc.gestao_tcc.repository.TurmaTCCRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -26,6 +33,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 import static org.hamcrest.Matchers.hasItems;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -41,8 +49,15 @@ class EntregaParecerIntegrationTest {
     private static final String URL = "/api/v1/entregas";
     private static final String EMAIL_ALUNO = "aluno.parecer@example.com";
     private static final String EMAIL_ORIENTADOR = "orientador.parecer@example.com";
+    private static final String EMAIL_OUTRO_ORIENTADOR = "outro.orientador.parecer@example.com";
+
     private static final String URL_PROJETO = "https://docs.example.com/projeto-tcc";
     private static final String URL_TCC1 = "https://docs.example.com/tcc1";
+    private static final String NOVA_URL_PROJETO = "https://docs.example.com/projeto-tcc-atualizado";
+
+    private static final String COMENTARIO_AJUSTES =
+            "Detalhar melhor a metodologia e os objetivos.";
+
     private static final String COMENTARIO_REPROVACAO =
             "O trabalho não atende aos requisitos mínimos.";
 
@@ -60,6 +75,15 @@ class EntregaParecerIntegrationTest {
 
     @Autowired
     private EntregaRepository entregaRepository;
+
+    @Autowired
+    private SolicitacaoRepository solicitacaoRepository;
+
+    @Autowired
+    private PrazoEntregaRepository prazoEntregaRepository;
+
+    @Autowired
+    private ParecerRepository parecerRepository;
 
     private Aluno aluno;
     private Orientador orientador;
@@ -85,6 +109,31 @@ class EntregaParecerIntegrationTest {
                 .vigente(true)
                 .professorResponsavel(orientador)
                 .build());
+    }
+
+    @Test
+    @DisplayName("GET /entregas/{id} - Orientador vinculado deve consultar a entrega e obter a URL")
+    void buscarPorId_OrientadorVinculado_DeveRetornarEntregaEUrl() throws Exception {
+        Entrega entrega = criarEntrega(TipoEntrega.PROJETO_TCC, URL_PROJETO);
+
+        mockMvc.perform(get(URL + "/" + entrega.getId())
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_ORIENTADOR)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(entrega.getId()))
+                .andExpect(jsonPath("$.urlDocumento").value(URL_PROJETO))
+                .andExpect(jsonPath("$.orientador.email").value(EMAIL_ORIENTADOR));
+    }
+
+    @Test
+    @DisplayName("GET /entregas/{id} - Orientador não vinculado deve receber 403")
+    void buscarPorId_OrientadorNaoVinculado_DeveRetornar403() throws Exception {
+        Entrega entrega = criarEntrega(TipoEntrega.PROJETO_TCC, URL_PROJETO);
+        criarOutroOrientador();
+
+        mockMvc.perform(get(URL + "/" + entrega.getId())
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_OUTRO_ORIENTADOR)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.erro").value("Acesso negado"));
     }
 
     @Test
@@ -131,18 +180,53 @@ class EntregaParecerIntegrationTest {
                 .build());
     }
 
+    private Orientador criarOutroOrientador() {
+        Orientador outro = new Orientador();
+        outro.setNome("Outro Orientador");
+        outro.setEmail(EMAIL_OUTRO_ORIENTADOR);
+        outro.setDepartamento("DAELN");
+        outro.setAtivo(true);
+
+        return orientadorRepository.saveAndFlush(outro);
+    }
+
+    private void criarVinculoAceito() {
+        solicitacaoRepository.saveAndFlush(SolicitacaoOrientacao.builder()
+                .aluno(aluno)
+                .orientador(orientador)
+                .tema("Tema do TCC")
+                .mensagem("Solicitação de orientação")
+                .status(StatusSolicitacao.ACEITA)
+                .build());
+    }
+
+    private void criarPrazoProjeto() {
+        prazoEntregaRepository.saveAndFlush(PrazoEntrega.builder()
+                .turma(turma)
+                .tipo(TipoEntrega.PROJETO_TCC)
+                .dataLimite(LocalDate.now().plusYears(1))
+                .build());
+    }
+
     private ResultActions registrarParecer(
             Long entregaId, String resultado, String comentario) throws Exception {
-
-        String payload = comentario == null
-                ? "{\"resultado\":\"%s\"}".formatted(resultado)
-                : "{\"resultado\":\"%s\",\"comentario\":\"%s\"}"
-                .formatted(resultado, comentario);
 
         return mockMvc.perform(post(URL + "/" + entregaId + "/parecer")
                 .with(tokenDe("ROLE_PROFESSOR", EMAIL_ORIENTADOR))
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(payload));
+                .content(corpoParecer(resultado, comentario)));
+    }
+
+    private String corpoParecer(String resultado, String comentario) {
+        return comentario == null
+                ? "{\"resultado\":\"%s\"}".formatted(resultado)
+                : "{\"resultado\":\"%s\",\"comentario\":\"%s\"}"
+                .formatted(resultado, comentario);
+    }
+
+    private String corpoSubmissao(String urlDocumento) {
+        return "{\"tipo\":\"PROJETO_TCC\",\"urlDocumento\":\"%s\"}"
+                .formatted(urlDocumento);
     }
 
     private RequestPostProcessor tokenDe(String role, String email) {
