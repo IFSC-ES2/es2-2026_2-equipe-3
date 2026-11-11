@@ -208,7 +208,9 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 
 ## 10. Como executar o aplicativo
 
-Para facilitar a execução dos ambientes de frontend, backend e banco de dados simultaneamente, o projeto está configurado com Docker Compose.
+Para facilitar a execução dos ambientes de frontend, backend, Keycloak e banco de dados simultaneamente, o projeto está configurado com Docker Compose.
+
+> **Documentação de Deploy e Staging:** Para instruções detalhadas sobre variáveis de ambiente (`.env.example`), execução do ambiente de _staging_ (com `docker-compose.prod.yml` e túneis Cloudflare), estratégia de _rollback_ e limitações conhecidas, consulte o **[Guia de Deploy e Staging (`docs/DEPLOY.md`)](docs/DEPLOY.md)**.
 
 ### Pré-requisitos
 
@@ -219,19 +221,19 @@ Certifique-se de ter instalado em sua máquina:
 
 ### Passo a Passo
 
-1. Clone o repositório e acesse a pasta raiz do projeto:
+1. Clone o repositório, crie o arquivo `.env` a partir do `.env.example` e acesse a pasta `SIGTCC`:
 
 ```bash
 git clone https://github.com/IFSC-ES2/es2-2026_2-equipe-3.git
-cd es2-2026_2-equipe-3/SIGTCC
-
+cd es2-2026_2-equipe-3
+cp .env.example SIGTCC/.env
+cd SIGTCC
 ```
 
 2. Construa as imagens e suba os contêineres:
 
 ```bash
-docker-compose up
-
+docker compose up
 ```
 
 3. Acesse a aplicação no seu navegador:
