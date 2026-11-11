@@ -121,9 +121,7 @@ describe("SubmissaoEntregaPage", () => {
 
     renderizarPagina();
 
-    expect(
-      await screen.findByText("Entregue com atraso"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("Entregue com atraso")).toBeInTheDocument();
   });
 
   it.each(["SUBMETIDO", "APROVADO", "REPROVADO"] as const)(
@@ -218,9 +216,7 @@ describe("SubmissaoEntregaPage", () => {
   it("exibe mensagem do backend quando retorna 422", async () => {
     const mensagem = "O prazo desta etapa ainda não foi cadastrado.";
 
-    vi.mocked(criarEntrega).mockRejectedValue(
-      new ApiError(422, mensagem),
-    );
+    vi.mocked(criarEntrega).mockRejectedValue(new ApiError(422, mensagem));
 
     renderizarPagina();
     await preencherLink(entrega.urlDocumento);
