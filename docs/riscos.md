@@ -394,3 +394,214 @@ capacidade real da equipe.
   - Manter documentado o procedimento para subir o ambiente de desenvolvimento a partir de uma configuração limpa.
   - Diferenciar problemas gerais de orquestração Docker de problemas específicos da integração com Keycloak, mantendo estes últimos acompanhados pelo R09.
 - **Responsável pelo Acompanhamento:** DevOps/Infra (`Willian Ferreira`)
+
+---
+
+## 6. Revisão ao Final da Sprint 4 (Entrega 8 / Release v0.4.0, 01/11 a 11/11/2026)
+
+Esta seção consolida a revisão dos riscos do projeto no encerramento da Sprint 4 (marco de release `v0.4.0`).
+
+### 6.1 Status Geral dos Riscos na Sprint 4 (Scrum Master / QA)
+
+
+|   ID    | Risco                                                             | Natureza               | Status na Sprint 4 | Observação / Evidência                                                                                                           | Responsável pelo Acompanhamento                                              |
+| :-----: | :---------------------------------------------------------------- | :--------------------- | :----------------: | :------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
+| **R01** | Desistência ou abandono de membro da equipe                       | Equipe                 |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Scrum Master (`Willian Ferreira`)                                            |
+| **R02** | Falhas de regressão por ausência de testes e CI quebrado          | Qualidade / Processo   |  _[A preencher]_   | _[A preencher]_                                                                                                                  | QA (`Willian Ferreira`)                                                      |
+| **R03** | Atraso no cronograma de integração das APIs Backend/Frontend      | Prazo                  |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Backend / QA (`Talles Souza`, `Willian Ferreira`)                            |
+| **R04** | Crescimento não planejado do escopo (Scope Creep)                 | Escopo                 |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Scrum Master (`Willian Ferreira`) / PO (`Adriano Luiz de Souza`)             |
+| **R05** | Divergência de ambientes e instabilidade na orquestração (Docker) | Tecnologia             |    **Mitigado**    | Padronização integral via `docker-compose.yml`, `docker-compose.prod.yml`, `.env.example` e `docs/DEPLOY.md` (PR #243).          | DevOps / Infra (`Eduardo Cardoso`)                                           |
+| **R06** | Ausência de autenticação expõe endpoints                          | Segurança              |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Arquiteta / Backend (`Damares Gaia`)                                         |
+| **R07** | Condição de corrida / concorrência de entregas                    | Qualidade / Dados      |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Backend (`Talles Souza`)                                                     |
+| **R08** | Mudança de direção do produto (Pivot)                             | Escopo / Estratégico   |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Scrum Master (`Willian Ferreira`)                                            |
+| **R09** | Complexidade e instabilidade na integração com Keycloak           | Segurança / Tecnologia |  _[A preencher]_   | _[A preencher]_                                                                                                                  | DevOps / QA (`Eduardo Cardoso`, `Willian Ferreira`)                          |
+| **R10** | Indisponibilidade do ambiente de staging compartilhado            | Infraestrutura         |    **Mitigado**    | Tunelamento seguro via Cloudflare Tunnels (`staging.sigtcc.online`), smoke tests em `docs/staging.md` e compose local (PR #244). | DevOps / Infra (`Eduardo Cardoso`)                                           |
+| **R11** | Submissão de links externos privados ou inacessíveis (US06/US07)  | Negócio / Usabilidade  |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Backend / Frontend / QA (`Talles Souza`, `Marcus Jhuan`, `Willian Ferreira`) |
+| **R12** | Modificação posterior do trabalho submetido fora do prazo (US06)  | Integridade / Negócio  |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Arquiteta / Backend (`Damares Gaia`, `Talles Souza`)                         |
+
+---
+
+### 6.2 Detalhamento dos Riscos de Responsabilidade de DevOps / Infraestrutura (`Eduardo Cardoso`)
+
+#### R05 — Divergência de Ambientes e Instabilidade na Orquestração (Docker)
+
+- **Status na Sprint 4:** Mitigado.
+- **O que ocorreu:** A infraestrutura de desenvolvimento e deploy foi totalmente estabilizada e padronizada ao longo da Sprint 4:
+  - O arquivo `SIGTCC/docker-compose.yml` manteve-se consistente para execução local de todos os componentes (MySQL 8.0, Keycloak 24 e backend Spring Boot), sem ocorrência de divergências entre os integrantes.
+  - Para a homologação e produção da Entrega 8, foi criado e testado o `SIGTCC/docker-compose.prod.yml`, orquestrando contêineres a partir de imagens multi-stage otimizadas, compiladas e publicadas automaticamente no GHCR pelo pipeline de CI (`docker-build.yml` - Issue #219 / PR #238).
+  - Todas as variáveis de ambiente necessárias foram mapeadas, testadas e consolidadas no arquivo `.env.example`, eliminando lacunas de configuração entre ambientes locais e remotos.
+  - Foi elaborado o guia oficial de deploy [`docs/DEPLOY.md`](DEPLOY.md) (Issue #221 / PR #243), documentando todo o passo a passo de inicialização a partir do zero, configuração de variáveis e procedimentos de rollback.
+- **Reavaliação:**
+  - **Probabilidade:** Média (2) → **Baixa (1)**. A padronização dos arquivos compose, o versionamento estrito de variáveis em `.env.example` e a publicação automatizada de imagens no registry do GitHub eliminaram a probabilidade de divergência de ambientes.
+  - **Impacto:** Médio (2) → **Baixo (1)**. Qualquer novo ambiente pode ser provisionado ou recuperado de forma determinística e reproduzível com um único comando de orquestração a partir do repositório.
+  - **Prioridade:** Média (4) → **Baixa (1)**.
+- **Eficácia da mitigação:** A mitigação preventiva mostrou-se plenamente eficaz. Não houve relatos de inconsistência de portas, variáveis ou dependências entre as máquinas dos membros da equipe ou no servidor de staging durante todo o ciclo da Sprint 4.
+- **Ações para a sustentação pós-MVP:**
+  - Manter as tags de versão das imagens Docker no GHCR sincronizadas com as releases do GitHub (`v0.4.0`).
+  - Executar os smoke tests documentados em `docs/DEPLOY.md` e `docs/staging.md` antes de qualquer atualização em ambiente de produção.
+- **Responsável pelo Acompanhamento:** DevOps/Infra (`Eduardo Cardoso`)
+
+#### R10 — Indisponibilidade ou Falha de Acesso ao Ambiente de Staging Compartilhado (Novo Risco de Infraestrutura)
+
+- **Natureza:** Infraestrutura / Operações
+- **Status na Sprint 4:** Mitigado.
+- **O que ocorreu:** Conforme levantado no planejamento da Sprint 4 ([`docs/entregas/sprint-4.md`](entregas/sprint-4.md)), a introdução de um ambiente de staging compartilhado na nuvem pela primeira vez trazia o risco de indisponibilidade externa (quedas de rede, portas fechadas ou falhas de DNS) que poderiam travar a validação docente e a homologação integrada das histórias US06 e US07.
+  - Como resposta, o DevOps implementou o tunelamento seguro via **Cloudflare Tunnels** apontando para os contêineres Docker da VPS (Issue #220 / PR #244), disponibilizando a aplicação em domínio seguro HTTPS (`staging.sigtcc.online`) sem necessidade de expor portas de roteador ou IPs públicos.
+  - Foi elaborado o documento [`docs/staging.md`](staging.md) contendo o roteiro de _Smoke Test_ para verificação de integridade dos serviços após o deploy (MySQL, Keycloak, Backend API e Frontend SPA).
+  - O ambiente local (`SIGTCC/docker-compose.yml`) permaneceu disponível como contingência imediata, garantindo que nenhum integrante ficasse bloqueado caso houvesse instabilidade de rede externa.
+- **Reavaliação:**
+  - **Probabilidade:** Média (2) → **Baixa (1)**. O tunnel do Cloudflare operou de forma estável e resiliente a reinicializações com reconexão automática.
+  - **Impacto:** Alto (3) → **Baixo (1)**. A existência de procedimentos claros de smoke test e contingência via Docker Compose local neutralizou o impacto sobre a homologação.
+  - **Prioridade:** Alta (6) → **Baixa (1)**.
+- **Eficácia da mitigação:** O ambiente de staging permaneceu acessível e operacional durante os testes de integração e validação final da entrega.
+- **Ações para a sustentação pós-MVP:**
+  - Manter o monitoramento básico de saúde dos contêineres via `docker compose ps` e healthchecks configurados.
+  - Realizar smoke test periódico dos serviços no endpoint público antes das bancas de avaliação.
+- **Responsável pelo Acompanhamento:** DevOps/Infra (`Eduardo Cardoso`)
+
+---
+
+### 6.3 Detalhamento dos Demais Riscos da Sprint 4 (A preencher pelos respectivos responsáveis)
+
+#### R01 — Desistência ou Abandono de Membro da Equipe
+
+- **Status na Sprint 4:** _[A preencher pelo Scrum Master]_
+- **O que ocorreu:** _[A preencher pelo Scrum Master]_
+- **Reavaliação:**
+  - **Probabilidade:** _[A preencher]_
+  - **Impacto:** _[A preencher]_
+  - **Prioridade:** _[A preencher]_
+- **Eficácia da mitigação:** _[A preencher]_
+- **Ações para o fechamento:** _[A preencher]_
+- **Responsável pelo Acompanhamento:** Scrum Master (`Willian Ferreira`)
+
+#### R02 — Falhas de Regressão por Ausência de Testes e CI Quebrado
+
+- **Status na Sprint 4:** _[A preencher pelo QA]_
+- **O que ocorreu:** _[A preencher pelo QA]_
+- **Reavaliação:**
+  - **Probabilidade:** _[A preencher]_
+  - **Impacto:** _[A preencher]_
+  - **Prioridade:** _[A preencher]_
+- **Eficácia da mitigação:** _[A preencher]_
+- **Ações para o fechamento:** _[A preencher]_
+- **Responsável pelo Acompanhamento:** QA (`Willian Ferreira`)
+
+#### R03 — Atraso no Cronograma de Integração das APIs Backend/Frontend
+
+- **Status na Sprint 4:** _[A preencher pelo Backend/QA]_
+- **O que ocorreu:** _[A preencher pelo Backend/QA]_
+- **Reavaliação:**
+  - **Probabilidade:** _[A preencher]_
+  - **Impacto:** _[A preencher]_
+  - **Prioridade:** _[A preencher]_
+- **Eficácia da mitigação:** _[A preencher]_
+- **Ações para o fechamento:** _[A preencher]_
+- **Responsável pelo Acompanhamento:** Backend / QA (`Talles Souza`, `Willian Ferreira`)
+
+#### R04 — Crescimento Não Planejado do Escopo (Scope Creep)
+
+- **Status na Sprint 4:** _[A preencher pelo Scrum Master]_
+- **O que ocorreu:** _[A preencher pelo Scrum Master]_
+- **Reavaliação:**
+  - **Probabilidade:** _[A preencher]_
+  - **Impacto:** _[A preencher]_
+  - **Prioridade:** _[A preencher]_
+- **Eficácia da mitigação:** _[A preencher]_
+- **Ações para o fechamento:** _[A preencher]_
+- **Responsável pelo Acompanhamento:** Scrum Master (`Willian Ferreira`) / PO (`Adriano Luiz de Souza`)
+
+#### R06 — Ausência de Autenticação Expõe Endpoints
+
+- **Status na Sprint 4:** _[A preencher pela Arquiteta/Backend]_
+- **O que ocorreu:** _[A preencher pela Arquiteta/Backend]_
+- **Reavaliação:**
+  - **Probabilidade:** _[A preencher]_
+  - **Impacto:** _[A preencher]_
+  - **Prioridade:** _[A preencher]_
+- **Eficácia da mitigação:** _[A preencher]_
+- **Ações para o fechamento:** _[A preencher]_
+- **Responsável pelo Acompanhamento:** Arquiteta / Backend (`Damares Gaia`)
+
+#### R07 — Condição de Corrida no Aceite / Concorrência de Entregas
+
+- **Status na Sprint 4:** _[A preencher pelo Backend]_
+- **O que ocorreu:** _[A preencher pelo Backend]_
+- **Reavaliação:**
+  - **Probabilidade:** _[A preencher]_
+  - **Impacto:** _[A preencher]_
+  - **Prioridade:** _[A preencher]_
+- **Eficácia da mitigação:** _[A preencher]_
+- **Ações para o fechamento:** _[A preencher]_
+- **Responsável pelo Acompanhamento:** Backend (`Talles Souza`)
+
+#### R08 — Mudança de Direção do Produto (Pivot)
+
+- **Status na Sprint 4:** _[A preencher pelo Scrum Master]_
+- **O que ocorreu:** _[A preencher pelo Scrum Master]_
+- **Reavaliação:**
+  - **Probabilidade:** _[A preencher]_
+  - **Impacto:** _[A preencher]_
+  - **Prioridade:** _[A preencher]_
+- **Eficácia da mitigação:** _[A preencher]_
+- **Ações para o fechamento:** _[A preencher]_
+- **Responsável pelo Acompanhamento:** Scrum Master (`Willian Ferreira`)
+
+#### R09 — Complexidade e Instabilidade na Integração com Keycloak
+
+- **Status na Sprint 4:** _[A preencher pelo QA/DevOps]_
+- **O que ocorreu:** _[A preencher pelo QA/DevOps]_
+- **Reavaliação:**
+  - **Probabilidade:** _[A preencher]_
+  - **Impacto:** _[A preencher]_
+  - **Prioridade:** _[A preencher]_
+- **Eficácia da mitigação:** _[A preencher]_
+- **Ações para o fechamento:** _[A preencher]_
+- **Responsável pelo Acompanhamento:** DevOps / QA (`Eduardo Cardoso`, `Willian Ferreira`)
+
+#### R11 — Submissão de Links Externos Privados ou Inacessíveis (US06 / US07)
+
+- **Natureza:** Negócio / Usabilidade
+- **Status na Sprint 4:** _[A preencher pelo Backend/Frontend/QA]_
+- **O que ocorreu:** _[A preencher pelo Backend/Frontend/QA]_
+- **Reavaliação:**
+  - **Probabilidade:** _[A preencher]_
+  - **Impacto:** _[A preencher]_
+  - **Prioridade:** _[A preencher]_
+- **Eficácia da mitigação:** _[A preencher]_
+- **Ações para o fechamento:** _[A preencher]_
+- **Responsável pelo Acompanhamento:** Backend / Frontend / QA (`Talles Souza`, `Marcus Jhuan`, `Willian Ferreira`)
+
+#### R12 — Modificação Posterior do Trabalho Submetido Fora do Prazo (US06)
+
+- **Natureza:** Integridade / Negócio
+- **Status na Sprint 4:** _[A preencher pela Arquiteta/Backend]_
+- **O que ocorreu:** _[A preencher pela Arquiteta/Backend]_
+- **Reavaliação:**
+  - **Probabilidade:** _[A preencher]_
+  - **Impacto:** _[A preencher]_
+  - **Prioridade:** _[A preencher]_
+- **Eficácia da mitigação:** _[A preencher]_
+- **Ações para o fechamento:** _[A preencher]_
+- **Responsável pelo Acompanhamento:** Arquiteta de Software / Backend (`Damares Gaia`, `Talles Souza`)
+
+---
+
+### 6.4 Matriz Consolidada de Riscos ao Término da Sprint 4 (A consolidar pelo Scrum Master)
+
+> A ser finalizada pelo Scrum Master na conclusão da Issue #231.
+
+|   ID    | Risco                                  | Natureza        |  Probabilidade  |     Impacto     |   Prioridade    | Status Final                             |
+| :-----: | :------------------------------------- | :-------------- | :-------------: | :-------------: | :-------------: | :--------------------------------------- |
+| **R01** | Desistência de membro da equipe        | Equipe          | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
+| **R02** | Falhas por ausência de testes/CI       | Qualidade       | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
+| **R03** | Atraso no cronograma das APIs          | Prazo           | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
+| **R04** | Crescimento do escopo                  | Escopo          | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
+| **R05** | Divergência de ambientes (Docker)      | Tecnologia      |    Baixa (1)    |    Baixo (1)    |    Baixa (1)    | **Mitigado (Docker compose, DEPLOY.md)** |
+| **R06** | Ausência de autenticação nos endpoints | Segurança       | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
+| **R07** | Condição de corrida / concorrência     | Qualidade/Dados | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
+| **R08** | Mudança de direção do produto (Pivot)  | Estratégico     | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
+| **R09** | Instabilidade na integração Keycloak   | Segurança       | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
+| **R10** | Indisponibilidade de Staging           | Infraestrutura  |    Baixa (1)    |    Baixo (1)    |    Baixa (1)    | **Mitigado (Cloudflare Tunnels)**        |
+| **R11** | Links externos privados/inacessíveis   | Usabilidade     | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
+| **R12** | Alteração de trabalho após o prazo     | Integridade     | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
