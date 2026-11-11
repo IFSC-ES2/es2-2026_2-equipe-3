@@ -366,6 +366,64 @@ Em conformidade com as diretrizes da disciplina e visando garantir a transparên
 
 Todo o conteúdo técnico, código, migrações Flyway, diagramas C4, especificações de padrões de projeto e decisões de arquitetura gerados ou refinados com o apoio da IA foram minuciosamente lidos, compreendidos, testados contra a base de dados MySQL/H2 e validados pela Arquiteta de Software responsável. A integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
 
+---
+
+### Eduardo Cardoso Oliveira (Engenheiro de DevOps / Infraestrutura)
+
+**Ferramentas utilizadas:** Google Gemini e Claude (Anthropic)  
+**Período:** 04/11/2026 a 11/11/2026
+
+**Contexto da atuação:** Na Sprint 4, o integrante atuou em seu papel titular de Engenheiro de DevOps e Infraestrutura, conduzindo a configuração de variáveis e validação de links (US06), a evolução do pipeline de CI com build multi-stage e publicação no GHCR, o provisionamento do ambiente de staging acessível via Cloudflare Tunnels, a elaboração do guia oficial de deploy (`docs/DEPLOY.md`), além do fechamento de governança de sua responsabilidade (métrica M-04, riscos R05 e R10, contribuições individuais e declaração de uso de IA). Em todas as entregas, a IA foi empregada como ferramenta de apoio na estruturação técnica, rascunhos de workflows/compose, coleta estatística automatizada e formatação Markdown; todas as configurações de ambiente, fluxos de autenticação e comandos foram executados e validados manualmente em ambiente local e de staging antes da integração.
+
+- **Validação de links e variáveis de ambiente da US06 (Issue #218):**
+  - **Data:** 04/11/2026.
+  - **Ferramenta:** Claude (Anthropic) e Google Gemini.
+  - **Artefatos:** `application.properties`, `.env.example`, `SecurityConfig.java`, testes de validação HTTPS/CORS, `docs/ARQUITETURA.md` e `docs/qualidade.md`.
+  - **Prompts utilizados:**
+    - "Configure a propriedade `APP_SUBMISSAO_DOMINIOS_SUGERIDOS` no `application.properties` e no `.env.example`, garantindo propagação limpa para o backend sem adicionar volumes ou serviços extras no compose."
+    - "Ajuste as regras do `SecurityConfig` para restringir o endpoint `/api/v1/entregas/**` a usuários com `ROLE_ALUNO` e gere testes cobrindo validação de URL HTTPS e CORS."
+  - **Aproveitamento:** Estruturação inicial da configuração de propriedades, ajuste das regras de segurança de rota e esqueleto dos testes automatizados.
+  - **Adaptação/Descarte:** Remoção manual de artefatos de persistência que pertenciam à Issue #216 (`4c342cd`), ajuste da rota `/api/v1/entregas` e definição manual do valor padrão dos domínios sugeridos (`7b5120a`).
+  - **Validação Técnica:** Execução local das suítes de testes e checks do pipeline; integrado via **PR #235**.
+
+- **Pipeline de CI para `entrega-8` com publicação de imagens no GHCR (Issue #219):**
+  - **Data:** 05/11/2026.
+  - **Ferramenta:** Claude (Anthropic) e Google Gemini.
+  - **Artefatos:** `.github/workflows/docker-build.yml`, `docs/ci.md` e `.github/PULL_REQUEST_TEMPLATE.md`.
+  - **Prompts utilizados:**
+    - "Crie um rascunho de workflow `docker-build.yml` no GitHub Actions para a branch `entrega-8` que execute os testes unitários antes do build e publique as imagens Docker multi-stage de backend e frontend no GHCR com cache `type=gha` e tags `latest` e SHA, trazendo comentários de melhores formas de implementá-lo e aprimorá-lo."
+    - "Atualize o `docs/ci.md` para refletir os gatilhos reais, estratégia de cache e quality gates da Sprint 4."
+  - **Aproveitamento:** Estrutura base do workflow Docker Buildx com autenticação no GHCR, cache nativo do GitHub Actions e revisão textual de `docs/ci.md`.
+  - **Adaptação/Descarte:** Isolamento manual dos jobs de testes via diretiva `needs` (`931640c`), correção manual de variáveis de ambiente do workflow e alinhamento de tags em letras minúsculas conforme apontamentos da revisão técnica da Arquiteta.
+  - **Validação Técnica:** Execução completa com sucesso no GitHub Actions; integrado via **PR #238**.
+
+- **Provisionamento e configuração do ambiente de staging acessível (Issue #220):**
+  - **Data:** 09/11/2026 a 10/11/2026.
+  - **Ferramenta:** Claude (Anthropic) e Google Gemini.
+  - **Artefatos:** `SIGTCC/docker-compose.prod.yml`, `docs/staging.md` e `.env.example`.
+  - **Prompts utilizados:**
+    - "Estruture o `SIGTCC/docker-compose.prod.yml` consumindo as imagens do GHCR com variáveis configuráveis de issuer do Keycloak (`KEYCLOAK_PUBLIC_URL`), `KC_HTTP_ENABLED` e `hibernate.ddl-auto=validate`."
+    - "Monte um roteiro de smoke test via cURL/API para validar o ambiente de staging após o deploy, incluindo verificação de HTTP 400 ao enviar link `http://` inválido na US06."
+  - **Aproveitamento:** Base da orquestração Docker de produção/staging e estruturação do roteiro executável de smoke test por API.
+  - **Adaptação/Descarte:** Configuração manual em campo do tunelamento via **Cloudflare Tunnels** (`staging.sigtcc.online`), substituição de `KEYCLOAK_HOSTNAME` por `KEYCLOAK_PUBLIC_URL` (`886f706`), configuração de `webOrigins` no Keycloak e padronização do nome do arquivo para `docs/staging.md` (`f7675c3`).
+  - **Validação Técnica:** Subida dos contêineres na VPS, validação de acesso HTTPS externo e execução do smoke test completo; integrado via **PR #244**.
+
+- **Guia oficial de deploy e consolidação do `.env.example` (Issue #221):**
+  - **Data:** 09/11/2026 a 11/11/2026.
+  - **Ferramenta:** Claude (Anthropic) e Google Gemini.
+  - **Artefatos:** `docs/DEPLOY.md` e `.env.example`.
+  - **Prompts utilizados:**
+    - "Me ajude a elaborar a estrutura do guia oficial `docs/DEPLOY.md` contendo pré-requisitos, passo a passo de deploy local e em staging a partir do zero, documentação das variáveis do `.env.example`, smoke test e plano de rollback."
+  - **Aproveitamento:** Organização estrutural da documentação, padronização das tabelas de referência de variáveis e formatação Markdown.
+  - **Adaptação/Descarte:** Conferência e ajuste manual dos comandos de rollback, correção de links relativos para `staging.md` (`f711b62`) e atendimento às duas iterações de revisão da Arquiteta de Software (`cc4e8d6`, `0a0809c`).
+  - **Validação Técnica:** Revisão cruzada dos comandos de deploy e validação com Prettier; integrado via **PR #243**.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, scripts de infraestrutura, workflows de CI/CD, arquivos de composição Docker, código e documentação gerados ou estruturados com o apoio da IA foram lidos, executados, testados localmente e em ambiente de staging pelo integrante antes da integração aos respectivos Pull Requests. Assumo total responsabilidade técnica e acadêmica pelas decisões de infraestrutura, segurança e pelos artefatos entregues.
+
+---
+
 ### Marcus Jhuan Epifanio Lima (Designer UX/UI / Frontend)
 
 Apoio no planejamento e estruturação das funcionalidades US06 e US07:
