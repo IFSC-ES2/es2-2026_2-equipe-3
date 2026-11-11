@@ -197,7 +197,38 @@ Cada integrante registra abaixo suas contribuições da Sprint 4, com as issues 
 
 ### 11.4 Talles Souza da Cruz
 
-> Seção a ser preenchida pelo integrante.
+- **Papel na sprint:** Desenvolvedor Backend.
+- **Período:** 01/11/2026 a 11/11/2026.
+
+#### Contratos de dados
+
+- **Roles e Respostas de Erro nos Contratos de US06 e US07 (Issue #209 - PR #234):** Complemento dos contratos [`docs/contrato-dados-us06.md`](../contrato-dados-us06.md) e [`docs/contrato-dados-us07.md`](../contrato-dados-us07.md), elaborados em conjunto com Damares, detalhando por endpoint a role exigida e as respostas de erro.
+
+#### Implementação da submissão de entregas (US06)
+
+- **Service e Endpoint de Submissão por Link (Issue #216 - PR #236):** Implementação do `POST /api/v1/entregas`, com os DTOs de entrada e saída e a atualização da entidade `Entrega`. O endpoint valida a URL HTTPS, marca a entrega como `atrasada` quando enviada após o prazo e permite o reenvio somente quando o último parecer é `AJUSTES_NECESSARIOS`, substituindo o link e retornando a entrega ao status `SUBMETIDO`.
+
+#### Implementação da avaliação e do parecer (US07)
+
+- **Consulta das Submissões (Issue #210 - PR #240):** Implementação dos endpoints `GET /api/v1/entregas/orientador`, `GET /api/v1/entregas/minhas` e `GET /api/v1/entregas/{id}`, que permitem ao orientador consultar as entregas dos seus orientandos e ao aluno acompanhar as próprias entregas. Proteção das rotas por role no `SecurityConfig` e verificação do vínculo entre orientador, aluno e entrega.
+- **Endpoint de Registro de Parecer (Issue #215 - PR #237):** Implementação do `POST /api/v1/entregas/{id}/parecer` sobre a modelagem da migração `V7` e da entidade `Parecer` feitas por Damares. O endpoint registra os resultados `APROVADO`, `AJUSTES_NECESSARIOS` e `REPROVADO`, exige comentário em ajustes e reprovação e bloqueia uma nova avaliação de entrega já encerrada. Para evitar que pareceres simultâneos sobrescrevam uma decisão final, a entrega é carregada com trava pessimista (`PESSIMISTIC_WRITE`). As respostas de entrega passaram a exibir o parecer mais recente.
+
+#### Correção de defeitos
+
+| Issue | PR   | Defeito                                                                                      | Correção                                                                                                                                                                                                                                      |
+| :---- | :--- | :------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #200  | #211 | Qualquer usuário autenticado podia alterar ou remover o cadastro de qualquer orientador.     | Restrição da escrita de orientadores a `ROLE_PROFESSOR` e ao próprio professor, identificado pelo e-mail do token. Contrato da US02 atualizado e testes de integração do `OrientadorController` adicionados.                                  |
+| #201  | #213 | A solicitação de orientação identificava o aluno por dados enviados no formulário.           | Identificação do aluno pelo usuário autenticado (e-mail do token), com a remoção desses campos do formulário. Contrato da US04 atualizado e testes de integração e do `authService` adicionados.                                              |
+| #204  | #217 | A tela "Meu perfil" buscava o orientador por um id salvo no `localStorage`.                  | Obtenção do id do perfil pelo endpoint `/professores/me`, com mensagem clara quando o usuário não possui perfil de orientador. Testes de `OrientadorEdicao` atualizados.                                                                      |
+| #206  | #241 | Dois aceites simultâneos podiam ultrapassar o número de vagas do orientador (_lost update_). | Lock otimista com `@Version` em `PerfilOrientador`, migração `V8` e resposta `409` para o conflito. Teste de integração que reproduz a corrida e validação manual com MySQL real: de 5 aceites simultâneos com 1 vaga, apenas 1 foi aprovado. |
+
+#### Revisão de código e governança
+
+Integração (merge) à `entrega-8` dos PRs dos demais integrantes:
+
+- **Damares Gaia:** PRs #212 e #214.
+- **Eduardo Cardoso:** PRs #235 e #238.
+- **Willian Ferreira:** PRs #232 e #246.
 
 ### 11.5 Willian Ferreira dos Santos
 
