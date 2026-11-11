@@ -168,9 +168,34 @@ Todas as oito issues foram concluídas e, conforme o acompanhamento da equipe, s
 
 > Seção a ser preenchida ao longo da sprint, com a lista de PRs abertos, revisados e integrados à `entrega-8`.
 
-| PR  | Issue | Descrição | Status |
-| :-- | :---- | :-------- | :----- |
-| -   | -     | -         | -      |
+A tabela abaixo registra os Pull Requests aprovados e mesclados à branch `entrega-8` durante a Sprint 4. Foram incluídas as entregas inicialmente planejadas para as US06 e US07, as atividades de infraestrutura e documentação, os testes de integração e as correções de bugs identificadas durante a sprint.
+
+| PR | Issue(s) | Descrição | Status |
+| :--: | :--: | :--- | :--: |
+| [#247](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/247) | #229 | Cenários de integração: avaliação e parecer (US07). | Mesclado |
+| [#246](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/246) | #228 | Cenários de integração: submissão por link (US06). | Mesclado |
+| [#245](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/245) | #239 | Atualização da arquitetura e dos padrões do projeto na Sprint 4. | Mesclado |
+| [#244](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/244) | #220 | Configuração do ambiente de staging. | Mesclado |
+| [#243](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/243) | #221 | Criação de `docs/DEPLOY.md` e consolidação do `.env.example`. | Mesclado |
+| [#242](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/242) | #226, #227 | Implementação das telas de submissão e avaliação de entregas. | Mesclado |
+| [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241) | #206 | Correção de condição de corrida no controle de vagas do orientador. | Mesclado |
+| [#240](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/240) | #210 | Endpoint de consulta da submissão pelo orientador. | Mesclado |
+| [#238](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/238) | #219 | Atualização do pipeline de integração contínua para a `entrega-8`. | Mesclado |
+| [#237](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/237) | #215 | Modelagem e implementação do parecer das entregas. | Mesclado |
+| [#236](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/236) | #216 | Implementação do endpoint de submissão por link. | Mesclado |
+| [#235](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/235) | #218 | Validação de links e configuração de variáveis de ambiente. | Mesclado |
+| [#234](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/234) | #209 | Documentação dos contratos de dados das US06 e US07. | Mesclado |
+| [#233](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/233) | #223 | Modelagem e migração de banco de dados com Flyway V6. | Mesclado |
+| [#232](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/232) | #207 | Planejamento e documentação da Sprint 4. | Mesclado |
+| [#225](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/225) | #205 | Correção da renovação de token e tratamento de expiração de sessão. | Mesclado |
+| [#224](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/224) | #202 | Restrição de acesso à leitura de solicitações conforme autorização do usuário. | Mesclado |
+| [#217](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/217) | #204 | Correção do controle de acesso à edição do perfil, removendo a dependência indevida do `localStorage`. | Mesclado |
+| [#214](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/214) | #203 | Correção da listagem de solicitações no painel do professor. | Mesclado |
+| [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) | #201 | Correção da identificação do usuário na criação de solicitações. | Mesclado |
+| [#212](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/212) | #199 | Correção da autorização para aceitar ou recusar solicitações. | Mesclado |
+| [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211) | #200 | Correção do acesso indevido ao CRUD de orientadores por usuários autenticados. | Mesclado |
+
+Os Pull Requests relacionados às correções de bugs complementaram o escopo funcional da Sprint 4, reforçando os mecanismos de autorização, a integridade das operações e a consistência das informações. Todas as integrações registradas foram direcionadas à branch `entrega-8`.
 
 ---
 
