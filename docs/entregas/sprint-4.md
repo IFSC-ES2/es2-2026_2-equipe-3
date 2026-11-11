@@ -143,6 +143,25 @@ A revisão completa dos riscos será registrada em [`docs/riscos.md`](../riscos.
 
 - 03/11/2026: Sprint iniciada. Planejamento inicial registrado (seções 1 a 6). Issues de implementação, infraestrutura, QA e governança organizadas no board.
 
+### 7.1. Correções de Bugs
+
+Além das atividades previstas no escopo inicial das US06 e US07, a Sprint 4 também contemplou a resolução de bugs identificados no sistema e registrados em issues específicas no GitHub. Essas correções foram planejadas para o período de 03/11/2026, com início e data-alvo definidos para o mesmo dia, e integradas à branch `entrega-8` por meio de Pull Requests.
+
+As correções abrangeram problemas relacionados à autorização, ao controle de acesso, à integridade das informações e à estabilidade da aplicação.
+
+| Issue | Bug identificado | Situação |
+| :---: | :--- | :---: |
+| [#199](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/199) | Qualquer usuário autenticado aceita ou recusa qualquer solicitação. | Concluída |
+| [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | CRUD de orientadores aberto a qualquer usuário autenticado. | Concluída |
+| [#201](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/201) | Solicitação criada com o e-mail do corpo da requisição, e não com o do usuário logado. | Concluída |
+| [#202](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/202) | Qualquer usuário logado consegue ler qualquer solicitação. | Concluída |
+| [#203](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/203) | Painel do professor mostra solicitações do orientador errado. | Concluída |
+| [#204](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/204) | "Meu perfil" depende do `localStorage` e pode editar o perfil de outra pessoa. | Concluída |
+| [#205](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/205) | Sessão expira em aproximadamente cinco minutos e as chamadas passam a falhar com HTTP 401. | Concluída |
+| [#206](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/206) | Condição de corrida no controle de vagas do orientador. | Concluída |
+
+Todas as oito issues foram concluídas e, conforme o acompanhamento da equipe, suas respectivas correções foram integradas à branch `entrega-8`. Essas atividades complementares contribuíram para reforçar a segurança do controle de acesso, a consistência dos dados e a estabilidade do sistema durante a Sprint 4.
+
 ---
 
 ## 8. Pull Requests da Sprint 4
