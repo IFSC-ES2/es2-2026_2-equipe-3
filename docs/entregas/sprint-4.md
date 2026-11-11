@@ -201,7 +201,31 @@ Os Pull Requests relacionados às correções de bugs complementaram o escopo fu
 
 ## 9. Retrospectiva da Sprint 4
 
-> Seção a ser preenchida ao final da sprint.
+A Sprint 4 foi concluída com a entrega das funcionalidades previstas para as US06 e US07, complementadas por atividades de infraestrutura, documentação, governança e correção de bugs. O ciclo também exigiu atenção à estabilidade e à segurança das funcionalidades já implementadas nas sprints anteriores.
+
+### 9.1. Pontos positivos
+
+- **Conclusão do fluxo de acompanhamento do TCC:** foram implementadas a submissão de entregas por link externo HTTPS (US06) e a avaliação pelo orientador com registro de parecer (US07), completando o fluxo funcional previsto para o MVP.
+- **Fortalecimento da segurança e da integridade dos dados:** foram corrigidos oito bugs relacionados a autorização, controle de acesso, identificação do usuário autenticado, exibição de solicitações, gerenciamento de perfil, renovação de sessão e controle concorrente de vagas.
+- **Ampliação da validação automatizada:** foram desenvolvidos cenários de integração para as funcionalidades de submissão e avaliação, cobrindo regras de negócio e restrições de acesso.
+- **Infraestrutura de validação externa:** foi disponibilizado um ambiente de staging com documentação operacional, permitindo validar o funcionamento integrado dos serviços fora do ambiente local.
+- **Melhoria da documentação técnica:** foram atualizados os documentos de arquitetura e padrões do projeto, contratos de dados e instruções de deploy, contribuindo para a manutenção e a reprodução dos ambientes.
+
+### 9.2. Dificuldades e pontos de atenção
+
+- **Concorrência entre funcionalidades e correções:** além do escopo planejado para US06 e US07, foi necessário reservar esforço para corrigir problemas encontrados nas funcionalidades desenvolvidas em ciclos anteriores.
+- **Complexidade da autenticação e autorização:** os problemas envolvendo expiração de sessão, acesso indevido a recursos e identificação do usuário demonstraram a importância de validar as permissões no backend, sem depender exclusivamente de controles da interface.
+- **Concentração das atividades finais:** parte das atividades de QA, documentação, governança e release ficou concentrada nos últimos dias da sprint, exigindo acompanhamento próximo das dependências e das entregas pendentes.
+
+### 9.3. Lições aprendidas e ações de melhoria
+
+- Priorizar testes de autorização e propriedade dos recursos desde a implementação dos endpoints, incluindo cenários com usuários autenticados sem vínculo com os dados consultados.
+- Antecipar a integração entre backend e frontend, utilizando contratos de dados definidos previamente e testes automatizados durante o desenvolvimento, e não apenas ao final da sprint.
+- Iniciar a validação do ambiente de staging e dos procedimentos de deploy com antecedência, reduzindo a concentração de atividades operacionais no encerramento do ciclo.
+- Manter a documentação de arquitetura, riscos, métricas e deploy atualizada à medida que as decisões e implementações forem concluídas.
+
+De modo geral, a Sprint 4 ampliou a maturidade técnica do projeto, não apenas pela conclusão das funcionalidades restantes do fluxo de TCC, mas também pelo esforço dedicado à segurança, à qualidade e à preparação da infraestrutura para validações integradas.
+
 
 ---
 
