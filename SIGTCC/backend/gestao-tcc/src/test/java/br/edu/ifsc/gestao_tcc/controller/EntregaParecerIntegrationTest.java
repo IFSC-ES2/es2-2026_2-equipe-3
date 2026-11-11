@@ -137,6 +137,84 @@ class EntregaParecerIntegrationTest {
     }
 
     @Test
+    @DisplayName("POST /entregas/{id}/parecer - Orientador não vinculado deve receber 403")
+    void registrarParecer_OrientadorNaoVinculado_DeveRetornar403() throws Exception {
+        Entrega entrega = criarEntrega(TipoEntrega.PROJETO_TCC, URL_PROJETO);
+        criarOutroOrientador();
+
+        mockMvc.perform(post(URL + "/" + entrega.getId() + "/parecer")
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_OUTRO_ORIENTADOR))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(corpoParecer("APROVADO", null)))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.erro").value("Acesso negado"));
+    }
+
+    @Test
+    @DisplayName("POST /entregas/{id}/parecer - Ajustes necessários devem liberar reenvio ao aluno")
+    void registrarParecer_AjustesNecessarios_DevePermitirReenvioDoAluno() throws Exception {
+        Entrega entrega = criarEntrega(TipoEntrega.PROJETO_TCC, URL_PROJETO);
+
+        criarVinculoAceito();
+        criarPrazoProjeto();
+
+        registrarParecer(entrega.getId(), "AJUSTES_NECESSARIOS", COMENTARIO_AJUSTES)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("AJUSTES_NECESSARIOS"))
+                .andExpect(jsonPath("$.parecer.resultado").value("AJUSTES_NECESSARIOS"))
+                .andExpect(jsonPath("$.parecer.comentario").value(COMENTARIO_AJUSTES));
+
+        mockMvc.perform(post(URL)
+                        .with(tokenDe("ROLE_ALUNO", EMAIL_ALUNO))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(corpoSubmissao(NOVA_URL_PROJETO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("SUBMETIDO"))
+                .andExpect(jsonPath("$.urlDocumento").value(NOVA_URL_PROJETO))
+                .andExpect(jsonPath("$.parecer.resultado").value("AJUSTES_NECESSARIOS"));
+
+        org.assertj.core.api.Assertions.assertThat(parecerRepository.count())
+                .isEqualTo(1);
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+            value = StatusEntrega.class,
+            names = {"AJUSTES_NECESSARIOS", "REPROVADO"}
+    )
+    @DisplayName("POST /entregas/{id}/parecer - Deve exigir comentário para ajustes e reprovação")
+    void registrarParecer_SemComentarioObrigatorio_DeveRetornar422(
+            StatusEntrega resultado) throws Exception {
+
+        Entrega entrega = criarEntrega(TipoEntrega.PROJETO_TCC, URL_PROJETO);
+
+        registrarParecer(entrega.getId(), resultado.name(), null)
+                .andExpect(status().isUnprocessableContent())
+                .andExpect(jsonPath("$.erro").value("Regra de negócio violada"))
+                .andExpect(jsonPath("$.detalhes").value(
+                        "O comentário com a justificativa é obrigatório quando o parecer exige ajustes ou reprova a entrega."));
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+            value = StatusEntrega.class,
+            names = {"APROVADO", "REPROVADO"}
+    )
+    @DisplayName("POST /entregas/{id}/parecer - Não deve permitir reavaliar entrega com parecer definitivo")
+    void registrarParecer_EntregaComStatusDefinitivo_DeveRetornar409(
+            StatusEntrega statusDefinitivo) throws Exception {
+
+        Entrega entrega = criarEntrega(TipoEntrega.PROJETO_TCC, URL_PROJETO);
+
+        entrega.setStatus(statusDefinitivo);
+        entregaRepository.saveAndFlush(entrega);
+
+        registrarParecer(entrega.getId(), "APROVADO", null)
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.erro").value("Conflito de dados"));
+    }
+
+    @Test
     @DisplayName("GET /entregas/minhas - Deve refletir aprovação e reprovação após os pareceres")
     void painelDoAluno_AposPareceres_DeveExibirStatusAtualizados() throws Exception {
         Entrega projeto = criarEntrega(TipoEntrega.PROJETO_TCC, URL_PROJETO);
