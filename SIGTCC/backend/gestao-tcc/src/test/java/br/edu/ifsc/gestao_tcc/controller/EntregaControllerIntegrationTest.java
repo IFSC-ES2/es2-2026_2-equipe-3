@@ -41,6 +41,8 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.hasItem;
@@ -137,14 +139,20 @@ class EntregaControllerIntegrationTest {
                 .build());
     }
 
-    private TurmaTCC comPrazoProjeto(LocalDate dataLimite) {
+    private TurmaTCC comPrazo(TipoEntrega tipo, LocalDate dataLimite) {
         TurmaTCC turma = comTurmaVigente();
+
         prazoEntregaRepository.saveAndFlush(PrazoEntrega.builder()
                 .turma(turma)
-                .tipo(TipoEntrega.PROJETO_TCC)
+                .tipo(tipo)
                 .dataLimite(dataLimite)
                 .build());
+
         return turma;
+    }
+
+    private TurmaTCC comPrazoProjeto(LocalDate dataLimite) {
+        return comPrazo(TipoEntrega.PROJETO_TCC, dataLimite);
     }
 
     private Entrega comEntrega(TurmaTCC turma, StatusEntrega status) {
@@ -174,12 +182,16 @@ class EntregaControllerIntegrationTest {
     }
 
     private String corpo(String url) {
+        return corpo(TipoEntrega.PROJETO_TCC, url);
+    }
+
+    private String corpo(TipoEntrega tipo, String url) {
         return """
-                {
-                  "tipo": "PROJETO_TCC",
-                  "urlDocumento": "%s"
-                }
-                """.formatted(url);
+            {
+              "tipo": "%s",
+              "urlDocumento": "%s"
+            }
+            """.formatted(tipo.name(), url);
     }
 
     @Test
@@ -205,6 +217,53 @@ class EntregaControllerIntegrationTest {
                 .andExpect(jsonPath("$.parecer").value(nullValue()));
     }
 
+
+    @Test
+    @DisplayName("POST /entregas - Deve criar a entrega de TCC1 no prazo (201 Created)")
+    void submeter_Tcc1_NoPrazo_DeveRetornar201() throws Exception {
+        comSolicitacao(StatusSolicitacao.ACEITA);
+        comPrazo(TipoEntrega.TCC1, hoje.plusDays(5));
+
+        enviar(corpo(TipoEntrega.TCC1, URL_DOCUMENTO))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.tipo").value("TCC1"))
+                .andExpect(jsonPath("$.urlDocumento").value(URL_DOCUMENTO))
+                .andExpect(jsonPath("$.status").value("SUBMETIDO"))
+                .andExpect(jsonPath("$.atrasada").value(false))
+                .andExpect(jsonPath("$.enviadoEm").isNotEmpty())
+                .andExpect(jsonPath("$.aluno.email").value(EMAIL_ALUNO))
+                .andExpect(jsonPath("$.orientador.email").value(EMAIL_ORIENTADOR));
+    }
+
+    @Test
+    @DisplayName("POST /entregas - Deve criar a entrega de TCC2 no prazo (201 Created)")
+    void submeter_Tcc2_NoPrazo_DeveRetornar201() throws Exception {
+        comSolicitacao(StatusSolicitacao.ACEITA);
+        comPrazo(TipoEntrega.TCC2, hoje.plusDays(5));
+
+        enviar(corpo(TipoEntrega.TCC2, URL_DOCUMENTO))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.tipo").value("TCC2"))
+                .andExpect(jsonPath("$.urlDocumento").value(URL_DOCUMENTO))
+                .andExpect(jsonPath("$.status").value("SUBMETIDO"))
+                .andExpect(jsonPath("$.atrasada").value(false))
+                .andExpect(jsonPath("$.enviadoEm").isNotEmpty())
+                .andExpect(jsonPath("$.aluno.email").value(EMAIL_ALUNO))
+                .andExpect(jsonPath("$.orientador.email").value(EMAIL_ORIENTADOR));
+    }
+
+    @Test
+    @DisplayName("POST /entregas - Deve considerar a submissão na data limite como dentro do prazo (201 Created)")
+    void submeter_NaDataLimite_DeveRetornar201SemAtraso() throws Exception {
+        comSolicitacao(StatusSolicitacao.ACEITA);
+        comPrazoProjeto(hoje);
+
+        enviar(corpo(URL_DOCUMENTO))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.status").value("SUBMETIDO"))
+                .andExpect(jsonPath("$.atrasada").value(false));
+    }
+
     @Test
     @DisplayName("POST /entregas - Deve aceitar o envio após o prazo marcando atraso (201 Created)")
     void submeter_AposOPrazo_DeveRetornar201ComAtraso() throws Exception {
@@ -224,17 +283,36 @@ class EntregaControllerIntegrationTest {
         TurmaTCC turma = comPrazoProjeto(hoje.minusDays(1));
         Entrega existente = comEntrega(turma, StatusEntrega.AJUSTES_NECESSARIOS);
 
+        Parecer parecerAnterior = parecerRepository.saveAndFlush(Parecer.builder()
+                .entrega(existente)
+                .orientador(orientador)
+                .resultado(StatusEntrega.AJUSTES_NECESSARIOS)
+                .comentario(COMENTARIO_PARECER)
+                .build());
+
         enviar(corpo(NOVA_URL))
                 .andExpect(status().isOk())
                 .andExpect(header().doesNotExist(HttpHeaders.LOCATION))
                 .andExpect(jsonPath("$.id").value(existente.getId()))
                 .andExpect(jsonPath("$.urlDocumento").value(NOVA_URL))
                 .andExpect(jsonPath("$.status").value("SUBMETIDO"))
-                .andExpect(jsonPath("$.atrasada").value(true));
+                .andExpect(jsonPath("$.atrasada").value(true))
+                .andExpect(jsonPath("$.parecer.resultado").value("AJUSTES_NECESSARIOS"))
+                .andExpect(jsonPath("$.parecer.comentario").value(COMENTARIO_PARECER));
 
         // Descarta o cache da sessão para ler o que realmente foi gravado no banco.
         entityManager.flush();
         entityManager.clear();
+
+        List<Parecer> historico = parecerRepository
+                .findByEntregaIdOrderByRegistradoEmDesc(existente.getId());
+
+        assertThat(historico).hasSize(1);
+        assertThat(historico.getFirst().getId()).isEqualTo(parecerAnterior.getId());
+        assertThat(historico.getFirst().getResultado())
+                .isEqualTo(StatusEntrega.AJUSTES_NECESSARIOS);
+        assertThat(historico.getFirst().getComentario())
+                .isEqualTo(COMENTARIO_PARECER);
 
         Entrega gravada = entregaRepository.findById(existente.getId()).orElseThrow();
         assertThat(gravada.getUrlDocumento()).isEqualTo(NOVA_URL);
