@@ -403,21 +403,21 @@ Esta seção consolida a revisão dos riscos do projeto no encerramento da Sprin
 
 ### 6.1 Status Geral dos Riscos na Sprint 4 (Scrum Master / QA)
 
-
-|   ID    | Risco                                                             | Natureza               | Status na Sprint 4 | Observação / Evidência                                                                                                           | Responsável pelo Acompanhamento                                              |
-| :-----: | :---------------------------------------------------------------- | :--------------------- | :----------------: | :------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
-| **R01** | Desistência ou abandono de membro da equipe                       | Equipe                 |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Scrum Master (`Willian Ferreira`)                                            |
-| **R02** | Falhas de regressão por ausência de testes e CI quebrado          | Qualidade / Processo   |  _[A preencher]_   | _[A preencher]_                                                                                                                  | QA (`Willian Ferreira`)                                                      |
-| **R03** | Atraso no cronograma de integração das APIs Backend/Frontend      | Prazo                  |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Backend / QA (`Talles Souza`, `Willian Ferreira`)                            |
-| **R04** | Crescimento não planejado do escopo (Scope Creep)                 | Escopo                 |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Scrum Master (`Willian Ferreira`) / PO (`Adriano Luiz de Souza`)             |
-| **R05** | Divergência de ambientes e instabilidade na orquestração (Docker) | Tecnologia             |    **Mitigado**    | Padronização integral via `docker-compose.yml`, `docker-compose.prod.yml`, `.env.example` e `docs/DEPLOY.md` (PR #243).          | DevOps / Infra (`Eduardo Cardoso`)                                           |
-| **R06** | Ausência de autenticação expõe endpoints                          | Segurança              |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Arquiteta / Backend (`Damares Gaia`)                                         |
-| **R07** | Condição de corrida / concorrência de entregas                    | Qualidade / Dados      |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Backend (`Talles Souza`)                                                     |
-| **R08** | Mudança de direção do produto (Pivot)                             | Escopo / Estratégico   |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Scrum Master (`Willian Ferreira`)                                            |
-| **R09** | Complexidade e instabilidade na integração com Keycloak           | Segurança / Tecnologia |  _[A preencher]_   | _[A preencher]_                                                                                                                  | DevOps / QA (`Eduardo Cardoso`, `Willian Ferreira`)                          |
-| **R10** | Indisponibilidade do ambiente de staging compartilhado            | Infraestrutura         |    **Mitigado**    | Tunelamento seguro via Cloudflare Tunnels (`staging.sigtcc.online`), smoke tests em `docs/staging.md` e compose local (PR #244). | DevOps / Infra (`Eduardo Cardoso`)                                           |
-| **R11** | Submissão de links externos privados ou inacessíveis (US06/US07)  | Negócio / Usabilidade  |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Backend / Frontend / QA (`Talles Souza`, `Marcus Jhuan`, `Willian Ferreira`) |
-| **R12** | Modificação posterior do trabalho submetido fora do prazo (US06)  | Integridade / Negócio  |  _[A preencher]_   | _[A preencher]_                                                                                                                  | Arquiteta / Backend (`Damares Gaia`, `Talles Souza`)                         |
+|   ID    | Risco                                                             | Natureza               |            Status na Sprint 4            | Observação / Evidência                                                                                                                                             | Responsável pelo Acompanhamento                                              |
+| :-----: | :---------------------------------------------------------------- | :--------------------- | :--------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
+| **R01** | Desistência ou abandono de membro da equipe                       | Equipe                 |               **Mitigado**               | Todos os 5 integrantes contribuíram ativamente na Sprint 4; Marcus implementou telas de US06/US07 (PR #242) e trabalho foi fatiado em issues menores.              | Scrum Master (`Willian Ferreira`)                                            |
+| **R02** | Falhas de regressão por ausência de testes e CI quebrado          | Qualidade / Processo   |               **Mitigado**               | 8 bugs pré-existentes corrigidos (#199–#206); suítes de integração US06/US07 adicionadas (PRs #246, #247) e CI `docker-build.yml` condicionado aos testes.         | QA (`Willian Ferreira`)                                                      |
+| **R03** | Atraso no cronograma de integração das APIs Backend/Frontend      | Prazo                  |               **Mitigado**               | Contratos de dados US06/US07 publicados no início da sprint (Issue #209 / PR #234), evitando bloqueios de interface por divergência de payload.                    | Backend / QA (`Talles Souza`, `Willian Ferreira`)                            |
+| **R04** | Crescimento não planejado do escopo (Scope Creep)                 | Escopo                 |               **Mitigado**               | Regras de US06/US07 congeladas no planejamento (`sprint-4.md`); US08 (#15) formalmente postergada para o backlog após absorção dos 8 bugs (#199–#206).             | Scrum Master (`Willian Ferreira`) / PO (`Adriano Luiz de Souza`)             |
+| **R05** | Divergência de ambientes e instabilidade na orquestração (Docker) | Tecnologia             |               **Mitigado**               | Padronização integral via `docker-compose.yml`, `docker-compose.prod.yml`, `.env.example` e `docs/DEPLOY.md` (PR #243).                                            | DevOps / Infra (`Eduardo Cardoso`)                                           |
+| **R06** | Ausência de autenticação expõe endpoints                          | Segurança              |        **Resolvido / Encerrado**         | Autenticação Keycloak ativa em `/api/**` desde a Sprint 3 e autorização granular corrigida na Sprint 4 (#199–#204, PRs #211–#214, #217, #224).                     | Arquiteta / Backend (`Damares Gaia`)                                         |
+| **R07** | Condição de corrida / concorrência de entregas                    | Qualidade / Dados      |               **Mitigado**               | Lock otimista (`@Version` em `PerfilOrientador`, Flyway `V8`, PR #241) para vagas e lock pessimista (`PESSIMISTIC_WRITE`, PR #237) para pareceres da US07.         | Backend (`Talles Souza`)                                                     |
+| **R08** | Mudança de direção do produto (Pivot)                             | Escopo / Estratégico   |         **Resolvido / Obsoleto**         | Direção consolidada na Sprint 3 (ADRs 0010, 0011 e 0013); nenhuma alteração estratégica ocorreu na Sprint 4.                                                       | Scrum Master (`Willian Ferreira`)                                            |
+| **R09** | Complexidade e instabilidade na integração com Keycloak           | Segurança / Tecnologia |               **Mitigado**               | Expiração de sessão com HTTP 401 corrigida via fila e refresh automático de token (Issue #205 / PR #225); staging validado com `KEYCLOAK_PUBLIC_URL` (#220).       | DevOps / QA (`Eduardo Cardoso`, `Willian Ferreira`)                          |
+| **R10** | Indisponibilidade do ambiente de staging compartilhado            | Infraestrutura         |               **Mitigado**               | Tunelamento seguro via Cloudflare Tunnels (`staging.sigtcc.online`), smoke tests em `docs/staging.md` e compose local (PR #244).                                   | DevOps / Infra (`Eduardo Cardoso`)                                           |
+| **R11** | Submissão de links externos privados ou inacessíveis (US06/US07)  | Negócio / Usabilidade  |               **Mitigado**               | Alerta na UI de submissão (`SubmissaoEntrega/index.tsx`) orientando permissão de leitura e fluxo de `AJUSTES_NECESSARIOS` para reenvio pelo aluno.                 | Backend / Frontend / QA (`Talles Souza`, `Marcus Jhuan`, `Willian Ferreira`) |
+| **R12** | Modificação posterior do trabalho submetido fora do prazo (US06)  | Integridade / Negócio  |               **Mitigado**               | Registro exato de `enviado_em` (`Instant`) e flag `atrasada` na entidade `Entrega` (Flyway `V6`), bloqueio de reenvio após decisão final e orientação ADR-0013.    | Arquiteta / Backend (`Damares Gaia`, `Talles Souza`)                         |
+| **R13** | Atraso em cadeia entre Backend, Frontend e QA na US07             | Prazo / Processo       | **Concretizado parcialmente / Mitigado** | Backend US07 entregue em 06/11 (#210, #215), mas frontend integrado em 10/11 (PR #242) concentrou QA no último dia (PRs #246, #247 em 11/11), sem impedir entrega. | Scrum Master / QA / Dev (`Willian Ferreira`, `Talles Souza`, `Marcus Jhuan`) |
 
 ---
 
@@ -461,147 +461,77 @@ Esta seção consolida a revisão dos riscos do projeto no encerramento da Sprin
 
 ---
 
-### 6.3 Detalhamento dos Demais Riscos da Sprint 4 (A preencher pelos respectivos responsáveis)
+### 6.3 Detalhamento dos Riscos com Ocorrência, Ação Técnica ou Novos na Sprint 4
 
-#### R01 — Desistência ou Abandono de Membro da Equipe
-
-- **Status na Sprint 4:** _[A preencher pelo Scrum Master]_
-- **O que ocorreu:** _[A preencher pelo Scrum Master]_
-- **Reavaliação:**
-  - **Probabilidade:** _[A preencher]_
-  - **Impacto:** _[A preencher]_
-  - **Prioridade:** _[A preencher]_
-- **Eficácia da mitigação:** _[A preencher]_
-- **Ações para o fechamento:** _[A preencher]_
-- **Responsável pelo Acompanhamento:** Scrum Master (`Willian Ferreira`)
+> **Nota sobre riscos sem ocorrência ou encerrados:** **R01** (todos os 5 integrantes ativos; Marcus no PR #242) e **R03** (contratos prévios US06/US07 no PR #234) não se concretizaram na Sprint 4 e permanecem registrados na tabela `6.1` e na matriz `6.4`. **R06** (autenticação/autorização concluída com Keycloak e fixes `#199`–`#204`), **R08** (direção do produto consolidada desde a Sprint 3) e eventuais riscos de **storage local / upload binário** (substituídos por link externo HTTPS na [`ADR-0013`](adrs/ADR-0013.md)) foram encerrados como **resolvidos/obsoletos**.
 
 #### R02 — Falhas de Regressão por Ausência de Testes e CI Quebrado
 
-- **Status na Sprint 4:** _[A preencher pelo QA]_
-- **O que ocorreu:** _[A preencher pelo QA]_
-- **Reavaliação:**
-  - **Probabilidade:** _[A preencher]_
-  - **Impacto:** _[A preencher]_
-  - **Prioridade:** _[A preencher]_
-- **Eficácia da mitigação:** _[A preencher]_
-- **Ações para o fechamento:** _[A preencher]_
-- **Responsável pelo Acompanhamento:** QA (`Willian Ferreira`)
-
-#### R03 — Atraso no Cronograma de Integração das APIs Backend/Frontend
-
-- **Status na Sprint 4:** _[A preencher pelo Backend/QA]_
-- **O que ocorreu:** _[A preencher pelo Backend/QA]_
-- **Reavaliação:**
-  - **Probabilidade:** _[A preencher]_
-  - **Impacto:** _[A preencher]_
-  - **Prioridade:** _[A preencher]_
-- **Eficácia da mitigação:** _[A preencher]_
-- **Ações para o fechamento:** _[A preencher]_
-- **Responsável pelo Acompanhamento:** Backend / QA (`Talles Souza`, `Willian Ferreira`)
+- **Status na Sprint 4:** Mitigado.
+- **O que ocorreu e evidências:** Foram corrigidos 8 bugs pré-existentes (`#199`–`#206`, PRs `#211`–`#214`, `#217`, `#224`, `#225`, `#241`) e adicionados cenários de integração da US06 (`#228` / PR `#246`: `EntregaControllerIntegrationTest`, `SubmissaoEntrega.test.tsx`), US07 (`#229` / PR `#247`: `EntregaParecerIntegrationTest`, `AvaliacaoEntrega.test.tsx`), concorrência (`SolicitacaoConcorrenciaIntegrationTest`) e repositórios (`EntregaRepositoryTest`, `ParecerRepositoryTest`). O CI foi atualizado em `entrega-8` (`#219` / PR `#238`) com `docker-build.yml` condicionado aos testes.
+- **Reavaliação e risco residual:** Probabilidade **Baixa (1)**, Impacto **Médio (2)**, Prioridade **Baixa (2)**. **Risco residual:** baixo, mantido sob controle pelos checks obrigatórios de CI.
+- **Responsável:** QA (`Willian Ferreira`)
 
 #### R04 — Crescimento Não Planejado do Escopo (Scope Creep)
 
-- **Status na Sprint 4:** _[A preencher pelo Scrum Master]_
-- **O que ocorreu:** _[A preencher pelo Scrum Master]_
-- **Reavaliação:**
-  - **Probabilidade:** _[A preencher]_
-  - **Impacto:** _[A preencher]_
-  - **Prioridade:** _[A preencher]_
-- **Eficácia da mitigação:** _[A preencher]_
-- **Ações para o fechamento:** _[A preencher]_
-- **Responsável pelo Acompanhamento:** Scrum Master (`Willian Ferreira`) / PO (`Adriano Luiz de Souza`)
-
-#### R06 — Ausência de Autenticação Expõe Endpoints
-
-- **Status na Sprint 4:** _[A preencher pela Arquiteta/Backend]_
-- **O que ocorreu:** _[A preencher pela Arquiteta/Backend]_
-- **Reavaliação:**
-  - **Probabilidade:** _[A preencher]_
-  - **Impacto:** _[A preencher]_
-  - **Prioridade:** _[A preencher]_
-- **Eficácia da mitigação:** _[A preencher]_
-- **Ações para o fechamento:** _[A preencher]_
-- **Responsável pelo Acompanhamento:** Arquiteta / Backend (`Damares Gaia`)
+- **Status na Sprint 4:** Mitigado.
+- **O que ocorreu e evidências:** As regras de US06/US07 foram congeladas antes da implementação ([`docs/entregas/sprint-4.md`](entregas/sprint-4.md), seção 3.2). Diante do esforço extra com os 8 bugs (`#199`–`#206`), a equipe acionou a contenção prevista e **postergou a US08 (`#15`)** para o backlog futuro, preservando prazo e qualidade da release `v0.4.0`.
+- **Reavaliação e risco residual:** Probabilidade Alta (3) → **Baixa (1)**, Impacto **Médio (2)**, Prioridade Alta (6) → **Baixa (2)**. **Risco residual:** baixo no escopo entregue; US08 permanece rastreada na Issue `#15`.
+- **Responsável:** Scrum Master (`Willian Ferreira`) / PO (`Adriano Luiz de Souza`)
 
 #### R07 — Condição de Corrida no Aceite / Concorrência de Entregas
 
-- **Status na Sprint 4:** _[A preencher pelo Backend]_
-- **O que ocorreu:** _[A preencher pelo Backend]_
-- **Reavaliação:**
-  - **Probabilidade:** _[A preencher]_
-  - **Impacto:** _[A preencher]_
-  - **Prioridade:** _[A preencher]_
-- **Eficácia da mitigação:** _[A preencher]_
-- **Ações para o fechamento:** _[A preencher]_
-- **Responsável pelo Acompanhamento:** Backend (`Talles Souza`)
-
-#### R08 — Mudança de Direção do Produto (Pivot)
-
-- **Status na Sprint 4:** _[A preencher pelo Scrum Master]_
-- **O que ocorreu:** _[A preencher pelo Scrum Master]_
-- **Reavaliação:**
-  - **Probabilidade:** _[A preencher]_
-  - **Impacto:** _[A preencher]_
-  - **Prioridade:** _[A preencher]_
-- **Eficácia da mitigação:** _[A preencher]_
-- **Ações para o fechamento:** _[A preencher]_
-- **Responsável pelo Acompanhamento:** Scrum Master (`Willian Ferreira`)
+- **Status na Sprint 4:** Mitigado.
+- **O que ocorreu e evidências:** A Issue `#206` (PR `#241`) corrigiu a condição de corrida nas vagas de `PerfilOrientador` com **lock otimista (`@Version` + Flyway `V8`)**, retornando `409` em conflitos (validado por `SolicitacaoConcorrenciaIntegrationTest` e teste real em MySQL). Na US07, o `EntregaRepository` passou a usar **lock pessimista (`@Lock(LockModeType.PESSIMISTIC_WRITE)`)** para evitar pareceres simultâneos (`#215` / PR `#237`).
+- **Reavaliação e risco residual:** Probabilidade **Baixa (1)**, Impacto Alto (3) → **Médio (2)**, Prioridade Média (3) → **Baixa (2)**. **Risco residual:** baixo (aceite e recusa simultâneos seguem mapeados como melhoria futura sem risco de saldo negativo).
+- **Responsável:** Backend (`Talles Souza`)
 
 #### R09 — Complexidade e Instabilidade na Integração com Keycloak
 
-- **Status na Sprint 4:** _[A preencher pelo QA/DevOps]_
-- **O que ocorreu:** _[A preencher pelo QA/DevOps]_
-- **Reavaliação:**
-  - **Probabilidade:** _[A preencher]_
-  - **Impacto:** _[A preencher]_
-  - **Prioridade:** _[A preencher]_
-- **Eficácia da mitigação:** _[A preencher]_
-- **Ações para o fechamento:** _[A preencher]_
-- **Responsável pelo Acompanhamento:** DevOps / QA (`Eduardo Cardoso`, `Willian Ferreira`)
+- **Status na Sprint 4:** Mitigado.
+- **O que ocorreu e evidências:** Ocorreu expiração de sessão em ~5 minutos gerando erros `401` no frontend (Issue `#205`), corrigida no PR `#225` com fila de requisições e refresh automático de token no `api.ts`. Em staging (`#220` / PR `#244`), `KEYCLOAK_PUBLIC_URL` e `webOrigins` foram ajustados e validados por smoke test (`docs/staging.md`).
+- **Reavaliação e risco residual:** Probabilidade Alta (3) → **Baixa (1)**, Impacto Alto (3) → **Médio (2)**, Prioridade Crítica (9) → **Baixa (2)**. **Risco residual:** baixo no MVP, mantida a limitação conhecida de `grant_type=password` ([`ADR-0014`](adrs/ADR-0014.md)) para futura adoção de PKCE.
+- **Responsável:** DevOps / QA (`Eduardo Cardoso`, `Willian Ferreira`)
 
 #### R11 — Submissão de Links Externos Privados ou Inacessíveis (US06 / US07)
 
 - **Natureza:** Negócio / Usabilidade
-- **Status na Sprint 4:** _[A preencher pelo Backend/Frontend/QA]_
-- **O que ocorreu:** _[A preencher pelo Backend/Frontend/QA]_
-- **Reavaliação:**
-  - **Probabilidade:** _[A preencher]_
-  - **Impacto:** _[A preencher]_
-  - **Prioridade:** _[A preencher]_
-- **Eficácia da mitigação:** _[A preencher]_
-- **Ações para o fechamento:** _[A preencher]_
-- **Responsável pelo Acompanhamento:** Backend / Frontend / QA (`Talles Souza`, `Marcus Jhuan`, `Willian Ferreira`)
+- **Mitigação e ocorrido:** Decorrente da [`ADR-0013`](adrs/ADR-0013.md), o sistema valida URL HTTPS (`@URL(protocol = "https")`), mas depende da permissão configurada pelo aluno no provedor externo. Para mitigar, a tela `SubmissaoEntrega/index.tsx` exibe instrução explícita sobre permissão de leitura e o orientador dispõe do parecer `AJUSTES_NECESSARIOS`, liberando o reenvio pelo aluno (`EntregaControllerIntegrationTest`, `EntregaParecerIntegrationTest`).
+- **Reavaliação e risco residual:** Probabilidade **Média (2)**, Impacto **Médio (2)**, Prioridade **Média (4)**. **Risco residual:** moderado e aceito por decisão arquitetural (`ADR-0013`), contornado pelo fluxo de ajustes.
+- **Responsável:** Backend / Frontend / QA (`Talles Souza`, `Marcus Jhuan`, `Willian Ferreira`)
 
-#### R12 — Modificação Posterior do Trabalho Submetido Fora do Prazo (US06)
+#### R12 — Modificação Posterior do Trabalho Submetido Após o Prazo (US06)
 
 - **Natureza:** Integridade / Negócio
-- **Status na Sprint 4:** _[A preencher pela Arquiteta/Backend]_
-- **O que ocorreu:** _[A preencher pela Arquiteta/Backend]_
-- **Reavaliação:**
-  - **Probabilidade:** _[A preencher]_
-  - **Impacto:** _[A preencher]_
-  - **Prioridade:** _[A preencher]_
-- **Eficácia da mitigação:** _[A preencher]_
-- **Ações para o fechamento:** _[A preencher]_
-- **Responsável pelo Acompanhamento:** Arquiteta de Software / Backend (`Damares Gaia`, `Talles Souza`)
+- **Mitigação e ocorrido:** Como apenas a URL (`url_documento`) é persistida (`ADR-0013`), links editáveis podem ser alterados após o prazo. Como mitigação, o backend grava `enviado_em` (`Instant` via `Clock`) e a flag `atrasada` na tabela `entrega` (`V6`), bloqueia reenvios após parecer definitivo (`APROVADO` ou `REPROVADO`) e orienta o uso de links somente leitura/imutáveis (`contrato-dados-us06.md`).
+- **Reavaliação e risco residual:** Probabilidade **Baixa (1)**, Impacto **Médio (2)**, Prioridade **Baixa (2)**. **Risco residual:** baixo e aceito no escopo do MVP.
+- **Responsável:** Arquiteta de Software / Backend (`Damares Gaia`, `Talles Souza`)
+
+#### R13 — Atraso em Cadeia entre Backend, Frontend e QA na US07
+
+- **Natureza:** Prazo / Processo
+- **Mitigação e ocorrido:** Havia dependência sequencial concentrada entre `09/11` e `11/11`. O backend da US07 (`#210`, `#215` — PRs `#240`, `#237`) e os contratos (`#209` — PR `#234`) foram entregues antecipadamente (`04/11` e `06/11`) e a US08 foi postergada. Como o frontend (`#226`/`#227` — PR `#242`) foi integrado em `10/11`, os testes de integração de QA (`#228` — PR `#246` e `#229` — PR `#247`) concentraram-se no último dia (`11/11/2026`), sendo concluídos com CI verde antes do encerramento.
+- **Reavaliação e risco residual:** Probabilidade **Média (2)**, Impacto **Médio (2)**, Prioridade **Média (4)**. **Risco residual:** controlado para `v0.4.0`; recomendação registrada em `sprint-4.md` (seção 9.3) para antecipar a integração de frontend em ciclos futuros.
+- **Responsável:** Scrum Master / QA / Dev (`Willian Ferreira`, `Talles Souza`, `Marcus Jhuan`)
 
 ---
 
-### 6.4 Matriz Consolidada de Riscos ao Término da Sprint 4 (A consolidar pelo Scrum Master)
+### 6.4 Matriz Consolidada de Riscos ao Término da Sprint 4
 
-> A ser finalizada pelo Scrum Master na conclusão da Issue #231.
+|   ID    | Risco                                            | Natureza            | Probabilidade |  Impacto  | Prioridade | Status Final                                            |
+| :-----: | :----------------------------------------------- | :------------------ | :-----------: | :-------: | :--------: | :------------------------------------------------------ |
+| **R01** | Desistência de membro da equipe                  | Equipe              |   Média (2)   | Alto (3)  |  Alta (6)  | **Mitigado (equipe completa ativa; issues fatiadas)**   |
+| **R02** | Falhas por ausência de testes/CI                 | Qualidade           |   Baixa (1)   | Médio (2) | Baixa (2)  | **Mitigado (CI completo + testes US06/US07 + 8 fixes)** |
+| **R03** | Atraso no cronograma das APIs                    | Prazo               |   Baixa (1)   | Médio (2) | Baixa (2)  | **Mitigado (contratos prévios US06/US07)**              |
+| **R04** | Crescimento do escopo                            | Escopo              |   Baixa (1)   | Médio (2) | Baixa (2)  | **Mitigado (US08 postergada para manter qualidade)**    |
+| **R05** | Divergência de ambientes (Docker)                | Tecnologia          |   Baixa (1)   | Baixo (1) | Baixa (1)  | **Mitigado (Docker Compose, `.env.example`, DEPLOY)**   |
+| **R06** | Ausência de autenticação nos endpoints           | Segurança           |   Baixa (1)   | Baixo (1) | Baixa (1)  | **Resolvido / Encerrado (Keycloak + fixes #199–#204)**  |
+| **R07** | Condição de corrida / concorrência               | Qualidade/Dados     |   Baixa (1)   | Médio (2) | Baixa (2)  | **Mitigado (`@Version` V8 + `PESSIMISTIC_WRITE`)**      |
+| **R08** | Mudança de direção do produto (Pivot)            | Estratégico         |   Baixa (1)   | Baixo (1) | Baixa (1)  | **Resolvido / Obsoleto (direção consolidada)**          |
+| **R09** | Instabilidade na integração Keycloak             | Segurança           |   Baixa (1)   | Médio (2) | Baixa (2)  | **Mitigado (refresh automático #205 + staging)**        |
+| **R10** | Indisponibilidade de Staging                     | Infraestrutura      |   Baixa (1)   | Baixo (1) | Baixa (1)  | **Mitigado (Cloudflare Tunnels + compose local)**       |
+| **R11** | Links externos privados/inacessíveis (US06/US07) | Negócio/Usabilidade |   Média (2)   | Médio (2) | Média (4)  | **Mitigado (orientação na UI + reenvio em ajustes)**    |
+| **R12** | Alteração de trabalho após o prazo (US06)        | Integridade/Negócio |   Baixa (1)   | Médio (2) | Baixa (2)  | **Mitigado (registro `enviado_em` + bloqueio final)**   |
+| **R13** | Atraso em cadeia Backend, Frontend e QA na US07  | Prazo/Processo      |   Média (2)   | Médio (2) | Média (4)  | **Mitigado no fechamento (PRs #246 e #247 integrados)** |
 
-|   ID    | Risco                                  | Natureza        |  Probabilidade  |     Impacto     |   Prioridade    | Status Final                             |
-| :-----: | :------------------------------------- | :-------------- | :-------------: | :-------------: | :-------------: | :--------------------------------------- |
-| **R01** | Desistência de membro da equipe        | Equipe          | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
-| **R02** | Falhas por ausência de testes/CI       | Qualidade       | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
-| **R03** | Atraso no cronograma das APIs          | Prazo           | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
-| **R04** | Crescimento do escopo                  | Escopo          | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
-| **R05** | Divergência de ambientes (Docker)      | Tecnologia      |    Baixa (1)    |    Baixo (1)    |    Baixa (1)    | **Mitigado (Docker compose, DEPLOY.md)** |
-| **R06** | Ausência de autenticação nos endpoints | Segurança       | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
-| **R07** | Condição de corrida / concorrência     | Qualidade/Dados | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
-| **R08** | Mudança de direção do produto (Pivot)  | Estratégico     | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
-| **R09** | Instabilidade na integração Keycloak   | Segurança       | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
-| **R10** | Indisponibilidade de Staging           | Infraestrutura  |    Baixa (1)    |    Baixo (1)    |    Baixa (1)    | **Mitigado (Cloudflare Tunnels)**        |
-| **R11** | Links externos privados/inacessíveis   | Usabilidade     | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
-| **R12** | Alteração de trabalho após o prazo     | Integridade     | _[A preencher]_ | _[A preencher]_ | _[A preencher]_ | _[A preencher]_                          |
+> **Riscos obsoletos após a `ADR-0013`:** riscos ligados a **storage local e custódia de arquivos binários** (espaço em disco, volumes Docker de mídia e validação de upload `MultipartFile`) deixaram de ser aplicáveis após a adoção de links externos HTTPS ([`docs/adrs/ADR-0013.md`](adrs/ADR-0013.md)), sendo substituídos por **R11** e **R12**.
