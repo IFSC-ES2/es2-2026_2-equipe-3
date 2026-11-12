@@ -407,4 +407,37 @@ Integração (merge) à `entrega-8` dos PRs dos demais integrantes:
 
 ### 11.5 Willian Ferreira dos Santos
 
-> Seção a ser preenchida pelo integrante.
+- **Papel:** Scrum Master e Engenheiro de Qualidade (QA).
+- **Período:** 03/11/2026 a 11/11/2026.
+- **Atividades e Entregas na Sprint 4:**
+
+  - **Planejamento e Condução da Sprint 4 (Issue #207 - PR #232):**
+    - Elaboração e atualização do documento [`docs/entregas/sprint-4.md`](sprint-4.md), registrando a inspeção do estado do MVP ao final da Sprint 3, a meta da sprint, as histórias selecionadas, as regras de negócio, o fatiamento das atividades e a distribuição de responsabilidades.
+    - Organização das atividades em issues específicas, com responsáveis, prazos e dependências, facilitando o acompanhamento do trabalho e a rastreabilidade das entregas.
+    - Acompanhamento do andamento da sprint, das atividades pendentes e das integrações realizadas na branch `entrega-8`.
+    - Registro das correções de bugs incorporadas durante o ciclo, dos Pull Requests integrados, da retrospectiva e do incremento entregue.
+    - Reavaliação das prioridades diante da capacidade disponível e das demandas adicionais identificadas durante a execução, contribuindo para a decisão de postergar a US08 e preservar o tempo necessário à integração e à validação das US06 e US07.
+
+  - **Correção de Controle de Acesso às Solicitações (Issue #202 - PR #224):**
+    - Identificação e correção de falhas que permitiam que qualquer usuário autenticado consultasse solicitações de orientação sem possuir autorização para acessá-las.
+    - Implementação de verificações de autorização para restringir a consulta de uma solicitação ao aluno responsável e ao orientador relacionado, impedindo o acesso por usuários sem vínculo com o registro.
+    - Restrição do endpoint de consulta das solicitações de um orientador para permitir que o professor autenticado consulte apenas as próprias solicitações.
+    - Inclusão e ajuste de testes para verificar o comportamento das permissões, incluindo respostas HTTP `403 Forbidden` para tentativas de acesso não autorizado.
+
+  - **Testes de Integração da Submissão de Entregas (US06 - Issue #228 - PR #246):**
+    - Desenvolvimento dos cenários de integração para validar o fluxo de submissão de entregas por meio de links externos HTTPS.
+    - Verificação dos comportamentos previstos para a submissão, considerando as regras de negócio definidas para a US06, incluindo validação do endereço informado, identificação da entrega e tratamento de submissões realizadas após o prazo.
+    - Execução dos testes automatizados e integração dos cenários à branch `entrega-8`, contribuindo para verificar o funcionamento da funcionalidade junto ao backend e às regras de autorização.
+
+  - **Testes de Integração da Avaliação e Parecer (US07 - Issue #229 - PR #247):**
+    - Desenvolvimento dos cenários de integração para validar a consulta das entregas pelo orientador, o registro de pareceres e o acompanhamento dos resultados pelo aluno.
+    - Validação dos cenários de autorização, incluindo o acesso permitido ao orientador vinculado e a rejeição de consultas por usuários sem vínculo com a entrega.
+    - Verificação das regras de negócio relacionadas ao parecer, incluindo a obrigatoriedade de comentário em situações de ajustes ou reprovação, o bloqueio de reavaliação de entregas com decisão definitiva e a possibilidade de reenvio após `AJUSTES_NECESSARIOS`.
+    - Verificação da atualização das informações apresentadas ao aluno após a avaliação, contemplando os resultados do parecer.
+    - Execução dos testes automatizados de integração, com todos os cenários executados localmente apresentando resultado satisfatório.
+    - Integração dos testes à branch `entrega-8`, ampliando a cobertura de validação do fluxo de avaliação da US07.
+
+  - **Acompanhamento do Processo e Governança:**
+    - Atuação como Scrum Master durante a Sprint 4, acompanhando as issues, os responsáveis, os prazos e as dependências das atividades.
+    - Registro das decisões e dos acontecimentos relevantes no documento da sprint, mantendo a rastreabilidade entre planejamento, execução, Pull Requests, retrospectiva e incremento entregue.
+    - Acompanhamento das correções de bugs e das atividades de QA, contribuindo para que as entregas fossem integradas e validadas antes do encerramento da sprint.
