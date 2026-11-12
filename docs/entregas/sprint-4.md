@@ -149,16 +149,16 @@ Além das atividades previstas no escopo inicial das US06 e US07, a Sprint 4 tam
 
 As correções abrangeram problemas relacionados à autorização, ao controle de acesso, à integridade das informações e à estabilidade da aplicação.
 
-| Issue | Bug identificado | Situação |
-| :---: | :--- | :---: |
-| [#199](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/199) | Qualquer usuário autenticado aceita ou recusa qualquer solicitação. | Concluída |
-| [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | CRUD de orientadores aberto a qualquer usuário autenticado. | Concluída |
-| [#201](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/201) | Solicitação criada com o e-mail do corpo da requisição, e não com o do usuário logado. | Concluída |
-| [#202](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/202) | Qualquer usuário logado consegue ler qualquer solicitação. | Concluída |
-| [#203](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/203) | Painel do professor mostra solicitações do orientador errado. | Concluída |
-| [#204](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/204) | "Meu perfil" depende do `localStorage` e pode editar o perfil de outra pessoa. | Concluída |
+|                               Issue                                | Bug identificado                                                                           | Situação  |
+| :----------------------------------------------------------------: | :----------------------------------------------------------------------------------------- | :-------: |
+| [#199](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/199) | Qualquer usuário autenticado aceita ou recusa qualquer solicitação.                        | Concluída |
+| [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | CRUD de orientadores aberto a qualquer usuário autenticado.                                | Concluída |
+| [#201](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/201) | Solicitação criada com o e-mail do corpo da requisição, e não com o do usuário logado.     | Concluída |
+| [#202](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/202) | Qualquer usuário logado consegue ler qualquer solicitação.                                 | Concluída |
+| [#203](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/203) | Painel do professor mostra solicitações do orientador errado.                              | Concluída |
+| [#204](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/204) | "Meu perfil" depende do `localStorage` e pode editar o perfil de outra pessoa.             | Concluída |
 | [#205](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/205) | Sessão expira em aproximadamente cinco minutos e as chamadas passam a falhar com HTTP 401. | Concluída |
-| [#206](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/206) | Condição de corrida no controle de vagas do orientador. | Concluída |
+| [#206](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/206) | Condição de corrida no controle de vagas do orientador.                                    | Concluída |
 
 Todas as oito issues foram concluídas e, conforme o acompanhamento da equipe, suas respectivas correções foram integradas à branch `entrega-8`. Essas atividades complementares contribuíram para reforçar a segurança do controle de acesso, a consistência dos dados e a estabilidade do sistema durante a Sprint 4.
 
@@ -170,30 +170,30 @@ Todas as oito issues foram concluídas e, conforme o acompanhamento da equipe, s
 
 A tabela abaixo registra os Pull Requests aprovados e mesclados à branch `entrega-8` durante a Sprint 4. Foram incluídas as entregas inicialmente planejadas para as US06 e US07, as atividades de infraestrutura e documentação, os testes de integração e as correções de bugs identificadas durante a sprint.
 
-| PR | Issue(s) | Descrição | Status |
-| :--: | :--: | :--- | :--: |
-| [#247](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/247) | #229 | Cenários de integração: avaliação e parecer (US07). | Mesclado |
-| [#246](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/246) | #228 | Cenários de integração: submissão por link (US06). | Mesclado |
-| [#245](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/245) | #239 | Atualização da arquitetura e dos padrões do projeto na Sprint 4. | Mesclado |
-| [#244](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/244) | #220 | Configuração do ambiente de staging. | Mesclado |
-| [#243](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/243) | #221 | Criação de `docs/DEPLOY.md` e consolidação do `.env.example`. | Mesclado |
-| [#242](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/242) | #226, #227 | Implementação das telas de submissão e avaliação de entregas. | Mesclado |
-| [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241) | #206 | Correção de condição de corrida no controle de vagas do orientador. | Mesclado |
-| [#240](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/240) | #210 | Endpoint de consulta da submissão pelo orientador. | Mesclado |
-| [#238](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/238) | #219 | Atualização do pipeline de integração contínua para a `entrega-8`. | Mesclado |
-| [#237](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/237) | #215 | Modelagem e implementação do parecer das entregas. | Mesclado |
-| [#236](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/236) | #216 | Implementação do endpoint de submissão por link. | Mesclado |
-| [#235](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/235) | #218 | Validação de links e configuração de variáveis de ambiente. | Mesclado |
-| [#234](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/234) | #209 | Documentação dos contratos de dados das US06 e US07. | Mesclado |
-| [#233](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/233) | #223 | Modelagem e migração de banco de dados com Flyway V6. | Mesclado |
-| [#232](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/232) | #207 | Planejamento e documentação da Sprint 4. | Mesclado |
-| [#225](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/225) | #205 | Correção da renovação de token e tratamento de expiração de sessão. | Mesclado |
-| [#224](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/224) | #202 | Restrição de acesso à leitura de solicitações conforme autorização do usuário. | Mesclado |
-| [#217](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/217) | #204 | Correção do controle de acesso à edição do perfil, removendo a dependência indevida do `localStorage`. | Mesclado |
-| [#214](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/214) | #203 | Correção da listagem de solicitações no painel do professor. | Mesclado |
-| [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) | #201 | Correção da identificação do usuário na criação de solicitações. | Mesclado |
-| [#212](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/212) | #199 | Correção da autorização para aceitar ou recusar solicitações. | Mesclado |
-| [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211) | #200 | Correção do acesso indevido ao CRUD de orientadores por usuários autenticados. | Mesclado |
+|                                PR                                |  Issue(s)  | Descrição                                                                                              |  Status  |
+| :--------------------------------------------------------------: | :--------: | :----------------------------------------------------------------------------------------------------- | :------: |
+| [#247](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/247) |    #229    | Cenários de integração: avaliação e parecer (US07).                                                    | Mesclado |
+| [#246](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/246) |    #228    | Cenários de integração: submissão por link (US06).                                                     | Mesclado |
+| [#245](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/245) |    #239    | Atualização da arquitetura e dos padrões do projeto na Sprint 4.                                       | Mesclado |
+| [#244](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/244) |    #220    | Configuração do ambiente de staging.                                                                   | Mesclado |
+| [#243](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/243) |    #221    | Criação de `docs/DEPLOY.md` e consolidação do `.env.example`.                                          | Mesclado |
+| [#242](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/242) | #226, #227 | Implementação das telas de submissão e avaliação de entregas.                                          | Mesclado |
+| [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241) |    #206    | Correção de condição de corrida no controle de vagas do orientador.                                    | Mesclado |
+| [#240](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/240) |    #210    | Endpoint de consulta da submissão pelo orientador.                                                     | Mesclado |
+| [#238](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/238) |    #219    | Atualização do pipeline de integração contínua para a `entrega-8`.                                     | Mesclado |
+| [#237](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/237) |    #215    | Modelagem e implementação do parecer das entregas.                                                     | Mesclado |
+| [#236](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/236) |    #216    | Implementação do endpoint de submissão por link.                                                       | Mesclado |
+| [#235](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/235) |    #218    | Validação de links e configuração de variáveis de ambiente.                                            | Mesclado |
+| [#234](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/234) |    #209    | Documentação dos contratos de dados das US06 e US07.                                                   | Mesclado |
+| [#233](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/233) |    #223    | Modelagem e migração de banco de dados com Flyway V6.                                                  | Mesclado |
+| [#232](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/232) |    #207    | Planejamento e documentação da Sprint 4.                                                               | Mesclado |
+| [#225](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/225) |    #205    | Correção da renovação de token e tratamento de expiração de sessão.                                    | Mesclado |
+| [#224](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/224) |    #202    | Restrição de acesso à leitura de solicitações conforme autorização do usuário.                         | Mesclado |
+| [#217](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/217) |    #204    | Correção do controle de acesso à edição do perfil, removendo a dependência indevida do `localStorage`. | Mesclado |
+| [#214](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/214) |    #203    | Correção da listagem de solicitações no painel do professor.                                           | Mesclado |
+| [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) |    #201    | Correção da identificação do usuário na criação de solicitações.                                       | Mesclado |
+| [#212](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/212) |    #199    | Correção da autorização para aceitar ou recusar solicitações.                                          | Mesclado |
+| [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211) |    #200    | Correção do acesso indevido ao CRUD de orientadores por usuários autenticados.                         | Mesclado |
 
 Os Pull Requests relacionados às correções de bugs complementaram o escopo funcional da Sprint 4, reforçando os mecanismos de autorização, a integridade das operações e a consistência das informações. Todas as integrações registradas foram direcionadas à branch `entrega-8`.
 
@@ -226,7 +226,6 @@ A Sprint 4 foi concluída com a entrega das funcionalidades previstas para as US
 
 De modo geral, a Sprint 4 ampliou a maturidade técnica do projeto, não apenas pela conclusão das funcionalidades restantes do fluxo de TCC, mas também pelo esforço dedicado à segurança, à qualidade e à preparação da infraestrutura para validações integradas.
 
-
 ---
 
 ## 10. Incremento Entregue
@@ -235,39 +234,39 @@ Ao final da Sprint 4, foi integrado à branch `entrega-8` o incremento correspon
 
 ### 10.1. Funcionalidades entregues
 
-| Item | Entrega | Resultado |
-| :--- | :--- | :--- |
-| **US06 - Submissão de Entregas do TCC** | Submissão de trabalho por link externo HTTPS, com identificação da etapa, registro da data de envio e indicação de atraso. | Concluída |
-| **US07 - Avaliação e Parecer das Entregas** | Consulta da entrega pelo orientador e registro de parecer com os resultados `APROVADO`, `REPROVADO` e `AJUSTES_NECESSARIOS`. | Concluída |
-| **Reenvio de entrega** | Possibilidade de substituir o link após um parecer `AJUSTES_NECESSARIOS`, respeitando as regras de encerramento da etapa. | Concluída |
-| **Painel do aluno** | Exibição do status da entrega e do parecer registrado pelo orientador. | Concluída |
-| **Tela do orientador** | Consulta do documento por link externo e registro de avaliação, com restrições para pareceres definitivos e entregas aguardando reenvio. | Concluída |
+| Item                                        | Entrega                                                                                                                                  | Resultado |
+| :------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------- | :-------- |
+| **US06 - Submissão de Entregas do TCC**     | Submissão de trabalho por link externo HTTPS, com identificação da etapa, registro da data de envio e indicação de atraso.               | Concluída |
+| **US07 - Avaliação e Parecer das Entregas** | Consulta da entrega pelo orientador e registro de parecer com os resultados `APROVADO`, `REPROVADO` e `AJUSTES_NECESSARIOS`.             | Concluída |
+| **Reenvio de entrega**                      | Possibilidade de substituir o link após um parecer `AJUSTES_NECESSARIOS`, respeitando as regras de encerramento da etapa.                | Concluída |
+| **Painel do aluno**                         | Exibição do status da entrega e do parecer registrado pelo orientador.                                                                   | Concluída |
+| **Tela do orientador**                      | Consulta do documento por link externo e registro de avaliação, com restrições para pareceres definitivos e entregas aguardando reenvio. | Concluída |
 
 ### 10.2. Infraestrutura e documentação
 
-| Item | Entrega | Resultado |
-| :--- | :--- | :--- |
-| **CI** | Atualização do pipeline de integração contínua para a branch `entrega-8`. | Concluída |
-| **Staging** | Configuração do ambiente de staging acessível externamente, utilizando Docker e Cloudflare Tunnel. | Concluída |
-| **Deploy** | Criação de `docs/DEPLOY.md` e consolidação do `.env.example`. | Concluída |
-| **Arquitetura** | Atualização da documentação de arquitetura e dos padrões adotados no projeto. | Concluída |
-| **Contratos de dados** | Documentação dos contratos das APIs das US06 e US07. | Concluída |
-| **Métricas e riscos** | Atualização dos documentos de acompanhamento e governança do projeto. | Concluída |
+| Item                   | Entrega                                                                                            | Resultado |
+| :--------------------- | :------------------------------------------------------------------------------------------------- | :-------- |
+| **CI**                 | Atualização do pipeline de integração contínua para a branch `entrega-8`.                          | Concluída |
+| **Staging**            | Configuração do ambiente de staging acessível externamente, utilizando Docker e Cloudflare Tunnel. | Concluída |
+| **Deploy**             | Criação de `docs/DEPLOY.md` e consolidação do `.env.example`.                                      | Concluída |
+| **Arquitetura**        | Atualização da documentação de arquitetura e dos padrões adotados no projeto.                      | Concluída |
+| **Contratos de dados** | Documentação dos contratos das APIs das US06 e US07.                                               | Concluída |
+| **Métricas e riscos**  | Atualização dos documentos de acompanhamento e governança do projeto.                              | Concluída |
 
 ### 10.3. Qualidade e correção de bugs
 
 Durante a Sprint 4, foram concluídas oito issues de correção de bugs, com integração das respectivas alterações à branch `entrega-8`:
 
-| Issue | Correção realizada |
-| :---: | :--- |
-| #199 | Restrição da autorização para aceitar ou recusar solicitações. |
-| #200 | Restrição do acesso ao CRUD de orientadores conforme as permissões do usuário. |
-| #201 | Utilização da identidade do usuário autenticado na criação de solicitações. |
-| #202 | Restrição da leitura de solicitações aos usuários autorizados. |
-| #203 | Correção da consulta de solicitações exibidas no painel do professor. |
-| #204 | Correção do controle de acesso à edição do perfil, eliminando a dependência indevida do `localStorage`. |
-| #205 | Renovação do token e tratamento da expiração da sessão, evitando falhas de autenticação após o vencimento. |
-| #206 | Correção da condição de corrida no controle de vagas do orientador. |
+| Issue | Correção realizada                                                                                         |
+| :---: | :--------------------------------------------------------------------------------------------------------- |
+| #199  | Restrição da autorização para aceitar ou recusar solicitações.                                             |
+| #200  | Restrição do acesso ao CRUD de orientadores conforme as permissões do usuário.                             |
+| #201  | Utilização da identidade do usuário autenticado na criação de solicitações.                                |
+| #202  | Restrição da leitura de solicitações aos usuários autorizados.                                             |
+| #203  | Correção da consulta de solicitações exibidas no painel do professor.                                      |
+| #204  | Correção do controle de acesso à edição do perfil, eliminando a dependência indevida do `localStorage`.    |
+| #205  | Renovação do token e tratamento da expiração da sessão, evitando falhas de autenticação após o vencimento. |
+| #206  | Correção da condição de corrida no controle de vagas do orientador.                                        |
 
 Além das correções, foram implementados cenários de integração para as US06 e US07, contemplando os principais fluxos funcionais, regras de negócio e restrições de autorização.
 
