@@ -139,8 +139,6 @@ A revisão completa dos riscos será registrada em [`docs/riscos.md`](../riscos.
 
 ## 7. Andamento das Atividades
 
-> Seção a ser preenchida ao longo da sprint pelo Scrum Master, com o registro de impedimentos, replanejamentos e atualizações relevantes do board.
-
 - 03/11/2026: Sprint iniciada. Planejamento inicial registrado (seções 1 a 6). Issues de implementação, infraestrutura, QA e governança organizadas no board.
 
 ### 7.1. Correções de Bugs
@@ -166,12 +164,11 @@ Todas as oito issues foram concluídas e, conforme o acompanhamento da equipe, s
 
 ## 8. Pull Requests da Sprint 4
 
-> Seção a ser preenchida ao longo da sprint, com a lista de PRs abertos, revisados e integrados à `entrega-8`.
-
 A tabela abaixo registra os Pull Requests aprovados e mesclados à branch `entrega-8` durante a Sprint 4. Foram incluídas as entregas inicialmente planejadas para as US06 e US07, as atividades de infraestrutura e documentação, os testes de integração e as correções de bugs identificadas durante a sprint.
 
 |                                PR                                |  Issue(s)  | Descrição                                                                                              |  Status  |
 | :--------------------------------------------------------------: | :--------: | :----------------------------------------------------------------------------------------------------- | :------: |
+| [#248](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/248) |    #231    | Atualização e revisão dos riscos do projeto para a Sprint 4.                                           | Mesclado |
 | [#247](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/247) |    #229    | Cenários de integração: avaliação e parecer (US07).                                                    | Mesclado |
 | [#246](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/246) |    #228    | Cenários de integração: submissão por link (US06).                                                     | Mesclado |
 | [#245](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/245) |    #239    | Atualização da arquitetura e dos padrões do projeto na Sprint 4.                                       | Mesclado |
@@ -316,7 +313,7 @@ Cada integrante registra abaixo suas contribuições da Sprint 4, com as issues 
   - **Atualização da Arquitetura do Sistema Real e Padrões de Projeto (Issue #239 - PR #245):** Atualização dos diagramas arquiteturais C4 ([`docs/diagramas/c2-conteineres.md`](../diagramas/c2-conteineres.md)) incorporando as rotas da release `v0.4.0` (US06 e US07), atualização do fluxo de refresh token e separação arquitetural de responsabilidades em [`docs/ARQUITETURA.md`](../ARQUITETURA.md) e [`ADR-0012`](../adrs/ADR-0012.md), além da documentação dos novos padrões estruturais (Value Object com `@Embeddable` e Interceptor com retry queue) em [`docs/PADROES-DE-PROJETO.md`](../PADROES-DE-PROJETO.md).
   - **Acompanhamento e Memória de Cálculo de Métricas (Issue #230):** Atualização da métrica [`M-06: Cumprimento da Capacidade`](../metricas/M-06.md) para a Sprint 4, com registro histórico nominal por integrante e consolidação de 41h executadas de 42h planejadas (97,6% de aderência - Meta Desejada).
   - **Revisão de Código (Code Review) e Governança:** Revisão técnica formal, validação de segurança e aprovação de Pull Requests fundamentais da sprint:
-    - **PR #238 (Issue #216):** Service e endpoint de submissão de entrega por link (US06), revisado e aprovado com validação das regras de negócio de entrega atrasada e verificação de URL HTTPS.
+    - **PR #238 (Issue #219):** Revisão técnica formal (`CHANGES_REQUESTED`) da atualização do CI (`docker-build.yml`), `docker-compose.prod.yml` e `docs/ci.md` quanto à aderência à `ADR-0009` e às evidências reais do pipeline.
     - **PR #240 (Issue #210):** Endpoint de consulta de submissão para orientador (US07), revisado e aprovado com validação de permissões de acesso do orientador.
     - **PR #243 (Issue #221):** Documentação de deploy (`docs/DEPLOY.md`) e script de smoke test, revisado em duas iterações técnicas rigorosas com apontamentos sobre a URL pública do Keycloak e alinhamento de variáveis de ambiente.
 
@@ -367,7 +364,15 @@ Cada integrante registra abaixo suas contribuições da Sprint 4, com as issues 
 
 ### 11.3 Marcus Jhuan Epifanio Lima
 
-> Seção a ser preenchida pelo integrante.
+- **Principais entregas:**
+  - **Implementação das Telas de Submissão de Entrega e Avaliação pelo Orientador (Issues #226 e #227 / PR #242):**
+    - Desenvolvimento da tela de submissão do aluno ([`SubmissaoEntrega`](../../SIGTCC/frontend/src/paginas/SubmissaoEntrega/index.tsx)) na rota protegida `/minhas-entregas` (`ROLE_ALUNO`), permitindo selecionar a etapa, enviar link externo HTTPS conforme `ADR-0013`, acompanhar status/atraso e reenviar após parecer `AJUSTES_NECESSARIOS`.
+    - Desenvolvimento da tela de avaliação do orientador ([`AvaliacaoEntrega`](../../SIGTCC/frontend/src/paginas/AvaliacaoEntrega/index.tsx)) na rota protegida `/avaliar-entregas` (`ROLE_PROFESSOR`), com listagem e filtro por status, abertura do documento externo, registro de parecer e obrigatoriedade de comentário em ajustes necessários e reprovação.
+    - Criação dos serviços e tipagens de integração com a API ([`entregaService.ts`](../../SIGTCC/frontend/src/utils/entregaService.ts) e [`Entrega.ts`](../../SIGTCC/frontend/src/types/Entrega.ts)) e configuração de rotas e navegação em [`App.tsx`](../../SIGTCC/frontend/src/App.tsx).
+  - **Testes Unitários de Componentes no Frontend:**
+    - Criação de testes automatizados com Vitest em [`SubmissaoEntrega.test.tsx`](../../SIGTCC/frontend/src/paginas/SubmissaoEntrega/SubmissaoEntrega.test.tsx) (10 casos) e [`AvaliacaoEntrega.test.tsx`](../../SIGTCC/frontend/src/paginas/AvaliacaoEntrega/AvaliacaoEntrega.test.tsx) (8 casos), cobrindo validação de URL HTTPS, atraso, reenvio, tratamento de erros HTTP (`400`, `403`, `409`, `422`), filtros e bloqueio de avaliação em estados finais.
+  - **Registro de Uso de IA (`USO-IA.md`):**
+    - Registro do uso de IA nas atividades da Sprint 4 em [`USO-IA.md`](../../USO-IA.md) (branch `docs/atualiza-uso-ia-sprint-4`).
 
 ### 11.4 Talles Souza da Cruz
 
