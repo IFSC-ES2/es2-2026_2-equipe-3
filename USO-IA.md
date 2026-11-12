@@ -503,3 +503,58 @@ Aproveitamento: Apoio na identificação de cenários de teste, análise de caso
 Adaptação/Descarte: Os cenários foram revisados conforme os requisitos das funcionalidades.
 
 Validação Técnica: Conferência dos resultados das execuções e verificação do comportamento esperado da aplicação.
+
+---
+
+## Willian Ferreira dos Santos (Scrum Master / Engenheiro de Qualidade - QA)
+
+**Ferramenta utilizada:** ChatGPT (OpenAI)  
+**Período:** 03/11/2026 a 11/11/2026
+
+#### Detalhamento de Usos por Artefato e Atividade:
+
+- **Planejamento e organização da Sprint 4 (Issue #207 / PR #232):**
+  - **Data:** 03/11/2026 a 04/11/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefato:** `docs/entregas/sprint-4.md`.
+  - **Aproveitamento:** Apoio na estruturação do documento de planejamento da Sprint 4, incluindo a definição da meta, organização do escopo das User Stories US06 e US07, detalhamento das atividades, identificação de dependências e riscos e organização das issues necessárias para a execução da sprint.
+  - **Adaptação/Descarte:** As sugestões foram avaliadas e ajustadas conforme as decisões tomadas pela equipe. A definição do escopo da sprint, a priorização das funcionalidades e a distribuição das responsabilidades permaneceram sob responsabilidade dos integrantes.
+  - **Validação Técnica:** Revisão do documento de planejamento, conferência das informações com as issues do GitHub e integração por meio do **PR #232**.
+
+- **Correção de falha de autorização nos endpoints de consulta de solicitações (Issue #202 / PR #224):**
+  - **Data:** 03/11/2026 a 04/11/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefatos:** `SolicitacaoController`, `SolicitacaoService` e testes automatizados relacionados aos endpoints de consulta de solicitações.
+  - **Aproveitamento:** Apoio na análise da falha de controle de acesso que permitia a usuários autenticados consultar solicitações de outros usuários. A IA auxiliou na definição da lógica de autorização para garantir que somente o aluno autor da solicitação e o orientador vinculado pudessem consultar uma solicitação individual. Também auxiliou na análise da restrição do endpoint de listagem de solicitações por orientador, garantindo que o usuário autenticado pudesse consultar somente as solicitações vinculadas ao próprio perfil.
+  - **Adaptação/Descarte:** As sugestões foram adaptadas à estrutura de autenticação e autorização já existente no backend. As verificações foram ajustadas para considerar o usuário autenticado e os relacionamentos efetivamente cadastrados no sistema, evitando confiar exclusivamente em identificadores informados pela requisição.
+  - **Validação Técnica:** Execução dos testes automatizados relacionados à autorização e revisão do comportamento dos endpoints para os cenários permitidos e não permitidos. Alterações integradas por meio do **PR #224**.
+
+- **Elaboração e validação de testes de integração da US06 - Submissão de Entregas (Issue #228 / PR #246):**
+  - **Data:** 10/11/2026 a 11/11/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefatos:** Testes de integração do backend relacionados ao fluxo de submissão de entregas da US06.
+  - **Aproveitamento:** Apoio na análise dos critérios de aceitação e do contrato de dados da US06, na identificação de cenários relevantes para os testes de integração e na investigação de problemas encontrados durante a execução da suíte.
+  - **Adaptação/Descarte:** Os cenários e sugestões foram conferidos com os requisitos da US06, o contrato de dados e a implementação existente. Os ajustes necessários foram realizados considerando o comportamento real da aplicação.
+  - **Validação Técnica:** Execução local dos testes de integração e conferência dos resultados antes da submissão do **PR #246**, relacionado à Issue #228.
+
+- **Elaboração e validação de testes de integração da US07 - Avaliação de Entregas (Issue #229 / PR #247):**
+  - **Data:** 10/11/2026 a 11/11/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefatos:** `EntregaControllerIntegrationTest` e demais testes de integração relacionados ao fluxo de avaliação de entregas da US07.
+  - **Aproveitamento:** Apoio na identificação, estruturação e revisão dos cenários de integração do fluxo de avaliação pelo orientador. Foram analisados cenários de autorização, validação de dados obrigatórios, transições de estado e comportamento do sistema após a emissão de um parecer.
+  - **Adaptação/Descarte:** Os cenários foram ajustados conforme as regras de negócio e o contrato de dados da US07. Foram considerados, entre outros, os casos de acesso permitido pelo orientador vinculado, bloqueio de acesso por orientador não vinculado, validação de comentário obrigatório, impedimento de nova avaliação após decisão definitiva e comportamento do fluxo de reenvio após solicitação de ajustes.
+  - **Validação Técnica:** Execução local dos testes de integração do backend, com aprovação de todos os testes executados. A implementação foi submetida por meio do **PR #247**, relacionado à Issue #229, e integrada à branch `entrega-8`.
+
+- **Apoio na resolução de problemas de testes, Git e documentação:**
+  - **Data:** 03/11/2026 a 11/11/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefatos:** Código-fonte do backend, testes automatizados, arquivos de configuração e documentação Markdown do projeto.
+  - **Aproveitamento:** Apoio na interpretação de mensagens de erro, análise de resultados de testes, revisão de comandos Git, organização de alterações e conferência de documentos relacionados às atividades da sprint.
+  - **Adaptação/Descarte:** As orientações foram utilizadas como sugestões e conferidas com o estado real do repositório, com os resultados dos comandos executados e com as regras de versionamento e governança estabelecidas pela equipe.
+  - **Validação Técnica:** Execução dos comandos e testes localmente, conferência dos resultados e revisão manual das alterações antes de sua integração.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. As sugestões foram utilizadas como apoio ao planejamento, à implementação, à análise de requisitos, à elaboração de testes e à revisão técnica, sem substituir a tomada de decisões ou a responsabilidade do integrante. Os testes automatizados foram executados localmente para verificar o comportamento das funcionalidades e a consistência das alterações com os contratos de dados e critérios de aceitação do projeto.
+
+O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto, pelas alterações realizadas e pelos artefatos entregues.
