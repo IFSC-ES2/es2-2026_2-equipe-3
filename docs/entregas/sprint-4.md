@@ -168,6 +168,8 @@ A tabela abaixo registra os Pull Requests aprovados e mesclados à branch `entre
 
 |                                PR                                |  Issue(s)  | Descrição                                                                                              |  Status  |
 | :--------------------------------------------------------------: | :--------: | :----------------------------------------------------------------------------------------------------- | :------: |
+| [#250](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/250) |     —      | Consolidação das declarações de uso de IA da Sprint 4 (`USO-IA.md`).                                   | Mesclado |
+| [#249](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/249) |    #207    | Fechamento da Sprint 4 (`sprint-4.md`) e atualização do `README.md`.                                   | Mesclado |
 | [#248](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/248) |    #231    | Atualização e revisão dos riscos do projeto para a Sprint 4.                                           | Mesclado |
 | [#247](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/247) |    #229    | Cenários de integração: avaliação e parecer (US07).                                                    | Mesclado |
 | [#246](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/246) |    #228    | Cenários de integração: submissão por link (US06).                                                     | Mesclado |
@@ -182,7 +184,7 @@ A tabela abaixo registra os Pull Requests aprovados e mesclados à branch `entre
 | [#236](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/236) |    #216    | Implementação do endpoint de submissão por link.                                                       | Mesclado |
 | [#235](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/235) |    #218    | Validação de links e configuração de variáveis de ambiente.                                            | Mesclado |
 | [#234](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/234) |    #209    | Documentação dos contratos de dados das US06 e US07.                                                   | Mesclado |
-| [#233](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/233) |    #223    | Modelagem e migração de banco de dados com Flyway V6.                                                  | Mesclado |
+| [#233](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/233) | #208, #223 | Modelagem e migração de banco de dados com Flyway V6.                                                  | Mesclado |
 | [#232](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/232) |    #207    | Planejamento e documentação da Sprint 4.                                                               | Mesclado |
 | [#225](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/225) |    #205    | Correção da renovação de token e tratamento de expiração de sessão.                                    | Mesclado |
 | [#224](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/224) |    #202    | Restrição de acesso à leitura de solicitações conforme autorização do usuário.                         | Mesclado |
@@ -342,9 +344,9 @@ Cada integrante registra abaixo suas contribuições da Sprint 4, com as issues 
     - Consolidação definitiva do arquivo de referência [`.env.example`](../../.env.example), unificando todas as variáveis de configuração de ambiente de forma consistente, rastreável e auditável, eliminando valores sensíveis expostos.
     - Alinhamento de referências cruzadas entre `DEPLOY.md`, `staging.md` e os arquivos compose do projeto.
   - **Acompanhamento da Métrica de Processo M-04 — Lead Time de Pull Requests (Issue #230):**
-    - Atualização da ficha técnica [`docs/metricas/M-04.md`](../metricas/M-04.md) com o histórico completo de Pull Requests da sprint (PRs #211 a #245), calculando os tempos exatos de ciclo entre criação e merge.
-    - Elaboração da memória de cálculo da Sprint 4: média de **12,3h**, mediana de **5,7h**, 80% dos PRs Dentro da Meta ($\le 24$h), 20% na Faixa Aceitável ($24$h a $48$h) e **0% em Zona de Alerta**, alcançando **100% de conformidade com o SLA** e demonstrando a eficácia dos Quality Gates automatizados no GitHub Actions.
-    - Análise histórica comparativa frente ao Baseline e às Sprints 1, 2 e 3, com diagnóstico específico do Lead Time das entregas de infraestrutura (média de 18,2h).
+    - Atualização da ficha técnica [`docs/metricas/M-04.md`](../metricas/M-04.md) com o histórico completo de Pull Requests da sprint integrados até o fechamento da documentação (25 PRs, `#211` a `#250`), calculando os tempos exatos de ciclo entre criação e merge.
+    - Elaboração da memória de cálculo da Sprint 4: média de **10,2h**, mediana de **3,8h**, **84,0%** dos PRs Dentro da Meta ($\le 24$h), **16,0%** na Faixa Aceitável ($24$h a $48$h) e **0% em Zona de Alerta**, alcançando **100,0% de conformidade com o SLA** e demonstrando a eficácia dos Quality Gates automatizados no GitHub Actions.
+    - Análise histórica comparativa frente ao Baseline e às Sprints 1, 2 e 3, com diagnóstico específico do Lead Time das entregas de infraestrutura (média de 18,2h nos PRs `#235`, `#238`, `#243` e `#244`).
   - **Reavaliação dos Riscos Técnicos de DevOps e Infraestrutura (Issue #231):**
     - Reavaliação formal dos riscos sob responsabilidade de DevOps em [`docs/riscos.md`](../riscos.md): **R05** (Divergência de Ambientes e Instabilidade Docker) mitigado definitivamente pela padronização dos contêineres e documentação de deploy, e **R10** (Indisponibilidade do Ambiente de Staging) mitigado pela alta disponibilidade do Cloudflare Tunnels e roteiro de smoke tests.
   - **Revisão de Código (Code Review) e Governança:**

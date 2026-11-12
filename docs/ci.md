@@ -61,14 +61,11 @@ A integração atua como a primeira linha de defesa contra bugs e erros (Risco R
 
 Caso algum _check_ do pipeline falhe, o botão de _Merge_ do GitHub ficará bloqueado, exigindo que o desenvolvedor corrija o erro na branch de origem e faça um novo _push_ para disparar o pipeline novamente.
 
-## 5. Evidência de Execução do Pipeline — Sprint 3
+## 5. Evidência de Execução do Pipeline — Sprint 4
 
-Durante a Sprint 3, foi realizada uma execução completa e bem-sucedida do pipeline de Integração Contínua em um Pull Request direcionado à ramificação `entrega-7`.
+Durante a Sprint 4, os workflows de Integração Contínua (**Backend CI**, **Frontend CI**, **Verificação de Formatação** e **Verificação de Documentação**) validaram continuamente os Pull Requests direcionados à ramificação `entrega-8`, incluindo build, testes automatizados, formatação Prettier e validação de sintaxe Docker Compose (`docker-compose.yml` e `docker-compose.prod.yml`).
 
-A execução validou os workflows de **Backend CI** e **Frontend CI**, incluindo build e testes automatizados.
+- **Atualização do pipeline na Sprint 4 (Issue #219):** [Pull Request #238](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/238) (`Docs/219 atualiza ci`), que ajustou os triggers dos workflows para `entrega-8` e configurou o build multi-stage Docker no GHCR.
+- **Execução completa com código e testes (Issue #229):** [Pull Request #247](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/247) (`Test/229 cenarios integracao us07`), integrado à `entrega-8` com os checks obrigatórios aprovados.
 
-**Pull Request de evidência:** #148 — Atualização do pipeline de CI para a Sprint 3.
-
-**Resultado:** execução concluída com sucesso, com os checks obrigatórios de Backend CI e Frontend CI aprovados.
-
-> [Link para o Pull Request #148](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/182)
+> Na Sprint 3 (Entrega 7), a evidência anterior de execução do pipeline foi registrada no [Pull Request #182](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/182).
