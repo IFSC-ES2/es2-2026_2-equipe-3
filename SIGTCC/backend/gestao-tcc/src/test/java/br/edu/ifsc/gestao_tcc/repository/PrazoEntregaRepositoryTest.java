@@ -79,4 +79,21 @@ class PrazoEntregaRepositoryTest {
         assertFalse(prazoEntregaRepository.existsByTurmaIdAndTipo(turma.getId(), TipoEntrega.TCC1));
         assertFalse(prazoEntregaRepository.existsByTurmaIdAndTipo(turma.getId(), TipoEntrega.TCC2));
     }
+
+    @Test
+    @DisplayName("Deve buscar o prazo da etapa somente na turma informada")
+    void findByTurmaIdAndTipo_DeveRetornarPrazoDaTurmaEEtapa() {
+        TurmaTCC turmaAtual = criarTurma("2026/2", true, "prof1@ifsc.edu.br");
+        TurmaTCC outraTurma = criarTurma("2026/1", false, "prof2@ifsc.edu.br");
+        LocalDate dataLimite = LocalDate.of(2026, 11, 10);
+        salvarPrazo(turmaAtual, TipoEntrega.PROJETO_TCC, dataLimite);
+        salvarPrazo(outraTurma, TipoEntrega.TCC1, LocalDate.of(2026, 5, 10));
+
+        assertThat(prazoEntregaRepository.findByTurmaIdAndTipo(turmaAtual.getId(), TipoEntrega.PROJETO_TCC))
+                .isPresent()
+                .get()
+                .extracting(PrazoEntrega::getDataLimite)
+                .isEqualTo(dataLimite);
+        assertThat(prazoEntregaRepository.findByTurmaIdAndTipo(turmaAtual.getId(), TipoEntrega.TCC1)).isEmpty();
+    }
 }   

@@ -7,6 +7,8 @@ import br.edu.ifsc.gestao_tcc.service.SolicitacaoService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -18,11 +20,17 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SolicitacaoController {
 
+    private static final String CLAIM_EMAIL = "email";
+    private static final String CLAIM_NOME = "name";
+
     private final SolicitacaoService solicitacaoService;
 
     @PostMapping
-    public ResponseEntity<SolicitacaoResponseDTO> criarSolicitacao(@RequestBody @Valid SolicitacaoRequestDTO dto) {
-        SolicitacaoResponseDTO resposta = solicitacaoService.criarSolicitacao(dto);
+    public ResponseEntity<SolicitacaoResponseDTO> criarSolicitacao(
+            @RequestBody @Valid SolicitacaoRequestDTO dto,
+            @AuthenticationPrincipal Jwt jwt) {
+        SolicitacaoResponseDTO resposta = solicitacaoService.criarSolicitacao(
+                dto, jwt.getClaimAsString(CLAIM_EMAIL), jwt.getClaimAsString(CLAIM_NOME));
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
                 .buildAndExpand(resposta.id())
@@ -33,23 +41,38 @@ public class SolicitacaoController {
     @GetMapping("/orientador/{orientadorId}")
     public ResponseEntity<List<SolicitacaoResponseDTO>> listarPorOrientador(
             @PathVariable Long orientadorId,
-            @RequestParam(required = false) String status
+            @RequestParam(required = false) String status,
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        return ResponseEntity.ok(solicitacaoService.listarPorOrientador(orientadorId, status));
+        return ResponseEntity.ok(
+                solicitacaoService.listarPorOrientador(
+                        orientadorId,
+                        status,
+                        jwt == null ? null : jwt.getClaimAsString(CLAIM_EMAIL)
+                )
+        );
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<SolicitacaoResponseDTO> buscarPorId(
-            @PathVariable Long id
-    )   {
-        return ResponseEntity.ok(solicitacaoService.buscarPorId(id));
+            @PathVariable Long id,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        return ResponseEntity.ok(
+                solicitacaoService.buscarPorId(
+                        id,
+                        jwt == null ? null : jwt.getClaimAsString(CLAIM_EMAIL)
+                )
+        );
     }
 
     @PatchMapping("/{id}/status")
     public ResponseEntity<SolicitacaoResponseDTO> atualizarStatus(
             @PathVariable Long id,
-            @RequestBody AtualizaStatusRequest request
+            @RequestBody AtualizaStatusRequest request,
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        return ResponseEntity.ok(solicitacaoService.atualizarStatus(id, request));
+        return ResponseEntity.ok(solicitacaoService.atualizarStatus(
+                id, request, jwt.getClaimAsString(CLAIM_EMAIL)));
     }
 }

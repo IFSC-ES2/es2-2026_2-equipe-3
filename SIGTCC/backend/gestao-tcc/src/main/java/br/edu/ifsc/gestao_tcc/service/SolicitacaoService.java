@@ -4,6 +4,7 @@ import br.edu.ifsc.gestao_tcc.dto.AtualizaStatusRequest;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoResponseDTO;
 import br.edu.ifsc.gestao_tcc.event.SolicitacaoStatusChangedEvent;
+import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.exception.SolicitacaoJaRespondidaException;
@@ -30,6 +31,9 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class SolicitacaoService {
 
+    private static final String MENSAGEM_ACESSO_NEGADO =
+            "Somente o orientador destinatário pode aceitar ou recusar esta solicitação.";
+
     private final SolicitacaoRepository solicitacaoRepository;
     private final OrientadorRepository orientadorRepository;
     private final AlunoRepository alunoRepository;
@@ -37,16 +41,20 @@ public class SolicitacaoService {
     private final List<ValidacaoSolicitacaoOrientacao> validacoes;
 
     @Transactional
-    public SolicitacaoResponseDTO criarSolicitacao(SolicitacaoRequestDTO dto) {
+    public SolicitacaoResponseDTO criarSolicitacao(SolicitacaoRequestDTO dto, String emailAluno, String nomeAluno) {
+        if (emailAluno == null || emailAluno.isBlank()) {
+            throw new AcessoNegadoException("Não foi possível identificar o aluno autenticado.");
+        }
+
         Orientador orientador = orientadorRepository.findById(dto.getOrientadorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Orientador com identificador " + dto.getOrientadorId() + " não foi encontrado."));
 
-        Aluno aluno = alunoRepository.findByEmail(dto.getAluno().getEmail())
+        Aluno aluno = alunoRepository.findByEmail(emailAluno)
                 .orElseGet(() -> {
                     Aluno novoAluno = Aluno.builder()
-                            .nome(dto.getAluno().getNome())
-                            .email(dto.getAluno().getEmail())
-                            .curso(dto.getAluno().getCurso())
+                            .nome(nomeAluno == null || nomeAluno.isBlank() ? emailAluno : nomeAluno.trim())
+                            .email(emailAluno)
+                            .curso(dto.getCurso().trim())
                             .build();
                     return alunoRepository.save(novoAluno);
                 });
@@ -66,10 +74,32 @@ public class SolicitacaoService {
         return toResponse(solicitacaoSalva);
     }
 
+    private void validarAcessoPorOrientador(
+            Orientador orientador,
+            String emailUsuario
+    ) {
+        if (emailUsuario == null
+                || emailUsuario.isBlank()
+                || !emailUsuario.equalsIgnoreCase(orientador.getEmail())) {
+
+            throw new AcessoNegadoException(
+                    "Você não tem permissão para acessar as solicitações deste orientador."
+            );
+        }
+    }
+
     @Transactional(readOnly = true)
-    public List<SolicitacaoResponseDTO> listarPorOrientador(Long orientadorId, String status) {
+    public List<SolicitacaoResponseDTO> listarPorOrientador(
+            Long orientadorId,
+            String status,
+            String emailUsuario
+    ) {
         Orientador orientador = orientadorRepository.findById(orientadorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Orientador com identificador " + orientadorId + " não foi encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Orientador com identificador " + orientadorId + " não foi encontrado."
+                ));
+
+        validarAcessoPorOrientador(orientador, emailUsuario);
 
         List<SolicitacaoOrientacao> solicitacoes;
         if (status == null || status.isBlank()) {
@@ -84,20 +114,45 @@ public class SolicitacaoService {
                 .toList();
     }
 
+    private void validarAcessoPorSolicitacao(
+            SolicitacaoOrientacao solicitacao,
+            String emailUsuario
+    ) {
+        boolean ehAluno = emailUsuario != null
+                && solicitacao.getAluno().getEmail().equalsIgnoreCase(emailUsuario);
+
+        boolean ehOrientador = emailUsuario != null
+                && solicitacao.getOrientador().getEmail().equalsIgnoreCase(emailUsuario);
+
+        if (!ehAluno && !ehOrientador) {
+            throw new AcessoNegadoException(
+                    "Você não tem permissão para acessar esta solicitação."
+            );
+        }
+    }
+
     @Transactional(readOnly = true)
-    public SolicitacaoResponseDTO buscarPorId(Long solicitacaoId) {
+    public SolicitacaoResponseDTO buscarPorId(
+            Long solicitacaoId,
+            String emailUsuario
+    ) {
         SolicitacaoOrientacao solicitacao = solicitacaoRepository.findById(solicitacaoId)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Solicitação com identificador " + solicitacaoId + " não foi encontrada."
                 ));
 
+        validarAcessoPorSolicitacao(solicitacao, emailUsuario);
+
         return toResponse(solicitacao);
     }
 
     @Transactional
-    public SolicitacaoResponseDTO atualizarStatus(Long solicitacaoId, AtualizaStatusRequest request) {
+    public SolicitacaoResponseDTO atualizarStatus(
+            Long solicitacaoId, AtualizaStatusRequest request, String emailOrientador) {
         SolicitacaoOrientacao solicitacao = solicitacaoRepository.findById(solicitacaoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Solicitação com identificador " + solicitacaoId + " não foi encontrada."));
+
+        validarOrientadorDestinatario(solicitacao.getOrientador(), emailOrientador);
 
         if (solicitacao.getStatus() != StatusSolicitacao.PENDENTE) {
             throw new SolicitacaoJaRespondidaException("Esta solicitação foi respondida e não pode ser alterada.");
@@ -129,6 +184,14 @@ public class SolicitacaoService {
         eventPublisher.publishEvent(new SolicitacaoStatusChangedEvent(solicitacao, statusAnterior, novoStatus));
 
         return toResponse(solicitacao);
+    }
+
+    private void validarOrientadorDestinatario(Orientador orientador, String emailOrientador) {
+        if (emailOrientador == null || emailOrientador.isBlank()
+                || orientador == null || orientador.getEmail() == null
+                || !emailOrientador.trim().equalsIgnoreCase(orientador.getEmail())) {
+            throw new AcessoNegadoException(MENSAGEM_ACESSO_NEGADO);
+        }
     }
 
     private void validarVagasDisponiveis(Orientador orientador) {

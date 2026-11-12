@@ -40,6 +40,8 @@ O objetivo deste contrato é permitir que as equipes de Frontend, Backend e Qual
 | `PATCH`  | `/api/v1/orientadores/{id}` | Atualiza dados cadastrais, linhas de pesquisa e número de vagas de um orientador | `200 OK`               |
 | `DELETE` | `/api/v1/orientadores/{id}` | Remove ou desativa o cadastro de um orientador no sistema                        | `204 No Content`       |
 
+> **Autorização:** as rotas `GET` exigem apenas um token válido (aluno ou professor). `POST`, `PATCH` e `DELETE` exigem `ROLE_PROFESSOR`; caso contrário, retornam `403 Forbidden`. Em `PATCH` e `DELETE /{id}`, o professor só pode alterar o **próprio** cadastro: o claim `email` do JWT deve ser igual ao e-mail do orientador (sem diferenciar maiúsculas e minúsculas). Caso contrário, a resposta é `403 Forbidden`.
+
 > **Nota de Escopo do Vertical Slice (Sprint 1):** O contrato de dados especifica a API REST completa do recurso `orientadores`. Para o _vertical slice_ funcional demonstrável da Sprint 1, a implementação prioriza o fluxo de cadastro (`POST`) e consulta/vitrine (`GET`), seguindo com a atualização (`PATCH`) e exclusão (`DELETE`) na sequência do backlog.
 
 ---
@@ -148,6 +150,10 @@ Retornado caso o e-mail informado já esteja registrado para outro orientador.
   "detalhes": "O e-mail informado já está cadastrado no sistema."
 }
 ```
+
+##### Acesso Negado: `403 Forbidden`
+
+Retornado quando o token não possui `ROLE_PROFESSOR` (por exemplo, um aluno).
 
 ---
 
@@ -272,9 +278,51 @@ Retorna o objeto do orientador com os dados atualizados.
 
 Retornado caso os campos enviados sejam inválidos (ex: vagas negativas).
 
+##### Acesso Negado: `403 Forbidden`
+
+Retornado quando o token não possui `ROLE_PROFESSOR` ou quando o professor autenticado tenta editar o cadastro de outro orientador.
+
+```json
+{
+  "timestamp": "2026-09-11T09:30:00Z",
+  "status": 403,
+  "erro": "Acesso negado",
+  "caminho": "/api/v1/orientadores/2",
+  "detalhes": "Você só pode alterar o seu próprio cadastro de orientador."
+}
+```
+
 ##### Não Encontrado: `404 Not Found`
 
 Retornado caso o ID do orientador não exista.
+
+##### Conflito: `409 Conflict`
+
+Retornado quando o perfil foi alterado por outra operação ao mesmo tempo, como o aceite de uma solicitação. Nenhuma alteração é gravada, e o professor pode repetir a ação.
+
+```json
+{
+  "timestamp": "2026-09-11T09:30:00Z",
+  "status": 409,
+  "erro": "Conflito de dados",
+  "caminho": "/api/v1/orientadores/1",
+  "detalhes": "Os dados foram alterados por outra operação ao mesmo tempo. Atualize a página e tente novamente."
+}
+```
+
+##### Regra de Negócio: `422 Unprocessable Content`
+
+Retornado quando o campo `email` é enviado com um valor diferente do e-mail atual. O e-mail identifica o professor no Keycloak e não pode ser alterado por este endpoint. Enviar o mesmo e-mail é aceito e não altera nada.
+
+```json
+{
+  "timestamp": "2026-09-11T09:30:00Z",
+  "status": 422,
+  "erro": "Regra de negócio violada",
+  "caminho": "/api/v1/orientadores/1",
+  "detalhes": "O e-mail do orientador não pode ser alterado."
+}
+```
 
 ---
 
@@ -289,6 +337,10 @@ Retornado caso o ID do orientador não exista.
 ##### Sucesso: `204 No Content`
 
 O cadastro foi removido ou desativado com sucesso (sem corpo de resposta).
+
+##### Acesso Negado: `403 Forbidden`
+
+Retornado quando o token não possui `ROLE_PROFESSOR` ou quando o professor autenticado tenta desativar o cadastro de outro orientador.
 
 ##### Não Encontrado: `404 Not Found`
 

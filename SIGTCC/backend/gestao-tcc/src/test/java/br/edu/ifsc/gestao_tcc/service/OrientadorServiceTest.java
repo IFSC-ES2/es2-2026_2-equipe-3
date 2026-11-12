@@ -3,7 +3,9 @@ package br.edu.ifsc.gestao_tcc.service;
 import br.edu.ifsc.gestao_tcc.dto.OrientadorRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.OrientadorResponseDTO;
 import br.edu.ifsc.gestao_tcc.dto.OrientadorUpdateDTO;
+import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
 import br.edu.ifsc.gestao_tcc.exception.EmailDuplicadoException;
+import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.model.LinhaPesquisa;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
@@ -26,6 +28,9 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrientadorServiceTest {
+    private static final String EMAIL_DONO = "adriano.lima@ifsc.edu.br";
+    private static final String EMAIL_OUTRO = "outro.professor@ifsc.edu.br";
+
     @Mock
     private OrientadorRepository orientadorRepository;
 
@@ -199,7 +204,7 @@ class OrientadorServiceTest {
         when(orientadorRepository.findById(id)).thenReturn(Optional.of(orientador));
         when(orientadorRepository.save(any(Orientador.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        OrientadorResponseDTO response = orientadorService.atualizar(id, updateDTO);
+        OrientadorResponseDTO response = orientadorService.atualizar(id, updateDTO, EMAIL_DONO);
 
         assertNotNull(response);
         assertEquals(5, response.vagasDisponiveis());
@@ -219,7 +224,7 @@ class OrientadorServiceTest {
 
         when(orientadorRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> orientadorService.atualizar(id, updateDTO));
+        assertThrows(ResourceNotFoundException.class, () -> orientadorService.atualizar(id, updateDTO, EMAIL_DONO));
 
         verify(orientadorRepository, times(1)).findById(id);
         verify(orientadorRepository, never()).save(any());
@@ -234,7 +239,7 @@ class OrientadorServiceTest {
 
         when(orientadorRepository.findById(id)).thenReturn(Optional.of(orientador));
 
-        orientadorService.deletar(id);
+        orientadorService.deletar(id, EMAIL_DONO);
 
         ArgumentCaptor<Orientador> captor = ArgumentCaptor.forClass(Orientador.class);
         verify(orientadorRepository, times(1)).save(captor.capture());
@@ -250,9 +255,93 @@ class OrientadorServiceTest {
 
         when(orientadorRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> orientadorService.deletar(id));
+        assertThrows(ResourceNotFoundException.class, () -> orientadorService.deletar(id, EMAIL_DONO));
 
         verify(orientadorRepository, times(1)).findById(id);
+        verify(orientadorRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve permitir atualizar o próprio cadastro ignorando maiúsculas no e-mail do token")
+    void atualizar_DevePermitir_QuandoEmailDoTokenDifereApenasEmMaiusculas() {
+        Long id = 1L;
+        Orientador orientador = criarOrientadorMock(id, "Dr. Adriano Lima");
+        OrientadorUpdateDTO updateDTO = new OrientadorUpdateDTO(null, null, null, null, 4, null);
+
+        when(orientadorRepository.findById(id)).thenReturn(Optional.of(orientador));
+        when(orientadorRepository.save(any(Orientador.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        OrientadorResponseDTO response = orientadorService.atualizar(id, updateDTO, EMAIL_DONO.toUpperCase());
+
+        assertEquals(4, response.vagasDisponiveis());
+        verify(orientadorRepository, times(1)).save(orientador);
+    }
+
+    @Test
+    @DisplayName("Deve lançar AcessoNegadoException ao atualizar o cadastro de outro orientador")
+    void atualizar_DeveLancarAcessoNegado_QuandoUsuarioNaoEhDono() {
+        Long id = 1L;
+        when(orientadorRepository.findById(id)).thenReturn(Optional.of(criarOrientadorMock(id, "Dr. Adriano Lima")));
+        OrientadorUpdateDTO updateDTO = new OrientadorUpdateDTO(null, null, null, null, 0, null);
+
+        AcessoNegadoException exception = assertThrows(AcessoNegadoException.class,
+                () -> orientadorService.atualizar(id, updateDTO, EMAIL_OUTRO));
+
+        assertEquals("Você só pode alterar o seu próprio cadastro de orientador.", exception.getMessage());
+        verify(orientadorRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar AcessoNegadoException quando o token não possui e-mail")
+    void atualizar_DeveLancarAcessoNegado_QuandoEmailAusente() {
+        Long id = 1L;
+        when(orientadorRepository.findById(id)).thenReturn(Optional.of(criarOrientadorMock(id, "Dr. Adriano Lima")));
+        OrientadorUpdateDTO updateDTO = new OrientadorUpdateDTO(null, null, null, null, 0, null);
+
+        assertThrows(AcessoNegadoException.class, () -> orientadorService.atualizar(id, updateDTO, null));
+        assertThrows(AcessoNegadoException.class, () -> orientadorService.atualizar(id, updateDTO, " "));
+        verify(orientadorRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar RegraDeNegocioException ao tentar trocar o e-mail do orientador")
+    void atualizar_DeveLancarRegraDeNegocio_QuandoEmailAlterado() {
+        Long id = 1L;
+        when(orientadorRepository.findById(id)).thenReturn(Optional.of(criarOrientadorMock(id, "Dr. Adriano Lima")));
+        OrientadorUpdateDTO updateDTO = new OrientadorUpdateDTO(null, "novo@ifsc.edu.br", null, null, null, null);
+
+        RegraDeNegocioException exception = assertThrows(RegraDeNegocioException.class,
+                () -> orientadorService.atualizar(id, updateDTO, EMAIL_DONO));
+
+        assertEquals("O e-mail do orientador não pode ser alterado.", exception.getMessage());
+        verify(orientadorRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve aceitar o mesmo e-mail no corpo do PATCH sem considerá-lo uma troca")
+    void atualizar_DevePermitir_QuandoEmailEnviadoIgualAoAtual() {
+        Long id = 1L;
+        Orientador orientador = criarOrientadorMock(id, "Dr. Adriano Lima");
+        OrientadorUpdateDTO updateDTO = new OrientadorUpdateDTO(null, EMAIL_DONO.toUpperCase(), null, null, null, null);
+
+        when(orientadorRepository.findById(id)).thenReturn(Optional.of(orientador));
+        when(orientadorRepository.save(any(Orientador.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        OrientadorResponseDTO response = orientadorService.atualizar(id, updateDTO, EMAIL_DONO);
+
+        assertEquals(EMAIL_DONO, response.email());
+    }
+
+    @Test
+    @DisplayName("Deve lançar AcessoNegadoException ao desativar o cadastro de outro orientador")
+    void deletar_DeveLancarAcessoNegado_QuandoUsuarioNaoEhDono() {
+        Long id = 1L;
+        Orientador orientador = criarOrientadorMock(id, "João");
+        when(orientadorRepository.findById(id)).thenReturn(Optional.of(orientador));
+
+        assertThrows(AcessoNegadoException.class, () -> orientadorService.deletar(id, EMAIL_OUTRO));
+
+        assertTrue(orientador.getAtivo());
         verify(orientadorRepository, never()).save(any());
     }
 
@@ -271,6 +360,7 @@ class OrientadorServiceTest {
         return Orientador.builder()
                 .id(id)
                 .nome(nome)
+                .email(EMAIL_DONO)
                 .ativo(true)
                 .perfil(perfil)
                 .build();

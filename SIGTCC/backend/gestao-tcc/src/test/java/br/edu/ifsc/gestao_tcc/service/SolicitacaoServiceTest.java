@@ -30,6 +30,11 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class SolicitacaoServiceTest {
 
+    private static final String EMAIL_ORIENTADOR = "orientador@ifsc.edu.br";
+    private static final String EMAIL_OUTRO_ORIENTADOR = "outro.orientador@ifsc.edu.br";
+    private static final String EMAIL_TOKEN = "joao@ifsc.edu.br";
+    private static final String NOME_TOKEN = "João da Silva";
+
     @Mock
     private SolicitacaoRepository solicitacaoRepository;
     @Mock
@@ -55,14 +60,14 @@ class SolicitacaoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve criar solicitação com sucesso reutilizando um aluno existente")
+    @DisplayName("Deve criar solicitação reutilizando o aluno identificado pelo e-mail do token")
     void criarSolicitacao_ComAlunoExistente_DeveRetornarSucesso() {
         SolicitacaoRequestDTO requestDTO = criarRequestDTO();
         Orientador orientador = criarOrientadorMock(1L, 2);
-        Aluno alunoExistente = criarAlunoMock(10L, requestDTO.getAluno().getEmail());
+        Aluno alunoExistente = criarAlunoMock(10L, EMAIL_TOKEN);
 
         when(orientadorRepository.findById(1L)).thenReturn(Optional.of(orientador));
-        when(alunoRepository.findByEmail(alunoExistente.getEmail())).thenReturn(Optional.of(alunoExistente));
+        when(alunoRepository.findByEmail(EMAIL_TOKEN)).thenReturn(Optional.of(alunoExistente));
 
         when(solicitacaoRepository.save(any(SolicitacaoOrientacao.class))).thenAnswer(invocation -> {
             SolicitacaoOrientacao s = invocation.getArgument(0);
@@ -71,24 +76,25 @@ class SolicitacaoServiceTest {
             return s;
         });
 
-        SolicitacaoResponseDTO response = solicitacaoService.criarSolicitacao(requestDTO);
+        SolicitacaoResponseDTO response = solicitacaoService.criarSolicitacao(requestDTO, EMAIL_TOKEN, NOME_TOKEN);
 
         assertNotNull(response);
         assertEquals(100L, response.id());
         assertEquals(StatusSolicitacao.PENDENTE, response.status());
+        assertEquals(EMAIL_TOKEN, response.aluno().email());
 
         verify(validacaoMock, times(1)).validar(requestDTO, alunoExistente, orientador);
         verify(alunoRepository, never()).save(any(Aluno.class));
     }
 
     @Test
-    @DisplayName("Deve criar solicitação com sucesso e criar um novo aluno caso não exista")
-    void criarSolicitacao_ComNovoAluno_DeveRetornarSucesso() {
+    @DisplayName("Deve criar novo aluno com e-mail e nome do token e curso do corpo")
+    void criarSolicitacao_ComNovoAluno_DeveUsarDadosDoToken() {
         SolicitacaoRequestDTO requestDTO = criarRequestDTO();
         Orientador orientador = criarOrientadorMock(1L, 2);
 
         when(orientadorRepository.findById(1L)).thenReturn(Optional.of(orientador));
-        when(alunoRepository.findByEmail(requestDTO.getAluno().getEmail())).thenReturn(Optional.empty());
+        when(alunoRepository.findByEmail(EMAIL_TOKEN)).thenReturn(Optional.empty());
 
         when(alunoRepository.save(any(Aluno.class))).thenAnswer(i -> {
             Aluno a = i.getArgument(0);
@@ -102,10 +108,60 @@ class SolicitacaoServiceTest {
             return s;
         });
 
-        SolicitacaoResponseDTO response = solicitacaoService.criarSolicitacao(requestDTO);
+        SolicitacaoResponseDTO response = solicitacaoService.criarSolicitacao(requestDTO, EMAIL_TOKEN, NOME_TOKEN);
 
         assertNotNull(response);
-        verify(alunoRepository, times(1)).save(any(Aluno.class)); // Garante que o novo aluno foi salvo
+        ArgumentCaptor<Aluno> alunoCaptor = ArgumentCaptor.forClass(Aluno.class);
+        verify(alunoRepository, times(1)).save(alunoCaptor.capture());
+        Aluno salvo = alunoCaptor.getValue();
+        assertEquals(EMAIL_TOKEN, salvo.getEmail());
+        assertEquals(NOME_TOKEN, salvo.getNome());
+        assertEquals("Engenharia", salvo.getCurso());
+    }
+
+    @Test
+    @DisplayName("Deve usar o e-mail como nome quando o token não possuir a claim de nome")
+    void criarSolicitacao_SemNomeNoToken_DeveUsarEmailComoNome() {
+        SolicitacaoRequestDTO requestDTO = criarRequestDTO();
+        Orientador orientador = criarOrientadorMock(1L, 2);
+
+        when(orientadorRepository.findById(1L)).thenReturn(Optional.of(orientador));
+        when(alunoRepository.findByEmail(EMAIL_TOKEN)).thenReturn(Optional.empty());
+        when(alunoRepository.save(any(Aluno.class))).thenAnswer(i -> i.getArgument(0));
+        when(solicitacaoRepository.save(any(SolicitacaoOrientacao.class))).thenAnswer(i -> i.getArgument(0));
+
+        solicitacaoService.criarSolicitacao(requestDTO, EMAIL_TOKEN, null);
+
+        ArgumentCaptor<Aluno> alunoCaptor = ArgumentCaptor.forClass(Aluno.class);
+        verify(alunoRepository).save(alunoCaptor.capture());
+        assertEquals(EMAIL_TOKEN, alunoCaptor.getValue().getNome());
+    }
+
+    @Test
+    @DisplayName("Deve negar acesso quando o token não possuir e-mail")
+    void criarSolicitacao_SemEmailNoToken_DeveLancarAcessoNegado() {
+        SolicitacaoRequestDTO requestDTO = criarRequestDTO();
+
+        assertThrows(AcessoNegadoException.class,
+                () -> solicitacaoService.criarSolicitacao(requestDTO, " ", NOME_TOKEN));
+        verifyNoInteractions(alunoRepository, solicitacaoRepository);
+    }
+
+    @Test
+    @DisplayName("Deve propagar solicitação duplicada do aluno autenticado")
+    void criarSolicitacao_Duplicada_DeveLancarExcecao() {
+        SolicitacaoRequestDTO requestDTO = criarRequestDTO();
+        Orientador orientador = criarOrientadorMock(1L, 2);
+        Aluno alunoExistente = criarAlunoMock(10L, EMAIL_TOKEN);
+
+        when(orientadorRepository.findById(1L)).thenReturn(Optional.of(orientador));
+        when(alunoRepository.findByEmail(EMAIL_TOKEN)).thenReturn(Optional.of(alunoExistente));
+        doThrow(new SolicitacaoDuplicadaException("Você possui uma solicitação pendente para este orientador."))
+                .when(validacaoMock).validar(requestDTO, alunoExistente, orientador);
+
+        assertThrows(SolicitacaoDuplicadaException.class,
+                () -> solicitacaoService.criarSolicitacao(requestDTO, EMAIL_TOKEN, NOME_TOKEN));
+        verify(solicitacaoRepository, never()).save(any());
     }
 
     @Test
@@ -114,7 +170,8 @@ class SolicitacaoServiceTest {
         SolicitacaoRequestDTO requestDTO = criarRequestDTO();
         when(orientadorRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> solicitacaoService.criarSolicitacao(requestDTO));
+        assertThrows(ResourceNotFoundException.class,
+                () -> solicitacaoService.criarSolicitacao(requestDTO, EMAIL_TOKEN, NOME_TOKEN));
         verify(solicitacaoRepository, never()).save(any());
     }
 
@@ -127,7 +184,7 @@ class SolicitacaoServiceTest {
         when(orientadorRepository.findById(1L)).thenReturn(Optional.of(orientador));
         when(solicitacaoRepository.findByOrientadorIdOrderByCriadoEmDesc(1L)).thenReturn(List.of(solicitacao));
 
-        List<SolicitacaoResponseDTO> resultado = solicitacaoService.listarPorOrientador(1L, null);
+        List<SolicitacaoResponseDTO> resultado = solicitacaoService.listarPorOrientador(1L, null, "orientador@ifsc.edu.br");
 
         assertEquals(1, resultado.size());
         assertEquals(StatusSolicitacao.PENDENTE, resultado.get(0).status());
@@ -143,7 +200,7 @@ class SolicitacaoServiceTest {
         when(solicitacaoRepository.findByOrientadorIdAndStatusOrderByCriadoEmDesc(1L, StatusSolicitacao.ACEITA))
                 .thenReturn(List.of(solicitacao));
 
-        List<SolicitacaoResponseDTO> resultado = solicitacaoService.listarPorOrientador(1L, "ACEITA");
+        List<SolicitacaoResponseDTO> resultado = solicitacaoService.listarPorOrientador(1L, "ACEITA", "orientador@ifsc.edu.br");
 
         assertEquals(1, resultado.size());
         assertEquals(StatusSolicitacao.ACEITA, resultado.get(0).status());
@@ -158,7 +215,7 @@ class SolicitacaoServiceTest {
 
         when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
 
-        SolicitacaoResponseDTO response = solicitacaoService.atualizarStatus(100L, request);
+        SolicitacaoResponseDTO response = solicitacaoService.atualizarStatus(100L, request, EMAIL_ORIENTADOR);
 
         assertEquals(StatusSolicitacao.ACEITA, response.status());
         assertNull(response.justificativa());
@@ -169,15 +226,67 @@ class SolicitacaoServiceTest {
     }
 
     @Test
-    @DisplayName("Deve lançar erro ao tentar aceitar solicitação sem vagas disponíveis")
-    void atualizarStatus_ParaAceitaSemVagas_DeveLancarExcecao() {
-        Orientador orientador = criarOrientadorMock(1L, 0); // Zero vagas
+    @DisplayName("Deve permitir atualização quando o e-mail do orientador tem diferença de maiúsculas/minúsculas")
+    void atualizarStatus_EmailComCaixaDiferente_DevePermitir() {
+        Orientador orientador = criarOrientadorMock(1L, 1);
         SolicitacaoOrientacao solicitacao = criarSolicitacaoMock(100L, StatusSolicitacao.PENDENTE, orientador);
         AtualizaStatusRequest request = new AtualizaStatusRequest(StatusSolicitacao.ACEITA, null);
 
         when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
 
-        assertThrows(VagasIndisponiveisException.class, () -> solicitacaoService.atualizarStatus(100L, request));
+        SolicitacaoResponseDTO response = solicitacaoService.atualizarStatus(
+                100L, request, "Orientador@IFSC.edu.br");
+
+        assertEquals(StatusSolicitacao.ACEITA, response.status());
+    }
+
+    @Test
+    @DisplayName("Deve lançar AcessoNegadoException quando outro orientador tenta aceitar ou recusar a solicitação")
+    void atualizarStatus_OutroOrientador_DeveLancarAcessoNegado() {
+        Orientador orientador = criarOrientadorMock(1L, 2);
+        SolicitacaoOrientacao solicitacao = criarSolicitacaoMock(100L, StatusSolicitacao.PENDENTE, orientador);
+        AtualizaStatusRequest request = new AtualizaStatusRequest(StatusSolicitacao.ACEITA, null);
+
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+
+        AcessoNegadoException ex = assertThrows(AcessoNegadoException.class,
+                () -> solicitacaoService.atualizarStatus(100L, request, EMAIL_OUTRO_ORIENTADOR));
+
+        assertEquals("Somente o orientador destinatário pode aceitar ou recusar esta solicitação.", ex.getMessage());
+        assertEquals(StatusSolicitacao.PENDENTE, solicitacao.getStatus());
+        verify(solicitacaoRepository, never()).save(any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar AcessoNegadoException quando o e-mail do usuário autenticado é nulo ou em branco")
+    void atualizarStatus_EmailNuloOuEmBranco_DeveLancarAcessoNegado() {
+        Orientador orientador = criarOrientadorMock(1L, 2);
+        SolicitacaoOrientacao solicitacao = criarSolicitacaoMock(100L, StatusSolicitacao.PENDENTE, orientador);
+        AtualizaStatusRequest request = new AtualizaStatusRequest(StatusSolicitacao.ACEITA, null);
+
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+
+        assertThrows(AcessoNegadoException.class,
+                () -> solicitacaoService.atualizarStatus(100L, request, null));
+        assertThrows(AcessoNegadoException.class,
+                () -> solicitacaoService.atualizarStatus(100L, request, "   "));
+
+        verify(solicitacaoRepository, never()).save(any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar erro ao tentar aceitar solicitação sem vagas disponíveis")
+    void atualizarStatus_ParaAceitaSemVagas_DeveLancarExcecao() {
+        Orientador orientador = criarOrientadorMock(1L, 0);
+        SolicitacaoOrientacao solicitacao = criarSolicitacaoMock(100L, StatusSolicitacao.PENDENTE, orientador);
+        AtualizaStatusRequest request = new AtualizaStatusRequest(StatusSolicitacao.ACEITA, null);
+
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+
+        assertThrows(VagasIndisponiveisException.class,
+                () -> solicitacaoService.atualizarStatus(100L, request, EMAIL_ORIENTADOR));
         verify(solicitacaoRepository, never()).save(any());
     }
 
@@ -190,7 +299,7 @@ class SolicitacaoServiceTest {
 
         when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
 
-        SolicitacaoResponseDTO response = solicitacaoService.atualizarStatus(100L, request);
+        SolicitacaoResponseDTO response = solicitacaoService.atualizarStatus(100L, request, EMAIL_ORIENTADOR);
 
         assertEquals(StatusSolicitacao.RECUSADA, response.status());
         assertEquals("Não tenho disponibilidade na agenda.", response.justificativa());
@@ -205,35 +314,123 @@ class SolicitacaoServiceTest {
 
         when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
 
-        assertThrows(ValidacaoRequisicaoException.class, () -> solicitacaoService.atualizarStatus(100L, request));
+        assertThrows(ValidacaoRequisicaoException.class,
+                () -> solicitacaoService.atualizarStatus(100L, request, EMAIL_ORIENTADOR));
     }
 
     @Test
     @DisplayName("Deve lançar erro de conflito ao tentar atualizar solicitação já respondida")
     void atualizarStatus_SolicitacaoJaRespondida_DeveLancarExcecao() {
         Orientador orientador = criarOrientadorMock(1L, 2);
-        // Solicitação já com estado ACEITA
         SolicitacaoOrientacao solicitacao = criarSolicitacaoMock(100L, StatusSolicitacao.ACEITA, orientador);
         AtualizaStatusRequest request = new AtualizaStatusRequest(StatusSolicitacao.RECUSADA, "Justificativa teste");
 
         when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
 
-        assertThrows(SolicitacaoJaRespondidaException.class, () -> solicitacaoService.atualizarStatus(100L, request));
+        assertThrows(SolicitacaoJaRespondidaException.class,
+                () -> solicitacaoService.atualizarStatus(100L, request, EMAIL_ORIENTADOR));
     }
 
+    @Test
+    void listarPorOrientador_UsuarioDiferente_DeveLancarAcessoNegado() {
+        Orientador orientador = new Orientador();
+        orientador.setId(1L);
+        orientador.setEmail("orientador@ifsc.edu.br");
+
+        when(orientadorRepository.findById(1L))
+                .thenReturn(Optional.of(orientador));
+
+        assertThrows(
+                AcessoNegadoException.class,
+                () -> solicitacaoService.listarPorOrientador(
+                        1L,
+                        null,
+                        "outro@ifsc.edu.br"
+                )
+        );
+    }
+
+    @Test
+    void buscarPorId_AlunoAutor_DeveRetornarSolicitacao() {
+        Aluno aluno = new Aluno();
+        aluno.setEmail("aluno@ifsc.edu.br");
+
+        Orientador orientador = new Orientador();
+        orientador.setEmail("orientador@ifsc.edu.br");
+
+        SolicitacaoOrientacao solicitacao = SolicitacaoOrientacao.builder()
+                .aluno(aluno)
+                .orientador(orientador)
+                .build();
+
+        when(solicitacaoRepository.findById(1L))
+                .thenReturn(Optional.of(solicitacao));
+
+        SolicitacaoResponseDTO resultado =
+                solicitacaoService.buscarPorId(
+                        1L,
+                        "aluno@ifsc.edu.br"
+                );
+
+        assertNotNull(resultado);
+    }
+
+    @Test
+    void buscarPorId_OrientadorResponsavel_DeveRetornarSolicitacao() {
+        Aluno aluno = new Aluno();
+        aluno.setEmail("aluno@ifsc.edu.br");
+
+        Orientador orientador = new Orientador();
+        orientador.setEmail("orientador@ifsc.edu.br");
+
+        SolicitacaoOrientacao solicitacao = SolicitacaoOrientacao.builder()
+                .aluno(aluno)
+                .orientador(orientador)
+                .build();
+
+        when(solicitacaoRepository.findById(1L))
+                .thenReturn(Optional.of(solicitacao));
+
+        SolicitacaoResponseDTO resultado =
+                solicitacaoService.buscarPorId(
+                        1L,
+                        "orientador@ifsc.edu.br"
+                );
+
+        assertNotNull(resultado);
+    }
+
+    @Test
+    void buscarPorId_UsuarioSemVinculo_DeveLancarAcessoNegado() {
+        Aluno aluno = new Aluno();
+        aluno.setEmail("aluno@ifsc.edu.br");
+
+        Orientador orientador = new Orientador();
+        orientador.setEmail("orientador@ifsc.edu.br");
+
+        SolicitacaoOrientacao solicitacao = SolicitacaoOrientacao.builder()
+                .aluno(aluno)
+                .orientador(orientador)
+                .build();
+
+        when(solicitacaoRepository.findById(1L))
+                .thenReturn(Optional.of(solicitacao));
+
+        assertThrows(
+                AcessoNegadoException.class,
+                () -> solicitacaoService.buscarPorId(
+                        1L,
+                        "outro@ifsc.edu.br"
+                )
+        );
+    }
 
     private SolicitacaoRequestDTO criarRequestDTO() {
         SolicitacaoRequestDTO dto = new SolicitacaoRequestDTO();
         dto.setOrientadorId(1L);
         dto.setTema("IA na Saúde");
         dto.setMensagem("Gostaria de ser orientado.");
-
-        SolicitacaoRequestDTO.AlunoDTO alunoDTO = new SolicitacaoRequestDTO.AlunoDTO();
-        alunoDTO.setNome("João");
-        alunoDTO.setEmail("joao@ifsc.edu.br");
-        alunoDTO.setCurso("Engenharia");
-        dto.setAluno(alunoDTO);
-
+        dto.setCurso("Engenharia");
         return dto;
     }
 
@@ -242,7 +439,7 @@ class SolicitacaoServiceTest {
         Orientador orientador = new Orientador();
         orientador.setId(id);
         orientador.setNome("Dr. Orientador");
-        orientador.setEmail("orientador@ifsc.edu.br");
+        orientador.setEmail(EMAIL_ORIENTADOR);
         orientador.setPerfil(perfil);
         return orientador;
     }

@@ -3,6 +3,7 @@ package br.edu.ifsc.gestao_tcc.exception;
 import br.edu.ifsc.gestao_tcc.dto.ErroCampoDTO;
 import br.edu.ifsc.gestao_tcc.dto.ErrorResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -54,6 +55,20 @@ public class GlobalExceptionHandler {
                 "Conflito de dados",
                 request.getRequestURI(),
                 ex.getMessage()
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponseDTO> handleOptimisticLockingFailureException(
+            OptimisticLockingFailureException ex, HttpServletRequest request) {
+
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                HttpStatus.CONFLICT.value(),
+                "Conflito de dados",
+                request.getRequestURI(),
+                "Os dados foram alterados por outra operação ao mesmo tempo. Atualize a página e tente novamente."
         );
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);

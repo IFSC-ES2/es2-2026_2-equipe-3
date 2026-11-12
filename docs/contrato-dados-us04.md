@@ -1,7 +1,8 @@
 # Contrato de Dados da API - US04: Solicitação e Aceite de Orientação
 
-- **Versão do Documento:** 1.0.0
+- **Versão do Documento:** 1.2.0
 - **Data de Elaboração:** 23/09/2026
+- **Última Atualização:** 01/11/2026: o aluno do `POST` passa a ser identificado pelo token JWT
 - **Responsável Arquitetural:** Damares Gaia (Arquiteta de Software)
 - **História de Usuário Relacionada:** US04 – Solicitação e Aceite de Orientação (com a fatia operacional da US03 - botão "Solicitar Orientação" no catálogo)
 - **Issue de Critérios de Aceitação:** #11 (cenários 1–2 nativos da issue, com "Aprovado" corrigido para "Aceita"; cenários 3–10 desta seção [11](#11-critérios-de-aceitação-da-us04-formato-bdd) incorporados)
@@ -33,7 +34,7 @@ Herdados do contrato da US02, sem alterações:
 - **Nomenclatura dos Campos (JSON):** `camelCase`
 - **Datas:** ISO 8601 em UTC (`YYYY-MM-DDTHH:mm:ssZ`)
 - **Formato de Erro:** objeto padrão `ErroResponse` (seção 3.5), o mesmo produzido por `ErrorResponseDTO` / `GlobalExceptionHandler`.
-- **Autenticação:** nenhuma nesta sprint (a US01 foi postergada). Todos os endpoints são públicos; ver limitação registrada na [seção 8](#8-decisões-assumidas-e-divergências-com-o-código-atual).
+- **Autenticação:** todos os endpoints exigem token JWT emitido pelo Keycloak (`Authorization: Bearer <token>`). O `POST /api/v1/solicitacoes` exige o papel `ROLE_ALUNO`; os demais papéis recebem `403 Forbidden`.
 
 ---
 
@@ -50,15 +51,14 @@ Herdados do contrato da US02, sem alterações:
 
 ### 3.2. `SolicitacaoRequest` (entrada do `POST`)
 
-| Campo          | Tipo   | Obrigatório? | Regras e Restrições                                                       |
-| :------------- | :----- | :----------- | :------------------------------------------------------------------------ |
-| `orientadorId` | Long   | Sim          | Identificador de um orientador existente. Valor `>= 1`.                   |
-| `aluno`        | Objeto | Sim          | Dados do aluno (ver abaixo).                                              |
-| `aluno.nome`   | String | Sim          | 3 a 100 caracteres. Não pode conter apenas espaços.                       |
-| `aluno.email`  | String | Sim          | Formato de e-mail válido. Máximo 100 caracteres. Chave de busca do aluno. |
-| `aluno.curso`  | String | Sim          | 2 a 100 caracteres. Não pode conter apenas espaços.                       |
-| `tema`         | String | Sim          | 5 a 150 caracteres. Não pode conter apenas espaços.                       |
-| `mensagem`     | String | Sim          | 10 a 1000 caracteres. Proposta/justificativa inicial.                     |
+| Campo          | Tipo   | Obrigatório? | Regras e Restrições                                               |
+| :------------- | :----- | :----------- | :---------------------------------------------------------------- |
+| `orientadorId` | Long   | Sim          | Identificador de um orientador existente. Valor `>= 1`.           |
+| `curso`        | String | Sim          | 2 a 100 caracteres. Usado apenas na criação do registro do aluno. |
+| `tema`         | String | Sim          | 5 a 150 caracteres. Não pode conter apenas espaços.               |
+| `mensagem`     | String | Sim          | 10 a 1000 caracteres. Proposta/justificativa inicial.             |
+
+> **Identificação do aluno:** o corpo **não** contém nome nem e-mail do aluno. O aluno é identificado pela claim `email` do token JWT, e o nome vem da claim `name` (se ausente, usa-se o e-mail). Um objeto `aluno` enviado no corpo é ignorado.
 
 ### 3.3. `SolicitacaoResponse` (saída de todos os endpoints de sucesso)
 
@@ -104,12 +104,12 @@ Herdados do contrato da US02, sem alterações:
 
 ## 4. Sumário dos Endpoints
 
-| Método  | Rota                                             | Descrição                                                                  | Sucesso       | Quem usa           |
-| :------ | :----------------------------------------------- | :------------------------------------------------------------------------- | :------------ | :----------------- |
-| `POST`  | `/api/v1/solicitacoes`                           | Aluno envia uma solicitação de orientação                                  | `201 Created` | Aluno              |
-| `GET`   | `/api/v1/solicitacoes/orientador/{orientadorId}` | Lista as solicitações recebidas por um orientador                          | `200 OK`      | Orientador         |
-| `PATCH` | `/api/v1/solicitacoes/{id}/status`               | Orientador aceita ou recusa uma solicitação                                | `200 OK`      | Orientador         |
-| `GET`   | `/api/v1/solicitacoes/{id}`                      | Detalha uma solicitação (também usado pelo aluno para acompanhar o status) | `200 OK`      | Aluno e Orientador |
+| Método  | Rota                                             | Descrição                                                                  | Sucesso       | Quem usa             |
+| :------ | :----------------------------------------------- | :------------------------------------------------------------------------- | :------------ | :------------------- |
+| `POST`  | `/api/v1/solicitacoes`                           | Aluno envia uma solicitação de orientação                                  | `201 Created` | Aluno (`ROLE_ALUNO`) |
+| `GET`   | `/api/v1/solicitacoes/orientador/{orientadorId}` | Lista as solicitações recebidas por um orientador                          | `200 OK`      | Orientador           |
+| `PATCH` | `/api/v1/solicitacoes/{id}/status`               | Orientador aceita ou recusa uma solicitação                                | `200 OK`      | Orientador           |
+| `GET`   | `/api/v1/solicitacoes/{id}`                      | Detalha uma solicitação (também usado pelo aluno para acompanhar o status) | `200 OK`      | Aluno e Orientador   |
 
 ---
 
@@ -119,12 +119,14 @@ Herdados do contrato da US02, sem alterações:
 
 - **Método HTTP:** `POST`
 - **Rota:** `/api/v1/solicitacoes`
-- **Descrição:** Cria uma solicitação com status `PENDENTE`. O backend busca o `Aluno` pelo e-mail; se não existir, cria o registro (subtipo de `Usuario`, sem credenciais de login) antes de associá-lo à solicitação. Se já existir, o registro é **reaproveitado sem alteração** de `nome` e `curso`.
+- **Autorização:** somente `ROLE_ALUNO`. Sem token: `401 Unauthorized`; outro papel: `403 Forbidden`.
+- **Descrição:** Cria uma solicitação com status `PENDENTE`. O backend busca o `Aluno` pelo e-mail do **usuário autenticado** (claim `email` do JWT); se não existir, cria o registro com o e-mail e o nome do token e o `curso` do corpo. Se já existir, o registro é **reaproveitado sem alteração** de `nome` e `curso`.
 - **Regras de negócio aplicadas (Strategy):** orientador ativo e com vagas (`vagasDisponiveis > 0`); inexistência de solicitação `PENDENTE` do mesmo aluno para o mesmo orientador.
 
 #### Cabeçalhos da Requisição
 
 ```http
+Authorization: Bearer <token>
 Content-Type: application/json
 Accept: application/json
 ```
@@ -134,11 +136,7 @@ Accept: application/json
 ```json
 {
   "orientadorId": 1,
-  "aluno": {
-    "nome": "Ana Beatriz Souza",
-    "email": "ana.souza@aluno.ifsc.edu.br",
-    "curso": "Análise e Desenvolvimento de Sistemas"
-  },
+  "curso": "Análise e Desenvolvimento de Sistemas",
   "tema": "Sistema de recomendação de orientadores com IA",
   "mensagem": "Tenho interesse na linha de Engenharia de Software e gostaria de desenvolver meu TCC sobre métricas de qualidade."
 }
@@ -185,7 +183,7 @@ Accept: application/json
   "erro": "Erro de validação nos dados enviados",
   "caminho": "/api/v1/solicitacoes",
   "detalhes": [
-    { "campo": "aluno.email", "mensagem": "Formato de e-mail inválido." },
+    { "campo": "curso", "mensagem": "O curso do aluno é obrigatório." },
     { "campo": "tema", "mensagem": "O tema é obrigatório." }
   ]
 }
@@ -241,6 +239,7 @@ Orientador sem vagas ou inativo.
 - **Rota:** `/api/v1/solicitacoes/orientador/{orientadorId}`
 - **Descrição:** Retorna as solicitações endereçadas ao orientador, ordenadas por `criadoEm` decrescente (mais recentes primeiro). Sem paginação nesta sprint.
 - **Uso no painel do orientador:** o "painel" de notificações da #11 é esta listagem com `?status=PENDENTE`, consultada quando o orientador abre a tela (e ao recarregar/atualizar a lista após aceitar ou recusar). **Não há notificação real nesta sprint** - sem push, WebSocket ou e-mail. O único observer implementado é o `AtualizadorVagasObserver` (decremento de vagas); nenhum observer de notificação deve ser criado apenas para "ilustrar" o padrão sem um consumidor real.
+- **Autorização:** somente o orientador autenticado cujo e-mail corresponde ao e-mail do `orientadorId` pode consultar a listagem. Outros usuários autenticados recebem `403 Forbidden`.
 
 #### Cabeçalhos da Requisição
 
@@ -284,6 +283,20 @@ Array de `SolicitacaoResponse`. Se não houver solicitações, retorna `[]` (nã
     }
   }
 ]
+```
+
+##### Acesso Negado: `403 Forbidden`
+
+Retornado quando o usuário autenticado não é o orientador correspondente ao `orientadorId`. Isso inclui alunos e outros orientadores.
+
+```json
+{
+  "timestamp": "2026-11-03T14:00:00Z",
+  "status": 403,
+  "erro": "Acesso negado",
+  "caminho": "/api/v1/solicitacoes/orientador/1",
+  "detalhes": "Você não tem permissão para acessar as solicitações deste orientador."
+}
 ```
 
 ##### Erro de Validação: `400 Bad Request`
@@ -400,6 +413,20 @@ Status ausente ou inválido, ou `justificativa` ausente/fora do tamanho ao recus
 }
 ```
 
+##### Acesso Negado: `403 Forbidden`
+
+Retornado quando o token não possui `ROLE_PROFESSOR` ou quando o professor autenticado não é o orientador destinatário da solicitação.
+
+```json
+{
+  "timestamp": "2026-09-26T11:00:00Z",
+  "status": 403,
+  "erro": "Acesso negado",
+  "caminho": "/api/v1/solicitacoes/2/status",
+  "detalhes": "Somente o orientador destinatário pode aceitar ou recusar esta solicitação."
+}
+```
+
 ##### Não Encontrado: `404 Not Found`
 
 ```json
@@ -447,6 +474,7 @@ Aceite com orientador sem vagas, ou status de destino não permitido neste endpo
 - **Método HTTP:** `GET`
 - **Rota:** `/api/v1/solicitacoes/{id}`
 - **Descrição:** Recupera uma solicitação pelo identificador. É o endpoint que o aluno usa para **acompanhar o status** (`PENDENTE`, `ACEITA`, `RECUSADA`, `CANCELADA`) a partir do `id` recebido no `POST`.
+- **Autorização:** somente o aluno autor da solicitação ou o orientador responsável pode consultar seus dados. Outros usuários autenticados recebem `403 Forbidden`.
 
 #### Cabeçalhos da Requisição
 
@@ -483,6 +511,20 @@ Retorna um `SolicitacaoResponse` (mesmo formato do exemplo da seção 5.3). Para
 }
 ```
 
+##### Acesso Negado: `403 Forbidden`
+
+Retornado quando o usuário autenticado não é o aluno autor nem o orientador responsável pela solicitação.
+
+```json
+{
+  "timestamp": "2026-11-03T14:00:00Z",
+  "status": 403,
+  "erro": "Acesso negado",
+  "caminho": "/api/v1/solicitacoes/1",
+  "detalhes": "Você não tem permissão para acessar esta solicitação."
+}
+```
+
 ##### Não Encontrado: `404 Not Found`
 
 ```json
@@ -506,6 +548,7 @@ Retorna um `SolicitacaoResponse` (mesmo formato do exemplo da seção 5.3). Para
 | Código | `erro`                                 | Formato de `detalhes`        |
 | :----- | :------------------------------------- | :--------------------------- |
 | `400`  | `Erro de validação nos dados enviados` | Array de `{campo, mensagem}` |
+| `403`  | `Acesso negado`                        | String                       |
 | `404`  | `Recurso não encontrado`               | String                       |
 | `409`  | `Conflito de dados`                    | String                       |
 | `422`  | `Regra de negócio violada`             | String                       |
@@ -515,12 +558,8 @@ Retorna um `SolicitacaoResponse` (mesmo formato do exemplo da seção 5.3). Para
 | Endpoint                | `campo`         | Condição                            | `mensagem`                                                                 |
 | :---------------------- | :-------------- | :---------------------------------- | :------------------------------------------------------------------------- |
 | `POST`                  | `orientadorId`  | Ausente                             | `O orientador é obrigatório.`                                              |
-| `POST`                  | `aluno`         | Ausente                             | `Os dados do aluno são obrigatórios.`                                      |
-| `POST`                  | `aluno.nome`    | Ausente ou em branco                | `O nome do aluno é obrigatório.`                                           |
-| `POST`                  | `aluno.nome`    | Fora de 3–100 caracteres            | `O nome deve ter entre 3 e 100 caracteres.`                                |
-| `POST`                  | `aluno.email`   | Ausente ou em branco                | `O e-mail é obrigatório.`                                                  |
-| `POST`                  | `aluno.email`   | Formato inválido                    | `Formato de e-mail inválido.`                                              |
-| `POST`                  | `aluno.curso`   | Ausente ou em branco                | `O curso é obrigatório.`                                                   |
+| `POST`                  | `curso`         | Ausente ou em branco                | `O curso do aluno é obrigatório.`                                          |
+| `POST`                  | `curso`         | Fora de 2–100 caracteres            | `O curso deve ter entre 2 e 100 caracteres.`                               |
 | `POST`                  | `tema`          | Ausente ou em branco                | `O tema é obrigatório.`                                                    |
 | `POST`                  | `tema`          | Fora de 5–150 caracteres            | `O tema deve ter entre 5 e 150 caracteres.`                                |
 | `POST`                  | `mensagem`      | Ausente ou em branco                | `A mensagem é obrigatória.`                                                |
@@ -529,6 +568,14 @@ Retorna um `SolicitacaoResponse` (mesmo formato do exemplo da seção 5.3). Para
 | `PATCH`                 | `justificativa` | `status=RECUSADA` sem justificativa | `A justificativa é obrigatória para recusar a solicitação.`                |
 | `PATCH`                 | `justificativa` | Fora de 10–500 caracteres           | `A justificativa deve ter entre 10 e 500 caracteres.`                      |
 | `PATCH` e `GET` (lista) | `status`        | Valor fora da enumeração            | `Status inválido. Valores aceitos: PENDENTE, ACEITA, RECUSADA, CANCELADA.` |
+
+### 6.2.1. `403 Forbidden`
+
+| Endpoint                            | Condição                                                                             | `detalhes`                                                                    |
+| :---------------------------------- | :----------------------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
+| `PATCH`                             | Usuário sem `ROLE_PROFESSOR` ou professor que não é o destinatário da solicitação    | `Somente o orientador destinatário pode aceitar ou recusar esta solicitação.` |
+| `GET /{id}`                         | Usuário autenticado que não é o aluno autor nem o orientador responsável             | `Você não tem permissão para acessar esta solicitação.`                       |
+| `GET .../orientador/{orientadorId}` | Usuário autenticado que não é o orientador correspondente ao identificador informado | `Você não tem permissão para acessar as solicitações deste orientador.`       |
 
 ### 6.3. `404 Not Found`
 
@@ -539,10 +586,11 @@ Retorna um `SolicitacaoResponse` (mesmo formato do exemplo da seção 5.3). Para
 
 ### 6.4. `409 Conflict`
 
-| Endpoint | Condição                                                       | `detalhes`                                                      |
-| :------- | :------------------------------------------------------------- | :-------------------------------------------------------------- |
-| `POST`   | Aluno já possui solicitação `PENDENTE` para o mesmo orientador | `Você já possui uma solicitação pendente para este orientador.` |
-| `PATCH`  | Solicitação com status diferente de `PENDENTE`                 | `Esta solicitação já foi respondida e não pode ser alterada.`   |
+| Endpoint | Condição                                                                  | `detalhes`                                                                                         |
+| :------- | :------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------- |
+| `POST`   | Aluno já possui solicitação `PENDENTE` para o mesmo orientador            | `Você já possui uma solicitação pendente para este orientador.`                                    |
+| `PATCH`  | Solicitação com status diferente de `PENDENTE`                            | `Esta solicitação já foi respondida e não pode ser alterada.`                                      |
+| `PATCH`  | Aceite em conflito com outra alteração simultânea do perfil do orientador | `Os dados foram alterados por outra operação ao mesmo tempo. Atualize a página e tente novamente.` |
 
 > **Removido na v1.1.0:** a regra "e-mail informado já pertence a um usuário
 > que não é aluno" foi retirada do escopo desta sprint (não estava coberta
@@ -582,13 +630,14 @@ Retorna um `SolicitacaoResponse` (mesmo formato do exemplo da seção 5.3). Para
 
 | #   | Decisão                                                                                                                                                                                       | Motivo                                                                         |
 | :-- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------- |
-| D1  | `POST` devolve `201` **com corpo** (`SolicitacaoResponse`) além do `Location`.                                                                                                                | O aluno não tem login; precisa do `id` para acompanhar o status.               |
-| D2  | Aluno existente (mesmo e-mail) é reaproveitado **sem** atualizar `nome`/`curso`.                                                                                                              | Evita sobrescrita de dados por terceiros sem autenticação.                     |
+| D1  | `POST` devolve `201` **com corpo** (`SolicitacaoResponse`) além do `Location`.                                                                                                                | O frontend precisa do `id` para acompanhar o status sem uma segunda chamada.   |
+| D2  | Aluno existente (mesmo e-mail do token) é reaproveitado **sem** atualizar `nome`/`curso`.                                                                                                     | O cadastro do aluno não é editado pelo fluxo de solicitação.                   |
+| D13 | O aluno é identificado pela claim `email` do JWT; nome e e-mail não fazem parte do corpo do `POST`.                                                                                           | Impede criar solicitações em nome de outra pessoa e contornar a duplicidade.   |
 | D3  | Tamanhos mínimos/máximos de `tema` (5–150), `mensagem` (10–1000) e `justificativa` (10–500).                                                                                                  | A #11 não define limites; valores adotados aqui e ajustáveis nas colunas.      |
 | D4  | `justificativa` enviada com `ACEITA` é ignorada (sem erro).                                                                                                                                   | Simplifica o frontend; evita 400 por dado irrelevante.                         |
 | D5  | Listagem ordenada por `criadoEm` decrescente, sem paginação.                                                                                                                                  | Consistente com a listagem de orientadores da US02.                            |
 | D6  | `CANCELADA` existe na enumeração, mas nenhum endpoint a define.                                                                                                                               | O plano da Sprint 2 lista o status, mas só descreve `ACEITA`/`RECUSADA`.       |
-| D7  | O acompanhamento do aluno é feito por `GET /{id}` (sem endpoint de listagem por aluno).                                                                                                       | Fora do escopo da sprint; o aluno não possui login (US01 postergada).          |
+| D7  | O acompanhamento do aluno é feito por `GET /{id}` (sem endpoint de listagem por aluno).                                                                                                       | Fora do escopo da sprint (decisão tomada antes da autenticação da US01).       |
 | D8  | O "painel" do orientador é a listagem `GET .../orientador/{id}?status=PENDENTE`, sem push, WebSocket ou e-mail. Não há observer de notificação - apenas `AtualizadorVagasObserver`, síncrono. | Confirmado pela equipe; atende ao cenário 1 da #11 dentro do escopo da sprint. |
 | D12 | A regra de e-mail de aluno coincidente com e-mail de orientador foi removida da v1.0 e não faz parte do escopo da Sprint 2.                                                                   | Sem critério de aceitação correspondente na #11; ver seção 12.                 |
 | D9  | O valor do status de aceite é `ACEITA`. A #11 deve ser corrigida ("Aprovado" → "Aceita").                                                                                                     | Confirmado pela equipe; alinha issue, plano da Sprint 2 e código.              |
@@ -607,7 +656,7 @@ Ao preparar este documento, foram encontradas diferenças entre o contrato da US
 ### 8.3. Limitações conhecidas
 
 - **Sem autenticação (US01 postergada):** qualquer cliente pode chamar `PATCH` como se fosse o orientador, e os `id` de solicitação são sequenciais e enumeráveis. Aceito para o MVP da Sprint 2 e deve constar em `docs/riscos.md`.
-- **Concorrência no aceite:** duas aceitações simultâneas da última vaga devem resultar em uma delas recebendo `422` (ou `409`, por conflito de versão). O backend deve fazer a verificação de vagas e o decremento dentro da mesma transação.
+- **Concorrência no aceite:** `PerfilOrientador` usa lock otimista (`@Version`). Quando dois aceites do mesmo orientador se sobrepõem, um retorna `200` e o outro `409`, mesmo que ainda haja vagas, e o orientador pode repetir a ação. Um aceite iniciado depois do commit do anterior já lê o valor atualizado e, sem vagas, recebe `422`.
 
 ---
 

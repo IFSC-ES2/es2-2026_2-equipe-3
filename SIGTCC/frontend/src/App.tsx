@@ -5,6 +5,8 @@ import { OrientadorListagemPage } from "./paginas/Orientadores";
 import { PainelSolicitacoesPage } from "./paginas/PainelSolicitacoes";
 import { SolicitarOrientacaoPage } from "./paginas/SolicitarOrientacao";
 import { AcompanharSolicitacaoPage } from "./paginas/AcompanharSolicitacao";
+import { SubmissaoEntregaPage } from "./paginas/SubmissaoEntrega";
+import { AvaliacaoEntregaPage } from "./paginas/AvaliacaoEntrega";
 import { LoginPage } from "./paginas/Login";
 import { ProtectedRoute } from "./auth/ProtectedRoute";
 import "./App.css";
@@ -49,7 +51,7 @@ function App() {
       <Route
         path="/solicitar/:orientadorId"
         element={
-          <ProtectedRoute>
+          <ProtectedRoute papelExigido="ROLE_ALUNO">
             <SolicitarOrientacaoPage />
           </ProtectedRoute>
         }
@@ -63,10 +65,18 @@ function App() {
         }
       />
       <Route
-        path="/painel-orientador/:orientadorId"
+        path="/minhas-entregas"
+        element={
+          <ProtectedRoute papelExigido="ROLE_ALUNO">
+            <SubmissaoEntregaPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/avaliar-entregas"
         element={
           <ProtectedRoute papelExigido="ROLE_PROFESSOR">
-            <PainelSolicitacoesPage />
+            <AvaliacaoEntregaPage />
           </ProtectedRoute>
         }
       />

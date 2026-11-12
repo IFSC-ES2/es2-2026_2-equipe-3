@@ -314,3 +314,247 @@ Todo o conteúdo, código e documentação gerados com o apoio da IA foram lidos
 #### Validação e Responsabilidade Técnica:
 
 Todo o conteúdo, código, configurações e documentação gerados ou revisados com o apoio da IA foram lidos, compreendidos, conferidos e validados pelo integrante antes da integração aos respectivos Pull Requests. A IA foi utilizada como ferramenta de apoio à análise, implementação, revisão e documentação, não substituindo a tomada de decisões técnicas. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
+
+---
+
+## Entrega 8 (Sprint 4):
+
+Em conformidade com as diretrizes da disciplina e visando garantir a transparência e a rastreabilidade exigidas, apresentamos as declarações de uso de Inteligência Artificial generativa referentes à Sprint 4 (23/10/2026 a 11/11/2026), organizadas por integrante responsável:
+
+---
+
+### Damares do Socorro Gonçalves Gaia (Arquiteta de Software)
+
+**Ferramenta utilizada:** Google Gemini (versão Advanced)  
+**Período:** 01/11/2026 a 10/11/2026
+
+#### Detalhamento de Usos por Artefato e Atividade:
+
+- **Modelagem da Entidade Entrega e Migração Flyway V6 (Issue #208 / PR #233):**
+  - **Data:** 04/11/2026.
+  - **Ferramenta:** Google Gemini Advanced.
+  - **Artefatos:** `V6__criar_tabela_entregas.sql`, `Entrega.java`, `StatusEntrega.java`, `EntregaRepository.java` e `EntregaRepositoryTest.java`.
+  - **Aproveitamento:** Auxílio na sintaxe DDL da tabela `entregas` com campo `url_documento VARCHAR(2048)`, enum `StatusEntrega`, constraint de unicidade por aluno/turma/tipo e estrutura inicial dos testes de repositório.
+  - **Adaptação/Descarte:** A Arquiteta ajustou as constraints de chave estrangeira com integridade referencial estrita e configurou os testes de repositório com validação de esquema Flyway.
+  - **Validação Técnica:** Execução dos testes automatizados e integração aprovada no **PR #233** em 04/11/2026.
+
+- **Modelagem da Entidade Parecer e Migração Flyway V7 (Issue #215 / PR #237):**
+  - **Data:** 05/11/2026 a 06/11/2026.
+  - **Ferramenta:** Google Gemini Advanced.
+  - **Artefatos:** `V7__criar_tabela_pareceres.sql`, `Parecer.java`, `ParecerRepository.java` e `ParecerRepositoryTest.java`.
+  - **Aproveitamento:** Auxílio na estruturação inicial da entidade JPA `Parecer`, na sintaxe DDL do script Flyway com integridade referencial para `entregas` e `orientadores`, e no esqueleto da classe de repositório Spring Data JPA.
+  - **Adaptação/Descarte:** A Arquiteta realizou a correção manual de incompatibilidade da suíte `@DataJpaTest` com H2 (`DATETIME` não reconhecido em modo padrão). Configurou explicitamente `@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)` e `MODE=MySQL`, habilitando a execução das migrações reais Flyway (`V1` a `V7`) com validação de esquema estrita (`spring.jpa.hibernate.ddl-auto=validate`) para atender ao Achado A6 da Entrega 6.
+  - **Validação Técnica:** Commit `de2f00f` em 05/11/2026, execução dos testes no CI e merge no **PR #237** em 06/11/2026.
+
+- **Consolidação de Arquitetura, Padrões de Projeto e ADRs (Issue #239):**
+  - **Data:** 06/11/2026 a 07/11/2026.
+  - **Ferramenta:** Google Gemini Advanced.
+  - **Artefatos:** `docs/ARQUITETURA.md`, `docs/PADROES-DE-PROJETO.md`, `docs/diagramas/c1-contexto.md`, `docs/diagramas/c2-conteineres.md` e ADRs (`ADR-0007`, `ADR-0008`, `ADR-0009`, `ADR-0012` e `ADR-0013`).
+  - **Aproveitamento:** Apoio na estruturação da documentação arquitetural para o marco `v0.4.0` (Sprint 4), formatação de tabelas comparativas, alinhamento de diagramas C4 em sintaxe Mermaid e formatação geral em Markdown.
+  - **Adaptação/Descarte:** Foram descartadas classes não existentes no código real (`SolicitacaoContexto`, `LogAuditoriaObserver`) e atualizados os nomes de pacotes e classes de validação e eventos para refletir a implementação do backend (`validation.ValidacaoSolicitacaoOrientacao` e `observer.AtualizadorVagasObserver`), sanando o Achado A7 da Entrega 6. Todos os links absolutos (`file:///`) foram convertidos manualmente para links relativos (Achado A12). Foi documentada a evolução Flyway até `V8` e a mitigação de condições de corrida via bloqueio otimista (`@Version` em `PerfilOrientador`).
+  - **Validação Técnica:** Commits `d1791f1`, `4f393c1` e `ba37f58` em 06/11/2026; commits `a8fbf50`, `6be30e6`, `f66790e` e `e3e54b5` em 07/11/2026; abertura e submissão do **PR #245** em 10/11/2026.
+
+- **Revisão Técnica Qualificada de Pull Requests (PR #238, PR #240 e PR #243):**
+  - **Data:** 05/11/2026 a 10/11/2026.
+  - **Ferramenta:** Google Gemini Advanced.
+  - **Artefatos:** PR #238 (`docs/219-atualiza-ci`), PR #240 (`feature/210-consulta-submissao`) e PR #243 (`docs/221-criar-documento-deploy`).
+  - **Aproveitamento:** Utilização da IA para inspeção estática comparativa de diffs contra branch base e conferência cruzada entre contratos de dados, arquivos Compose e documentação operacional.
+  - **Adaptação/Descarte:** Todas as solicitações de alteração foram validadas pela Arquiteta: no PR #238 (05/11) exigiu o alinhamento de tags minúsculas no GHCR, `KC_HTTP_ENABLED` e `validate` no `docker-compose.prod.yml`; no PR #240 (06/11 e 09/11) verificou a aderência ao contrato US06 e autorizações de segurança; no PR #243 (10/11) apontou o alinhamento da variável `KEYCLOAK_PUBLIC_URL` e smoke test.
+  - **Validação Técnica:** Acompanhamento das correções submetidas pelos autores e aprovação formal registrada nos Pull Requests correspondentes.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo técnico, código, migrações Flyway, diagramas C4, especificações de padrões de projeto e decisões de arquitetura gerados ou refinados com o apoio da IA foram minuciosamente lidos, compreendidos, testados contra a base de dados MySQL/H2 e validados pela Arquiteta de Software responsável. A integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
+
+---
+
+### Eduardo Cardoso Oliveira (Engenheiro de DevOps / Infraestrutura)
+
+**Ferramentas utilizadas:** Google Gemini e Claude (Anthropic)  
+**Período:** 04/11/2026 a 11/11/2026
+
+**Contexto da atuação:** Na Sprint 4, o integrante atuou em seu papel titular de Engenheiro de DevOps e Infraestrutura, conduzindo a configuração de variáveis e validação de links (US06), a evolução do pipeline de CI com build multi-stage e publicação no GHCR, o provisionamento do ambiente de staging acessível via Cloudflare Tunnels, a elaboração do guia oficial de deploy (`docs/DEPLOY.md`), além do fechamento de governança de sua responsabilidade (métrica M-04, riscos R05 e R10, contribuições individuais e declaração de uso de IA). Em todas as entregas, a IA foi empregada como ferramenta de apoio na estruturação técnica, rascunhos de workflows/compose, coleta estatística automatizada e formatação Markdown; todas as configurações de ambiente, fluxos de autenticação e comandos foram executados e validados manualmente em ambiente local e de staging antes da integração.
+
+- **Validação de links e variáveis de ambiente da US06 (Issue #218):**
+  - **Data:** 04/11/2026.
+  - **Ferramenta:** Claude (Anthropic) e Google Gemini.
+  - **Artefatos:** `application.properties`, `.env.example`, `SecurityConfig.java`, testes de validação HTTPS/CORS, `docs/ARQUITETURA.md` e `docs/qualidade.md`.
+  - **Prompts utilizados:**
+    - "Configure a propriedade `APP_SUBMISSAO_DOMINIOS_SUGERIDOS` no `application.properties` e no `.env.example`, garantindo propagação limpa para o backend sem adicionar volumes ou serviços extras no compose."
+    - "Ajuste as regras do `SecurityConfig` para restringir o endpoint `/api/v1/entregas/**` a usuários com `ROLE_ALUNO` e gere testes cobrindo validação de URL HTTPS e CORS."
+  - **Aproveitamento:** Estruturação inicial da configuração de propriedades, ajuste das regras de segurança de rota e esqueleto dos testes automatizados.
+  - **Adaptação/Descarte:** Remoção manual de artefatos de persistência que pertenciam à Issue #216 (`4c342cd`), ajuste da rota `/api/v1/entregas` e definição manual do valor padrão dos domínios sugeridos (`7b5120a`).
+  - **Validação Técnica:** Execução local das suítes de testes e checks do pipeline; integrado via **PR #235**.
+
+- **Pipeline de CI para `entrega-8` com publicação de imagens no GHCR (Issue #219):**
+  - **Data:** 05/11/2026.
+  - **Ferramenta:** Claude (Anthropic) e Google Gemini.
+  - **Artefatos:** `.github/workflows/docker-build.yml`, `docs/ci.md` e `.github/PULL_REQUEST_TEMPLATE.md`.
+  - **Prompts utilizados:**
+    - "Crie um rascunho de workflow `docker-build.yml` no GitHub Actions para a branch `entrega-8` que execute os testes unitários antes do build e publique as imagens Docker multi-stage de backend e frontend no GHCR com cache `type=gha` e tags `latest` e SHA, trazendo comentários de melhores formas de implementá-lo e aprimorá-lo."
+    - "Atualize o `docs/ci.md` para refletir os gatilhos reais, estratégia de cache e quality gates da Sprint 4."
+  - **Aproveitamento:** Estrutura base do workflow Docker Buildx com autenticação no GHCR, cache nativo do GitHub Actions e revisão textual de `docs/ci.md`.
+  - **Adaptação/Descarte:** Isolamento manual dos jobs de testes via diretiva `needs` (`931640c`), correção manual de variáveis de ambiente do workflow e alinhamento de tags em letras minúsculas conforme apontamentos da revisão técnica da Arquiteta.
+  - **Validação Técnica:** Execução completa com sucesso no GitHub Actions; integrado via **PR #238**.
+
+- **Provisionamento e configuração do ambiente de staging acessível (Issue #220):**
+  - **Data:** 09/11/2026 a 10/11/2026.
+  - **Ferramenta:** Claude (Anthropic) e Google Gemini.
+  - **Artefatos:** `SIGTCC/docker-compose.prod.yml`, `docs/staging.md` e `.env.example`.
+  - **Prompts utilizados:**
+    - "Estruture o `SIGTCC/docker-compose.prod.yml` consumindo as imagens do GHCR com variáveis configuráveis de issuer do Keycloak (`KEYCLOAK_PUBLIC_URL`), `KC_HTTP_ENABLED` e `hibernate.ddl-auto=validate`."
+    - "Monte um roteiro de smoke test via cURL/API para validar o ambiente de staging após o deploy, incluindo verificação de HTTP 400 ao enviar link `http://` inválido na US06."
+  - **Aproveitamento:** Base da orquestração Docker de produção/staging e estruturação do roteiro executável de smoke test por API.
+  - **Adaptação/Descarte:** Configuração manual em campo do tunelamento via **Cloudflare Tunnels** (`staging.sigtcc.online`), substituição de `KEYCLOAK_HOSTNAME` por `KEYCLOAK_PUBLIC_URL` (`886f706`), configuração de `webOrigins` no Keycloak e padronização do nome do arquivo para `docs/staging.md` (`f7675c3`).
+  - **Validação Técnica:** Subida dos contêineres na VPS, validação de acesso HTTPS externo e execução do smoke test completo; integrado via **PR #244**.
+
+- **Guia oficial de deploy e consolidação do `.env.example` (Issue #221):**
+  - **Data:** 09/11/2026 a 11/11/2026.
+  - **Ferramenta:** Claude (Anthropic) e Google Gemini.
+  - **Artefatos:** `docs/DEPLOY.md` e `.env.example`.
+  - **Prompts utilizados:**
+    - "Me ajude a elaborar a estrutura do guia oficial `docs/DEPLOY.md` contendo pré-requisitos, passo a passo de deploy local e em staging a partir do zero, documentação das variáveis do `.env.example`, smoke test e plano de rollback."
+  - **Aproveitamento:** Organização estrutural da documentação, padronização das tabelas de referência de variáveis e formatação Markdown.
+  - **Adaptação/Descarte:** Conferência e ajuste manual dos comandos de rollback, correção de links relativos para `staging.md` (`f711b62`) e atendimento às duas iterações de revisão da Arquiteta de Software (`cc4e8d6`, `0a0809c`).
+  - **Validação Técnica:** Revisão cruzada dos comandos de deploy e validação com Prettier; integrado via **PR #243**.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, scripts de infraestrutura, workflows de CI/CD, arquivos de composição Docker, código e documentação gerados ou estruturados com o apoio da IA foram lidos, executados, testados localmente e em ambiente de staging pelo integrante antes da integração aos respectivos Pull Requests. Assumo total responsabilidade técnica e acadêmica pelas decisões de infraestrutura, segurança e pelos artefatos entregues.
+
+---
+
+### Talles Souza da Cruz (Desenvolvedor Backend)
+
+**Ferramenta utilizada:** Claude (Anthropic)  
+**Período:** 01/11/2026 a 11/11/2026
+
+#### Detalhamento de Usos por Artefato e Atividade:
+
+- **Identificação e Correção de Defeitos (Issues #199 a #206):**
+  - **Data:** 30/10/2026 a 07/11/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Artefatos:** relatório interno de bugs (não versionado); `SecurityConfig.java`, `OrientadorService.java`, `SolicitacaoService.java`, `PerfilOrientador.java`, `GlobalExceptionHandler.java` e a migração `V8__adicionar_versao_perfil_orientador.sql`; no frontend, `SolicitacaoForm` e `OrientadorEdicao`; contratos de dados da US02 e da US04; e os testes correspondentes.
+  - **Aproveitamento:** Apoio na revisão estática do sistema, que registrou 22 possíveis defeitos classificados por severidade, e na correção dos defeitos sob responsabilidade do integrante: restrição da escrita de orientadores ao próprio professor (#200), identificação do aluno pelo usuário autenticado (#201), remoção da dependência do `localStorage` em "Meu perfil" (#204) e condição de corrida no controle de vagas (#206), além da escrita dos testes e de roteiros de teste manual.
+  - **Adaptação/Descarte:** Cada defeito foi conferido manualmente no código, e os 8 mais graves viraram as issues #199 a #206. Na #206, o integrante escolheu o lock otimista (`@Version`) em vez da trava pessimista, porque a issue exigia `409` no aceite concorrente, e deixou para uma issue separada o caso de aceite e recusa simultâneos.
+  - **Validação Técnica:** Execução local das suítes do backend e do frontend; na #206, o teste de concorrência falhou antes da correção e passou depois, e o teste manual com MySQL real resultou em 1 aceite e 4 conflitos para 1 vaga. Revisão e aprovação nos **PRs #211, #213, #217 e #241**.
+
+- **Implementação das APIs de Submissão e Avaliação de Entregas (US06 e US07 - Issues #209, #216, #210 e #215):**
+  - **Data:** 04/11/2026 a 06/11/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Artefatos:** `docs/contrato-dados-us06.md`, `docs/contrato-dados-us07.md`, DTOs de entrega e parecer, `Entrega.java`, `EntregaRepository.java`, `EntregaService.java`, `EntregaController.java`, `SecurityConfig.java`, `EntregaServiceTest.java` e `EntregaControllerIntegrationTest.java`.
+  - **Aproveitamento:** Apoio no detalhamento das roles e respostas de erro nos contratos, na implementação da submissão por link (`POST /api/v1/entregas`), das consultas para orientador e aluno (`GET /orientador`, `/minhas` e `/{id}`) e do registro de parecer (`POST /{id}/parecer`, com trava pessimista contra pareceres simultâneos), e na escrita dos testes unitários e de integração.
+  - **Adaptação/Descarte:** O código foi conferido contra os contratos e adaptado aos padrões do projeto (camadas, DTOs, exceções de domínio e `Clock` injetável). Decisões tomadas pelo integrante: verificar o conflito de estado (`409`) antes da regra de negócio (`422`) e representar "aprovado com ressalvas" como `APROVADO` com comentário, conforme a decisão D7 do contrato da US07.
+  - **Validação Técnica:** Execução local do `./gradlew build` e teste manual com MySQL e Keycloak reais do fluxo completo de submissão, ajustes, reenvio e aprovação; de 8 pareceres simultâneos, apenas 1 foi gravado. Revisão e aprovação nos **PRs #234, #236, #240 e #237**.
+
+- **Revisão de Pull Requests (PRs #212, #214, #232, #235, #238 e #246):**
+  - **Data:** 02/11/2026 a 11/11/2026.
+  - **Ferramenta:** Claude (Anthropic).
+  - **Aproveitamento:** Apoio na leitura dos diffs e na conferência das alterações contra os contratos de dados, as issues e os padrões do projeto.
+  - **Adaptação/Descarte:** Os apontamentos sugeridos foram conferidos pelo integrante antes de serem considerados na revisão.
+  - **Validação Técnica:** Aprovação e integração dos PRs à `entrega-8` após a conferência do CI.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código e documentação gerados com o apoio da IA foram lidos, compreendidos, executados, testados e revisados pelo integrante antes da integração aos respectivos pull requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
+
+---
+
+### Marcus Jhuan Epifanio Lima (Designer UX/UI / Frontend)
+
+Apoio no planejamento e estruturação das funcionalidades US06 e US07:
+
+Data: Durante a Sprint 4.
+
+Ferramenta: GitHub Copilot.
+
+Artefato: Funcionalidades de submissão do aluno e avaliação do orientador.
+
+Aproveitamento: Apoio na organização das etapas de desenvolvimento, estruturação das funcionalidades e elaboração de mapas mentais para orientar a implementação.
+
+Adaptação/Descarte: As sugestões foram analisadas e adaptadas conforme os requisitos e a estrutura existente no projeto.
+
+Validação Técnica: Revisão das decisões e validação das funcionalidades durante o desenvolvimento.
+
+Apoio na identificação e resolução de problemas (Debug):
+
+Data: Durante a Sprint 4.
+
+Ferramenta: GitHub Copilot.
+
+Artefato: Componentes, serviços e integração com a API das funcionalidades US06 e US07.
+
+Aproveitamento: Apoio na análise de erros, investigação de possíveis causas e identificação de alternativas para solucionar problemas encontrados durante o desenvolvimento.
+
+Adaptação/Descarte: As sugestões foram avaliadas conforme o comportamento esperado das funcionalidades e o contexto do projeto.
+
+Validação Técnica: Verificação das soluções por meio da execução da aplicação e análise dos resultados.
+
+Apoio na elaboração e análise de testes:
+
+Data: Durante a Sprint 4.
+
+Ferramenta: GitHub Copilot.
+
+Artefato: Testes relacionados às funcionalidades US06 e US07.
+
+Aproveitamento: Apoio na identificação de cenários de teste, análise de casos de sucesso e falha e interpretação dos resultados das execuções.
+
+Adaptação/Descarte: Os cenários foram revisados conforme os requisitos das funcionalidades.
+
+Validação Técnica: Conferência dos resultados das execuções e verificação do comportamento esperado da aplicação.
+
+---
+
+## Willian Ferreira dos Santos (Scrum Master / Engenheiro de Qualidade - QA)
+
+**Ferramenta utilizada:** ChatGPT (OpenAI)  
+**Período:** 03/11/2026 a 11/11/2026
+
+#### Detalhamento de Usos por Artefato e Atividade:
+
+- **Planejamento e organização da Sprint 4 (Issue #207 / PR #232):**
+  - **Data:** 03/11/2026 a 04/11/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefato:** `docs/entregas/sprint-4.md`.
+  - **Aproveitamento:** Apoio na estruturação do documento de planejamento da Sprint 4, incluindo a definição da meta, organização do escopo das User Stories US06 e US07, detalhamento das atividades, identificação de dependências e riscos e organização das issues necessárias para a execução da sprint.
+  - **Adaptação/Descarte:** As sugestões foram avaliadas e ajustadas conforme as decisões tomadas pela equipe. A definição do escopo da sprint, a priorização das funcionalidades e a distribuição das responsabilidades permaneceram sob responsabilidade dos integrantes.
+  - **Validação Técnica:** Revisão do documento de planejamento, conferência das informações com as issues do GitHub e integração por meio do **PR #232**.
+
+- **Correção de falha de autorização nos endpoints de consulta de solicitações (Issue #202 / PR #224):**
+  - **Data:** 03/11/2026 a 04/11/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefatos:** `SolicitacaoController`, `SolicitacaoService` e testes automatizados relacionados aos endpoints de consulta de solicitações.
+  - **Aproveitamento:** Apoio na análise da falha de controle de acesso que permitia a usuários autenticados consultar solicitações de outros usuários. A IA auxiliou na definição da lógica de autorização para garantir que somente o aluno autor da solicitação e o orientador vinculado pudessem consultar uma solicitação individual. Também auxiliou na análise da restrição do endpoint de listagem de solicitações por orientador, garantindo que o usuário autenticado pudesse consultar somente as solicitações vinculadas ao próprio perfil.
+  - **Adaptação/Descarte:** As sugestões foram adaptadas à estrutura de autenticação e autorização já existente no backend. As verificações foram ajustadas para considerar o usuário autenticado e os relacionamentos efetivamente cadastrados no sistema, evitando confiar exclusivamente em identificadores informados pela requisição.
+  - **Validação Técnica:** Execução dos testes automatizados relacionados à autorização e revisão do comportamento dos endpoints para os cenários permitidos e não permitidos. Alterações integradas por meio do **PR #224**.
+
+- **Elaboração e validação de testes de integração da US06 - Submissão de Entregas (Issue #228 / PR #246):**
+  - **Data:** 10/11/2026 a 11/11/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefatos:** Testes de integração do backend relacionados ao fluxo de submissão de entregas da US06.
+  - **Aproveitamento:** Apoio na análise dos critérios de aceitação e do contrato de dados da US06, na identificação de cenários relevantes para os testes de integração e na investigação de problemas encontrados durante a execução da suíte.
+  - **Adaptação/Descarte:** Os cenários e sugestões foram conferidos com os requisitos da US06, o contrato de dados e a implementação existente. Os ajustes necessários foram realizados considerando o comportamento real da aplicação.
+  - **Validação Técnica:** Execução local dos testes de integração e conferência dos resultados antes da submissão do **PR #246**, relacionado à Issue #228.
+
+- **Elaboração e validação de testes de integração da US07 - Avaliação de Entregas (Issue #229 / PR #247):**
+  - **Data:** 10/11/2026 a 11/11/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefatos:** `EntregaControllerIntegrationTest` e demais testes de integração relacionados ao fluxo de avaliação de entregas da US07.
+  - **Aproveitamento:** Apoio na identificação, estruturação e revisão dos cenários de integração do fluxo de avaliação pelo orientador. Foram analisados cenários de autorização, validação de dados obrigatórios, transições de estado e comportamento do sistema após a emissão de um parecer.
+  - **Adaptação/Descarte:** Os cenários foram ajustados conforme as regras de negócio e o contrato de dados da US07. Foram considerados, entre outros, os casos de acesso permitido pelo orientador vinculado, bloqueio de acesso por orientador não vinculado, validação de comentário obrigatório, impedimento de nova avaliação após decisão definitiva e comportamento do fluxo de reenvio após solicitação de ajustes.
+  - **Validação Técnica:** Execução local dos testes de integração do backend, com aprovação de todos os testes executados. A implementação foi submetida por meio do **PR #247**, relacionado à Issue #229, e integrada à branch `entrega-8`.
+
+- **Apoio na resolução de problemas de testes, Git e documentação:**
+  - **Data:** 03/11/2026 a 11/11/2026.
+  - **Ferramenta:** ChatGPT (OpenAI).
+  - **Artefatos:** Código-fonte do backend, testes automatizados, arquivos de configuração e documentação Markdown do projeto.
+  - **Aproveitamento:** Apoio na interpretação de mensagens de erro, análise de resultados de testes, revisão de comandos Git, organização de alterações e conferência de documentos relacionados às atividades da sprint.
+  - **Adaptação/Descarte:** As orientações foram utilizadas como sugestões e conferidas com o estado real do repositório, com os resultados dos comandos executados e com as regras de versionamento e governança estabelecidas pela equipe.
+  - **Validação Técnica:** Execução dos comandos e testes localmente, conferência dos resultados e revisão manual das alterações antes de sua integração.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. As sugestões foram utilizadas como apoio ao planejamento, à implementação, à análise de requisitos, à elaboração de testes e à revisão técnica, sem substituir a tomada de decisões ou a responsabilidade do integrante. Os testes automatizados foram executados localmente para verificar o comportamento das funcionalidades e a consistência das alterações com os contratos de dados e critérios de aceitação do projeto.
+
+O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto, pelas alterações realizadas e pelos artefatos entregues.

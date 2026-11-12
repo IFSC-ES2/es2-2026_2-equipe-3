@@ -12,13 +12,13 @@
 
 Os papéis foram revistos a cada sprint. O papel de Scrum Master é rotativo.
 
-| Integrante                        | Sprint 1 (Entrega 5)                        | Sprint 2 (Entrega 6)                     | Sprint 3 (Entrega 7)                     |
-| :-------------------------------- | :------------------------------------------ | :--------------------------------------- | :--------------------------------------- |
-| Damares do Socorro Gonçalves Gaia | Arquiteta de Software                       | **Scrum Master** e Arquiteta de Software | Arquiteta de Software                    |
-| Eduardo Cardoso Oliveira          | **Scrum Master** e Engenheiro de Requisitos | Engenheiro de Requisitos                 | Engenheiro de Qualidade (QA)             |
-| Marcus Jhuan Epifanio Lima        | Designer de UX/UI                           | Designer de UX/UI                        | Designer de UX/UI                        |
-| Talles Souza da Cruz              | Engenheiro de Qualidade (QA)                | Engenheiro de Qualidade (QA)             | **Scrum Master** e Desenvolvedor Backend |
-| Willian Ferreira dos Santos       | DevOps/Infra                                | DevOps/Infra                             | DevOps/Infra                             |
+| Integrante                        | Sprint 1 (Entrega 5)                        | Sprint 2 (Entrega 6)                     | Sprint 3 (Entrega 7)                     | Sprint 4 (Entrega 8)                            |
+| :-------------------------------- | :------------------------------------------ | :--------------------------------------- | :--------------------------------------- | :---------------------------------------------- |
+| Damares do Socorro Gonçalves Gaia | Arquiteta de Software                       | **Scrum Master** e Arquiteta de Software | Arquiteta de Software                    | Arquiteta de Software e Desenvolvedora Backend  |
+| Eduardo Cardoso Oliveira          | **Scrum Master** e Engenheiro de Requisitos | Engenheiro de Requisitos                 | Engenheiro de Qualidade (QA)             | DevOps/Infraestrutura                           |
+| Marcus Jhuan Epifanio Lima        | Designer de UX/UI                           | Designer de UX/UI                        | Designer de UX/UI                        | Desenvolvedor Frontend                          |
+| Talles Souza da Cruz              | Engenheiro de Qualidade (QA)                | Engenheiro de Qualidade (QA)             | **Scrum Master** e Desenvolvedor Backend | Desenvolvedor Backend                           |
+| Willian Ferreira dos Santos       | DevOps/Infra                                | DevOps/Infra                             | DevOps/Infra                             | **Scrum Master** e Engenheiro de Qualidade (QA) |
 
 ## 2. Definição e Contextualização do Tema
 
@@ -206,9 +206,52 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 - **Sem notificações:** Continua não havendo envio de e-mail, notificação push ou WebSocket para novas solicitações, respostas ou prazos próximos.
 - **Débitos técnicos registrados:** Validações pendentes do contrato da US04 e ausência de teste de integração ponta a ponta, conforme a seção 2.2 de [`docs/entregas/sprint-3.md`](docs/entregas/sprint-3.md).
 
-## 10. Como executar o aplicativo
+## 10. Entrega 8: Submissão de Entregas, Avaliação e Ambiente de Staging (Sprint 4)
 
-Para facilitar a execução dos ambientes de frontend, backend e banco de dados simultaneamente, o projeto está configurado com Docker Compose.
+Nesta etapa, concluímos o fluxo de acompanhamento do TCC previsto para o MVP, com a submissão de entregas por link externo HTTPS pelo aluno (US06) e a avaliação com parecer pelo orientador (US07). A sprint também consolidou oito correções de autorização e sessão, controle de concorrência nas vagas e nos pareceres, atualização da documentação de arquitetura e padrões de projeto, guia de deploy e configuração do ambiente de _staging_.
+
+- **[Relatório de Fechamento da Sprint 4](docs/entregas/sprint-4.md):** Planejamento, correções de bugs, Pull Requests mesclados, retrospectiva, incremento entregue e contribuições individuais.
+- **Contratos de Dados da API:** [US06 - Submissão de Entregas](docs/contrato-dados-us06.md) e [US07 - Avaliação e Parecer](docs/contrato-dados-us07.md).
+- **[Guia de Deploy e Staging](docs/DEPLOY.md):** Consolidação do `.env.example`, execução em ambiente local e _staging_ (`docker-compose.prod.yml` + Cloudflare Tunnel) e estratégia de _rollback_.
+- **[Documento de Arquitetura](docs/ARQUITETURA.md) e [Padrões de Projeto](docs/PADROES-DE-PROJETO.md):** Atualizações da Sprint 4 para o módulo de entregas, pareceres e controle concorrente.
+- **[Riscos do Projeto](docs/riscos.md):** Revisão dos riscos ao final da Sprint 4 (incluindo os riscos R11, R12 e R13).
+- **[Integração Contínua (CI)](docs/ci.md):** Pipeline atualizado para a `entrega-8` e workflow de build Docker (`docker-build.yml`).
+- **[Plano de Medição e Métricas](docs/METRICAS.md):** Fichas técnicas de [M-01](docs/metricas/M-01.md) a [M-06](docs/metricas/M-06.md).
+- **[Declaração de Uso de IA](USO-IA.md):** Registro da utilização de ferramentas de IA na Sprint 4.
+- **Release:** `v0.4.0` (planejada após a integração da `entrega-8` na `main`).
+
+### 10.1. O que funciona no MVP ao final da Sprint 4
+
+- **Submissão de entregas por link externo (US06):** Alunos com vínculo aceito (`ROLE_ALUNO`) submetem um link HTTPS para `PROJETO_TCC`, `TCC_1` ou `TCC_2` na rota `/minhas-entregas` (`POST /api/v1/entregas`), conforme a [`ADR-0013`](docs/adrs/ADR-0013.md), com detecção automática de envio em atraso e suporte a reenvio quando o parecer solicita ajustes.
+- **Acompanhamento do status pelo aluno (US07):** O painel do aluno exibe as entregas submetidas, status (`SUBMETIDO`, `AJUSTES_NECESSARIOS`, `APROVADO`, `REPROVADO`), indicador de atraso e comentário do orientador via `GET /api/v1/entregas/minhas` e `GET /api/v1/entregas/{id}`.
+- **Avaliação e parecer pelo orientador (US07):** Professores vinculados (`ROLE_PROFESSOR`) listam as entregas dos orientandos na rota `/avaliar-entregas` (`GET /api/v1/entregas/orientador`), acessam o link do documento externo e registram parecer (`APROVADO`, `AJUSTES_NECESSARIOS` ou `REPROVADO`, com comentário obrigatório nos dois últimos casos) via `POST /api/v1/entregas/{id}/parecer`.
+- **Segurança, sessão e concorrência:** Correção de falhas de autorização e isolamento de dados entre usuários (`#199` a `#204`), renovação automática de token (`#205`), controle de concorrência otimista (`@Version`) nas vagas do orientador (`#206`) e trava pessimista (`PESSIMISTIC_WRITE`) no registro de parecer (`#215`).
+- **Infraestrutura de staging e testes de integração:** Disponibilização de `SIGTCC/docker-compose.prod.yml` e ampliação dos cenários automatizados de integração no backend e de testes unitários no frontend para US06 e US07.
+
+### 10.2. Endpoints da API adicionados na Sprint 4
+
+| Método | Rota                            | Descrição                                                                                         | Sucesso                  | Quem usa                                |
+| :----- | :------------------------------ | :------------------------------------------------------------------------------------------------ | :----------------------- | :-------------------------------------- |
+| `POST` | `/api/v1/entregas`              | Submete link HTTPS para etapa do TCC ou reenvia entrega com status `AJUSTES_NECESSARIOS`.         | `201 Created` / `200 OK` | Aluno (`ROLE_ALUNO`)                    |
+| `GET`  | `/api/v1/entregas/minhas`       | Lista as entregas submetidas pelo aluno autenticado na turma vigente.                             | `200 OK`                 | Aluno (`ROLE_ALUNO`)                    |
+| `GET`  | `/api/v1/entregas/orientador`   | Lista as entregas dos orientandos vinculados ao professor autenticado (filtro opcional `status`). | `200 OK`                 | Orientador (`ROLE_PROFESSOR`)           |
+| `GET`  | `/api/v1/entregas/{id}`         | Detalha uma entrega específica (restrito ao aluno autor ou ao orientador vinculado).              | `200 OK`                 | Aluno autor ou Orientador vinculado     |
+| `POST` | `/api/v1/entregas/{id}/parecer` | Registra parecer (`APROVADO`, `AJUSTES_NECESSARIOS` ou `REPROVADO`) em uma entrega submetida.     | `200 OK`                 | Orientador vinculado (`ROLE_PROFESSOR`) |
+
+Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificação completa de payloads, validações e códigos de erro (`400`, `401`, `403`, `409`, `422`) em [`docs/contrato-dados-us06.md`](docs/contrato-dados-us06.md) e [`docs/contrato-dados-us07.md`](docs/contrato-dados-us07.md).
+
+### 10.3. Limitações Conhecidas e Escopo Postergado
+
+- **US08 (Agendamento de bancas de defesa) postergada:** Conforme registrado na seção 10.4 de [`docs/entregas/sprint-4.md`](docs/entregas/sprint-4.md), a US08 foi mantida no backlog para preservar o prazo e a validação das entregas US06 e US07 e das oito correções de bugs.
+- **Reenvio sem histórico de links:** Quando o aluno reenvia uma entrega após parecer `AJUSTES_NECESSARIOS`, o novo `urlDocumento` substitui o anterior; o conteúdo externo hospedado fora do sistema segue sob responsabilidade do autor (`R11` e `R12` em [`docs/riscos.md`](docs/riscos.md)).
+- **Sem notificações automáticas:** Não há envio de e-mail, push ou WebSocket quando uma entrega é submetida ou avaliada; o acompanhamento ocorre pelos painéis da aplicação.
+- **Autenticação via Direct Access Grant:** Permanece o fluxo descrito na [`ADR-0014`](docs/adrs/ADR-0014.md), agora com renovação de token tratada no cliente HTTP.
+
+## 11. Como executar o aplicativo
+
+Para facilitar a execução dos ambientes de frontend, backend, Keycloak e banco de dados simultaneamente, o projeto está configurado com Docker Compose.
+
+> **Documentação de Deploy e Staging:** Para instruções detalhadas sobre variáveis de ambiente (`.env.example`), execução do ambiente de _staging_ (com `docker-compose.prod.yml` e túneis Cloudflare), estratégia de _rollback_ e limitações conhecidas, consulte o **[Guia de Deploy e Staging (`docs/DEPLOY.md`)](docs/DEPLOY.md)**.
 
 ### Pré-requisitos
 
@@ -219,19 +262,19 @@ Certifique-se de ter instalado em sua máquina:
 
 ### Passo a Passo
 
-1. Clone o repositório e acesse a pasta raiz do projeto:
+1. Clone o repositório, crie o arquivo `.env` a partir do `.env.example` e acesse a pasta `SIGTCC`:
 
 ```bash
 git clone https://github.com/IFSC-ES2/es2-2026_2-equipe-3.git
-cd es2-2026_2-equipe-3/SIGTCC
-
+cd es2-2026_2-equipe-3
+cp .env.example SIGTCC/.env
+cd SIGTCC
 ```
 
 2. Construa as imagens e suba os contêineres:
 
 ```bash
-docker-compose up
-
+docker compose up
 ```
 
 3. Acesse a aplicação no seu navegador:
@@ -266,7 +309,7 @@ docker compose down
 
 ```
 
-## 11. Como executar os testes unitários
+## 12. Como executar os testes unitários
 
 O projeto possui suítes de testes isoladas para as camadas de frontend e backend. Certifique-se de abrir o terminal e navegar para a pasta correspondente antes de executar os comandos.
 
