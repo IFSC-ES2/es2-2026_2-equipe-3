@@ -88,7 +88,7 @@ Durante o processo de estimativa, a equipe identificou as seguintes limitações
 2. **Definição dos Contratos de API:** Ajustes nos DTOs de entrada e saída entre backend e frontend durante o desenvolvimento podem exigir pequenas refatorações não previstas nas USs iniciais.
 3. **Disponibilidade e Trabalho Assíncrono:** A restrição de tempo dos integrantes decorrente de jornadas de trabalho em horário comercial impõe a necessidade de um fluxo rigoroso de testes e Code Reviews assíncronos, o que pode diluir o tempo de conclusão de cada SP ao longo da semana.
 
---- 
+---
 
 ## 6. Justificativa de não participação
 
