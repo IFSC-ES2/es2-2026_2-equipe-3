@@ -139,28 +139,309 @@ A revisão completa dos riscos será registrada em [`docs/riscos.md`](../riscos.
 
 ## 7. Andamento das Atividades
 
-> Seção a ser preenchida ao longo da sprint pelo Scrum Master, com o registro de impedimentos, replanejamentos e atualizações relevantes do board.
-
 - 03/11/2026: Sprint iniciada. Planejamento inicial registrado (seções 1 a 6). Issues de implementação, infraestrutura, QA e governança organizadas no board.
+
+### 7.1. Correções de Bugs
+
+Além das atividades previstas no escopo inicial das US06 e US07, a Sprint 4 também contemplou a resolução de bugs identificados no sistema e registrados em issues específicas no GitHub. Essas correções foram planejadas para o período de 03/11/2026, com início e data-alvo definidos para o mesmo dia, e integradas à branch `entrega-8` por meio de Pull Requests.
+
+As correções abrangeram problemas relacionados à autorização, ao controle de acesso, à integridade das informações e à estabilidade da aplicação.
+
+|                               Issue                                | Bug identificado                                                                           | Situação  |
+| :----------------------------------------------------------------: | :----------------------------------------------------------------------------------------- | :-------: |
+| [#199](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/199) | Qualquer usuário autenticado aceita ou recusa qualquer solicitação.                        | Concluída |
+| [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | CRUD de orientadores aberto a qualquer usuário autenticado.                                | Concluída |
+| [#201](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/201) | Solicitação criada com o e-mail do corpo da requisição, e não com o do usuário logado.     | Concluída |
+| [#202](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/202) | Qualquer usuário logado consegue ler qualquer solicitação.                                 | Concluída |
+| [#203](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/203) | Painel do professor mostra solicitações do orientador errado.                              | Concluída |
+| [#204](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/204) | "Meu perfil" depende do `localStorage` e pode editar o perfil de outra pessoa.             | Concluída |
+| [#205](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/205) | Sessão expira em aproximadamente cinco minutos e as chamadas passam a falhar com HTTP 401. | Concluída |
+| [#206](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/206) | Condição de corrida no controle de vagas do orientador.                                    | Concluída |
+
+Todas as oito issues foram concluídas e, conforme o acompanhamento da equipe, suas respectivas correções foram integradas à branch `entrega-8`. Essas atividades complementares contribuíram para reforçar a segurança do controle de acesso, a consistência dos dados e a estabilidade do sistema durante a Sprint 4.
 
 ---
 
 ## 8. Pull Requests da Sprint 4
 
-> Seção a ser preenchida ao longo da sprint, com a lista de PRs abertos, revisados e integrados à `entrega-8`.
+A tabela abaixo registra os Pull Requests aprovados e mesclados à branch `entrega-8` durante a Sprint 4. Foram incluídas as entregas inicialmente planejadas para as US06 e US07, as atividades de infraestrutura e documentação, os testes de integração e as correções de bugs identificadas durante a sprint.
 
-| PR  | Issue | Descrição | Status |
-| :-- | :---- | :-------- | :----- |
-| -   | -     | -         | -      |
+|                                PR                                |  Issue(s)  | Descrição                                                                                              |  Status  |
+| :--------------------------------------------------------------: | :--------: | :----------------------------------------------------------------------------------------------------- | :------: |
+| [#248](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/248) |    #231    | Atualização e revisão dos riscos do projeto para a Sprint 4.                                           | Mesclado |
+| [#247](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/247) |    #229    | Cenários de integração: avaliação e parecer (US07).                                                    | Mesclado |
+| [#246](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/246) |    #228    | Cenários de integração: submissão por link (US06).                                                     | Mesclado |
+| [#245](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/245) |    #239    | Atualização da arquitetura e dos padrões do projeto na Sprint 4.                                       | Mesclado |
+| [#244](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/244) |    #220    | Configuração do ambiente de staging.                                                                   | Mesclado |
+| [#243](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/243) |    #221    | Criação de `docs/DEPLOY.md` e consolidação do `.env.example`.                                          | Mesclado |
+| [#242](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/242) | #226, #227 | Implementação das telas de submissão e avaliação de entregas.                                          | Mesclado |
+| [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241) |    #206    | Correção de condição de corrida no controle de vagas do orientador.                                    | Mesclado |
+| [#240](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/240) |    #210    | Endpoint de consulta da submissão pelo orientador.                                                     | Mesclado |
+| [#238](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/238) |    #219    | Atualização do pipeline de integração contínua para a `entrega-8`.                                     | Mesclado |
+| [#237](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/237) |    #215    | Modelagem e implementação do parecer das entregas.                                                     | Mesclado |
+| [#236](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/236) |    #216    | Implementação do endpoint de submissão por link.                                                       | Mesclado |
+| [#235](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/235) |    #218    | Validação de links e configuração de variáveis de ambiente.                                            | Mesclado |
+| [#234](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/234) |    #209    | Documentação dos contratos de dados das US06 e US07.                                                   | Mesclado |
+| [#233](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/233) |    #223    | Modelagem e migração de banco de dados com Flyway V6.                                                  | Mesclado |
+| [#232](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/232) |    #207    | Planejamento e documentação da Sprint 4.                                                               | Mesclado |
+| [#225](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/225) |    #205    | Correção da renovação de token e tratamento de expiração de sessão.                                    | Mesclado |
+| [#224](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/224) |    #202    | Restrição de acesso à leitura de solicitações conforme autorização do usuário.                         | Mesclado |
+| [#217](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/217) |    #204    | Correção do controle de acesso à edição do perfil, removendo a dependência indevida do `localStorage`. | Mesclado |
+| [#214](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/214) |    #203    | Correção da listagem de solicitações no painel do professor.                                           | Mesclado |
+| [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) |    #201    | Correção da identificação do usuário na criação de solicitações.                                       | Mesclado |
+| [#212](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/212) |    #199    | Correção da autorização para aceitar ou recusar solicitações.                                          | Mesclado |
+| [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211) |    #200    | Correção do acesso indevido ao CRUD de orientadores por usuários autenticados.                         | Mesclado |
+
+Os Pull Requests relacionados às correções de bugs complementaram o escopo funcional da Sprint 4, reforçando os mecanismos de autorização, a integridade das operações e a consistência das informações. Todas as integrações registradas foram direcionadas à branch `entrega-8`.
 
 ---
 
 ## 9. Retrospectiva da Sprint 4
 
-> Seção a ser preenchida ao final da sprint.
+A Sprint 4 foi concluída com a entrega das funcionalidades previstas para as US06 e US07, complementadas por atividades de infraestrutura, documentação, governança e correção de bugs. O ciclo também exigiu atenção à estabilidade e à segurança das funcionalidades já implementadas nas sprints anteriores.
+
+### 9.1. Pontos positivos
+
+- **Conclusão do fluxo de acompanhamento do TCC:** foram implementadas a submissão de entregas por link externo HTTPS (US06) e a avaliação pelo orientador com registro de parecer (US07), completando o fluxo funcional previsto para o MVP.
+- **Fortalecimento da segurança e da integridade dos dados:** foram corrigidos oito bugs relacionados a autorização, controle de acesso, identificação do usuário autenticado, exibição de solicitações, gerenciamento de perfil, renovação de sessão e controle concorrente de vagas.
+- **Ampliação da validação automatizada:** foram desenvolvidos cenários de integração para as funcionalidades de submissão e avaliação, cobrindo regras de negócio e restrições de acesso.
+- **Infraestrutura de validação externa:** foi disponibilizado um ambiente de staging com documentação operacional, permitindo validar o funcionamento integrado dos serviços fora do ambiente local.
+- **Melhoria da documentação técnica:** foram atualizados os documentos de arquitetura e padrões do projeto, contratos de dados e instruções de deploy, contribuindo para a manutenção e a reprodução dos ambientes.
+
+### 9.2. Dificuldades e pontos de atenção
+
+- **Concorrência entre funcionalidades e correções:** além do escopo planejado para US06 e US07, foi necessário reservar esforço para corrigir problemas encontrados nas funcionalidades desenvolvidas em ciclos anteriores.
+- **Complexidade da autenticação e autorização:** os problemas envolvendo expiração de sessão, acesso indevido a recursos e identificação do usuário demonstraram a importância de validar as permissões no backend, sem depender exclusivamente de controles da interface.
+- **Concentração das atividades finais:** parte das atividades de QA, documentação, governança e release ficou concentrada nos últimos dias da sprint, exigindo acompanhamento próximo das dependências e das entregas pendentes.
+
+### 9.3. Lições aprendidas e ações de melhoria
+
+- Priorizar testes de autorização e propriedade dos recursos desde a implementação dos endpoints, incluindo cenários com usuários autenticados sem vínculo com os dados consultados.
+- Antecipar a integração entre backend e frontend, utilizando contratos de dados definidos previamente e testes automatizados durante o desenvolvimento, e não apenas ao final da sprint.
+- Iniciar a validação do ambiente de staging e dos procedimentos de deploy com antecedência, reduzindo a concentração de atividades operacionais no encerramento do ciclo.
+- Manter a documentação de arquitetura, riscos, métricas e deploy atualizada à medida que as decisões e implementações forem concluídas.
+
+De modo geral, a Sprint 4 ampliou a maturidade técnica do projeto, não apenas pela conclusão das funcionalidades restantes do fluxo de TCC, mas também pelo esforço dedicado à segurança, à qualidade e à preparação da infraestrutura para validações integradas.
 
 ---
 
 ## 10. Incremento Entregue
 
-> Seção a ser preenchida ao final da sprint, com os itens efetivamente entregues, os itens postergados ou removidos e as respectivas justificativas.
+Ao final da Sprint 4, foi integrado à branch `entrega-8` o incremento correspondente ao ciclo, contemplando as funcionalidades previstas para as US06 e US07, melhorias de infraestrutura, documentação técnica, testes e correções de bugs. Durante a execução, a equipe também realizou uma revisão de prioridades, considerando a capacidade disponível, os riscos de integração e a necessidade de preservar a qualidade das entregas.
+
+### 10.1. Funcionalidades entregues
+
+| Item                                        | Entrega                                                                                                                                  | Resultado |
+| :------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------- | :-------- |
+| **US06 - Submissão de Entregas do TCC**     | Submissão de trabalho por link externo HTTPS, com identificação da etapa, registro da data de envio e indicação de atraso.               | Concluída |
+| **US07 - Avaliação e Parecer das Entregas** | Consulta da entrega pelo orientador e registro de parecer com os resultados `APROVADO`, `REPROVADO` e `AJUSTES_NECESSARIOS`.             | Concluída |
+| **Reenvio de entrega**                      | Possibilidade de substituir o link após um parecer `AJUSTES_NECESSARIOS`, respeitando as regras de encerramento da etapa.                | Concluída |
+| **Painel do aluno**                         | Exibição do status da entrega e do parecer registrado pelo orientador.                                                                   | Concluída |
+| **Tela do orientador**                      | Consulta do documento por link externo e registro de avaliação, com restrições para pareceres definitivos e entregas aguardando reenvio. | Concluída |
+
+### 10.2. Infraestrutura e documentação
+
+| Item                   | Entrega                                                                                            | Resultado |
+| :--------------------- | :------------------------------------------------------------------------------------------------- | :-------- |
+| **CI**                 | Atualização do pipeline de integração contínua para a branch `entrega-8`.                          | Concluída |
+| **Staging**            | Configuração do ambiente de staging acessível externamente, utilizando Docker e Cloudflare Tunnel. | Concluída |
+| **Deploy**             | Criação de `docs/DEPLOY.md` e consolidação do `.env.example`.                                      | Concluída |
+| **Arquitetura**        | Atualização da documentação de arquitetura e dos padrões adotados no projeto.                      | Concluída |
+| **Contratos de dados** | Documentação dos contratos das APIs das US06 e US07.                                               | Concluída |
+| **Métricas e riscos**  | Atualização dos documentos de acompanhamento e governança do projeto.                              | Concluída |
+
+### 10.3. Qualidade e correção de bugs
+
+Durante a Sprint 4, foram concluídas oito issues de correção de bugs, com integração das respectivas alterações à branch `entrega-8`:
+
+| Issue | Correção realizada                                                                                         |
+| :---: | :--------------------------------------------------------------------------------------------------------- |
+| #199  | Restrição da autorização para aceitar ou recusar solicitações.                                             |
+| #200  | Restrição do acesso ao CRUD de orientadores conforme as permissões do usuário.                             |
+| #201  | Utilização da identidade do usuário autenticado na criação de solicitações.                                |
+| #202  | Restrição da leitura de solicitações aos usuários autorizados.                                             |
+| #203  | Correção da consulta de solicitações exibidas no painel do professor.                                      |
+| #204  | Correção do controle de acesso à edição do perfil, eliminando a dependência indevida do `localStorage`.    |
+| #205  | Renovação do token e tratamento da expiração da sessão, evitando falhas de autenticação após o vencimento. |
+| #206  | Correção da condição de corrida no controle de vagas do orientador.                                        |
+
+Além das correções, foram implementados cenários de integração para as US06 e US07, contemplando os principais fluxos funcionais, regras de negócio e restrições de autorização.
+
+### 10.4. Itens não entregues ou postergados
+
+**US08 - Agendamento e Organização de Banca (#15): Postergada.**
+
+A equipe decidiu postergar a implementação da US08, que prevê o agendamento e a organização das bancas de defesa do TCC. A funcionalidade permite que o professor ou orientador informe a data, o horário e o local da defesa — ou um link de videoconferência —, convide professores examinadores e disponibilize o agendamento nos painéis dos membros convidados.
+
+A decisão de não incluir essa história no incremento da Sprint 4 (Entrega 8) foi tomada após avaliar o escopo das entregas em andamento, a capacidade disponível da equipe e os riscos associados à implementação de novas funcionalidades em um período limitado. Os principais fatores considerados foram:
+
+- **Capacidade de desenvolvimento e prazo disponível:** a Sprint 4 teve um período de execução de 03/11/2026 a 11/11/2026 e já contemplava a implementação e a integração das US06 e US07, além de atividades de infraestrutura, documentação, testes e governança. Durante o ciclo, também foi necessário absorver oito correções de bugs em funcionalidades existentes, ampliando a demanda de trabalho em relação às atividades inicialmente previstas.
+
+- **Complexidade funcional da US08:** embora a história tenha como objetivo principal o agendamento de uma banca, sua implementação envolve mais do que o simples cadastro de data e horário. Seria necessário desenvolver mecanismos para registrar as informações do evento, associá-lo ao TCC do aluno, permitir a inclusão de professores examinadores, controlar os convites e disponibilizar os agendamentos nos painéis dos membros convidados. Isso exigiria alterações integradas no backend e no frontend, além de validações e testes dos diferentes comportamentos envolvidos.
+
+- **Dependência do fluxo de avaliação do TCC:** o critério de aceitação da US08 estabelece que o agendamento ocorre quando o TCC do aluno já foi pré-aprovado para defesa. Portanto, a funcionalidade está relacionada a uma etapa posterior do processo de acompanhamento do trabalho. A equipe considerou mais adequado concluir e validar primeiro o fluxo de submissão e avaliação, desenvolvido nas US06 e US07, antes de avançar para a organização das bancas.
+
+- **Necessidade de integração e validação:** a inclusão de uma nova história exigiria tempo adicional para implementar, revisar e integrar seus componentes, além de verificar o funcionamento dos convites e a visualização dos agendamentos pelos professores envolvidos. Com o prazo restante, assumir essa demanda poderia comprometer a profundidade dos testes e a validação das funcionalidades já desenvolvidas.
+
+- **Mitigação dos riscos de crescimento do escopo e de perda de qualidade:** considerando os riscos de crescimento do escopo (R04), baixa capacidade disponível (R01) e concentração das atividades no encerramento da sprint, a equipe optou por não ampliar o conjunto de funcionalidades sem tempo suficiente para garantir sua implementação completa e validação adequada. Essa decisão buscou evitar a entrega de um volume maior de funcionalidades com possibilidade de apresentarem falhas, integrações incompletas ou comportamentos não verificados.
+
+Dessa forma, a postergação da US08 foi uma decisão consciente de gerenciamento de escopo, priorização e qualidade. A equipe optou por concentrar os esforços na conclusão das US06 e US07, nas correções necessárias e na preparação da infraestrutura de validação, em vez de assumir uma nova funcionalidade sem capacidade suficiente para assegurar sua entrega com a qualidade esperada.
+
+A US08 não foi descartada. Ela permanece no backlog do produto para ser reavaliada e priorizada em um ciclo posterior, considerando a capacidade da equipe, as dependências funcionais e o planejamento das próximas entregas.
+
+### 10.5. Resultado final
+
+O incremento da Sprint 4 consolida o fluxo de acompanhamento do TCC, permitindo que o aluno submeta seu trabalho por meio de um link externo seguro e acompanhe o parecer emitido pelo orientador. Também foram reforçados os mecanismos de autorização e integridade das operações, ampliadas as possibilidades de validação por testes automatizados e preparados os recursos de infraestrutura e documentação necessários à execução e validação do sistema.
+
+A equipe priorizou a entrega de um conjunto funcional integrado e validado, postergando a US08 para evitar a ampliação do escopo além da capacidade disponível e preservar a qualidade do incremento. A branch `entrega-8` reúne as implementações e correções integradas durante a sprint, tendo como marco de release planejado a versão `v0.4.0`.
+
+---
+
+## 11. Contribuições Individuais Detalhadas
+
+Cada integrante registra abaixo suas contribuições da Sprint 4, com as issues e os PRs como evidência. O detalhamento do uso de IA em cada artefato está em [`USO-IA.md`](../../USO-IA.md) (Entrega 8).
+
+### 11.1 Damares do Socorro Gonçalves Gaia
+
+- **Papel:** Arquiteta de Software / Backend.
+- **Identificadores Git:** `Damares Gaia <damaresgaia@gmail.com>`, `121111955+damaresgaia@users.noreply.github.com` (usuária GitHub: `damaresgaia`).
+- **Atividades e Entregas na Sprint 4:**
+  - **Modelagem de Dados e Migração da Entidade Entrega (Issue #208 - PR #233):** Criação da migration Flyway `V6__criar_tabela_entrega.sql` modelando a tabela `entrega` vinculada à `turma_tcc`, suporte à URL externa HTTPS (ADR-0013), flag de submissão atrasada, anotações de validação e repositório `EntregaRepository`.
+  - **Modelagem de Dados e Migração da Entidade Parecer (Issue #215 - PR #237):** Concepção da migration Flyway `V7__criar_tabela_parecer.sql` estruturando a entidade `Parecer`, enum `ResultadoParecer` (`APROVADO`, `REPROVADO`, `AJUSTES_NECESSARIOS`), relacionamento com `Entrega` e `Professor`, e cobertura completa com testes automatizados de integração JPA (`ParecerRepositoryTest`) validando integridade referencial, constraints e aplicação das migrations Flyway em ambiente de testes H2 configurado em modo de compatibilidade MySQL (`MODE=MySQL`).
+  - **Especificação dos Contratos de Dados das APIs de US06 e US07 (Issue #209 - PR #234):** Elaboração dos documentos de especificação de contrato de API [`docs/contrato-dados-us06.md`](../contrato-dados-us06.md) (submissão de entregas por link externo HTTPS) e [`docs/contrato-dados-us07.md`](../contrato-dados-us07.md) (avaliação e emissão de parecer), definindo schemas de request/response, validações, códigos de status HTTP e cenários de teste BDD em colaboração com o backend.
+  - **Correção da Renovação Automática de Token e Interceptor Frontend (Issue #205 - PR #225):** Atuação conjunta na identificação da causa raiz do loop infinito de requisições no `api.ts`, implementação do mecanismo de fila de requisições pendentes durante o refresh de token e configuração da renovação silenciosa transparente com tratamento seguro de concorrência.
+  - **Atualização da Arquitetura do Sistema Real e Padrões de Projeto (Issue #239 - PR #245):** Atualização dos diagramas arquiteturais C4 ([`docs/diagramas/c2-conteineres.md`](../diagramas/c2-conteineres.md)) incorporando as rotas da release `v0.4.0` (US06 e US07), atualização do fluxo de refresh token e separação arquitetural de responsabilidades em [`docs/ARQUITETURA.md`](../ARQUITETURA.md) e [`ADR-0012`](../adrs/ADR-0012.md), além da documentação dos novos padrões estruturais (Value Object com `@Embeddable` e Interceptor com retry queue) em [`docs/PADROES-DE-PROJETO.md`](../PADROES-DE-PROJETO.md).
+  - **Acompanhamento e Memória de Cálculo de Métricas (Issue #230):** Atualização da métrica [`M-06: Cumprimento da Capacidade`](../metricas/M-06.md) para a Sprint 4, com registro histórico nominal por integrante e consolidação de 41h executadas de 42h planejadas (97,6% de aderência - Meta Desejada).
+  - **Revisão de Código (Code Review) e Governança:** Revisão técnica formal, validação de segurança e aprovação de Pull Requests fundamentais da sprint:
+    - **PR #238 (Issue #219):** Revisão técnica formal (`CHANGES_REQUESTED`) da atualização do CI (`docker-build.yml`), `docker-compose.prod.yml` e `docs/ci.md` quanto à aderência à `ADR-0009` e às evidências reais do pipeline.
+    - **PR #240 (Issue #210):** Endpoint de consulta de submissão para orientador (US07), revisado e aprovado com validação de permissões de acesso do orientador.
+    - **PR #243 (Issue #221):** Documentação de deploy (`docs/DEPLOY.md`) e script de smoke test, revisado em duas iterações técnicas rigorosas com apontamentos sobre a URL pública do Keycloak e alinhamento de variáveis de ambiente.
+
+### 11.2 Eduardo Cardoso Oliveira
+
+- **Papel:** Engenheiro de DevOps / Infraestrutura.
+- **Identificadores Git:** `Eduardo Cardoso <eduardo.co22@aluno.ifsc.edu.br>` (usuário GitHub: `EduCardoso22`).
+- **Atividades e Entregas na Sprint 4:**
+  - **Validação de Links e Variáveis de Ambiente da US06 (Issue #218 - PR #235):**
+    - Configuração e propagação segura da variável `APP_SUBMISSAO_DOMINIOS_SUGERIDOS` no backend Spring Boot (`application.properties`) e no `.env.example`, sem introduzir acoplamentos ou dependências desnecessárias de volume.
+    - Atualização do [`docs/contrato-dados-us06.md`](../contrato-dados-us06.md), [`docs/ARQUITETURA.md`](../ARQUITETURA.md) e [`docs/qualidade.md`](../qualidade.md) para refletir a estratégia de submissão por link externo HTTPS (ADR-0013) com validação estrita `@URL(protocol = "https")` e persistência em coluna de 2048 caracteres.
+    - Implementação de testes automatizados de validação de protocolo HTTPS, persistência e suporte a CORS.
+    - Adequação das regras de segurança no `SecurityConfig.java` para o endpoint `/api/v1/entregas/**` com exigência de `ROLE_ALUNO`.
+  - **Atualização do Pipeline de CI e Publicação de Imagens no GHCR (Issue #219 - PR #238):**
+    - Criação do workflow [`.github/workflows/docker-build.yml`](../../.github/workflows/docker-build.yml) para automação do build multi-stage e publicação das imagens de Backend e Frontend no GitHub Container Registry (GHCR), com tagueamento determinístico (`latest` e SHA do commit).
+    - Otimização do cache das camadas Docker utilizando a API nativa do GitHub Actions (`type=gha`), reduzindo expressivamente o tempo de build.
+    - Configuração de isolamento de dependências com a diretiva `needs` interna no workflow, garantindo que o build e push de contêineres ocorram somente após a aprovação com sucesso dos jobs de testes unitários.
+    - Atualização completa de [`docs/ci.md`](../ci.md), documentando os 5 workflows ativos, gatilhos de execução, políticas de bloqueio de branch e Quality Gates obrigatórios da `entrega-8`.
+    - Atualização do template de Pull Request ([`.github/PULL_REQUEST_TEMPLATE.md`](../../.github/PULL_REQUEST_TEMPLATE.md)) para inclusão das verificações de CI e evidências da Sprint 4.
+  - **Configuração e Provisionamento do Ambiente de Staging Acessível (Issue #220 - PR #244):**
+    - Criação da orquestração de homologação/produção em [`SIGTCC/docker-compose.prod.yml`](../../SIGTCC/docker-compose.prod.yml), parametrizando variáveis de segurança do Keycloak (`KC_HTTP_ENABLED`, `KC_HOSTNAME_STRICT`, `KC_HOSTNAME`) e validação de schema do Hibernate (`hibernate.ddl-auto=validate`).
+    - Integração e provisionamento de tunelamento seguro via **Cloudflare Tunnels**, expondo os serviços conteinerizados da VPS sob domínio seguro HTTPS (`staging.sigtcc.online`) sem necessidade de liberação de portas de firewall ou IPs públicos dedicados.
+    - Elaboração do artefato oficial [`docs/staging.md`](../staging.md), documentando a arquitetura remota, credenciais administrativas, consumo de imagens GHCR e um roteiro executável de _Smoke Test_ via cURL/PowerShell para validação automatizada de saúde dos 4 componentes (MySQL 8.0, Keycloak 24 IAM, Backend API REST e Frontend SPA).
+  - **Guia Oficial de Deploy e Consolidação de Variáveis de Ambiente (Issue #221 - PR #243):**
+    - Redação integral e publicação do guia oficial de implantação [`docs/DEPLOY.md`](../DEPLOY.md), contemplando pré-requisitos, instruções passo a passo para deploy local e em staging a partir de ambiente limpo, configuração de `KEYCLOAK_PUBLIC_URL` e `webOrigins`, rotinas de smoke test e plano de rollback com comandos detalhados.
+    - Consolidação definitiva do arquivo de referência [`.env.example`](../../.env.example), unificando todas as variáveis de configuração de ambiente de forma consistente, rastreável e auditável, eliminando valores sensíveis expostos.
+    - Alinhamento de referências cruzadas entre `DEPLOY.md`, `staging.md` e os arquivos compose do projeto.
+  - **Acompanhamento da Métrica de Processo M-04 — Lead Time de Pull Requests (Issue #230):**
+    - Atualização da ficha técnica [`docs/metricas/M-04.md`](../metricas/M-04.md) com o histórico completo de Pull Requests da sprint (PRs #211 a #245), calculando os tempos exatos de ciclo entre criação e merge.
+    - Elaboração da memória de cálculo da Sprint 4: média de **12,3h**, mediana de **5,7h**, 80% dos PRs Dentro da Meta ($\le 24$h), 20% na Faixa Aceitável ($24$h a $48$h) e **0% em Zona de Alerta**, alcançando **100% de conformidade com o SLA** e demonstrando a eficácia dos Quality Gates automatizados no GitHub Actions.
+    - Análise histórica comparativa frente ao Baseline e às Sprints 1, 2 e 3, com diagnóstico específico do Lead Time das entregas de infraestrutura (média de 18,2h).
+  - **Reavaliação dos Riscos Técnicos de DevOps e Infraestrutura (Issue #231):**
+    - Reavaliação formal dos riscos sob responsabilidade de DevOps em [`docs/riscos.md`](../riscos.md): **R05** (Divergência de Ambientes e Instabilidade Docker) mitigado definitivamente pela padronização dos contêineres e documentação de deploy, e **R10** (Indisponibilidade do Ambiente de Staging) mitigado pela alta disponibilidade do Cloudflare Tunnels e roteiro de smoke tests.
+  - **Revisão de Código (Code Review) e Governança:**
+    - Atuação contínua na revisão técnica, verificação de qualidade de código, conformidade com os pipelines de CI e aprovação de Pull Requests de todos os integrantes integrados à `entrega-8`:
+      - **PR #211 (Issue #200):** Fix de fechamento de endpoints abertos de usuário (Talles Souza).
+      - **PR #213 (Issue #201):** Fix de extração de e-mail do aluno logado via token JWT (Talles Souza).
+      - **PR #217 (Issue #204):** Fix de integridade de dados do usuário em LocalStorage (Talles Souza).
+      - **PR #224 (Issue #202):** Fix de restrição de leitura de solicitações com validação de vínculo (Willian Ferreira).
+      - **PR #233 (Issue #208):** Modelagem JPA, constraints e migração Flyway V6 da entidade Entrega (Damares Gaia).
+      - **PR #234 (Issue #209):** Especificação dos contratos de dados das APIs de US06 e US07 (Damares Gaia / Talles Souza).
+      - **PR #236 (Issue #216):** Service e endpoint `POST /api/v1/entregas` de submissão por link HTTPS (Talles Souza).
+      - **PR #237 (Issue #215):** Modelagem da entidade Parecer, enum de resultado e migração Flyway V7 (Damares Gaia).
+      - **PR #240 (Issue #210):** Endpoints de consulta de submissão para orientador e aluno (Talles Souza).
+      - **PR #241 (Issue #206):** Tratamento de condição de corrida com bloqueio otimista `@Version` e migração Flyway V8 (Talles Souza).
+      - **PR #242 (Issues #226/#227):** Interface frontend para submissão de link e avaliação de parecer com testes Vitest (Marcus Jhuan).
+      - **PR #245 (Issue #239):** Atualização da documentação arquitetural C4 e padrões estruturais do sistema (Damares Gaia).
+
+### 11.3 Marcus Jhuan Epifanio Lima
+
+- **Principais entregas:**
+  - **Implementação das Telas de Submissão de Entrega e Avaliação pelo Orientador (Issues #226 e #227 / PR #242):**
+    - Desenvolvimento da tela de submissão do aluno ([`SubmissaoEntrega`](../../SIGTCC/frontend/src/paginas/SubmissaoEntrega/index.tsx)) na rota protegida `/minhas-entregas` (`ROLE_ALUNO`), permitindo selecionar a etapa, enviar link externo HTTPS conforme `ADR-0013`, acompanhar status/atraso e reenviar após parecer `AJUSTES_NECESSARIOS`.
+    - Desenvolvimento da tela de avaliação do orientador ([`AvaliacaoEntrega`](../../SIGTCC/frontend/src/paginas/AvaliacaoEntrega/index.tsx)) na rota protegida `/avaliar-entregas` (`ROLE_PROFESSOR`), com listagem e filtro por status, abertura do documento externo, registro de parecer e obrigatoriedade de comentário em ajustes necessários e reprovação.
+    - Criação dos serviços e tipagens de integração com a API ([`entregaService.ts`](../../SIGTCC/frontend/src/utils/entregaService.ts) e [`Entrega.ts`](../../SIGTCC/frontend/src/types/Entrega.ts)) e configuração de rotas e navegação em [`App.tsx`](../../SIGTCC/frontend/src/App.tsx).
+  - **Testes Unitários de Componentes no Frontend:**
+    - Criação de testes automatizados com Vitest em [`SubmissaoEntrega.test.tsx`](../../SIGTCC/frontend/src/paginas/SubmissaoEntrega/SubmissaoEntrega.test.tsx) (10 casos) e [`AvaliacaoEntrega.test.tsx`](../../SIGTCC/frontend/src/paginas/AvaliacaoEntrega/AvaliacaoEntrega.test.tsx) (8 casos), cobrindo validação de URL HTTPS, atraso, reenvio, tratamento de erros HTTP (`400`, `403`, `409`, `422`), filtros e bloqueio de avaliação em estados finais.
+  - **Registro de Uso de IA (`USO-IA.md`):**
+    - Registro do uso de IA nas atividades da Sprint 4 em [`USO-IA.md`](../../USO-IA.md) (branch `docs/atualiza-uso-ia-sprint-4`).
+
+### 11.4 Talles Souza da Cruz
+
+- **Papel na sprint:** Desenvolvedor Backend.
+- **Período:** 01/11/2026 a 11/11/2026.
+
+#### Contratos de dados
+
+- **Roles e Respostas de Erro nos Contratos de US06 e US07 (Issue #209 - PR #234):** Complemento dos contratos [`docs/contrato-dados-us06.md`](../contrato-dados-us06.md) e [`docs/contrato-dados-us07.md`](../contrato-dados-us07.md), elaborados em conjunto com Damares, detalhando por endpoint a role exigida e as respostas de erro.
+
+#### Implementação da submissão de entregas (US06)
+
+- **Service e Endpoint de Submissão por Link (Issue #216 - PR #236):** Implementação do `POST /api/v1/entregas`, com os DTOs de entrada e saída e a atualização da entidade `Entrega`. O endpoint valida a URL HTTPS, marca a entrega como `atrasada` quando enviada após o prazo e permite o reenvio somente quando o último parecer é `AJUSTES_NECESSARIOS`, substituindo o link e retornando a entrega ao status `SUBMETIDO`.
+
+#### Implementação da avaliação e do parecer (US07)
+
+- **Consulta das Submissões (Issue #210 - PR #240):** Implementação dos endpoints `GET /api/v1/entregas/orientador`, `GET /api/v1/entregas/minhas` e `GET /api/v1/entregas/{id}`, que permitem ao orientador consultar as entregas dos seus orientandos e ao aluno acompanhar as próprias entregas. Proteção das rotas por role no `SecurityConfig` e verificação do vínculo entre orientador, aluno e entrega.
+- **Endpoint de Registro de Parecer (Issue #215 - PR #237):** Implementação do `POST /api/v1/entregas/{id}/parecer` sobre a modelagem da migração `V7` e da entidade `Parecer` feitas por Damares. O endpoint registra os resultados `APROVADO`, `AJUSTES_NECESSARIOS` e `REPROVADO`, exige comentário em ajustes e reprovação e bloqueia uma nova avaliação de entrega já encerrada. Para evitar que pareceres simultâneos sobrescrevam uma decisão final, a entrega é carregada com trava pessimista (`PESSIMISTIC_WRITE`). As respostas de entrega passaram a exibir o parecer mais recente.
+
+#### Correção de defeitos
+
+| Issue | PR   | Defeito                                                                                      | Correção                                                                                                                                                                                                                                      |
+| :---- | :--- | :------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| #200  | #211 | Qualquer usuário autenticado podia alterar ou remover o cadastro de qualquer orientador.     | Restrição da escrita de orientadores a `ROLE_PROFESSOR` e ao próprio professor, identificado pelo e-mail do token. Contrato da US02 atualizado e testes de integração do `OrientadorController` adicionados.                                  |
+| #201  | #213 | A solicitação de orientação identificava o aluno por dados enviados no formulário.           | Identificação do aluno pelo usuário autenticado (e-mail do token), com a remoção desses campos do formulário. Contrato da US04 atualizado e testes de integração e do `authService` adicionados.                                              |
+| #204  | #217 | A tela "Meu perfil" buscava o orientador por um id salvo no `localStorage`.                  | Obtenção do id do perfil pelo endpoint `/professores/me`, com mensagem clara quando o usuário não possui perfil de orientador. Testes de `OrientadorEdicao` atualizados.                                                                      |
+| #206  | #241 | Dois aceites simultâneos podiam ultrapassar o número de vagas do orientador (_lost update_). | Lock otimista com `@Version` em `PerfilOrientador`, migração `V8` e resposta `409` para o conflito. Teste de integração que reproduz a corrida e validação manual com MySQL real: de 5 aceites simultâneos com 1 vaga, apenas 1 foi aprovado. |
+
+#### Revisão de código e governança
+
+Integração (merge) à `entrega-8` dos PRs dos demais integrantes:
+
+- **Damares Gaia:** PRs #212 e #214.
+- **Eduardo Cardoso:** PRs #235 e #238.
+- **Willian Ferreira:** PRs #232 e #246.
+
+### 11.5 Willian Ferreira dos Santos
+
+- **Papel:** Scrum Master e Engenheiro de Qualidade (QA).
+- **Período:** 03/11/2026 a 11/11/2026.
+- **Atividades e Entregas na Sprint 4:**
+
+  - **Planejamento e Condução da Sprint 4 (Issue #207 - PR #232):**
+    - Elaboração e atualização do documento [`docs/entregas/sprint-4.md`](sprint-4.md), registrando a inspeção do estado do MVP ao final da Sprint 3, a meta da sprint, as histórias selecionadas, as regras de negócio, o fatiamento das atividades e a distribuição de responsabilidades.
+    - Organização das atividades em issues específicas, com responsáveis, prazos e dependências, facilitando o acompanhamento do trabalho e a rastreabilidade das entregas.
+    - Acompanhamento do andamento da sprint, das atividades pendentes e das integrações realizadas na branch `entrega-8`.
+    - Registro das correções de bugs incorporadas durante o ciclo, dos Pull Requests integrados, da retrospectiva e do incremento entregue.
+    - Reavaliação das prioridades diante da capacidade disponível e das demandas adicionais identificadas durante a execução, contribuindo para a decisão de postergar a US08 e preservar o tempo necessário à integração e à validação das US06 e US07.
+
+  - **Correção de Controle de Acesso às Solicitações (Issue #202 - PR #224):**
+    - Identificação e correção de falhas que permitiam que qualquer usuário autenticado consultasse solicitações de orientação sem possuir autorização para acessá-las.
+    - Implementação de verificações de autorização para restringir a consulta de uma solicitação ao aluno responsável e ao orientador relacionado, impedindo o acesso por usuários sem vínculo com o registro.
+    - Restrição do endpoint de consulta das solicitações de um orientador para permitir que o professor autenticado consulte apenas as próprias solicitações.
+    - Inclusão e ajuste de testes para verificar o comportamento das permissões, incluindo respostas HTTP `403 Forbidden` para tentativas de acesso não autorizado.
+
+  - **Testes de Integração da Submissão de Entregas (US06 - Issue #228 - PR #246):**
+    - Desenvolvimento dos cenários de integração para validar o fluxo de submissão de entregas por meio de links externos HTTPS.
+    - Verificação dos comportamentos previstos para a submissão, considerando as regras de negócio definidas para a US06, incluindo validação do endereço informado, identificação da entrega e tratamento de submissões realizadas após o prazo.
+    - Execução dos testes automatizados e integração dos cenários à branch `entrega-8`, contribuindo para verificar o funcionamento da funcionalidade junto ao backend e às regras de autorização.
+
+  - **Testes de Integração da Avaliação e Parecer (US07 - Issue #229 - PR #247):**
+    - Desenvolvimento dos cenários de integração para validar a consulta das entregas pelo orientador, o registro de pareceres e o acompanhamento dos resultados pelo aluno.
+    - Validação dos cenários de autorização, incluindo o acesso permitido ao orientador vinculado e a rejeição de consultas por usuários sem vínculo com a entrega.
+    - Verificação das regras de negócio relacionadas ao parecer, incluindo a obrigatoriedade de comentário em situações de ajustes ou reprovação, o bloqueio de reavaliação de entregas com decisão definitiva e a possibilidade de reenvio após `AJUSTES_NECESSARIOS`.
+    - Verificação da atualização das informações apresentadas ao aluno após a avaliação, contemplando os resultados do parecer.
+    - Execução dos testes automatizados de integração, com todos os cenários executados localmente apresentando resultado satisfatório.
+    - Integração dos testes à branch `entrega-8`, ampliando a cobertura de validação do fluxo de avaliação da US07.
+
+  - **Acompanhamento do Processo e Governança:**
+    - Atuação como Scrum Master durante a Sprint 4, acompanhando as issues, os responsáveis, os prazos e as dependências das atividades.
+    - Registro das decisões e dos acontecimentos relevantes no documento da sprint, mantendo a rastreabilidade entre planejamento, execução, Pull Requests, retrospectiva e incremento entregue.
+    - Acompanhamento das correções de bugs e das atividades de QA, contribuindo para que as entregas fossem integradas e validadas antes do encerramento da sprint.
