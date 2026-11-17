@@ -1,7 +1,9 @@
 package br.edu.ifsc.gestao_tcc.controller;
 
+import br.edu.ifsc.gestao_tcc.model.Aluno;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
 import br.edu.ifsc.gestao_tcc.model.PerfilOrientador;
+import br.edu.ifsc.gestao_tcc.repository.AlunoRepository;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +41,9 @@ class OrientadorControllerIntegrationTest {
 
     @Autowired
     private OrientadorRepository orientadorRepository;
+
+    @Autowired
+    private AlunoRepository alunoRepository;
 
     private Orientador professorA;
     private Orientador professorB;
@@ -151,6 +156,34 @@ class OrientadorControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("POST /orientadores - E-mail já cadastrado como aluno retorna 409 Conflict com ErrorResponseDTO")
+    void cadastrar_EmailJaCadastradoComoAluno_DeveRetornar409() throws Exception {
+        alunoRepository.saveAndFlush(Aluno.builder()
+                .nome("Aluno Existente")
+                .email(EMAIL_ALUNO)
+                .curso("Análise e Desenvolvimento de Sistemas")
+                .build());
+
+        String payload = """
+                {
+                  "nome": "Orientador Conflitante",
+                  "email": "%s",
+                  "linhasDePesquisa": ["IA"],
+                  "vagasDisponiveis": 2
+                }
+                """.formatted(EMAIL_ALUNO);
+
+        mockMvc.perform(post(URL)
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.erro").value("Conflito de dados"))
+                .andExpect(jsonPath("$.detalhes").isString());
     }
 
     @Test

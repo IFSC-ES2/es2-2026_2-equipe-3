@@ -183,6 +183,23 @@ class SolicitacaoControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("POST /solicitacoes - E-mail já cadastrado como orientador retorna 409 Conflict com ErrorResponseDTO")
+    void criar_EmailJaCadastradoComoOrientador_DeveRetornar409() throws Exception {
+        long antes = solicitacaoRepository.count();
+
+        mockMvc.perform(post(URL)
+                        .with(tokenDe("ROLE_ALUNO", EMAIL_PROFESSOR_B))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payloadValido()))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.erro").value("Conflito de dados"))
+                .andExpect(jsonPath("$.detalhes").isString());
+
+        assertThat(solicitacaoRepository.count()).isEqualTo(antes);
+    }
+
+    @Test
     @DisplayName("POST /solicitacoes - Professor não pode criar solicitação (403)")
     void criar_Professor_DeveRetornar403() throws Exception {
         long antes = solicitacaoRepository.count();
