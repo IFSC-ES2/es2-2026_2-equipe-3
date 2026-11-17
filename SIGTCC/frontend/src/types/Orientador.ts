@@ -7,8 +7,10 @@ export interface OrientadorInput {
   biografia?: string;
 }
 
-export interface Orientador
-  extends Omit<OrientadorInput, "departamento" | "biografia"> {
+export interface Orientador extends Omit<
+  OrientadorInput,
+  "departamento" | "biografia"
+> {
   id: number;
   ativo: boolean;
   criadoEm?: string;

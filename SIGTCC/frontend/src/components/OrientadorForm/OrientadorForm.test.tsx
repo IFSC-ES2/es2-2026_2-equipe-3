@@ -238,9 +238,7 @@ describe("OrientadorForm", () => {
       linhasDePesquisa: ["IA"],
       ativo: true,
     };
-    vi.mocked(atualizarOrientador).mockResolvedValue(
-      orientadorComCamposNulos,
-    );
+    vi.mocked(atualizarOrientador).mockResolvedValue(orientadorComCamposNulos);
 
     render(
       <OrientadorForm
