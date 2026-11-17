@@ -23,6 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -246,5 +247,50 @@ class OrientadorControllerIntegrationTest {
                 .andExpect(jsonPath("$.detalhes").value("O e-mail do orientador não pode ser alterado."));
 
         assertThat(recarregar(professorA).getEmail()).isEqualTo(EMAIL_PROFESSOR_A);
+    }
+
+    // --- Handlers genéricos do GlobalExceptionHandler (issue #262) ---
+
+    @Test
+    @DisplayName("POST /orientadores - E-mail já usado por um aluno deve retornar 409 no formato ErrorResponseDTO")
+    void cadastrar_EmailDeAlunoExistente_DeveRetornar409() throws Exception {
+        alunoRepository.saveAndFlush(Aluno.builder()
+                .nome("Aluno Existente")
+                .email("aluno.existente@example.com")
+                .curso("Engenharia")
+                .build());
+
+        String payload = """
+                {
+                  "nome": "Orientador com E-mail de Aluno",
+                  "email": "aluno.existente@example.com",
+                  "linhasDePesquisa": ["IA"],
+                  "vagasDisponiveis": 2
+                }
+                """;
+
+        mockMvc.perform(post(URL)
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.erro").value("Conflito de dados"))
+                .andExpect(jsonPath("$.caminho").value(URL))
+                .andExpect(jsonPath("$.detalhes").value(
+                        "A operação viola uma restrição de integridade dos dados, como um valor que já está cadastrado."));
+    }
+
+    @Test
+    @DisplayName("PUT /orientadores/{id} - Método não suportado deve manter o 405 no formato ErrorResponseDTO")
+    void metodoNaoSuportado_DeveRetornar405NoFormatoPadrao() throws Exception {
+        mockMvc.perform(put(URL + "/" + professorA.getId())
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value(405))
+                .andExpect(jsonPath("$.erro").value("Requisição inválida"))
+                .andExpect(jsonPath("$.caminho").value(URL + "/" + professorA.getId()));
     }
 }
