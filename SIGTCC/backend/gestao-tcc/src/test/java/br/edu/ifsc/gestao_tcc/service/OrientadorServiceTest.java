@@ -45,6 +45,8 @@ class OrientadorServiceTest {
 
     @Mock
     private ApplicationEventPublisher eventPublisher;
+
+    @Mock
     private UsuarioRepository usuarioRepository;
 
     @InjectMocks
