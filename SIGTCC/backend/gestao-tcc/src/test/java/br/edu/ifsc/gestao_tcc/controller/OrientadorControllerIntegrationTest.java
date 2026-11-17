@@ -176,10 +176,33 @@ class OrientadorControllerIntegrationTest {
                 """;
 
         mockMvc.perform(post(URL)
-                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .with(tokenDe("ROLE_PROFESSOR", "novo.orientador@example.com"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("POST /orientadores - Professor não pode cadastrar orientador com e-mail diferente do JWT")
+    void cadastrar_ProfessorUsandoEmailDeOutro_DeveRetornar403() throws Exception {
+        String emailDoOutro = "outro.orientador@example.com";
+        String payload = """
+                {
+                  "nome": "Orientador de Outro Usuário",
+                  "email": "%s",
+                  "linhasDePesquisa": ["IA"],
+                  "vagasDisponiveis": 2
+                }
+                """.formatted(emailDoOutro);
+
+        mockMvc.perform(post(URL)
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.erro").value("Acesso negado"));
+
+        assertThat(orientadorRepository.existsByEmail(emailDoOutro)).isFalse();
     }
 
     @Test
@@ -201,7 +224,7 @@ class OrientadorControllerIntegrationTest {
                 """.formatted(EMAIL_ALUNO);
 
         mockMvc.perform(post(URL)
-                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_ALUNO))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isConflict())
@@ -346,7 +369,7 @@ class OrientadorControllerIntegrationTest {
                 """;
 
         mockMvc.perform(post(URL)
-                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .with(tokenDe("ROLE_PROFESSOR", "aluno.existente@example.com"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isConflict())

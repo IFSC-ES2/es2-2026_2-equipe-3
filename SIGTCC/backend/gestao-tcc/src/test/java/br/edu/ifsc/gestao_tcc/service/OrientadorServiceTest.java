@@ -70,7 +70,7 @@ class OrientadorServiceTest {
             return o;
         });
 
-        Orientador salvo = orientadorService.cadastrar(requestDTO);
+        Orientador salvo = orientadorService.cadastrar("JOAO@IFSC.EDU.BR", requestDTO);
 
         assertNotNull(salvo);
         assertEquals(1L, salvo.getId());
@@ -91,10 +91,23 @@ class OrientadorServiceTest {
 
         when(usuarioRepository.existsByEmailIgnoreCase(requestDTO.getEmail())).thenReturn(true);
 
-        assertThrows(EmailDuplicadoException.class, () -> orientadorService.cadastrar(requestDTO));
+        assertThrows(EmailDuplicadoException.class,
+                () -> orientadorService.cadastrar(requestDTO.getEmail(), requestDTO));
 
         verify(usuarioRepository, times(1)).existsByEmailIgnoreCase(anyString());
         verify(orientadorRepository, never()).save(any(Orientador.class));
+    }
+
+    @Test
+    @DisplayName("Deve negar o cadastro quando o e-mail informado difere do e-mail autenticado")
+    void cadastrar_DeveNegar_QuandoEmailDivergeDoUsuarioAutenticado() {
+        OrientadorRequestDTO requestDTO = new OrientadorRequestDTO();
+        requestDTO.setEmail("outro@ifsc.edu.br");
+
+        assertThrows(AcessoNegadoException.class,
+                () -> orientadorService.cadastrar(EMAIL_DONO, requestDTO));
+
+        verifyNoInteractions(usuarioRepository, orientadorRepository);
     }
 
     @Test
