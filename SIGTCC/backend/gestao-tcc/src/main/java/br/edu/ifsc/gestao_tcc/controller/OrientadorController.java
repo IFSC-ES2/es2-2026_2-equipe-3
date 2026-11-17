@@ -27,8 +27,11 @@ public class OrientadorController {
     private final OrientadorService orientadorService;
 
     @PostMapping
-    public ResponseEntity<Void> cadastraOrientador(@RequestBody @Valid OrientadorRequestDTO orientadorDTO) {
-        Orientador orientadorCriado = orientadorService.cadastrar(orientadorDTO);
+    public ResponseEntity<Void> cadastraOrientador(
+            @RequestBody @Valid OrientadorRequestDTO orientadorDTO,
+            @AuthenticationPrincipal Jwt jwt) {
+        Orientador orientadorCriado = orientadorService.cadastrar(
+                    jwt.getClaimAsString(CLAIM_EMAIL), orientadorDTO);
 
         URI location = ServletUriComponentsBuilder.fromCurrentRequest()
                 .path("/{id}")
