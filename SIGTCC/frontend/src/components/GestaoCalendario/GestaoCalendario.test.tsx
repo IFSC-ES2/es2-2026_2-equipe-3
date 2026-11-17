@@ -56,6 +56,32 @@ describe("GestaoCalendario", () => {
     expect(linhas).toHaveLength(2); // TCC 1 e TCC 2 ainda sem prazo
   });
 
+  test("preenche a data do tipo inicial e atualiza ao trocar para outro tipo", async () => {
+    const user = userEvent.setup();
+    vi.mocked(listarPrazosVigentes).mockResolvedValue([
+      prazoProjetoExistente,
+      {
+        id: 11,
+        semestre: "2026/2",
+        tipo: "TCC1",
+        descricao: "TCC 1",
+        dataLimite: "2026-12-15",
+      },
+    ]);
+
+    render(<GestaoCalendario />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText("Data limite *")).toHaveValue("2026-11-30");
+    });
+
+    await user.selectOptions(
+      screen.getByLabelText("Tipo de entrega *"),
+      "TCC1",
+    );
+    expect(screen.getByLabelText("Data limite *")).toHaveValue("2026-12-15");
+  });
+
   test("deve cadastrar um novo prazo para um tipo ainda não cadastrado", async () => {
     const user = userEvent.setup();
     vi.mocked(listarPrazosVigentes).mockResolvedValue([]);

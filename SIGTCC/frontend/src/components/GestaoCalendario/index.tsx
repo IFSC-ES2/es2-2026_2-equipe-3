@@ -19,13 +19,14 @@ import "./GestaoCalendario.css";
 
 type ItemTipoEntrega = { valor: TipoEntrega; rotulo: string };
 type ErrosCampos = Record<string, string>;
+const TIPO_ENTREGA_INICIAL: TipoEntrega = "PROJETO_TCC";
 
 export function GestaoCalendario() {
   const [prazos, setPrazos] = useState<PrazoEntrega[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erroCarregamento, setErroCarregamento] = useState("");
   const [tipoSelecionado, setTipoSelecionado] =
-    useState<TipoEntrega>("PROJETO_TCC");
+    useState<TipoEntrega>(TIPO_ENTREGA_INICIAL);
   const [dataLimite, setDataLimite] = useState("");
   const [erros, setErros] = useState<ErrosCampos>({});
   const [erroGeral, setErroGeral] = useState("");
@@ -39,6 +40,10 @@ export function GestaoCalendario() {
         const dados = await listarPrazosVigentes();
         if (!ativo) return;
         setPrazos(dados);
+        setDataLimite(
+          dados.find((prazo) => prazo.tipo === TIPO_ENTREGA_INICIAL)
+            ?.dataLimite ?? "",
+        );
         setErroCarregamento("");
       } catch (erro) {
         if (!ativo) return;
