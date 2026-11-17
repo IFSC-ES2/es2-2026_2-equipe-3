@@ -312,6 +312,26 @@ class SolicitacaoServiceTest {
     }
 
     @Test
+    @DisplayName("Deve lançar OrientadorInativoException ao aceitar solicitação de orientador inativo, sem consumir vaga")
+    void atualizarStatus_ParaAceitaComOrientadorInativo_DeveLancarExcecao() {
+        Orientador orientador = criarOrientadorMock(1L, 2);
+        orientador.setAtivo(false);
+        SolicitacaoOrientacao solicitacao = criarSolicitacaoMock(100L, StatusSolicitacao.PENDENTE, orientador);
+        AtualizaStatusRequest request = new AtualizaStatusRequest(StatusSolicitacao.ACEITA, null);
+
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+
+        OrientadorInativoException exception = assertThrows(OrientadorInativoException.class,
+                () -> solicitacaoService.atualizarStatus(100L, request, EMAIL_ORIENTADOR));
+
+        assertEquals("O orientador está inativo e não pode aceitar solicitações.", exception.getMessage());
+        assertEquals(StatusSolicitacao.PENDENTE, solicitacao.getStatus());
+        assertEquals(2, orientador.getPerfil().getVagasDisponiveis());
+        verify(solicitacaoRepository, never()).save(any());
+        verify(eventPublisher, never()).publishEvent(any());
+    }
+
+    @Test
     @DisplayName("Deve atualizar o estado para RECUSADA com justificativa válida")
     void atualizarStatus_ParaRecusada_DeveAtualizar() {
         Orientador orientador = criarOrientadorMock(1L, 2);

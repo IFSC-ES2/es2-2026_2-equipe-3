@@ -3,8 +3,11 @@ package br.edu.ifsc.gestao_tcc.controller;
 import br.edu.ifsc.gestao_tcc.model.Aluno;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
 import br.edu.ifsc.gestao_tcc.model.PerfilOrientador;
+import br.edu.ifsc.gestao_tcc.model.SolicitacaoOrientacao;
+import br.edu.ifsc.gestao_tcc.model.StatusSolicitacao;
 import br.edu.ifsc.gestao_tcc.repository.AlunoRepository;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
+import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -45,6 +48,9 @@ class OrientadorControllerIntegrationTest {
 
     @Autowired
     private AlunoRepository alunoRepository;
+
+    @Autowired
+    private SolicitacaoRepository solicitacaoRepository;
 
     private Orientador professorA;
     private Orientador professorB;
@@ -247,6 +253,59 @@ class OrientadorControllerIntegrationTest {
                 .andExpect(jsonPath("$.detalhes").value("O e-mail do orientador não pode ser alterado."));
 
         assertThat(recarregar(professorA).getEmail()).isEqualTo(EMAIL_PROFESSOR_A);
+    }
+
+    // --- Orientador desativado (issue #263) ---
+
+    @Test
+    @DisplayName("GET /orientadores - Orientador desativado não deve aparecer no catálogo")
+    void listar_NaoDeveRetornarOrientadorDesativado() throws Exception {
+        professorB.setAtivo(false);
+        orientadorRepository.saveAndFlush(professorB);
+
+        mockMvc.perform(get(URL).with(tokenDe("ROLE_ALUNO", EMAIL_ALUNO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.email == '" + EMAIL_PROFESSOR_A + "')]").exists())
+                .andExpect(jsonPath("$[?(@.email == '" + EMAIL_PROFESSOR_B + "')]").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("DELETE /orientadores/{id} - Desativar deve cancelar as solicitações PENDENTE e manter as ACEITA e as vagas")
+    void deletar_DeveCancelarSolicitacoesPendentes() throws Exception {
+        SolicitacaoOrientacao pendente1 = salvarSolicitacao(professorA, "aluno.um@example.com", StatusSolicitacao.PENDENTE);
+        SolicitacaoOrientacao pendente2 = salvarSolicitacao(professorA, "aluno.dois@example.com", StatusSolicitacao.PENDENTE);
+        SolicitacaoOrientacao aceita = salvarSolicitacao(professorA, "aluno.tres@example.com", StatusSolicitacao.ACEITA);
+        SolicitacaoOrientacao deOutroProfessor =
+                salvarSolicitacao(professorB, "aluno.quatro@example.com", StatusSolicitacao.PENDENTE);
+
+        mockMvc.perform(delete(URL + "/" + professorA.getId())
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A)))
+                .andExpect(status().isNoContent());
+
+        assertThat(statusDe(pendente1)).isEqualTo(StatusSolicitacao.CANCELADA);
+        assertThat(statusDe(pendente2)).isEqualTo(StatusSolicitacao.CANCELADA);
+        assertThat(statusDe(aceita)).isEqualTo(StatusSolicitacao.ACEITA);
+        assertThat(statusDe(deOutroProfessor)).isEqualTo(StatusSolicitacao.PENDENTE);
+        assertThat(recarregar(professorA).getPerfil().getVagasDisponiveis()).isEqualTo(3);
+    }
+
+    private SolicitacaoOrientacao salvarSolicitacao(Orientador orientador, String emailAluno, StatusSolicitacao status) {
+        Aluno aluno = alunoRepository.saveAndFlush(Aluno.builder()
+                .nome("Aluno " + emailAluno)
+                .email(emailAluno)
+                .curso("Engenharia")
+                .build());
+        return solicitacaoRepository.saveAndFlush(SolicitacaoOrientacao.builder()
+                .orientador(orientador)
+                .aluno(aluno)
+                .tema("Tema de TCC em Engenharia de Software")
+                .mensagem("Gostaria de desenvolver meu trabalho sob sua orientação.")
+                .status(status)
+                .build());
+    }
+
+    private StatusSolicitacao statusDe(SolicitacaoOrientacao solicitacao) {
+        return solicitacaoRepository.findById(solicitacao.getId()).orElseThrow().getStatus();
     }
 
     // --- Handlers genéricos do GlobalExceptionHandler (issue #262) ---

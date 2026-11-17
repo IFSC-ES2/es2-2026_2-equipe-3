@@ -42,12 +42,12 @@ Herdados do contrato da US02, sem alterações:
 
 ### 3.1. Enumeração `StatusSolicitacao`
 
-| Valor       | Significado                                                                | Definido por                   |
-| :---------- | :------------------------------------------------------------------------- | :----------------------------- |
-| `PENDENTE`  | Solicitação criada e aguardando resposta do orientador                     | Sistema (criação)              |
-| `ACEITA`    | Orientador aceitou; uma vaga foi consumida                                 | Orientador (`PATCH`)           |
-| `RECUSADA`  | Orientador recusou, com justificativa                                      | Orientador (`PATCH`)           |
-| `CANCELADA` | Solicitação cancelada (reservado no modelo; **sem endpoint** nesta sprint) | - (fora do escopo da Sprint 2) |
+| Valor       | Significado                                              | Definido por                          |
+| :---------- | :------------------------------------------------------- | :------------------------------------ |
+| `PENDENTE`  | Solicitação criada e aguardando resposta do orientador   | Sistema (criação)                     |
+| `ACEITA`    | Orientador aceitou; uma vaga foi consumida               | Orientador (`PATCH`)                  |
+| `RECUSADA`  | Orientador recusou, com justificativa                    | Orientador (`PATCH`)                  |
+| `CANCELADA` | Solicitação cancelada porque o orientador foi desativado | Sistema (`DELETE /orientadores/{id}`) |
 
 ### 3.2. `SolicitacaoRequest` (entrada do `POST`)
 
@@ -458,7 +458,7 @@ A solicitação já foi respondida (status diferente de `PENDENTE`).
 
 ##### Regra de Negócio Violada: `422 Unprocessable Entity`
 
-Aceite com orientador sem vagas, ou status de destino não permitido neste endpoint (`PENDENTE`, `CANCELADA`).
+Aceite com orientador sem vagas ou inativo, ou status de destino não permitido neste endpoint (`PENDENTE`, `CANCELADA`).
 
 ```json
 {
@@ -599,12 +599,13 @@ Retornado quando o usuário autenticado não é o aluno autor nem o orientador r
 
 ### 6.5. `422 Unprocessable Entity`
 
-| Endpoint | Condição                                      | `detalhes`                                                                    |
-| :------- | :-------------------------------------------- | :---------------------------------------------------------------------------- |
-| `POST`   | Orientador com `vagasDisponiveis = 0`         | `O orientador não possui vagas disponíveis.`                                  |
-| `POST`   | Orientador inativo (`ativo = false`)          | `O orientador não está disponível para receber solicitações.`                 |
-| `PATCH`  | `ACEITA` com orientador sem vagas             | `O orientador não possui vagas disponíveis para aceitar esta solicitação.`    |
-| `PATCH`  | `status` de destino `PENDENTE` ou `CANCELADA` | `Somente os status ACEITA ou RECUSADA podem ser definidos por este endpoint.` |
+| Endpoint | Condição                                          | `detalhes`                                                                    |
+| :------- | :------------------------------------------------ | :---------------------------------------------------------------------------- |
+| `POST`   | Orientador com `vagasDisponiveis = 0`             | `O orientador não possui vagas disponíveis.`                                  |
+| `POST`   | Orientador inativo (`ativo = false`)              | `O orientador não está disponível para receber solicitações.`                 |
+| `PATCH`  | `ACEITA` com orientador inativo (`ativo = false`) | `O orientador está inativo e não pode aceitar solicitações.`                  |
+| `PATCH`  | `ACEITA` com orientador sem vagas                 | `O orientador não possui vagas disponíveis para aceitar esta solicitação.`    |
+| `PATCH`  | `status` de destino `PENDENTE` ou `CANCELADA`     | `Somente os status ACEITA ou RECUSADA podem ser definidos por este endpoint.` |
 
 **Critério de separação 409 × 422:** `409` indica que o **estado atual dos dados** impede a operação (duplicidade, solicitação já respondida). `422` indica que a requisição é bem formada e o recurso existe, mas uma **regra de negócio** a impede (sem vagas, orientador inativo, transição não permitida neste endpoint).
 
@@ -613,14 +614,14 @@ Retornado quando o usuário autenticado não é o aluno autor nem o orientador r
 ## 7. Máquina de Estados da Solicitação
 
 ```text
-              ┌──────────► ACEITA     (vagasDisponiveis - 1)
- PENDENTE ────┤
-              └──────────► RECUSADA   (exige justificativa)
-
- CANCELADA: previsto no modelo, sem transição exposta na Sprint 2.
+              ┌──────────► ACEITA     (vagasDisponiveis - 1; exige orientador ativo)
+ PENDENTE ────┼──────────► RECUSADA   (exige justificativa)
+              └──────────► CANCELADA  (automático ao desativar o orientador)
 ```
 
-`ACEITA`, `RECUSADA` e `CANCELADA` são estados finais nesta sprint. Qualquer `PATCH` sobre uma solicitação fora de `PENDENTE` retorna `409`.
+`ACEITA`, `RECUSADA` e `CANCELADA` são estados finais. Qualquer `PATCH` sobre uma solicitação fora de `PENDENTE` retorna `409`.
+
+**Desativação do orientador (issue #263):** `DELETE /api/v1/orientadores/{id}` muda todas as solicitações `PENDENTE` do orientador para `CANCELADA` e publica `SolicitacaoStatusChangedEvent` para cada uma. As vagas não mudam, e as solicitações `ACEITA` e `RECUSADA` não são alteradas. A migration `V9` aplicou a mesma regra aos orientadores desativados antes da correção.
 
 ---
 
@@ -636,7 +637,7 @@ Retornado quando o usuário autenticado não é o aluno autor nem o orientador r
 | D3  | Tamanhos mínimos/máximos de `tema` (5–150), `mensagem` (10–1000) e `justificativa` (10–500).                                                                                                  | A #11 não define limites; valores adotados aqui e ajustáveis nas colunas.                                                           |
 | D4  | `justificativa` enviada com `ACEITA` é ignorada (sem erro).                                                                                                                                   | Simplifica o frontend; evita 400 por dado irrelevante.                                                                              |
 | D5  | Listagem ordenada por `criadoEm` decrescente, sem paginação.                                                                                                                                  | Consistente com a listagem de orientadores da US02.                                                                                 |
-| D6  | `CANCELADA` existe na enumeração, mas nenhum endpoint a define.                                                                                                                               | O plano da Sprint 2 lista o status, mas só descreve `ACEITA`/`RECUSADA`.                                                            |
+| D6  | `CANCELADA` não pode ser definido pelo `PATCH`; só o sistema o define, ao desativar o orientador (issue #263).                                                                                | O plano da Sprint 2 lista o status, mas só descreve `ACEITA`/`RECUSADA`.                                                            |     | O plano da Sprint 2 lista o status, mas só descreve `ACEITA`/`RECUSADA`. |
 | D7  | O acompanhamento do aluno é feito por `GET /{id}` (sem endpoint de listagem por aluno).                                                                                                       | Fora do escopo da sprint (decisão tomada antes da autenticação da US01).                                                            |
 | D8  | O "painel" do orientador é a listagem `GET .../orientador/{id}?status=PENDENTE`, sem push, WebSocket ou e-mail. Não há observer de notificação - apenas `AtualizadorVagasObserver`, síncrono. | Confirmado pela equipe; atende ao cenário 1 da #11 dentro do escopo da sprint.                                                      |
 | D12 | A verificação de e-mail cruzado (`Aluno`↔`Orientador` na tabela `usuarios`) retorna `409 Conflict` com mensagem específica.                                                                   | Implementada na [#261](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/261) via `UsuarioRepository.existsByEmailIgnoreCase`. |
