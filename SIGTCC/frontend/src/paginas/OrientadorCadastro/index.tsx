@@ -7,6 +7,7 @@ import { useAuth } from "../../auth/useAuth";
 
 export function OrientadorCadastroPage() {
   const navigate = useNavigate();
+  const { sessao } = useAuth();
   const [mensagem, setMensagem] = useState("");
   const [sucesso, setSucesso] = useState(false);
 
@@ -21,6 +22,7 @@ export function OrientadorCadastroPage() {
   return (
     <PageShell active="cadastro" mensagem={mensagem} sucesso={sucesso}>
       <OrientadorForm
+        emailAutenticado={sessao?.email ?? ""}
         onSucesso={handleSucesso}
         onErro={(erro) => {
           setSucesso(false);
