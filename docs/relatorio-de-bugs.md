@@ -27,9 +27,9 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | ---------- | ---------- | ---------- | --------------------- |
 | Crítica    | 4          | 4          | 0                     |
 | Alta       | 4          | 4          | 0                     |
-| Média      | 7          | 5          | 2                     |                                                                                                                                       
-| Baixa      | 7          | 2          | 5                     |                                                                                                                                       
-| **Total**  | **22**     | **15**     | **7**                 |  
+| Média      | 7          | 5          | 2                     |
+| Baixa      | 7          | 2          | 5                     |
+| **Total**  | **22**     | **15**     | **7**                 |
 
 | Bug    | Título resumido                                    | Severidade | Status final                   | Issue                                                              | PR                                                                          |
 | ------ | -------------------------------------------------- | ---------- | ------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
@@ -62,25 +62,24 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 
 Defeitos não corrigidos até o congelamento de código, com o efeito observável para quem usa o sistema. Esta lista é replicada no `README.md` e na descrição da release.
 
-  | Bug    | Limitação                                                                                                                                                   | Contorno                      |                                                                                                                                                 
-  | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |                               
-  ----------------------------------------------------------------------------------- |                                                                                                                  
-  | BUG-14 | O filtro por linha de pesquisa usa "contém": filtrar por "IA" também traz "Mídias Digitais".                                                                | —                             
-                                                       |                                                                                                                                                 
-  | BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele.                                                                       | Não ocorre em banco novo, como
-  o de _staging_ ou o criado pelo `docker compose up`. |                                                                                                                                                 
-  | BUG-16 | A chave `xspring.application.name` está com um "x" a mais, e o arquivo `application.properties` não está em UTF-8.                                          | Sem efeito funcional.         
-                                                       |                                                                                                                                                 
-  | BUG-18 | Ao abrir um link protegido sem estar logado, o usuário vai para a página inicial do seu papel após o login, e não para o link original.                     | Navegar de novo até a página  
-  desejada.                                              |                                                                                                                                               
-  | BUG-19 | Na edição do perfil, campos opcionais vazios (`departamento`, `biografia`) geram aviso de input não controlado no console, e o PATCH reenvia campos extras. | Sem efeito visível para o     
-  usuário.                                                  |                                                                                                                                            
-  | BUG-20 | O calendário de prazos abre em "Editar prazo" com a data em branco, mesmo quando o prazo já existe.                                                         | Selecionar outro tipo de      
-  entrega e voltar, ou consultar a lista de prazos.          |                                                                                                                                           
-  | BUG-22 | Qualquer professor pode cadastrar um perfil de orientador com um e-mail digitado livremente, sem vínculo com a conta do Keycloak.                           | A edição e a remoção já são   
-  restritas ao dono do perfil (PR #211).   
-  
-  
+| Bug | Limitação | Contorno |  
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |  
+----------------------------------------------------------------------------------- |  
+| BUG-14 | O filtro por linha de pesquisa usa "contém": filtrar por "IA" também traz "Mídias Digitais". | —  
+|  
+| BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele. | Não ocorre em banco novo, como
+o de _staging_ ou o criado pelo `docker compose up`. |  
+| BUG-16 | A chave `xspring.application.name` está com um "x" a mais, e o arquivo `application.properties` não está em UTF-8. | Sem efeito funcional.  
+|  
+| BUG-18 | Ao abrir um link protegido sem estar logado, o usuário vai para a página inicial do seu papel após o login, e não para o link original. | Navegar de novo até a página  
+desejada. |  
+| BUG-19 | Na edição do perfil, campos opcionais vazios (`departamento`, `biografia`) geram aviso de input não controlado no console, e o PATCH reenvia campos extras. | Sem efeito visível para o  
+usuário. |  
+| BUG-20 | O calendário de prazos abre em "Editar prazo" com a data em branco, mesmo quando o prazo já existe. | Selecionar outro tipo de  
+entrega e voltar, ou consultar a lista de prazos. |  
+| BUG-22 | Qualquer professor pode cadastrar um perfil de orientador com um e-mail digitado livremente, sem vínculo com a conta do Keycloak. | A edição e a remoção já são  
+restritas ao dono do perfil (PR #211).
+
 ## 4. Detalhamento dos bugs
 
 ### 4.1. Severidade crítica (segurança e autorização)
