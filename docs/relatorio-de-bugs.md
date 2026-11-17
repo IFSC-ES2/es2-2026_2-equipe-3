@@ -28,8 +28,8 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | Crítica    | 4          | 4          | 0                     |
 | Alta       | 4          | 4          | 0                     |
 | Média      | 7          | 3          | 4                     |
-| Baixa      | 7          | 0          | 7                     |
-| **Total**  | **22**     | **11**     | **11**                |
+| Baixa      | 7          | 1          | 6                     |
+| **Total**  | **22**     | **12**     | **10**                |
 
 | Bug    | Título resumido                                    | Severidade | Status final                   | Issue                                                              | PR                                                                          |
 | ------ | -------------------------------------------------- | ---------- | ------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
@@ -49,7 +49,7 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | BUG-14 | Filtro por linha de pesquisa compara por substring | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-15 | Seed V5 pode sobrescrever dados                    | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-16 | Erro de digitação em `application.properties`      | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
-| BUG-17 | Contador de vagas mostra "—"                       | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
+| BUG-17 | Contador de vagas mostra "—"                       | Baixa      | Corrigido                      | [#266](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/266) | PR da issue #266                                                            |
 | BUG-18 | Redirecionamento após o login não acontece         | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-19 | Inputs controlados recebem `null`                  | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-20 | Calendário abre com a data vazia                   | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
@@ -69,7 +69,6 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 | BUG-14 | O filtro por linha de pesquisa usa "contém": filtrar por "IA" também traz "Mídias Digitais".                                                                                                        | —                                                                                   |
 | BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele.                                                                                                               | Não ocorre em banco novo, como o de _staging_ ou o criado pelo `docker compose up`. |
 | BUG-16 | A chave `xspring.application.name` está com um "x" a mais, e o arquivo `application.properties` não está em UTF-8.                                                                                  | Sem efeito funcional.                                                               |
-| BUG-17 | O painel do professor mostra "—" em vagas disponíveis quando não há solicitações pendentes.                                                                                                         | Consultar as vagas em "Meu perfil".                                                 |
 | BUG-18 | Ao abrir um link protegido sem estar logado, o usuário vai para a página inicial do seu papel após o login, e não para o link original.                                                             | Navegar de novo até a página desejada.                                              |
 | BUG-19 | Na edição do perfil, campos opcionais vazios (`departamento`, `biografia`) geram aviso de input não controlado no console, e o PATCH reenvia campos extras.                                         | Sem efeito visível para o usuário.                                                  |
 | BUG-20 | O calendário de prazos abre em "Editar prazo" com a data em branco, mesmo quando o prazo já existe.                                                                                                 | Selecionar outro tipo de entrega e voltar, ou consultar a lista de prazos.          |
@@ -286,11 +285,14 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-17: O contador de vagas do painel mostra "—" quando não há solicitações pendentes
 
-- **Status:** Limitação conhecida. Sem issue nem PR.
-- **Local:** `frontend/src/paginas/PainelSolicitacoes/index.tsx` (linhas 49 a 51 e 208 a 211)
-- **Descrição:** As vagas são lidas de `dados[0].orientador.vagasDisponiveis`, ou seja, só existem quando há pelo menos uma solicitação pendente.
-- **Impacto:** O professor sem pedidos pendentes não vê quantas vagas tem.
-- **Sugestão:** Obter as vagas do perfil do orientador, via `/orientadores/{id}` ou incluindo-as em `/professores/me`.
+- **Status:** Corrigido. Issue [#266](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/266).
+- **Local:** `frontend/src/paginas/PainelSolicitacoes/index.tsx`
+- **Descrição (antes da correção):** As vagas eram lidas de `dados[0].orientador.vagasDisponiveis`, ou seja, só existiam quando havia pelo menos uma solicitação pendente.
+- **Impacto (antes da correção):** O professor sem pedidos pendentes não via quantas vagas tinha.
+- **Correção:**
+  - O painel passa a buscar as vagas no perfil do orientador logado com `obterOrientador(perfil.id)` (`GET /orientadores/{id}`), o mesmo padrão da tela "Meu perfil". Nenhum endpoint mudou.
+  - Se essa busca falhar, a lista de solicitações continua sendo exibida e o contador mostra "—".
+  - Após um aceite, o contador continua sendo atualizado com as vagas devolvidas pelo `PATCH`.
 
 #### BUG-18: O redirecionamento de volta após o login nunca acontece
 

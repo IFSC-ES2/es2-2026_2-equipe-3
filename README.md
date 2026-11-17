@@ -255,8 +255,8 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 
 A triagem final do relatório de bugs teve este resultado:
 
-- **Corrigidos (11):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`. O BUG-12 foi corrigido na issue `#262`, que também resolveu indiretamente o BUG-09.
-- **Limitações conhecidas (11):** os demais, todos de severidade média ou baixa, listados abaixo.
+- **Corrigidos (12):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`. O BUG-12 foi corrigido na issue `#262`, que também resolveu indiretamente o BUG-09. O BUG-17 foi corrigido na issue `#266`.
+- **Limitações conhecidas (10):** os demais, todos de severidade média ou baixa, listados abaixo.
 
 Nenhum defeito conhecido impede a demonstração do MVP. Detalhes, passos de reprodução e sugestões de correção estão na seção 4 do relatório.
 
@@ -267,7 +267,6 @@ Nenhum defeito conhecido impede a demonstração do MVP. Detalhes, passos de rep
 | BUG-14 | Média      | O filtro por linha de pesquisa compara por substring ("IA" também traz "Mídias Digitais").                                       |
 | BUG-15 | Média      | O seed `V5` usa IDs fixos e pode sobrescrever dados de bancos criados antes dele. Não afeta bancos novos.                        |
 | BUG-16 | Baixa      | Chave `xspring.application.name` com erro de digitação, e `application.properties` fora de UTF-8.                                |
-| BUG-17 | Baixa      | O painel do professor mostra "—" em vagas disponíveis quando não há solicitações pendentes.                                      |
 | BUG-18 | Baixa      | Após o login, o usuário não volta ao link protegido que tentou abrir.                                                            |
 | BUG-19 | Baixa      | Na edição do perfil, campos opcionais nulos geram aviso de input não controlado, e o PATCH reenvia campos extras.                |
 | BUG-20 | Baixa      | O calendário de prazos abre em "Editar prazo" com a data em branco.                                                              |
