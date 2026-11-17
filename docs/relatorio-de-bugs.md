@@ -27,9 +27,9 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | ---------- | ---------- | ---------- | --------------------- |
 | Crítica    | 4          | 4          | 0                     |
 | Alta       | 4          | 4          | 0                     |
-| Média      | 7          | 1          | 6                     |
+| Média      | 7          | 3          | 4                     |
 | Baixa      | 7          | 0          | 7                     |
-| **Total**  | **22**     | **9**      | **13**                |
+| **Total**  | **22**     | **11**     | **11**                |
 
 | Bug    | Título resumido                                    | Severidade | Status final                   | Issue                                                              | PR                                                                          |
 | ------ | -------------------------------------------------- | ---------- | ------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
@@ -41,10 +41,10 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | BUG-06 | "Meu perfil" depende do `localStorage`             | Alta       | Corrigido                      | [#204](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/204) | [#217](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/217)            |
 | BUG-07 | Sessão expira em ~5 minutos                        | Alta       | Corrigido                      | [#205](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/205) | [#225](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/225)            |
 | BUG-08 | Condição de corrida nas vagas                      | Alta       | Corrigido                      | [#206](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/206) | [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241)            |
-| BUG-09 | Conflito de e-mail aluno/orientador gera 500       | Média      | Limitação conhecida (mitigada) | —                                                                  | Mitigação: [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) |
+| BUG-09 | Conflito de e-mail aluno/orientador gera 500       | Média      | Corrigido indiretamente        | [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) | Mesmo PR do BUG-12                                                          |
 | BUG-10 | PATCH de orientador sem checar e-mail duplicado    | Média      | Corrigido indiretamente        | [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211)            |
 | BUG-11 | Faltam limites de tamanho nos DTOs                 | Média      | Limitação conhecida (mitigada) | —                                                                  | Mitigação: [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) |
-| BUG-12 | Sem handler genérico de exceções                   | Média      | Limitação conhecida (mitigada) | —                                                                  | Mitigação: [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241) |
+| BUG-12 | Sem handler genérico de exceções                   | Média      | Corrigido                      | [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) | PR da issue #262                                                            |
 | BUG-13 | Orientador desativado continua listado e operando  | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-14 | Filtro por linha de pesquisa compara por substring | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-15 | Seed V5 pode sobrescrever dados                    | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
@@ -64,9 +64,7 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 | Bug    | Limitação                                                                                                                                                                                           | Contorno                                                                            |
 | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| BUG-09 | Cadastrar um orientador com o e-mail de um aluno já existente retorna **500**, e não 409.                                                                                                           | Usar e-mails distintos para alunos e professores, como no realm do Keycloak.        |
 | BUG-11 | O cadastro de orientador (`POST /orientadores`) não limita o tamanho de `nome`, `departamento`, `biografia` e dos itens de `linhasDePesquisa`. Valores grandes enviados direto à API geram **500**. | O formulário do frontend já valida os tamanhos.                                     |
-| BUG-12 | Erros inesperados, como violação de integridade, saem no formato padrão do Spring, fora do `ErrorResponseDTO`, e o frontend mostra uma mensagem genérica.                                           | —                                                                                   |
 | BUG-13 | A API do catálogo devolve orientadores desativados. Desativar um orientador não cancela as solicitações pendentes dele, e ainda é possível aceitá-las.                                              | O frontend oculta os orientadores inativos do catálogo.                             |
 | BUG-14 | O filtro por linha de pesquisa usa "contém": filtrar por "IA" também traz "Mídias Digitais".                                                                                                        | —                                                                                   |
 | BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele.                                                                                                               | Não ocorre em banco novo, como o de _staging_ ou o criado pelo `docker compose up`. |
@@ -188,17 +186,15 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-09: Conflito de e-mail entre aluno e orientador gera erro 500
 
-- **Status:** Limitação conhecida (mitigada). Sem issue própria. A mitigação veio com o PR [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213).
+- **Status:** Corrigido indiretamente. Issue [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262), no mesmo PR do BUG-12. Antes, o PR [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) já havia mitigado o defeito.
 - **Local:**
   - `backend/.../service/OrientadorService.java` (`cadastrar`)
   - `db/migration/V1__criar_tabelas_iniciais.sql` (`uk_usuario_email`)
 - **Descrição:** O e-mail é `UNIQUE` na tabela `usuarios`, que é compartilhada entre alunos e orientadores (herança `JOINED`). Mas `cadastrar` verifica apenas orientadores (`OrientadorRepository.existsByEmail`).
-- **Impacto:** Cadastrar um orientador com o e-mail de um aluno faz o banco lançar `DataIntegrityViolationException`. Ela não tem handler e vira **500**, quando o contrato espera 409.
+- **Impacto (antes da correção):** Cadastrar um orientador com o e-mail de um aluno fazia o banco lançar `DataIntegrityViolationException`. Ela não tinha handler e virava **500**, quando o contrato espera 409.
 - **Mitigação:** Após o PR #213, a solicitação usa o e-mail do JWT e exige `ROLE_ALUNO`. Deixou de ser possível criar uma solicitação com o e-mail de um orientador, que era o segundo caminho do defeito.
-- **Como reproduzir:** Com um aluno já registrado em `alunos`, envie `POST /api/v1/orientadores` com o e-mail desse aluno.
-- **Sugestão:**
-  - Verificar a existência do e-mail em `usuarios`.
-  - Adicionar um handler para `DataIntegrityViolationException` que retorne 409.
+- **Correção:** O handler de `DataIntegrityViolationException` adicionado na issue #262 converte a violação em **409** / `Conflito de dados` no formato `ErrorResponseDTO`. O cenário é coberto por `OrientadorControllerIntegrationTest.cadastrar_EmailDeAlunoExistente_DeveRetornar409`.
+- **Melhoria possível:** Verificar a existência do e-mail em `usuarios` no `cadastrar`, para devolver uma mensagem específica ("e-mail já cadastrado") em vez da mensagem genérica de integridade.
 
 #### BUG-10: O PATCH de orientador não verifica duplicidade de e-mail
 
@@ -225,12 +221,15 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-12: Não há handler genérico de exceções
 
-- **Status:** Limitação conhecida (mitigada). Sem issue própria. A mitigação veio com o PR [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241).
+- **Status:** Corrigido. Issue [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262). Antes, o PR [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241) já havia adicionado o handler de `OptimisticLockingFailureException` (409), como consequência da correção do BUG-08.
 - **Local:** `backend/.../exception/GlobalExceptionHandler.java`
-- **Descrição:** Não existem handlers para `Exception` nem para `DataIntegrityViolationException`.
-- **Mitigação:** O PR #241 adicionou o handler de `OptimisticLockingFailureException` (409), citado neste item como consequência da correção do BUG-08.
-- **Impacto:** Erros inesperados (BUG-09 e BUG-11) saem no formato padrão do Spring, fora do `ErrorResponseDTO` previsto em `docs/contrato-dados-*.md`. O `utils/apiErro.ts` do frontend cai na mensagem genérica.
-- **Sugestão:** Adicionar handlers para esses casos, com 409 para integridade e 500 no formato padrão para o restante.
+- **Descrição:** Não existiam handlers para `Exception` nem para `DataIntegrityViolationException`.
+- **Impacto (antes da correção):** Erros inesperados (BUG-09 e BUG-11) saíam no formato padrão do Spring, fora do `ErrorResponseDTO` previsto em `docs/contrato-dados-*.md`. O `utils/apiErro.ts` do frontend caía na mensagem genérica.
+- **Correção:**
+  - `DataIntegrityViolationException` → **409** / `Conflito de dados`, com mensagem genérica. A mensagem do banco vai só para o log.
+  - `Exception` → **500** / `Erro interno do servidor`, com mensagem fixa e sem stack trace. A exceção é registrada no log.
+  - Exceções do Spring MVC que já carregam status (rota inexistente, método não suportado, parâmetro ausente) mantêm o status original, no formato `ErrorResponseDTO`.
+  - Os handlers específicos continuam com precedência, verificado em `GlobalExceptionHandlerTest.testPrecedenciaDosHandlers`.
 
 #### BUG-13: Orientador desativado continua listado e operando
 
