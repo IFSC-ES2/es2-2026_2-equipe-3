@@ -20,7 +20,8 @@ public interface OrientadorRepository extends JpaRepository<Orientador, Long> {
         FROM Orientador o
         JOIN o.perfil p
         LEFT JOIN p.linhasPesquisa lp
-        WHERE (:area IS NULL OR LOWER(lp.nome) LIKE LOWER(CONCAT('%', :area, '%')))
+        WHERE o.ativo = true
+          AND (:area IS NULL OR LOWER(lp.nome) = LOWER(:area))
           AND (:temVagas IS NULL OR :temVagas = false OR p.vagasDisponiveis > 0)
     """)
     List<Orientador> findByFiltros(@Param("area") String area, @Param("temVagas") Boolean temVagas);
