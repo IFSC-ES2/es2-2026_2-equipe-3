@@ -107,70 +107,55 @@ O Keycloak importa automaticamente o arquivo `SIGTCC/keycloak/realm-import.json`
 
 ---
 
-## 3. Ambiente de Staging (Validação Externa via Cloudflare)
+## 3. Ambiente de Staging (Validação Externa via Tailscale Funnel)
 
-O ambiente de _staging_ utiliza o arquivo `SIGTCC/docker-compose.prod.yml` (com builds multi-stage otimizados: JRE 21 para o backend e Nginx na porta `80` para o frontend) aliado ao **Cloudflare Quick Tunnels** (`trycloudflare.com`) para expor a aplicação temporariamente à equipe durante validações de entrega.
+O ambiente de _staging_ utiliza o arquivo `SIGTCC/docker-compose.prod.yml` (com builds multi-stage otimizados: JRE 21 para o backend e Nginx na porta `80` para o frontend) aliado ao **Tailscale Funnel** para expor a aplicação por **URLs públicas e fixas com HTTPS** durante as avaliações da equipe e banca (conforme a Issue #260).
 
-> Para instruções operacionais adicionais, comandos complementares e histórico de validação da Sprint 4 (Issue #220), consulte também [`docs/staging.md`](staging.md).
+> **Documento Oficial de Staging:** Para o passo a passo operacional completo, credenciais de teste, procedimento de reinício e histórico de homologação, consulte **[`docs/staging.md`](staging.md)**.
 
-> **Nota sobre CI/CD (GHCR):** A cada push aprovado na branch `entrega-8`, o workflow `.github/workflows/docker-build.yml` também compila e publica automaticamente as imagens `ghcr.io/ifsc-es2/sigtcc-backend` e `ghcr.io/ifsc-es2/sigtcc-frontend` (tags `latest` e `<git-sha>`) no GitHub Container Registry. O staging com túnel dinâmico não utiliza essas imagens diretamente porque o frontend precisa embutir as URLs efêmeras geradas a cada execução.
+### 3.1. URLs Fixas do Ambiente
 
-### Passo a Passo para Subir o Staging
+| Serviço             | URL Pública Fixa                               | Porta Local |
+| :------------------ | :--------------------------------------------- | :---------- |
+| **Frontend**        | `https://sigtcc.cobbler-albacore.ts.net`       | `80`        |
+| **Backend (API)**   | `https://sigtcc.cobbler-albacore.ts.net:8443`  | `8080`      |
+| **Keycloak (Auth)** | `https://sigtcc.cobbler-albacore.ts.net:10000` | `8081`      |
 
-1. **Encerre o ambiente de desenvolvimento local** (caso esteja rodando) para liberar as portas `8080` (API) e `8081` (Keycloak), e a porta `80` ou `5173` do Frontend:
+### 3.2. Passo a Passo Resumido para Subir o Staging
 
-```bash
-cd SIGTCC
-docker compose down
-```
-
-2. **Abra três terminais separados e inicie os túneis do Cloudflare** para o Backend (`8080`), Keycloak (`8081`) e Frontend (`80`). O `cloudflared` gera as URLs públicas `https://<subdominio>.trycloudflare.com` imediatamente:
-
-```bash
-# Terminal 1 - Túnel da API (Backend)
-cloudflared tunnel --url http://localhost:8080
-
-# Terminal 2 - Túnel do Keycloak (IAM)
-cloudflared tunnel --url http://localhost:8081
-
-# Terminal 3 - Túnel do Frontend (Nginx)
-cloudflared tunnel --url http://localhost:80
-```
-
-3. **Atualize o arquivo `SIGTCC/.env`** com as 3 URLs HTTPS geradas no passo anterior:
+1. **Configurar o arquivo `SIGTCC/.env`** com as URLs fixas:
 
 ```dotenv
-VITE_API_URL=https://<url-gerada-para-8080>.trycloudflare.com
-VITE_KEYCLOAK_URL=https://<url-gerada-para-8081>.trycloudflare.com
-KEYCLOAK_PUBLIC_URL=https://<url-gerada-para-8081>.trycloudflare.com
-APP_CORS_ALLOWED_ORIGINS=https://<url-gerada-para-80>.trycloudflare.com
+VITE_API_URL=https://sigtcc.cobbler-albacore.ts.net:8443
+VITE_KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000
+KEYCLOAK_PUBLIC_URL=https://sigtcc.cobbler-albacore.ts.net:10000
+APP_CORS_ALLOWED_ORIGINS=https://sigtcc.cobbler-albacore.ts.net
 ```
 
-4. **Construa e suba o stack de produção/staging com banco zerado:**
-
-> O script de smoke test do passo 6 cria entidades no banco e não é repetível sobre o mesmo banco sem falhar em conflitos. Sempre zere o banco com `-v` antes de subir:
+2. **Ativar os túneis do Tailscale Funnel** para as três portas locais:
 
 ```bash
+tailscale funnel --bg --yes 80
+tailscale funnel --bg --yes --https=8443 8080
+tailscale funnel --bg --yes --https=10000 8081
+```
+
+3. **Subir o stack na tag oficial (`v1.0.0-rc.1`):**
+
+```bash
+git fetch --tags
+git checkout v1.0.0-rc.1
 cd SIGTCC
-docker compose -f docker-compose.prod.yml --env-file .env down -v
 docker compose -f docker-compose.prod.yml --env-file .env up -d --build
 ```
 
-5. **Verificação de Web Origins no Keycloak (se necessário):**
-   - O arquivo `SIGTCC/keycloak/realm-import.json` já vem configurado com `webOrigins: ["*"]` para staging, de modo que o client `sigtcc-frontend` já aceita requisições da URL do túnel automaticamente em volumes novos.
-   - Essa intervenção manual só é necessária caso exista um volume persistido antigo do Keycloak que não tenha sido recriado com `docker compose down -v`. Nesse cenário:
-     - Acesse o console administrativo do Keycloak em `http://localhost:8081` (ou pela URL do túnel 2) com as credenciais definidas em `KEYCLOAK_ADMIN_USERNAME` e `KEYCLOAK_ADMIN_PASSWORD`.
-     - Selecione o realm **`sigtcc`** -> **Clients** -> **`sigtcc-frontend`**.
-     - Em **Web origins**, adicione a URL pública do frontend (`https://<url-gerada-para-80>.trycloudflare.com`) ou `*`, e clique em **Save**.
+4. **Validar com o Smoke Test Automatizado:**
 
-6. **Validação (Smoke Test) e Compartilhamento:**
-   - Execute o comando oficial do smoke test automatizado (criado na Issue #220) a partir da raiz do repositório para validação da API e autenticação em staging:
-     ```bash
-     KEYCLOAK_URL=<url-do-keycloak> API_URL=<url-do-backend> bash SIGTCC/scripts/smoke-test.sh
-     ```
-     _(Exemplo: `KEYCLOAK_URL=https://<url-gerada-para-8081>.trycloudflare.com API_URL=https://<url-gerada-para-8080>.trycloudflare.com bash SIGTCC/scripts/smoke-test.sh`)_
-   - O script valida a autenticação com os três papéis, criação e aceite de solicitação, prazos, submissão por link HTTPS, avaliação e retorno de erros (401, 403, 409, 422).
-   - Em seguida, acesse a URL pública do Frontend (`https://<url-gerada-para-80>.trycloudflare.com`), realize login com um usuário de teste (ex: `aluno@example.com` / `aluno123`) e compartilhe o link com a equipe.
+```bash
+KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000 API_URL=https://sigtcc.cobbler-albacore.ts.net:8443 bash SIGTCC/scripts/smoke-test.sh
+```
+
+> **Atenção:** O `smoke-test.sh` cadastra dados reais e não deve ser executado sobre um banco já populado com dados de demonstração. Execute-o uma única vez logo após a criação inicial do banco zerado (`down -v`).
 
 ---
 
@@ -208,8 +193,6 @@ docker compose -f docker-compose.prod.yml --env-file .env up -d --build
 
 ## 5. Limitações Conhecidas (Staging)
 
-- **URLs Efêmeras do Cloudflare Quick Tunnels:** As URLs gratuitas geradas pelo `trycloudflare.com` mudam a cada reinício do processo `cloudflared`. Como o Vite embute `VITE_API_URL` e `VITE_KEYCLOAK_URL` estaticamente durante o `npm run build` no `Dockerfile` do frontend, sempre que um túnel da API ou do Keycloak for reiniciado é obrigatório atualizar o `.env` e reexecutar `docker compose -f docker-compose.prod.yml --env-file .env up -d --build frontend`.
-- **Web Origins do Keycloak:** O arquivo `SIGTCC/keycloak/realm-import.json` vem configurado com `webOrigins: ["*"]` para staging. Essa intervenção manual só é necessária se existir um volume legado persistido do Keycloak sem ter executado `docker compose down -v`. Em produção final, o curinga `*` deve ser substituído estritamente pelo domínio corporativo homologado.
-- **Importação Inicial do Realm (`realm-import.json`):** O Keycloak só executa o `--import-realm` quando o volume `keycloak_data` está vazio. Caso o arquivo `realm-import.json` seja atualizado no repositório, é necessário remover o volume do Keycloak (`docker compose down -v` ou remoção específica do volume) ou aplicar a alteração pelo console administrativo.
-- **Este staging não usa as imagens do GHCR:** O `docker-compose.prod.yml` constrói backend e frontend na própria máquina (`--build`), pois as URLs do túnel mudam a cada execução. As imagens publicadas pelo workflow `docker-build.yml` destinam-se a ambientes com URLs e hostnames fixos.
-- **Ausência de SLA no Túnel Gratuito:** Os Quick Tunnels do Cloudflare destinam-se exclusivamente a testes e homologação temporária, não possuindo garantia de disponibilidade contínua e estando sujeitos a limites de conexões simultâneas.
+- **Importação Inicial do Realm (`realm-import.json`):** O Keycloak só executa o `--import-realm` quando o volume `keycloak_data` está vazio. Caso o arquivo `realm-import.json` seja atualizado no repositório, é necessário remover o volume do Keycloak (`docker compose -f docker-compose.prod.yml down -v`) ou aplicar a alteração pelo console administrativo.
+- **Web Origins Restrito no Keycloak (Issue #260):** O arquivo `SIGTCC/keycloak/realm-import.json` não utiliza mais o curinga `*`, estando restrito estritamente a `https://sigtcc.cobbler-albacore.ts.net` e origens locais de desenvolvimento (`localhost`).
+- **Disponibilidade Dependente da Máquina Anfitriã:** O ambiente de staging utiliza túnel fixo via Tailscale Funnel hospedado na máquina de um integrante da equipe. A disponibilidade do ambiente depende do computador anfitrião permanecer ligado, conectado à internet e com o Docker em execução. Detalhes completos e procedimento de reinício em [`docs/staging.md`](staging.md).
