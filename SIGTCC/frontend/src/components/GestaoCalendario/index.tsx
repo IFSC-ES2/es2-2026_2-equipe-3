@@ -25,9 +25,8 @@ export function GestaoCalendario() {
   const [prazos, setPrazos] = useState<PrazoEntrega[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [erroCarregamento, setErroCarregamento] = useState("");
-  const [tipoSelecionado, setTipoSelecionado] = useState<TipoEntrega>(
-    TIPO_ENTREGA_INICIAL,
-  );
+  const [tipoSelecionado, setTipoSelecionado] =
+    useState<TipoEntrega>(TIPO_ENTREGA_INICIAL);
   const [dataLimite, setDataLimite] = useState("");
   const [erros, setErros] = useState<ErrosCampos>({});
   const [erroGeral, setErroGeral] = useState("");
