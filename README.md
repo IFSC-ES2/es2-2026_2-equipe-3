@@ -260,15 +260,15 @@ A triagem final do relatório de bugs teve este resultado:
 
 Nenhum defeito conhecido impede a demonstração do MVP. Detalhes, passos de reprodução e sugestões de correção estão na seção 4 do relatório.
 
-| Bug    | Severidade | Limitação                                                                                                                        |
-| :----- | :--------- | :------------------------------------------------------------------------------------------------------------------------------- |
-| BUG-14 | Média      | O filtro por linha de pesquisa compara por substring ("IA" também traz "Mídias Digitais").                                       |
-| BUG-15 | Média      | O seed `V5` usa IDs fixos e pode sobrescrever dados de bancos criados antes dele. Não afeta bancos novos.                        |
-| BUG-16 | Baixa      | Chave `xspring.application.name` com erro de digitação, e `application.properties` fora de UTF-8.                                |
-| BUG-18 | Baixa      | Após o login, o usuário não volta ao link protegido que tentou abrir.                                                            |
-| BUG-19 | Baixa      | Na edição do perfil, campos opcionais nulos geram aviso de input não controlado, e o PATCH reenvia campos extras.                |
-| BUG-20 | Baixa      | O calendário de prazos abre em "Editar prazo" com a data em branco.                                                              |
-| BUG-22 | Baixa      | Qualquer professor pode cadastrar um perfil de orientador com e-mail livre. Edição e remoção já são restritas ao dono do perfil. |
+| Bug    | Severidade | Limitação                                                                                                                                                            |
+| :----- | :--------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BUG-14 | Média      | O filtro por linha de pesquisa compara por substring ("IA" também traz "Mídias Digitais").                                                                           |
+| BUG-15 | Média      | O seed `V5` usa IDs fixos e pode sobrescrever dados de bancos criados antes dele. Não afeta bancos novos (verificado por teste); decisão registrada na issue `#274`. |
+| BUG-16 | Baixa      | Chave `xspring.application.name` com erro de digitação, e `application.properties` fora de UTF-8.                                                                    |
+| BUG-18 | Baixa      | Após o login, o usuário não volta ao link protegido que tentou abrir.                                                                                                |
+| BUG-19 | Baixa      | Na edição do perfil, campos opcionais nulos geram aviso de input não controlado, e o PATCH reenvia campos extras.                                                    |
+| BUG-20 | Baixa      | O calendário de prazos abre em "Editar prazo" com a data em branco.                                                                                                  |
+| BUG-22 | Baixa      | Qualquer professor pode cadastrar um perfil de orientador com e-mail livre. Edição e remoção já são restritas ao dono do perfil.                                     |
 
 ## 12. Ambiente de Staging e Execução
 

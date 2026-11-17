@@ -47,7 +47,7 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | BUG-12 | Sem handler genérico de exceções                   | Média      | Corrigido                      | [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) | PR da issue #262                                                            |
 | BUG-13 | Orientador desativado continua listado e operando  | Média      | Corrigido                      | [#263](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/263) | PR da issue #263                                                            |
 | BUG-14 | Filtro por linha de pesquisa compara por substring | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
-| BUG-15 | Seed V5 pode sobrescrever dados                    | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
+| BUG-15 | Seed V5 pode sobrescrever dados                    | Média      | Limitação conhecida            | [#274](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/274) | PR da issue #274                                                            |
 | BUG-16 | Erro de digitação em `application.properties`      | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-17 | Contador de vagas mostra "—"                       | Baixa      | Corrigido                      | [#266](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/266) | PR da issue #266                                                            |
 | BUG-18 | Redirecionamento após o login não acontece         | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
@@ -62,15 +62,15 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 
 Defeitos não corrigidos até o congelamento de código, com o efeito observável para quem usa o sistema. Esta lista é replicada no `README.md` e na descrição da release.
 
-| Bug    | Limitação                                                                                                                                                   | Contorno                                                                            |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| BUG-14 | O filtro por linha de pesquisa usa "contém": filtrar por "IA" também traz "Mídias Digitais".                                                                | —                                                                                   |
-| BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele.                                                                       | Não ocorre em banco novo, como o de _staging_ ou o criado pelo `docker compose up`. |
-| BUG-16 | A chave `xspring.application.name` está com um "x" a mais, e o arquivo `application.properties` não está em UTF-8.                                          | Sem efeito funcional.                                                               |
-| BUG-18 | Ao abrir um link protegido sem estar logado, o usuário vai para a página inicial do seu papel após o login, e não para o link original.                     | Navegar de novo até a página desejada.                                              |
-| BUG-19 | Na edição do perfil, campos opcionais vazios (`departamento`, `biografia`) geram aviso de input não controlado no console, e o PATCH reenvia campos extras. | Sem efeito visível para o usuário.                                                  |
-| BUG-20 | O calendário de prazos abre em "Editar prazo" com a data em branco, mesmo quando o prazo já existe.                                                         | Selecionar outro tipo de entrega e voltar, ou consultar a lista de prazos.          |
-| BUG-22 | Qualquer professor pode cadastrar um perfil de orientador com um e-mail digitado livremente, sem vínculo com a conta do Keycloak.                           | A edição e a remoção já são restritas ao dono do perfil (PR #211).                  |
+| Bug    | Limitação                                                                                                                                                   | Contorno                                                                                                                                                                     |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BUG-14 | O filtro por linha de pesquisa usa "contém": filtrar por "IA" também traz "Mídias Digitais".                                                                | —                                                                                                                                                                            |
+| BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele.                                                                       | Não ocorre em banco novo, como o de _staging_ ou o criado pelo `docker compose up` (verificado por teste automatizado). Bancos que já aplicaram a V5 não a executam de novo. |
+| BUG-16 | A chave `xspring.application.name` está com um "x" a mais, e o arquivo `application.properties` não está em UTF-8.                                          | Sem efeito funcional.                                                                                                                                                        |
+| BUG-18 | Ao abrir um link protegido sem estar logado, o usuário vai para a página inicial do seu papel após o login, e não para o link original.                     | Navegar de novo até a página desejada.                                                                                                                                       |
+| BUG-19 | Na edição do perfil, campos opcionais vazios (`departamento`, `biografia`) geram aviso de input não controlado no console, e o PATCH reenvia campos extras. | Sem efeito visível para o usuário.                                                                                                                                           |
+| BUG-20 | O calendário de prazos abre em "Editar prazo" com a data em branco, mesmo quando o prazo já existe.                                                         | Selecionar outro tipo de entrega e voltar, ou consultar a lista de prazos.                                                                                                   |
+| BUG-22 | Qualquer professor pode cadastrar um perfil de orientador com um e-mail digitado livremente, sem vínculo com a conta do Keycloak.                           | A edição e a remoção já são restritas ao dono do perfil (PR #211).                                                                                                           |
 
 ## 4. Detalhamento dos bugs
 
@@ -261,7 +261,7 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-15: O seed V5 pode sobrescrever dados existentes
 
-- **Status:** Limitação conhecida. Sem issue nem PR.
+- **Status:** Limitação conhecida (decisão registrada na issue [#274](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/274)).
 - **Local:** `backend/gestao-tcc/src/main/resources/db/migration/V5__seed_professores_e_turma_vigente.sql`
 - **Descrição:** A migration insere IDs fixos (1 e 2) em `usuarios`, `orientadores`, `perfis_professores` e `turmas_tcc`, com `ON DUPLICATE KEY UPDATE`.
 - **Impacto:** Em um banco que já tinha registros com esses IDs (ambiente de desenvolvimento com dados anteriores à V5):
@@ -269,9 +269,13 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
   - um aluno com id 1 ou 2 passa a ser também orientador;
   - perfis com id 1 ou 2 têm as vagas alteradas.
 - **Observação:** Não ocorre em bancos novos, como o de _staging_ e o criado pelo `docker compose up`, em que a V5 roda sobre tabelas vazias.
-- **Sugestão:**
-  - Inserir sem ID fixo, usando `INSERT ... SELECT` com `WHERE NOT EXISTS` por e-mail.
-  - Como a V5 já foi aplicada, a correção deve vir em uma nova migration, e não editando a V5.
+- **Decisão:** Manter como limitação conhecida, sem nova migration. Uma V10 não resolve o problema, porque:
+  - o dano só pode acontecer no momento em que a V5 é executada;
+  - em banco novo, a V5 roda logo após a V4, com as tabelas vazias, e não há o que sobrescrever;
+  - em banco existente, a V5 já foi aplicada e não roda de novo, e uma migration posterior não teria como saber os valores originais para restaurá-los;
+  - editar a V5 mudaria o checksum, e o `flyway validate` falharia no startup de todos os bancos que já a aplicaram.
+- **Verificação:** `MigracoesFlywayTest` executa todas as migrations em um banco H2 vazio. Ele confere que nenhuma fica pendente ou falha e que o seed cria apenas os dois professores, com 3 vagas cada, e a turma `2026/2`, sem nenhum aluno.
+- **Regra para seeds futuros:** inserir sem ID fixo, usando `INSERT ... SELECT ... WHERE NOT EXISTS` pela chave natural (o e-mail, no caso de usuários).
 
 ### 4.4. Severidade baixa (UX e problemas menores)
 
