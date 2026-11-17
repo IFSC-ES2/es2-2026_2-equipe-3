@@ -27,9 +27,9 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | ---------- | ---------- | ---------- | --------------------- |
 | Crítica    | 4          | 4          | 0                     |
 | Alta       | 4          | 4          | 0                     |
-| Média      | 7          | 3          | 4                     |
+| Média      | 7          | 4          | 3                     |
 | Baixa      | 7          | 0          | 7                     |
-| **Total**  | **22**     | **11**     | **11**                |
+| **Total**  | **22**     | **12**     | **10**                |
 
 | Bug    | Título resumido                                    | Severidade | Status final                   | Issue                                                              | PR                                                                          |
 | ------ | -------------------------------------------------- | ---------- | ------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
@@ -45,7 +45,7 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | BUG-10 | PATCH de orientador sem checar e-mail duplicado    | Média      | Corrigido indiretamente        | [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211)            |
 | BUG-11 | Faltam limites de tamanho nos DTOs                 | Média      | Limitação conhecida (mitigada) | —                                                                  | Mitigação: [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) |
 | BUG-12 | Sem handler genérico de exceções                   | Média      | Corrigido                      | [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) | PR da issue #262                                                            |
-| BUG-13 | Orientador desativado continua listado e operando  | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
+| BUG-13 | Orientador desativado continua listado e operando  | Média      | Corrigido                      | [#263](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/263) | PR da issue #263                                                            |
 | BUG-14 | Filtro por linha de pesquisa compara por substring | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-15 | Seed V5 pode sobrescrever dados                    | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-16 | Erro de digitação em `application.properties`      | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
@@ -65,7 +65,6 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 | Bug    | Limitação                                                                                                                                                                                           | Contorno                                                                            |
 | ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
 | BUG-11 | O cadastro de orientador (`POST /orientadores`) não limita o tamanho de `nome`, `departamento`, `biografia` e dos itens de `linhasDePesquisa`. Valores grandes enviados direto à API geram **500**. | O formulário do frontend já valida os tamanhos.                                     |
-| BUG-13 | A API do catálogo devolve orientadores desativados. Desativar um orientador não cancela as solicitações pendentes dele, e ainda é possível aceitá-las.                                              | O frontend oculta os orientadores inativos do catálogo.                             |
 | BUG-14 | O filtro por linha de pesquisa usa "contém": filtrar por "IA" também traz "Mídias Digitais".                                                                                                        | —                                                                                   |
 | BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele.                                                                                                               | Não ocorre em banco novo, como o de _staging_ ou o criado pelo `docker compose up`. |
 | BUG-16 | A chave `xspring.application.name` está com um "x" a mais, e o arquivo `application.properties` não está em UTF-8.                                                                                  | Sem efeito funcional.                                                               |
@@ -233,20 +232,21 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-13: Orientador desativado continua listado e operando
 
-- **Status:** Limitação conhecida. Sem issue nem PR.
+- **Status:** Corrigido. Issue [#263](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/263).
 - **Local:**
   - `backend/.../repository/OrientadorRepository.java` (`findByFiltros`)
   - `backend/.../service/OrientadorService.java` (`deletar`)
   - `backend/.../service/SolicitacaoService.java` (`atualizarStatus`)
-- **Descrição:**
-  - A consulta do catálogo não filtra `ativo = true`. Só o frontend filtra, em `OrientadorList`.
-  - O `deletar` (soft delete) não cancela as solicitações `PENDENTE` do orientador.
-  - O `atualizarStatus` permite aceitar solicitações de um orientador inativo.
-- **Impacto:** A API expõe orientadores desativados para outros clientes. Alunos ficam com solicitações pendentes "presas" que nunca serão respondidas.
-- **Sugestão:**
-  - Filtrar `ativo` na query.
-  - Ao desativar, mudar as pendentes para `CANCELADA`.
-  - Validar `ativo` no aceite.
+- **Descrição (antes da correção):**
+  - A consulta do catálogo não filtrava `ativo = true`. Só o frontend filtrava, em `OrientadorList`.
+  - O `deletar` (soft delete) não cancelava as solicitações `PENDENTE` do orientador.
+  - O `atualizarStatus` permitia aceitar solicitações de um orientador inativo.
+- **Impacto (antes da correção):** A API expunha orientadores desativados para outros clientes. Alunos ficavam com solicitações pendentes "presas", que nunca seriam respondidas.
+- **Correção:**
+  - `findByFiltros` filtra `o.ativo = true`. A consulta por ID continua retornando o orientador desativado.
+  - Ao desativar, as solicitações `PENDENTE` passam para `CANCELADA`, com um `SolicitacaoStatusChangedEvent` publicado para cada uma. As vagas e as solicitações `ACEITA` não mudam.
+  - Aceitar uma solicitação de orientador inativo retorna `422` (`OrientadorInativoException`). A recusa continua permitida.
+  - A migration `V9` cancela as pendentes de orientadores desativados antes da correção.
 
 #### BUG-14: O filtro por linha de pesquisa compara por substring
 
