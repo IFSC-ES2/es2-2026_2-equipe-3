@@ -14,6 +14,7 @@ import br.edu.ifsc.gestao_tcc.model.SolicitacaoOrientacao;
 import br.edu.ifsc.gestao_tcc.model.StatusSolicitacao;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
 import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
+import br.edu.ifsc.gestao_tcc.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -37,11 +38,12 @@ public class OrientadorService {
     private final OrientadorRepository orientadorRepository;
     private final SolicitacaoRepository solicitacaoRepository;
     private final ApplicationEventPublisher eventPublisher;
+    private final UsuarioRepository usuarioRepository;
 
     @Transactional
     public Orientador cadastrar(OrientadorRequestDTO dto) {
-        if (orientadorRepository.existsByEmail(dto.getEmail())) {
-            throw new EmailDuplicadoException("Já existe um orientador cadastrado com o e-mail: " + dto.getEmail());
+        if (usuarioRepository.existsByEmailIgnoreCase(dto.getEmail())) {
+            throw new EmailDuplicadoException("Já existe um usuário cadastrado com o e-mail: " + dto.getEmail());
         }
 
         Orientador orientador = new Orientador();

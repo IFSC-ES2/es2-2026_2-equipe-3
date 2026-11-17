@@ -205,7 +205,10 @@ Accept: application/json
 
 ##### Conflito: `409 Conflict`
 
-Solicitação `PENDENTE` duplicada, ou e-mail do aluno pertencente a um orientador.
+Retornado quando:
+
+1. O aluno já possui uma solicitação `PENDENTE` para o mesmo orientador (`"Você já possui uma solicitação pendente para este orientador."`); ou
+2. O e-mail do token JWT já está cadastrado na tabela `usuarios` para um usuário que não é aluno, como um orientador (`"Já existe um usuário cadastrado com o e-mail: {email}"`).
 
 ```json
 {
@@ -590,13 +593,9 @@ Retornado quando o usuário autenticado não é o aluno autor nem o orientador r
 | Endpoint | Condição                                                                  | `detalhes`                                                                                         |
 | :------- | :------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------- |
 | `POST`   | Aluno já possui solicitação `PENDENTE` para o mesmo orientador            | `Você já possui uma solicitação pendente para este orientador.`                                    |
+| `POST`   | E-mail do aluno autenticado já pertence a outro usuário (ex.: orientador) | `Já existe um usuário cadastrado com o e-mail: {email}`                                            |
 | `PATCH`  | Solicitação com status diferente de `PENDENTE`                            | `Esta solicitação já foi respondida e não pode ser alterada.`                                      |
 | `PATCH`  | Aceite em conflito com outra alteração simultânea do perfil do orientador | `Os dados foram alterados por outra operação ao mesmo tempo. Atualize a página e tente novamente.` |
-
-> **Removido na v1.1.0:** a regra "e-mail informado já pertence a um usuário
-> que não é aluno" foi retirada do escopo desta sprint (não estava coberta
-> por nenhum critério de aceitação da #11 e exigiria uma verificação cruzada
-> `Aluno`↔`Orientador` sem teste previsto). Ver seção 12 (Melhorias Futuras).
 
 ### 6.5. `422 Unprocessable Entity`
 
@@ -630,21 +629,21 @@ Retornado quando o usuário autenticado não é o aluno autor nem o orientador r
 
 ### 8.1. Decisões adotadas neste contrato
 
-| #   | Decisão                                                                                                                                                                                       | Motivo                                                                         |
-| :-- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------------------------------------------------------------------------- |
-| D1  | `POST` devolve `201` **com corpo** (`SolicitacaoResponse`) além do `Location`.                                                                                                                | O frontend precisa do `id` para acompanhar o status sem uma segunda chamada.   |
-| D2  | Aluno existente (mesmo e-mail do token) é reaproveitado **sem** atualizar `nome`/`curso`.                                                                                                     | O cadastro do aluno não é editado pelo fluxo de solicitação.                   |
-| D13 | O aluno é identificado pela claim `email` do JWT; nome e e-mail não fazem parte do corpo do `POST`.                                                                                           | Impede criar solicitações em nome de outra pessoa e contornar a duplicidade.   |
-| D3  | Tamanhos mínimos/máximos de `tema` (5–150), `mensagem` (10–1000) e `justificativa` (10–500).                                                                                                  | A #11 não define limites; valores adotados aqui e ajustáveis nas colunas.      |
-| D4  | `justificativa` enviada com `ACEITA` é ignorada (sem erro).                                                                                                                                   | Simplifica o frontend; evita 400 por dado irrelevante.                         |
-| D5  | Listagem ordenada por `criadoEm` decrescente, sem paginação.                                                                                                                                  | Consistente com a listagem de orientadores da US02.                            |
-| D6  | `CANCELADA` não pode ser definido pelo `PATCH`; só o sistema o define, ao desativar o orientador (issue #263).                                                                                | O plano da Sprint 2 lista o status, mas só descreve `ACEITA`/`RECUSADA`.       |
-| D7  | O acompanhamento do aluno é feito por `GET /{id}` (sem endpoint de listagem por aluno).                                                                                                       | Fora do escopo da sprint (decisão tomada antes da autenticação da US01).       |
-| D8  | O "painel" do orientador é a listagem `GET .../orientador/{id}?status=PENDENTE`, sem push, WebSocket ou e-mail. Não há observer de notificação - apenas `AtualizadorVagasObserver`, síncrono. | Confirmado pela equipe; atende ao cenário 1 da #11 dentro do escopo da sprint. |
-| D12 | A regra de e-mail de aluno coincidente com e-mail de orientador foi removida da v1.0 e não faz parte do escopo da Sprint 2.                                                                   | Sem critério de aceitação correspondente na #11; ver seção 12.                 |
-| D9  | O valor do status de aceite é `ACEITA`. A #11 deve ser corrigida ("Aprovado" → "Aceita").                                                                                                     | Confirmado pela equipe; alinha issue, plano da Sprint 2 e código.              |
-| D10 | As mensagens de erro são definidas na seção 6 deste contrato; a issue #11 foi editada para incorporar os 12 cenários (seção 10).                                                              | A #11 possuía originalmente apenas os cenários de envio e aceite.              |
-| D11 | O `detalhes` do `400` é um array `[{campo, mensagem}]`.                                                                                                                                       | Já é o formato do contrato da US02 e do frontend; corrige o handler.           |
+| #   | Decisão                                                                                                                                                                                       | Motivo                                                                                                                              |
+| :-- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------- |
+| D1  | `POST` devolve `201` **com corpo** (`SolicitacaoResponse`) além do `Location`.                                                                                                                | O frontend precisa do `id` para acompanhar o status sem uma segunda chamada.                                                        |
+| D2  | Aluno existente (mesmo e-mail do token) é reaproveitado **sem** atualizar `nome`/`curso`.                                                                                                     | O cadastro do aluno não é editado pelo fluxo de solicitação.                                                                        |
+| D13 | O aluno é identificado pela claim `email` do JWT; nome e e-mail não fazem parte do corpo do `POST`.                                                                                           | Impede criar solicitações em nome de outra pessoa e contornar a duplicidade.                                                        |
+| D3  | Tamanhos mínimos/máximos de `tema` (5–150), `mensagem` (10–1000) e `justificativa` (10–500).                                                                                                  | A #11 não define limites; valores adotados aqui e ajustáveis nas colunas.                                                           |
+| D4  | `justificativa` enviada com `ACEITA` é ignorada (sem erro).                                                                                                                                   | Simplifica o frontend; evita 400 por dado irrelevante.                                                                              |
+| D5  | Listagem ordenada por `criadoEm` decrescente, sem paginação.                                                                                                                                  | Consistente com a listagem de orientadores da US02.                                                                                 |
+| D6  | `CANCELADA` não pode ser definido pelo `PATCH`; só o sistema o define, ao desativar o orientador (issue #263). | O plano da Sprint 2 lista o status, mas só descreve `ACEITA`/`RECUSADA`. |                                                                                                                               | O plano da Sprint 2 lista o status, mas só descreve `ACEITA`/`RECUSADA`.                                                            |
+| D7  | O acompanhamento do aluno é feito por `GET /{id}` (sem endpoint de listagem por aluno).                                                                                                       | Fora do escopo da sprint (decisão tomada antes da autenticação da US01).                                                            |
+| D8  | O "painel" do orientador é a listagem `GET .../orientador/{id}?status=PENDENTE`, sem push, WebSocket ou e-mail. Não há observer de notificação - apenas `AtualizadorVagasObserver`, síncrono. | Confirmado pela equipe; atende ao cenário 1 da #11 dentro do escopo da sprint.                                                      |
+| D12 | A verificação de e-mail cruzado (`Aluno`↔`Orientador` na tabela `usuarios`) retorna `409 Conflict` com mensagem específica.                                                                   | Implementada na [#261](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/261) via `UsuarioRepository.existsByEmailIgnoreCase`. |
+| D9  | O valor do status de aceite é `ACEITA`. A #11 deve ser corrigida ("Aprovado" → "Aceita").                                                                                                     | Confirmado pela equipe; alinha issue, plano da Sprint 2 e código.                                                                   |
+| D10 | As mensagens de erro são definidas na seção 6 deste contrato; a issue #11 foi editada para incorporar os 12 cenários (seção 10).                                                              | A #11 possuía originalmente apenas os cenários de envio e aceite.                                                                   |
+| D11 | O `detalhes` do `400` é um array `[{campo, mensagem}]`.                                                                                                                                       | Já é o formato do contrato da US02 e do frontend; corrige o handler.                                                                |
 
 ### 8.2. Divergências entre o contrato da US02 e o código atual
 
@@ -685,7 +684,7 @@ serem esquecidos em sprints futuras.
 
 | #   | Item                                                                                        | Motivo do adiamento                                                                                    |
 | :-- | :------------------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------- |
-| F1  | Bloquear e-mail de aluno coincidente com e-mail de orientador (`409`).                      | Exige verificação cruzada `Aluno`↔`Orientador`; sem critério de aceitação na #11.                      |
+| F1  | ~~Bloquear e-mail de aluno coincidente com e-mail de orientador (`409`).~~                  | **Implementado na [#261](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/261).**                |
 | F2  | Endpoint de cancelamento pelo aluno (transição para `CANCELADA`).                           | Status reservado no enum, mas sem endpoint nesta sprint (decisão D6).                                  |
 | F3  | Notificação real ao orientador (e-mail, push ou WebSocket) quando uma solicitação é criada. | Fora do escopo; o "painel" é a listagem sob demanda (decisão D8).                                      |
 | F4  | Paginação na listagem de solicitações do orientador.                                        | Volume de dados da Sprint 2 não justifica; decisão D5.                                                 |

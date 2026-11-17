@@ -41,7 +41,7 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | BUG-06 | "Meu perfil" depende do `localStorage`             | Alta       | Corrigido                      | [#204](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/204) | [#217](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/217)            |
 | BUG-07 | Sessão expira em ~5 minutos                        | Alta       | Corrigido                      | [#205](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/205) | [#225](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/225)            |
 | BUG-08 | Condição de corrida nas vagas                      | Alta       | Corrigido                      | [#206](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/206) | [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241)            |
-| BUG-09 | Conflito de e-mail aluno/orientador gera 500       | Média      | Corrigido indiretamente        | [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) | Mesmo PR do BUG-12                                                          |
+| BUG-09 | Conflito de e-mail aluno/orientador gera 500       | Média      | Corrigido                      | [#261](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/261) | [#289](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/289)            |
 | BUG-10 | PATCH de orientador sem checar e-mail duplicado    | Média      | Corrigido indiretamente        | [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211)            |
 | BUG-11 | Faltam limites de tamanho nos DTOs                 | Média      | Limitação conhecida (mitigada) | —                                                                  | Mitigação: [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) |
 | BUG-12 | Sem handler genérico de exceções                   | Média      | Corrigido                      | [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) | PR da issue #262                                                            |
@@ -185,15 +185,15 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-09: Conflito de e-mail entre aluno e orientador gera erro 500
 
-- **Status:** Corrigido indiretamente. Issue [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262), no mesmo PR do BUG-12. Antes, o PR [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) já havia mitigado o defeito.
+- **Status:** Corrigido. Issue [#261](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/261), PR [#289](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/289). Antes, o PR [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) e a issue [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) (PR [#290](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/290)) já haviam mitigado o defeito.
 - **Local:**
   - `backend/.../service/OrientadorService.java` (`cadastrar`)
+  - `backend/.../service/SolicitacaoService.java` (`criarSolicitacao`)
+  - `backend/.../repository/UsuarioRepository.java` (`existsByEmailIgnoreCase`)
   - `db/migration/V1__criar_tabelas_iniciais.sql` (`uk_usuario_email`)
-- **Descrição:** O e-mail é `UNIQUE` na tabela `usuarios`, que é compartilhada entre alunos e orientadores (herança `JOINED`). Mas `cadastrar` verifica apenas orientadores (`OrientadorRepository.existsByEmail`).
-- **Impacto (antes da correção):** Cadastrar um orientador com o e-mail de um aluno fazia o banco lançar `DataIntegrityViolationException`. Ela não tinha handler e virava **500**, quando o contrato espera 409.
-- **Mitigação:** Após o PR #213, a solicitação usa o e-mail do JWT e exige `ROLE_ALUNO`. Deixou de ser possível criar uma solicitação com o e-mail de um orientador, que era o segundo caminho do defeito.
-- **Correção:** O handler de `DataIntegrityViolationException` adicionado na issue #262 converte a violação em **409** / `Conflito de dados` no formato `ErrorResponseDTO`. O cenário é coberto por `OrientadorControllerIntegrationTest.cadastrar_EmailDeAlunoExistente_DeveRetornar409`.
-- **Melhoria possível:** Verificar a existência do e-mail em `usuarios` no `cadastrar`, para devolver uma mensagem específica ("e-mail já cadastrado") em vez da mensagem genérica de integridade.
+- **Descrição:** O e-mail é `UNIQUE` na tabela `usuarios`, que é compartilhada entre alunos e orientadores (herança `JOINED`). Mas `OrientadorService.cadastrar` verificava apenas orientadores (`OrientadorRepository.existsByEmail`) e `SolicitacaoService.criarSolicitacao` verificava apenas alunos (`AlunoRepository.findByEmail`).
+- **Impacto (antes da correção):** Cadastrar um orientador com o e-mail de um aluno (ou criar solicitação com e-mail já pertencente a um orientador) fazia o banco lançar `DataIntegrityViolationException`, que antes do PR #290 virava **500** quando o contrato esperava 409.
+- **Correção:** Criado `UsuarioRepository.existsByEmailIgnoreCase`, utilizado tanto em `OrientadorService.cadastrar` quanto em `SolicitacaoService.criarSolicitacao` para verificar a existência do e-mail em toda a tabela `usuarios` e lançar `EmailDuplicadoException` (**409** / `Conflito de dados` com a mensagem `"Já existe um usuário cadastrado com o e-mail: {email}"` no formato `ErrorResponseDTO`), coberto por `OrientadorControllerIntegrationTest` e `SolicitacaoControllerIntegrationTest`.
 
 #### BUG-10: O PATCH de orientador não verifica duplicidade de e-mail
 
