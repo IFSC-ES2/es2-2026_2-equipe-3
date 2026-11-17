@@ -96,13 +96,13 @@ class OrientadorRepositoryTest {
     }
 
     @Test
-    @DisplayName("Deve retornar uma lista de orientadores filtrando por um trecho da linha de pesquisa")
+    @DisplayName("Deve retornar uma lista de orientadores filtrando pela linha de pesquisa exata ignorando maiúsculas e minúsculas")
     void findByFiltros_ComMatchNaLinhaDePesquisa_DeveRetornarLista() {
         salvarOrientadorComPerfil("Ana", "ana@ifsc.edu.br", "Inteligência Artificial");
         salvarOrientadorComPerfil("Carlos", "carlos@ifsc.edu.br", "Desenvolvimento Web");
 
         List<Orientador> resultado = orientadorRepository
-                .findByFiltros("inteligência", null);
+                .findByFiltros("inteligência artificial", null);
 
         assertThat(resultado).isNotEmpty();
         assertThat(resultado).hasSize(1);
@@ -225,7 +225,7 @@ class OrientadorRepositoryTest {
         entityManager.clear();
 
         List<Orientador> resultado =
-                orientadorRepository.findByFiltros("Inteligência", null);
+                orientadorRepository.findByFiltros("Inteligência Artificial", null);
 
         assertThat(resultado)
                 .extracting(Orientador::getNome)
@@ -261,10 +261,23 @@ class OrientadorRepositoryTest {
         entityManager.clear();
 
         List<Orientador> resultado =
-                orientadorRepository.findByFiltros("Inteligência", true);
+                orientadorRepository.findByFiltros("Inteligência Artificial", true);
 
         assertThat(resultado)
                 .extracting(Orientador::getNome)
                 .containsExactly("Ana");
+    }
+
+    @Test
+    @DisplayName("Deve comparar linha de pesquisa por igualdade exata ignorando maiúsculas e minúsculas sem retornar substrings (Issue #264)")
+    void findByFiltros_QuandoFiltraPorIA_NaoDeveRetornarMidiasDigitais() {
+        salvarOrientadorComPerfil("Orientador IA", "ia@ifsc.edu.br", "IA");
+        salvarOrientadorComPerfil("Orientador Midias", "midias@ifsc.edu.br", "Mídias Digitais");
+
+        List<Orientador> resultado = orientadorRepository.findByFiltros("ia", null);
+
+        assertThat(resultado)
+                .extracting(Orientador::getNome)
+                .containsExactly("Orientador IA");
     }
 }
