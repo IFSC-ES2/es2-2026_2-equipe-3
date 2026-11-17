@@ -247,7 +247,7 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 - **Sem notificações automáticas:** Não há envio de e-mail, push ou WebSocket quando uma entrega é submetida ou avaliada; o acompanhamento ocorre pelos painéis da aplicação.
 - **Autenticação via Direct Access Grant:** Permanece o fluxo descrito na [`ADR-0014`](docs/adrs/ADR-0014.md), agora com renovação de token tratada no cliente HTTP.
 
-## 11. Entrega 9
+## 11. Entrega 9: Release Candidate
 
 - **[Relatório de Bugs](docs/relatorio-de-bugs.md):** Triagem final dos 22 achados da revisão estática ([#256](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/256)), com o status de cada bug, as issues e os PRs relacionados.
 
@@ -255,16 +255,14 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 
 A triagem final do relatório de bugs teve este resultado:
 
-- **Corrigidos (9):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`.
-- **Limitações conhecidas (13):** os demais, todos de severidade média ou baixa, listados abaixo.
+- **Corrigidos (11):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`. O BUG-12 foi corrigido na issue `#262`, que também resolveu indiretamente o BUG-09.
+- **Limitações conhecidas (11):** os demais, todos de severidade média ou baixa, listados abaixo.
 
 Nenhum defeito conhecido impede a demonstração do MVP. Detalhes, passos de reprodução e sugestões de correção estão na seção 4 do relatório.
 
 | Bug    | Severidade | Limitação                                                                                                                        |
 | :----- | :--------- | :------------------------------------------------------------------------------------------------------------------------------- |
-| BUG-09 | Média      | Cadastrar orientador com o e-mail de um aluno existente retorna `500` em vez de `409`.                                           |
 | BUG-11 | Média      | `POST /orientadores` não limita o tamanho dos campos de texto. Valores grandes enviados direto à API geram `500`.                |
-| BUG-12 | Média      | Não há handler genérico de exceções: erros inesperados saem fora do formato `ErrorResponseDTO`.                                  |
 | BUG-13 | Média      | A API do catálogo devolve orientadores desativados, e desativar um orientador não cancela as solicitações pendentes dele.        |
 | BUG-14 | Média      | O filtro por linha de pesquisa compara por substring ("IA" também traz "Mídias Digitais").                                       |
 | BUG-15 | Média      | O seed `V5` usa IDs fixos e pode sobrescrever dados de bancos criados antes dele. Não afeta bancos novos.                        |

@@ -4,16 +4,26 @@ import br.edu.ifsc.gestao_tcc.dto.ErrorResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.ExceptionHandlerMethodResolver;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.lang.reflect.Method;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.doReturn;
@@ -226,6 +236,103 @@ class GlobalExceptionHandlerTest {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
         assertThat(response.getBody().detalhes().toString()).contains("PENDENTE");
+    }
+
+    // --- Handlers genéricos (issue #262) ---
+
+    @Test
+    @DisplayName("Deve capturar DataIntegrityViolationException e formatar como 409 sem expor a constraint")
+    void testHandleDataIntegrityViolationException() {
+        DataIntegrityViolationException ex = new DataIntegrityViolationException(
+                "could not execute statement; constraint [uk_usuario_email]");
+
+        ResponseEntity<ErrorResponseDTO> response =
+                exceptionHandler.handleDataIntegrityViolationException(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().status()).isEqualTo(409);
+        assertThat(response.getBody().erro()).isEqualTo("Conflito de dados");
+        assertThat(response.getBody().caminho()).isEqualTo("/api/v1/orientadores");
+        assertThat(response.getBody().timestamp()).isNotBlank();
+        assertThat(response.getBody().detalhes()).isEqualTo(
+                "A operação viola uma restrição de integridade dos dados, como um valor que já está cadastrado.");
+        assertThat(response.getBody().detalhes().toString()).doesNotContain("uk_usuario_email");
+    }
+
+    @Test
+    @DisplayName("Deve capturar exceção inesperada e formatar como 500 sem expor a mensagem interna")
+    void testHandleException_ErroInesperado() {
+        RuntimeException ex = new IllegalStateException("NullPointer em OrientadorService linha 42");
+
+        ResponseEntity<ErrorResponseDTO> response = exceptionHandler.handleException(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().status()).isEqualTo(500);
+        assertThat(response.getBody().erro()).isEqualTo("Erro interno do servidor");
+        assertThat(response.getBody().caminho()).isEqualTo("/api/v1/orientadores");
+        assertThat(response.getBody().detalhes())
+                .isEqualTo("Ocorreu um erro inesperado. Tente novamente mais tarde.");
+        assertThat(response.getBody().detalhes().toString()).doesNotContain("NullPointer");
+    }
+
+    @Test
+    @DisplayName("Exceção do Spring com status 404 deve manter o status no formato ErrorResponseDTO")
+    void testHandleException_ErrorResponse404() {
+        ResponseStatusException ex = new ResponseStatusException(HttpStatus.NOT_FOUND, "Rota inexistente.");
+
+        ResponseEntity<ErrorResponseDTO> response = exceptionHandler.handleException(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().status()).isEqualTo(404);
+        assertThat(response.getBody().erro()).isEqualTo("Recurso não encontrado");
+        assertThat(response.getBody().detalhes()).isEqualTo("Rota inexistente.");
+    }
+
+    @Test
+    @DisplayName("Método HTTP não suportado deve manter o 405 no formato ErrorResponseDTO")
+    void testHandleException_MetodoNaoSuportado() {
+        HttpRequestMethodNotSupportedException ex = new HttpRequestMethodNotSupportedException("PUT");
+
+        ResponseEntity<ErrorResponseDTO> response = exceptionHandler.handleException(ex, request);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.METHOD_NOT_ALLOWED);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().status()).isEqualTo(405);
+        assertThat(response.getBody().erro()).isEqualTo("Requisição inválida");
+        assertThat(response.getBody().detalhes().toString()).contains("PUT");
+    }
+
+    static Stream<Arguments> excecoesComHandlerEspecifico() {
+        return Stream.of(
+                Arguments.of(new ResourceNotFoundException("x"), "handleResourceNotFoundException"),
+                Arguments.of(new EmailDuplicadoException("x"), "handleEmailDuplicadoException"),
+                Arguments.of(new SolicitacaoDuplicadaException("x"), "handleConflitoDeEstadoException"),
+                Arguments.of(new OptimisticLockingFailureException("x"), "handleOptimisticLockingFailureException"),
+                Arguments.of(new VagasIndisponiveisException("x"), "handleRegraDeNegocioException"),
+                Arguments.of(mock(MethodArgumentNotValidException.class), "handleValidationExceptions"),
+                Arguments.of(mock(HttpMessageNotReadableException.class), "handleHttpMessageNotReadableException"),
+                Arguments.of(mock(MethodArgumentTypeMismatchException.class),
+                        "handleMethodArgumentTypeMismatchException"),
+                Arguments.of(new AcessoNegadoException("x"), "handleAcessoNegadoException"),
+                Arguments.of(new ValidacaoRequisicaoException("campo", "x"), "handleValidacaoRequisicaoException"),
+                Arguments.of(new DataIntegrityViolationException("x"), "handleDataIntegrityViolationException"),
+                Arguments.of(new IllegalStateException("x"), "handleException"),
+                Arguments.of(new HttpRequestMethodNotSupportedException("PUT"), "handleException"));
+    }
+
+    @ParameterizedTest(name = "{0} -> {1}")
+    @MethodSource("excecoesComHandlerEspecifico")
+    @DisplayName("Handlers específicos devem ter precedência sobre o handler genérico de Exception")
+    void testPrecedenciaDosHandlers(Exception ex, String handlerEsperado) {
+        ExceptionHandlerMethodResolver resolver = new ExceptionHandlerMethodResolver(GlobalExceptionHandler.class);
+
+        Method handler = resolver.resolveMethod(ex);
+
+        assertThat(handler).isNotNull();
+        assertThat(handler.getName()).isEqualTo(handlerEsperado);
     }
 
     /**

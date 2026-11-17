@@ -92,13 +92,13 @@ Herdados do contrato da US02, sem alterações:
 }
 ```
 
-| Campo       | Tipo                                   | Descrição                                                                                            |
-| :---------- | :------------------------------------- | :--------------------------------------------------------------------------------------------------- |
-| `timestamp` | String (ISO 8601)                      | Momento do erro.                                                                                     |
-| `status`    | Integer                                | Código HTTP.                                                                                         |
-| `erro`      | String                                 | Título fixo por categoria de erro (ver seção 6).                                                     |
-| `caminho`   | String                                 | URI da requisição.                                                                                   |
-| `detalhes`  | Array de `{campo, mensagem}` ou String | **400:** array com um item por violação. **404, 409 e 422:** String com a mensagem da regra violada. |
+| Campo       | Tipo                                   | Descrição                                                                                                                                   |
+| :---------- | :------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
+| `timestamp` | String (ISO 8601)                      | Momento do erro.                                                                                                                            |
+| `status`    | Integer                                | Código HTTP.                                                                                                                                |
+| `erro`      | String                                 | Título fixo por categoria de erro (ver seção 6).                                                                                            |
+| `caminho`   | String                                 | URI da requisição.                                                                                                                          |
+| `detalhes`  | Array de `{campo, mensagem}` ou String | **400:** array com um item por violação. **404, 409 e 422:** String com a mensagem da regra violada. **500:** String com mensagem genérica. |
 
 ---
 
@@ -552,6 +552,7 @@ Retornado quando o usuário autenticado não é o aluno autor nem o orientador r
 | `404`  | `Recurso não encontrado`               | String                       |
 | `409`  | `Conflito de dados`                    | String                       |
 | `422`  | `Regra de negócio violada`             | String                       |
+| `500`  | `Erro interno do servidor`             | String                       |
 
 ### 6.2. `400 Bad Request` - validação de campos
 
