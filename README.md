@@ -247,7 +247,7 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 - **Sem notificações automáticas:** Não há envio de e-mail, push ou WebSocket quando uma entrega é submetida ou avaliada; o acompanhamento ocorre pelos painéis da aplicação.
 - **Autenticação via Direct Access Grant:** Permanece o fluxo descrito na [`ADR-0014`](docs/adrs/ADR-0014.md), agora com renovação de token tratada no cliente HTTP.
 
-## 11. Entrega 9
+## 11. Entrega 9: Release Candidate
 
 - **[Relatório de Bugs](docs/relatorio-de-bugs.md):** Triagem final dos 22 achados da revisão estática ([#256](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/256)), com o status de cada bug, as issues e os PRs relacionados.
 
