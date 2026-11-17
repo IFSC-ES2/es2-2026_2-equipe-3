@@ -27,9 +27,9 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | ---------- | ---------- | ---------- | --------------------- |
 | Crítica    | 4          | 4          | 0                     |
 | Alta       | 4          | 4          | 0                     |
-| Média      | 7          | 5          | 2                     |
-| Baixa      | 7          | 0          | 7                     |
-| **Total**  | **22**     | **13**     | **9**                 |
+| Média      | 7          | 5          | 2                     |                                                                                                                                       
+| Baixa      | 7          | 2          | 5                     |                                                                                                                                       
+| **Total**  | **22**     | **15**     | **7**                 |  
 
 | Bug    | Título resumido                                    | Severidade | Status final                   | Issue                                                              | PR                                                                          |
 | ------ | -------------------------------------------------- | ---------- | ------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
@@ -49,11 +49,11 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | BUG-14 | Filtro por linha de pesquisa compara por substring | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-15 | Seed V5 pode sobrescrever dados                    | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-16 | Erro de digitação em `application.properties`      | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
-| BUG-17 | Contador de vagas mostra "—"                       | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
+| BUG-17 | Contador de vagas mostra "—"                       | Baixa      | Corrigido                      | [#266](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/266) | PR da issue #266                                                            |
 | BUG-18 | Redirecionamento após o login não acontece         | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-19 | Inputs controlados recebem `null`                  | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-20 | Calendário abre com a data vazia                   | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
-| BUG-21 | `ErrorResponseDTO` usa `Instant.now()`             | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
+| BUG-21 | `ErrorResponseDTO` usa `Instant.now()`             | Baixa      | Corrigido                      | [#278](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/278) | [#294](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/294)            |
 | BUG-22 | Professor cadastra orientador com qualquer e-mail  | Baixa      | Limitação conhecida (mitigada) | —                                                                  | Mitigação: [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211) |
 
 **Impacto no MVP:** nenhum defeito crítico ou alto permanece aberto. As limitações restantes são de severidade média ou baixa: afetam mensagens de erro, chamadas feitas direto à API ou detalhes de interface. Nenhuma impede a demonstração dos fluxos do MVP (login, catálogo, solicitação e aceite de orientação, calendário de prazos, submissão e avaliação de entregas).
@@ -62,18 +62,25 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 
 Defeitos não corrigidos até o congelamento de código, com o efeito observável para quem usa o sistema. Esta lista é replicada no `README.md` e na descrição da release.
 
-| Bug    | Limitação                                                                                                                                                   | Contorno                                                                            |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| BUG-14 | O filtro por linha de pesquisa usa "contém": filtrar por "IA" também traz "Mídias Digitais".                                                                | —                                                                                   |
-| BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele.                                                                       | Não ocorre em banco novo, como o de _staging_ ou o criado pelo `docker compose up`. |
-| BUG-16 | A chave `xspring.application.name` está com um "x" a mais, e o arquivo `application.properties` não está em UTF-8.                                          | Sem efeito funcional.                                                               |
-| BUG-17 | O painel do professor mostra "—" em vagas disponíveis quando não há solicitações pendentes.                                                                 | Consultar as vagas em "Meu perfil".                                                 |
-| BUG-18 | Ao abrir um link protegido sem estar logado, o usuário vai para a página inicial do seu papel após o login, e não para o link original.                     | Navegar de novo até a página desejada.                                              |
-| BUG-19 | Na edição do perfil, campos opcionais vazios (`departamento`, `biografia`) geram aviso de input não controlado no console, e o PATCH reenvia campos extras. | Sem efeito visível para o usuário.                                                  |
-| BUG-20 | O calendário de prazos abre em "Editar prazo" com a data em branco, mesmo quando o prazo já existe.                                                         | Selecionar outro tipo de entrega e voltar, ou consultar a lista de prazos.          |
-| BUG-21 | O `timestamp` das respostas de erro usa `Instant.now()`, e não o `Clock` do projeto.                                                                        | Sem efeito funcional.                                                               |
-| BUG-22 | Qualquer professor pode cadastrar um perfil de orientador com um e-mail digitado livremente, sem vínculo com a conta do Keycloak.                           | A edição e a remoção já são restritas ao dono do perfil (PR #211).                  |
-
+  | Bug    | Limitação                                                                                                                                                   | Contorno                      |                                                                                                                                                 
+  | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |                               
+  ----------------------------------------------------------------------------------- |                                                                                                                  
+  | BUG-14 | O filtro por linha de pesquisa usa "contém": filtrar por "IA" também traz "Mídias Digitais".                                                                | —                             
+                                                       |                                                                                                                                                 
+  | BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele.                                                                       | Não ocorre em banco novo, como
+  o de _staging_ ou o criado pelo `docker compose up`. |                                                                                                                                                 
+  | BUG-16 | A chave `xspring.application.name` está com um "x" a mais, e o arquivo `application.properties` não está em UTF-8.                                          | Sem efeito funcional.         
+                                                       |                                                                                                                                                 
+  | BUG-18 | Ao abrir um link protegido sem estar logado, o usuário vai para a página inicial do seu papel após o login, e não para o link original.                     | Navegar de novo até a página  
+  desejada.                                              |                                                                                                                                               
+  | BUG-19 | Na edição do perfil, campos opcionais vazios (`departamento`, `biografia`) geram aviso de input não controlado no console, e o PATCH reenvia campos extras. | Sem efeito visível para o     
+  usuário.                                                  |                                                                                                                                            
+  | BUG-20 | O calendário de prazos abre em "Editar prazo" com a data em branco, mesmo quando o prazo já existe.                                                         | Selecionar outro tipo de      
+  entrega e voltar, ou consultar a lista de prazos.          |                                                                                                                                           
+  | BUG-22 | Qualquer professor pode cadastrar um perfil de orientador com um e-mail digitado livremente, sem vínculo com a conta do Keycloak.                           | A edição e a remoção já são   
+  restritas ao dono do perfil (PR #211).   
+  
+  
 ## 4. Detalhamento dos bugs
 
 ### 4.1. Severidade crítica (segurança e autorização)
@@ -288,11 +295,14 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-17: O contador de vagas do painel mostra "—" quando não há solicitações pendentes
 
-- **Status:** Limitação conhecida. Sem issue nem PR.
-- **Local:** `frontend/src/paginas/PainelSolicitacoes/index.tsx` (linhas 49 a 51 e 208 a 211)
-- **Descrição:** As vagas são lidas de `dados[0].orientador.vagasDisponiveis`, ou seja, só existem quando há pelo menos uma solicitação pendente.
-- **Impacto:** O professor sem pedidos pendentes não vê quantas vagas tem.
-- **Sugestão:** Obter as vagas do perfil do orientador, via `/orientadores/{id}` ou incluindo-as em `/professores/me`.
+- **Status:** Corrigido. Issue [#266](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/266).
+- **Local:** `frontend/src/paginas/PainelSolicitacoes/index.tsx`
+- **Descrição (antes da correção):** As vagas eram lidas de `dados[0].orientador.vagasDisponiveis`, ou seja, só existiam quando havia pelo menos uma solicitação pendente.
+- **Impacto (antes da correção):** O professor sem pedidos pendentes não via quantas vagas tinha.
+- **Correção:**
+  - O painel passa a buscar as vagas no perfil do orientador logado com `obterOrientador(perfil.id)` (`GET /orientadores/{id}`), o mesmo padrão da tela "Meu perfil". Nenhum endpoint mudou.
+  - Se essa busca falhar, a lista de solicitações continua sendo exibida e o contador mostra "—".
+  - Após um aceite, o contador continua sendo atualizado com as vagas devolvidas pelo `PATCH`.
 
 #### BUG-18: O redirecionamento de volta após o login nunca acontece
 
@@ -325,11 +335,11 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-21: `ErrorResponseDTO` usa `Instant.now()` em vez do `Clock`
 
-- **Status:** Limitação conhecida. Sem issue nem PR.
+- **Status:** Corrigido. Issue [#278](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/278), PR [#294](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/294).
 - **Local:** `backend/.../dto/ErrorResponseDTO.java`
-- **Descrição:** O projeto define que a lógica de tempo deve usar o bean `Clock` (`config/ClockConfig`), mas o timestamp do erro usa `Instant.now()` diretamente.
-- **Impacto:** O timestamp não pode ser fixado em testes, o que é inconsistente com a convenção do projeto.
-- **Sugestão:** Injetar o `Clock` no `GlobalExceptionHandler` e passar `Instant.now(clock)` para `ErrorResponseDTO.of`.
+- **Descrição:** O projeto define que a lógica de tempo deve usar o bean `Clock` (`config/ClockConfig`), mas o timestamp do erro usava `Instant.now()` diretamente.
+- **Impacto (antes da correção):** O timestamp não podia ser fixado em testes, o que era inconsistente com a convenção do projeto.
+- **Correção:** O `GlobalExceptionHandler` recebe o bean `Clock` (`ClockConfig`) por injeção e passa `Instant.now(clock)` para `ErrorResponseDTO.of`. O comportamento é coberto por `GlobalExceptionHandlerTest` e pelo teste de integração com `Clock` fixo.
 
 #### BUG-22: Qualquer professor cadastra orientadores com qualquer e-mail
 

@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import java.time.Clock;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -57,7 +58,7 @@ class OrientadorControllerTest {
         validator.afterPropertiesSet();
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(orientadorController)
-                .setControllerAdvice(new GlobalExceptionHandler())
+                .setControllerAdvice(new GlobalExceptionHandler(Clock.systemUTC()))
                 .setValidator(validator)
                 .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                 .build();

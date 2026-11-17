@@ -13,13 +13,20 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -39,6 +46,16 @@ class OrientadorControllerIntegrationTest {
     private static final String EMAIL_PROFESSOR_A = "professor.orientador@example.com";
     private static final String EMAIL_PROFESSOR_B = "professor.responsavel@example.com";
     private static final String EMAIL_ALUNO = "aluno@example.com";
+    private static final Instant INSTANTE_FIXO = Instant.parse("2026-11-17T10:00:00Z");
+
+    @TestConfiguration
+    static class TestClockConfig {
+        @Bean
+        @Primary
+        Clock fixedClock() {
+            return Clock.fixed(INSTANTE_FIXO, ZoneOffset.UTC);
+        }
+    }
 
     @Autowired
     private MockMvc mockMvc;
@@ -351,5 +368,15 @@ class OrientadorControllerIntegrationTest {
                 .andExpect(jsonPath("$.status").value(405))
                 .andExpect(jsonPath("$.erro").value("Requisição inválida"))
                 .andExpect(jsonPath("$.caminho").value(URL + "/" + professorA.getId()));
+    }
+
+    @Test
+    @DisplayName("GET /orientadores/{id} - Recurso não encontrado deve usar o Clock injetado pelo Spring no timestamp")
+    void buscarPorId_Inexistente_DeveUsarClockInjetadoNoTimestamp() throws Exception {
+        mockMvc.perform(get(URL + "/999999")
+                        .with(tokenDe("ROLE_ALUNO", EMAIL_ALUNO)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.timestamp").value("2026-11-17T10:00:00Z"));
     }
 }
