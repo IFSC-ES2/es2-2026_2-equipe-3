@@ -274,11 +274,23 @@ Nenhum defeito conhecido impede a demonstração do MVP. Detalhes, passos de rep
 | BUG-21 | Baixa      | O `timestamp` das respostas de erro usa `Instant.now()` em vez do `Clock` do projeto.                                            |
 | BUG-22 | Baixa      | Qualquer professor pode cadastrar um perfil de orientador com e-mail livre. Edição e remoção já são restritas ao dono do perfil. |
 
-## 12. Como executar o aplicativo
+## 12. Ambiente de Staging e Execução
+
+### 12.1. Ambiente de Staging Oficial (URLs Fixas até a Defesa)
+
+O ambiente de _staging_ está publicado e acessível publicamente via URLs fixas com HTTPS para avaliação contínua até a apresentação final e defesa técnica:
+
+- **Frontend (Aplicação Web):** [https://sigtcc.cobbler-albacore.ts.net](https://sigtcc.cobbler-albacore.ts.net)
+- **Backend (API Spring Boot):** [https://sigtcc.cobbler-albacore.ts.net:8443](https://sigtcc.cobbler-albacore.ts.net:8443)
+- **Keycloak (Autenticação):** [https://sigtcc.cobbler-albacore.ts.net:10000](https://sigtcc.cobbler-albacore.ts.net:10000)
+
+> Para detalhes de configuração, procedimentos operacionais de reinício, responsável pela disponibilidade e script de verificação automatizada (_smoke test_), consulte [`docs/staging.md`](docs/staging.md).
+
+### 12.2. Como executar o aplicativo localmente
 
 Para facilitar a execução dos ambientes de frontend, backend, Keycloak e banco de dados simultaneamente, o projeto está configurado com Docker Compose.
 
-> **Documentação de Deploy e Staging:** Para instruções detalhadas sobre variáveis de ambiente (`.env.example`), execução do ambiente de _staging_ (com `docker-compose.prod.yml` e túneis Cloudflare), estratégia de _rollback_ e limitações conhecidas, consulte o **[Guia de Deploy e Staging (`docs/DEPLOY.md`)](docs/DEPLOY.md)**.
+> **Documentação de Deploy e Staging:** Para instruções detalhadas sobre variáveis de ambiente (`.env.example`), execução do ambiente de _staging_ (com `docker-compose.prod.yml`), estratégia de _rollback_ e limitações conhecidas, consulte o **[Guia de Deploy e Staging (`docs/DEPLOY.md`)](docs/DEPLOY.md)**.
 
 ### Pré-requisitos
 
