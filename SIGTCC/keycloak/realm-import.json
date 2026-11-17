@@ -35,12 +35,20 @@
       "implicitFlowEnabled": false,
       "directAccessGrantsEnabled": true,
       "serviceAccountsEnabled": false,
-      "rootUrl": "http://localhost:5173",
-      "redirectUris": ["http://localhost:5173/*", "http://localhost/*"],
-      "webOrigins": ["http://localhost:5173", "http://localhost", "*"],
+      "rootUrl": "https://sigtcc.cobbler-albacore.ts.net",
+      "redirectUris": [
+        "https://sigtcc.cobbler-albacore.ts.net/*",
+        "http://localhost:5173/*",
+        "http://localhost/*"
+      ],
+      "webOrigins": [
+        "https://sigtcc.cobbler-albacore.ts.net",
+        "http://localhost:5173",
+        "http://localhost"
+      ],
       "attributes": {
         "pkce.code.challenge.method": "S256",
-        "post.logout.redirect.uris": "http://localhost:5173/*##http://localhost/*"
+        "post.logout.redirect.uris": "https://sigtcc.cobbler-albacore.ts.net/*##http://localhost:5173/*##http://localhost/*"
       },
       "protocolMappers": [
         {
