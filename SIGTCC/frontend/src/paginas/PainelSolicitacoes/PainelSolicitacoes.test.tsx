@@ -8,6 +8,8 @@ import {
   atualizarStatusSolicitacao,
 } from "../../utils/solicitacaoService";
 import { obterPerfilProfessor } from "../../utils/professorService";
+import { obterOrientador } from "../../utils/orientadorService";
+import type { Orientador } from "../../types/Orientador";
 import { AuthProvider } from "../../auth/AuthContext";
 import { ApiError } from "../../utils/apiErro";
 import type { Solicitacao } from "../../types/Solicitacao";
@@ -33,6 +35,10 @@ vi.mock("../../utils/prazoEntregaService", () => ({
   atualizarPrazo: vi.fn(),
 }));
 
+vi.mock("../../utils/orientadorService", () => ({
+  obterOrientador: vi.fn(),
+}));
+
 const perfilBase: PerfilProfessor = {
   id: 1,
   nome: "Prof. Dr. Roberto",
@@ -40,6 +46,19 @@ const perfilBase: PerfilProfessor = {
   departamento: "DAELN",
   responsavelTurma: false,
 };
+
+function orientadorComVagas(vagasDisponiveis: number): Orientador {
+  return {
+    id: perfilBase.id,
+    nome: perfilBase.nome,
+    email: perfilBase.email,
+    departamento: "DAELN",
+    linhasDePesquisa: ["Engenharia de Software"],
+    vagasDisponiveis,
+    biografia: "Biografia",
+    ativo: true,
+  };
+}
 
 describe("PainelSolicitacoesPage (Issue #87)", () => {
   const mockSolicitacoes: Solicitacao[] = [
@@ -90,6 +109,7 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(obterPerfilProfessor).mockResolvedValue(perfilBase);
+    vi.mocked(obterOrientador).mockResolvedValue(orientadorComVagas(3));
     vi.mocked(listarPrazosVigentes).mockResolvedValue([]);
   });
 
@@ -473,6 +493,68 @@ describe("PainelSolicitacoesPage (Issue #87)", () => {
     });
   });
 
+  // --- Contador de vagas a partir do perfil (Issue #266) ---
+
+  function renderizarPainel() {
+    render(
+      <AuthProvider>
+        <MemoryRouter>
+          <PainelSolicitacoesPage />
+        </MemoryRouter>
+      </AuthProvider>,
+    );
+  }
+
+  function contadorDeVagas() {
+    return screen.getByText("Vagas disponíveis:").parentElement;
+  }
+
+  it("deve exibir as vagas disponíveis mesmo sem solicitações pendentes (Issue #266)", async () => {
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
+    vi.mocked(obterOrientador).mockResolvedValue(orientadorComVagas(4));
+
+    renderizarPainel();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText("Nenhuma solicitação pendente no momento."),
+      ).toBeInTheDocument();
+    });
+    expect(contadorDeVagas()).toHaveTextContent("4");
+    expect(contadorDeVagas()).not.toHaveTextContent("—");
+    expect(obterOrientador).toHaveBeenCalledWith(perfilBase.id);
+  });
+
+  it("deve usar as vagas do perfil do orientador, e não as da lista de solicitações (Issue #266)", async () => {
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue(
+      mockSolicitacoes,
+    );
+    vi.mocked(obterOrientador).mockResolvedValue(orientadorComVagas(5));
+
+    renderizarPainel();
+
+    await waitFor(() => {
+      expect(screen.getByText("Gabriel Silva")).toBeInTheDocument();
+    });
+    expect(contadorDeVagas()).toHaveTextContent("5");
+  });
+
+  it("deve exibir a lista e '—' no contador quando não for possível obter as vagas (Issue #266)", async () => {
+    vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue(
+      mockSolicitacoes,
+    );
+    vi.mocked(obterOrientador).mockRejectedValue(
+      new ApiError(500, "Erro interno do servidor"),
+    );
+
+    renderizarPainel();
+
+    await waitFor(() => {
+      expect(screen.getByText("Gabriel Silva")).toBeInTheDocument();
+    });
+    expect(contadorDeVagas()).toHaveTextContent("—");
+  });
+
   it("deve exibir a aba 'Gestão da Turma/Calendário' quando o professor for responsável pela turma", async () => {
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
     vi.mocked(obterPerfilProfessor).mockResolvedValue({
@@ -648,6 +730,7 @@ describe("Fluxo do Calendário de Entregas no Painel do Professor (US05 - Issue 
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(listarSolicitacoesPorOrientador).mockResolvedValue([]);
+    vi.mocked(obterOrientador).mockResolvedValue(orientadorComVagas(3));
     vi.mocked(listarPrazosVigentes).mockResolvedValue([]);
   });
 
