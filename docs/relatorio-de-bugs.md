@@ -28,8 +28,8 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | Crítica    | 4          | 4          | 0                     |
 | Alta       | 4          | 4          | 0                     |
 | Média      | 7          | 4          | 3                     |
-| Baixa      | 7          | 0          | 7                     |
-| **Total**  | **22**     | **12**     | **10**                |
+| Baixa      | 7          | 1          | 6                     |
+| **Total**  | **22**     | **13**     | **9**                 |
 
 | Bug    | Título resumido                                    | Severidade | Status final                   | Issue                                                              | PR                                                                          |
 | ------ | -------------------------------------------------- | ---------- | ------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
@@ -53,7 +53,7 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | BUG-18 | Redirecionamento após o login não acontece         | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-19 | Inputs controlados recebem `null`                  | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-20 | Calendário abre com a data vazia                   | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
-| BUG-21 | `ErrorResponseDTO` usa `Instant.now()`             | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
+| BUG-21 | `ErrorResponseDTO` usa `Instant.now()`             | Baixa      | Corrigido                      | [#278](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/278) | [#294](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/294)           |
 | BUG-22 | Professor cadastra orientador com qualquer e-mail  | Baixa      | Limitação conhecida (mitigada) | —                                                                  | Mitigação: [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211) |
 
 **Impacto no MVP:** nenhum defeito crítico ou alto permanece aberto. As limitações restantes são de severidade média ou baixa: afetam mensagens de erro, chamadas feitas direto à API ou detalhes de interface. Nenhuma impede a demonstração dos fluxos do MVP (login, catálogo, solicitação e aceite de orientação, calendário de prazos, submissão e avaliação de entregas).
@@ -72,7 +72,6 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 | BUG-18 | Ao abrir um link protegido sem estar logado, o usuário vai para a página inicial do seu papel após o login, e não para o link original.                                                             | Navegar de novo até a página desejada.                                              |
 | BUG-19 | Na edição do perfil, campos opcionais vazios (`departamento`, `biografia`) geram aviso de input não controlado no console, e o PATCH reenvia campos extras.                                         | Sem efeito visível para o usuário.                                                  |
 | BUG-20 | O calendário de prazos abre em "Editar prazo" com a data em branco, mesmo quando o prazo já existe.                                                                                                 | Selecionar outro tipo de entrega e voltar, ou consultar a lista de prazos.          |
-| BUG-21 | O `timestamp` das respostas de erro usa `Instant.now()`, e não o `Clock` do projeto.                                                                                                                | Sem efeito funcional.                                                               |
 | BUG-22 | Qualquer professor pode cadastrar um perfil de orientador com um e-mail digitado livremente, sem vínculo com a conta do Keycloak.                                                                   | A edição e a remoção já são restritas ao dono do perfil (PR #211).                  |
 
 ## 4. Detalhamento dos bugs
@@ -323,11 +322,11 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-21: `ErrorResponseDTO` usa `Instant.now()` em vez do `Clock`
 
-- **Status:** Limitação conhecida. Sem issue nem PR.
+- **Status:** Corrigido. Issue [#278](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/278), PR [#294](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/294).
 - **Local:** `backend/.../dto/ErrorResponseDTO.java`
-- **Descrição:** O projeto define que a lógica de tempo deve usar o bean `Clock` (`config/ClockConfig`), mas o timestamp do erro usa `Instant.now()` diretamente.
-- **Impacto:** O timestamp não pode ser fixado em testes, o que é inconsistente com a convenção do projeto.
-- **Sugestão:** Injetar o `Clock` no `GlobalExceptionHandler` e passar `Instant.now(clock)` para `ErrorResponseDTO.of`.
+- **Descrição:** O projeto define que a lógica de tempo deve usar o bean `Clock` (`config/ClockConfig`), mas o timestamp do erro usava `Instant.now()` diretamente.
+- **Impacto (antes da correção):** O timestamp não podia ser fixado em testes, o que era inconsistente com a convenção do projeto.
+- **Correção:** O `GlobalExceptionHandler` recebe o bean `Clock` (`ClockConfig`) por injeção e passa `Instant.now(clock)` para `ErrorResponseDTO.of`. O comportamento é coberto por `GlobalExceptionHandlerTest` e pelo teste de integração com `Clock` fixo.
 
 #### BUG-22: Qualquer professor cadastra orientadores com qualquer e-mail
 

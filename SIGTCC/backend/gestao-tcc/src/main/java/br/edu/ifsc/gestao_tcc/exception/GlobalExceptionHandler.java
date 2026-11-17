@@ -1,9 +1,9 @@
 package br.edu.ifsc.gestao_tcc.exception;
 
-import br.edu.ifsc.gestao_tcc.config.ClockConfig;
 import br.edu.ifsc.gestao_tcc.dto.ErroCampoDTO;
 import br.edu.ifsc.gestao_tcc.dto.ErrorResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -24,17 +24,10 @@ import java.util.List;
 
 @Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
 
     private final Clock clock;
-
-    public GlobalExceptionHandler() {
-        this(Clock.system(ClockConfig.FUSO_INSTITUICAO));
-    }
-
-    public GlobalExceptionHandler(Clock clock) {
-        this.clock = clock != null ? clock : Clock.system(ClockConfig.FUSO_INSTITUICAO);
-    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleResourceNotFoundException(
