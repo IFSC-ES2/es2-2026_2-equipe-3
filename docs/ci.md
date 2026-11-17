@@ -52,7 +52,7 @@ Para dar suporte à validação em ambiente de staging (a partir da `entrega-8`)
 
 - **Build e Push:** Utiliza o Docker Buildx para compilar as imagens do Backend e do Frontend simultaneamente (condicionado ao sucesso dos testes).
 - **Registry:** As imagens são publicadas no GHCR (GitHub Container Registry).
-- **Versionamento:** Cada build gera uma tag `latest` e uma tag com o SHA do commit (ex: `a1b2c3d`), garantindo rastreabilidade para o staging.
+- **Versionamento:** Cada build gera uma tag com o SHA do commit (ex: `:a1b2c3d`) e uma tag com a referência da branch ou release (`:entrega-9`, `:v1.0.0-rc.1`). A tag `:latest` é publicada e atualizada exclusivamente em pushes para o ramo principal `main` ou tags de release (`v*`), evitando que execuções em branches de entrega intermediárias sobrescrevam a versão estável mais recente.
 - **Cache Docker:** Utiliza a API de cache nativa do GitHub Actions (`type=gha`) para otimizar o tempo de construção das camadas do Docker.
 
 ## 4. Política de Bloqueio e Quality Gates (Regras de Proteção de Branch)
@@ -63,7 +63,7 @@ A integração atua como a primeira linha de defesa contra bugs e erros (Risco R
 2. **Checks obrigatórios do GitHub Actions aprovados:**
    - `Compilar e Rodar Testes Unitarios (Gradle)` (`backend-ci.yml`)
    - `Compilar, Testar e Gerar Build (Frontend)` (`frontend-ci.yml`)
-   - `Checar Formatação de Código (Prettier)` (`verificar-formatacao.yml`)
+   - `Checar Formatação de Código` (`verificar-formatacao.yml`)
    - `Validar Sintaxe dos Workflows (actionlint)` (`verificar-formatacao.yml`)
    - `Checar Arquivos Essenciais` (`verificacao-docs.yml`)
 

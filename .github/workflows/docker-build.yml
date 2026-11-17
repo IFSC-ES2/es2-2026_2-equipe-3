@@ -79,9 +79,9 @@ jobs:
           context: SIGTCC/backend/gestao-tcc
           push: true
           tags: |
-            ghcr.io/ifsc-es2/sigtcc-backend:latest
             ghcr.io/ifsc-es2/sigtcc-backend:${{ github.sha }}
-            ${{ startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/ifsc-es2/sigtcc-backend:{0}', github.ref_name) || '' }}
+            ghcr.io/ifsc-es2/sigtcc-backend:${{ github.ref_name }}
+            ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'ghcr.io/ifsc-es2/sigtcc-backend:latest' || '' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -91,9 +91,9 @@ jobs:
           context: SIGTCC/frontend
           push: true
           tags: |
-            ghcr.io/ifsc-es2/sigtcc-frontend:latest
             ghcr.io/ifsc-es2/sigtcc-frontend:${{ github.sha }}
-            ${{ startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/ifsc-es2/sigtcc-frontend:{0}', github.ref_name) || '' }}
+            ghcr.io/ifsc-es2/sigtcc-frontend:${{ github.ref_name }}
+            ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && 'ghcr.io/ifsc-es2/sigtcc-frontend:latest' || '' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |
