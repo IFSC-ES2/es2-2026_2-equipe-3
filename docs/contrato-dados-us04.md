@@ -554,7 +554,6 @@ Retornado quando o usuário autenticado não é o aluno autor nem o orientador r
 | `422`  | `Regra de negócio violada`             | String                       |
 | `500`  | `Erro interno do servidor`             | String                       |
 
-
 ### 6.2. `400 Bad Request` - validação de campos
 
 | Endpoint                | `campo`         | Condição                            | `mensagem`                                                                 |
