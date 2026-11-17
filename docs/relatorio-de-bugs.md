@@ -27,9 +27,9 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | ---------- | ---------- | ---------- | --------------------- |
 | Crítica    | 4          | 4          | 0                     |
 | Alta       | 4          | 4          | 0                     |
-| Média      | 7          | 4          | 3                     |
-| Baixa      | 7          | 1          | 6                     |
-| **Total**  | **22**     | **14**     | **8**                 |
+| Média      | 7          | 5          | 2                     |
+| Baixa      | 7          | 2          | 5                     |
+| **Total**  | **22**     | **15**     | **7**                 |
 
 | Bug    | Título resumido                                    | Severidade | Status final                   | Issue                                                              | PR                                                                          |
 | ------ | -------------------------------------------------- | ---------- | ------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
@@ -43,7 +43,7 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | BUG-08 | Condição de corrida nas vagas                      | Alta       | Corrigido                      | [#206](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/206) | [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241)            |
 | BUG-09 | Conflito de e-mail aluno/orientador gera 500       | Média      | Corrigido                      | [#261](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/261) | [#289](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/289)            |
 | BUG-10 | PATCH de orientador sem checar e-mail duplicado    | Média      | Corrigido indiretamente        | [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211)            |
-| BUG-11 | Faltam limites de tamanho nos DTOs                 | Média      | Limitação conhecida (mitigada) | —                                                                  | Mitigação: [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) |
+| BUG-11 | Faltam limites de tamanho nos DTOs                 | Média      | Corrigido                      | [#273](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/273) | PR da issue #273                                                            |
 | BUG-12 | Sem handler genérico de exceções                   | Média      | Corrigido                      | [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) | PR da issue #262                                                            |
 | BUG-13 | Orientador desativado continua listado e operando  | Média      | Corrigido                      | [#263](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/263) | PR da issue #263                                                            |
 | BUG-14 | Filtro por linha de pesquisa compara por substring | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
@@ -62,16 +62,15 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 
 Defeitos não corrigidos até o congelamento de código, com o efeito observável para quem usa o sistema. Esta lista é replicada no `README.md` e na descrição da release.
 
-| Bug    | Limitação                                                                                                                                                                                           | Contorno                                                                            |
-| ------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
-| BUG-11 | O cadastro de orientador (`POST /orientadores`) não limita o tamanho de `nome`, `departamento`, `biografia` e dos itens de `linhasDePesquisa`. Valores grandes enviados direto à API geram **500**. | O formulário do frontend já valida os tamanhos.                                     |
-| BUG-14 | O filtro por linha de pesquisa usa "contém": filtrar por "IA" também traz "Mídias Digitais".                                                                                                        | —                                                                                   |
-| BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele.                                                                                                               | Não ocorre em banco novo, como o de _staging_ ou o criado pelo `docker compose up`. |
-| BUG-16 | A chave `xspring.application.name` está com um "x" a mais, e o arquivo `application.properties` não está em UTF-8.                                                                                  | Sem efeito funcional.                                                               |
-| BUG-18 | Ao abrir um link protegido sem estar logado, o usuário vai para a página inicial do seu papel após o login, e não para o link original.                                                             | Navegar de novo até a página desejada.                                              |
-| BUG-19 | Na edição do perfil, campos opcionais vazios (`departamento`, `biografia`) geram aviso de input não controlado no console, e o PATCH reenvia campos extras.                                         | Sem efeito visível para o usuário.                                                  |
-| BUG-20 | O calendário de prazos abre em "Editar prazo" com a data em branco, mesmo quando o prazo já existe.                                                                                                 | Selecionar outro tipo de entrega e voltar, ou consultar a lista de prazos.          |
-| BUG-22 | Qualquer professor pode cadastrar um perfil de orientador com um e-mail digitado livremente, sem vínculo com a conta do Keycloak.                                                                   | A edição e a remoção já são restritas ao dono do perfil (PR #211).                  |
+| Bug    | Limitação                                                                                                                                                   | Contorno                                                                            |
+| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| BUG-14 | O filtro por linha de pesquisa usa "contém": filtrar por "IA" também traz "Mídias Digitais".                                                                | —                                                                                   |
+| BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele.                                                                       | Não ocorre em banco novo, como o de _staging_ ou o criado pelo `docker compose up`. |
+| BUG-16 | A chave `xspring.application.name` está com um "x" a mais, e o arquivo `application.properties` não está em UTF-8.                                          | Sem efeito funcional.                                                               |
+| BUG-18 | Ao abrir um link protegido sem estar logado, o usuário vai para a página inicial do seu papel após o login, e não para o link original.                     | Navegar de novo até a página desejada.                                              |
+| BUG-19 | Na edição do perfil, campos opcionais vazios (`departamento`, `biografia`) geram aviso de input não controlado no console, e o PATCH reenvia campos extras. | Sem efeito visível para o usuário.                                                  |
+| BUG-20 | O calendário de prazos abre em "Editar prazo" com a data em branco, mesmo quando o prazo já existe.                                                         | Selecionar outro tipo de entrega e voltar, ou consultar a lista de prazos.          |
+| BUG-22 | Qualquer professor pode cadastrar um perfil de orientador com um e-mail digitado livremente, sem vínculo com a conta do Keycloak.                           | A edição e a remoção já são restritas ao dono do perfil (PR #211).                  |
 
 ## 4. Detalhamento dos bugs
 
@@ -203,18 +202,21 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-11: Faltam limites de tamanho nos DTOs (o banco rejeita com 500)
 
-- **Status:** Limitação conhecida (mitigada). Sem issue própria. A mitigação veio com o PR [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213).
+- **Status:** Corrigido. Issue [#273](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/273). Antes, o PR [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) havia mitigado o defeito.
 - **Local:**
   - `backend/.../dto/OrientadorRequestDTO.java`
   - `backend/.../dto/OrientadorUpdateDTO.java`
-- **Descrição:**
-  - `OrientadorRequestDTO`: não há `@Size` em `nome` (coluna de 100), `departamento` (100) e `biografia` (500).
-  - Itens de `linhasDePesquisa` (coluna `VARCHAR(80)`): não têm `@Size` nem `@NotBlank`, nem no POST nem no PATCH.
-  - `OrientadorUpdateDTO`: aceita lista vazia de linhas, enquanto o cadastro exige ao menos uma.
-- **Mitigação:** O `AlunoDTO` saiu do `SolicitacaoRequestDTO` no PR #213, e o `curso` ganhou `@Size(max = 100)`. O `OrientadorUpdateDTO` já limita `nome`, `departamento` e `biografia`.
-- **Impacto:** Requisições feitas direto à API, sem passar pela validação do frontend, geram "Data too long" no MySQL, o que vira 500. Linhas de pesquisa em branco são aceitas.
-- **Como reproduzir:** Envie `POST /api/v1/orientadores` com uma linha de pesquisa de 81 caracteres.
-- **Sugestão:** Adicionar `@Size` e `@NotBlank`, inclusive nos elementos da lista (`List<@NotBlank @Size(max = 80) String>`).
+- **Descrição (antes da correção):**
+  - `OrientadorRequestDTO`: não havia `@Size` em `nome` (coluna de 100), `departamento` (100) e `biografia` (500).
+  - Itens de `linhasDePesquisa` (coluna `VARCHAR(80)`): não tinham `@Size` nem `@NotBlank`, nem no POST nem no PATCH.
+  - `OrientadorUpdateDTO`: aceitava lista vazia de linhas, enquanto o cadastro exige ao menos uma.
+- **Mitigação anterior:** O `AlunoDTO` saiu do `SolicitacaoRequestDTO` no PR #213. O nome e o e-mail do aluno passaram a vir do JWT, e o `curso` ganhou `@Size(max = 100)`.
+- **Impacto (antes da correção):** Requisições feitas direto à API, sem passar pela validação do frontend, geravam "Data too long" no MySQL. Linhas de pesquisa em branco eram aceitas.
+- **Correção:**
+  - `OrientadorRequestDTO`: `nome` 3–100, `email` ≤ 100, `departamento` ≤ 100 e `biografia` ≤ 500.
+  - Itens de `linhasDePesquisa`: `List<@NotBlank @Size(min = 2, max = 80) String>`, no POST e no PATCH. O mesmo limite já é aplicado pelo frontend.
+  - `OrientadorUpdateDTO`: `@Size(min = 1)` rejeita lista vazia. Omitir o campo continua mantendo as linhas atuais.
+  - Campos acima do limite retornam `400` com `detalhes` em `[{campo, mensagem}]`. Nos itens da lista, o `campo` traz o índice, como em `linhasDePesquisa[0]`.
 
 #### BUG-12: Não há handler genérico de exceções
 

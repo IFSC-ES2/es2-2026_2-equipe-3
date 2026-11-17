@@ -80,14 +80,14 @@ Accept: application/json
 
 #### Dicionário de Dados e Regras de Validação (Entrada)
 
-| Campo              | Tipo             | Obrigatório? | Regras e Restrições de Negócio                                                       |
-| :----------------- | :--------------- | :----------- | :----------------------------------------------------------------------------------- |
-| `nome`             | String           | Sim          | Mínimo 3 e máximo 100 caracteres. Não pode conter apenas espaços.                    |
-| `email`            | String           | Sim          | Deve possuir formato de e-mail válido (RFC 5322). Identificador único do orientador. |
-| `departamento`     | String           | Não          | Máximo 100 caracteres. Representa o departamento/câmpus de lotação.                  |
-| `linhasDePesquisa` | Array de Strings | Sim          | Deve conter ao menos 1 item. Cada linha deve ter entre 2 e 80 caracteres.            |
-| `vagasDisponiveis` | Integer          | Sim          | Número inteiro maior ou igual a 0 ($\ge 0$). Limite máximo sugerido de 20 vagas.     |
-| `biografia`        | String           | Não          | Texto descritivo opcional com tamanho máximo de 500 caracteres.                      |
+| Campo              | Tipo             | Obrigatório? | Regras e Restrições de Negócio                                                                                     |
+| :----------------- | :--------------- | :----------- | :----------------------------------------------------------------------------------------------------------------- |
+| `nome`             | String           | Sim          | Mínimo 3 e máximo 100 caracteres. Não pode conter apenas espaços.                                                  |
+| `email`            | String           | Sim          | Deve possuir formato de e-mail válido (RFC 5322), com no máximo 100 caracteres. Identificador único do orientador. |
+| `departamento`     | String           | Não          | Máximo 100 caracteres. Representa o departamento/câmpus de lotação.                                                |
+| `linhasDePesquisa` | Array de Strings | Sim          | Deve conter ao menos 1 item. Cada linha não pode ficar em branco e deve ter entre 2 e 80 caracteres.               |
+| `vagasDisponiveis` | Integer          | Sim          | Número inteiro maior ou igual a 0 ($\ge 0$). Limite máximo sugerido de 20 vagas.                                   |
+| `biografia`        | String           | Não          | Texto descritivo opcional com tamanho máximo de 500 caracteres.                                                    |
 
 #### Respostas Possíveis
 
@@ -136,6 +136,19 @@ Retornado quando um ou mais campos violam as regras estipuladas.
   ]
 }
 ```
+
+Os limites de tamanho seguem as colunas do banco e são validados antes de chegar a ele (issue #273):
+
+| Campo                 | Mensagem                                                |
+| :-------------------- | :------------------------------------------------------ |
+| `nome`                | `O nome deve ter entre 3 e 100 caracteres.`             |
+| `email`               | `O e-mail deve ter no máximo 100 caracteres.`           |
+| `departamento`        | `O departamento deve ter no máximo 100 caracteres.`     |
+| `biografia`           | `A biografia deve ter no máximo 500 caracteres.`        |
+| `linhasDePesquisa[i]` | `A linha de pesquisa não pode ficar em branco.`         |
+| `linhasDePesquisa[i]` | `A linha de pesquisa deve ter entre 2 e 80 caracteres.` |
+
+Nas violações de um item da lista, `campo` traz o índice do item, por exemplo `linhasDePesquisa[0]`.
 
 ##### Conflito: `409 Conflict`
 
@@ -276,7 +289,7 @@ Retorna o objeto do orientador com os dados atualizados.
 
 ##### Erro de Validação: `400 Bad Request`
 
-Retornado caso os campos enviados sejam inválidos (ex: vagas negativas).
+Retornado caso os campos enviados sejam inválidos (ex: vagas negativas). Valem os mesmos limites de tamanho do cadastro (seção 4.1). Como a atualização é parcial, omitir `linhasDePesquisa` mantém as linhas atuais, mas enviar uma lista vazia (`[]`) retorna `400` com `Informe ao menos uma linha de pesquisa.`
 
 ##### Acesso Negado: `403 Forbidden`
 
