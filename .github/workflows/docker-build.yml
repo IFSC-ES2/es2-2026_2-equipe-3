@@ -3,7 +3,10 @@ name: Build Docker Images (Staging)
 on:
   push:
     branches:
-      - "entrega-8"
+      - main
+      - "entrega-*"
+    tags:
+      - "v*"
 
 jobs:
   test-backend:
@@ -78,6 +81,7 @@ jobs:
           tags: |
             ghcr.io/ifsc-es2/sigtcc-backend:latest
             ghcr.io/ifsc-es2/sigtcc-backend:${{ github.sha }}
+            ${{ startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/ifsc-es2/sigtcc-backend:{0}', github.ref_name) || '' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -89,6 +93,7 @@ jobs:
           tags: |
             ghcr.io/ifsc-es2/sigtcc-frontend:latest
             ghcr.io/ifsc-es2/sigtcc-frontend:${{ github.sha }}
+            ${{ startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/ifsc-es2/sigtcc-frontend:{0}', github.ref_name) || '' }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           build-args: |

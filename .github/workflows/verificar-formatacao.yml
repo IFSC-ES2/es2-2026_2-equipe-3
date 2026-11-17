@@ -1,14 +1,18 @@
-name: Verificação de Formatação (Prettier)
+name: Verificação de Formatação e Sintaxe
 
 on:
+  push:
+    branches:
+      - main
+      - "entrega-*"
   pull_request:
     branches:
       - main
-      - entrega-*
+      - "entrega-*"
 
 jobs:
   formatacao:
-    name: Checar Formatação de Código
+    name: Checar Formatação de Código (Prettier)
     runs-on: ubuntu-latest
 
     steps:
@@ -22,3 +26,16 @@ jobs:
 
       - name: Executar Prettier
         run: npx prettier --check "." --ignore-path .gitignore
+
+  validar-workflows:
+    name: Validar Sintaxe dos Workflows (actionlint)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Executar actionlint
+        run: |
+          bash <(curl -s https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash)
+          ./actionlint
