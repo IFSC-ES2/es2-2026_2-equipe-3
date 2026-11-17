@@ -64,7 +64,7 @@ Entretanto, a identidade autenticada não substituiu inteiramente IDs do navegad
 
 #### A2 — Autenticação não garante autorização do match e do perfil
 
-- **Categoria:** implementação/segurança. 
+- **Categoria:** implementação/segurança.
 - **Severidade:** alta.
 - **Evidência:** `J/config/SecurityConfig.java:28–32` restringe por papel somente `/api/v1/professores/**`; demais operações exigem apenas autenticação. `OrientadorController.java:25–62`, `OrientadorService.java:79–126`, `SolicitacaoController.java:23–53` e `SolicitacaoService.java:39–99` aceitam IDs/dados sem conferir principal, papel ou propriedade. O e-mail do orientador é alterável (`OrientadorService.java:88–90`).
 - **Impacto:** pelo fluxo estático, token de aluno não é barrado por papel ao editar/desativar orientadores ou aceitar/recusar solicitações. Dados de propostas de terceiros também ficam acessíveis por IDs. A gestão de prazos verifica responsabilidade por e-mail (`PrazoEntregaService.java:91–102`), mas esse vínculo depende de um cadastro alterável, criando ainda risco de escalada em estados de dados que permitam a alteração. Não se executou exploração; não se afirma comprometimento real. A barreira para anônimos existe, portanto não se classifica a segurança como ausente, mas a US01 não está plenamente integrada ao MVP.
@@ -152,7 +152,7 @@ Entretanto, a identidade autenticada não substituiu inteiramente IDs do navegad
 
 #### A10 — R07 mitigado no registro, mas não no produto
 
-- **Categoria:** confiabilidade da evidência. 
+- **Categoria:** confiabilidade da evidência.
 - **Severidade:** alta.
 - **Evidência:** `riscos.md:335` afirma `@Version`/lock otimista validado por testes concorrentes. Entidade `PerfilOrientador`, serviço, repositórios e testes entregues não apresentam esse mecanismo/teste. README:204, M-02 e release corretamente mantêm concorrência pendente.
 - **Impacto:** a ficha de riscos não retrata o marco e contradiz outras fontes da própria equipe. O débito herdado foi explicitamente replanejado; o problema avaliativo adicional desta sprint é declarar mitigação inexistente. Não se infere falsificação intencional nem se desconta novamente a mesma causa integralmente em vários critérios.
@@ -217,17 +217,17 @@ O recorte `b5c5a3f..88288f7`, excluindo merges e arquivos de `avaliacao/`, cont�
 
 ### Nota da Entrega
 
-| Critério | Máximo | Nota |
-|---|---:|---:|
-| Inspeção e replanejamento | 1,0 | 0,9 |
-| Incremento funcional da Sprint 3 | 1,5 | 1,0 |
-| Arquitetura real documentada | 1,5 | 1,2 |
-| ADRs revisados e consolidados | 1,0 | 0,8 |
-| Reengenharia, PR e métrica antes/depois | 1,5 | 1,2 |
-| Testes automatizados integrados ao CI | 1,0 | 0,9 |
-| Métricas, riscos, documentação, README e IA | 1,0 | 0,5 |
-| Fluxo de trabalho, checks, merge e release | 1,5 | 1,3 |
-| **Total** | **10,0** | **7,8** |
+| Critério                                    |   Máximo |    Nota |
+| ------------------------------------------- | -------: | ------: |
+| Inspeção e replanejamento                   |      1,0 |     0,9 |
+| Incremento funcional da Sprint 3            |      1,5 |     1,0 |
+| Arquitetura real documentada                |      1,5 |     1,2 |
+| ADRs revisados e consolidados               |      1,0 |     0,8 |
+| Reengenharia, PR e métrica antes/depois     |      1,5 |     1,2 |
+| Testes automatizados integrados ao CI       |      1,0 |     0,9 |
+| Métricas, riscos, documentação, README e IA |      1,0 |     0,5 |
+| Fluxo de trabalho, checks, merge e release  |      1,5 |     1,3 |
+| **Total**                                   | **10,0** | **7,8** |
 
 ### Justificativa da Nota
 
@@ -241,13 +241,13 @@ Não se exige US06/07 completas nem se penaliza ROPC apenas por não usar PKCE: 
 
 Escala 0–10, considerando conteúdo, relevância, aderência às responsabilidades, periodicidade/oportunidade, integração, revisão, comunicação e apoio aos colegas; não são proporcionais à contagem de commits.
 
-| Integrante | Nota individual | Justificativa resumida |
-|---|---:|---|
-| Damares do Socorro Gonçalves Gaia | **8,5** | Base de domínio antecipada, arquitetura, ADRs e revisões substanciais; limitações de fidelidade arquitetural e auditabilidade gerencial. |
-| Eduardo Cardoso Oliveira | **9,0** | Absorção de frontend, QA, reengenharia e integração com comunicação de dependências; perdas por fechamento/testes finais e precisão de validação/métrica. |
-| Marcus Jhuan Epifanio Lima | **0,0** | Sem contribuição rastreável nesta sprint; tarefas implementadas por colegas, coerentemente com o registro explícito da equipe. |
-| Talles Souza da Cruz | **9,0** | Planejamento, identidade, calendário, diagnóstico, revisões efetivas e release, distribuídos na janela; autorização e fechamento documental não integralmente consolidados. |
-| Willian Ferreira dos Santos | **8,3** | Filtros/testes antecipados, CI e apoio em revisão/fechamento; perdas de documentação, rastreabilidade de garantias e consolidação tardia do CI. |
+| Integrante                        | Nota individual | Justificativa resumida                                                                                                                                                      |
+| --------------------------------- | --------------: | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Damares do Socorro Gonçalves Gaia |         **8,5** | Base de domínio antecipada, arquitetura, ADRs e revisões substanciais; limitações de fidelidade arquitetural e auditabilidade gerencial.                                    |
+| Eduardo Cardoso Oliveira          |         **9,0** | Absorção de frontend, QA, reengenharia e integração com comunicação de dependências; perdas por fechamento/testes finais e precisão de validação/métrica.                   |
+| Marcus Jhuan Epifanio Lima        |         **0,0** | Sem contribuição rastreável nesta sprint; tarefas implementadas por colegas, coerentemente com o registro explícito da equipe.                                              |
+| Talles Souza da Cruz              |         **9,0** | Planejamento, identidade, calendário, diagnóstico, revisões efetivas e release, distribuídos na janela; autorização e fechamento documental não integralmente consolidados. |
+| Willian Ferreira dos Santos       |         **8,3** | Filtros/testes antecipados, CI e apoio em revisão/fechamento; perdas de documentação, rastreabilidade de garantias e consolidação tardia do CI.                             |
 
 O 0,0 de Marcus representa falta de evidência para pontuar a Sprint 3, não uma afirmação de inexistência absoluta de esforço privado. A nota pode ser revista diante de artefatos/ações contemporâneos verificáveis; associação a issues concluídas por colegas não substitui contribuição efetiva. Não foram usadas suas notas ou relatos da Sprint 2 para produzir essa conclusão.
 
@@ -257,13 +257,13 @@ A nota composta combina 30% da coletiva e 70% da contribuição individual. Os c
 
 `nota composta = (nota coletiva × 0,30) + (nota individual × 0,70)`
 
-| Integrante | Coletiva | Individual | Cálculo | Nota composta |
-|---|---:|---:|---:|---:|
-| Damares do Socorro Gonçalves Gaia | 7,8 | 8,5 | `(7,8 × 0,30) + (8,5 × 0,70) = 8,29` | **8,3** |
-| Eduardo Cardoso Oliveira | 7,8 | 9,0 | `(7,8 × 0,30) + (9,0 × 0,70) = 8,64` | **8,6** |
-| Marcus Jhuan Epifanio Lima | 7,8 | 0,0 | `(7,8 × 0,30) + (0,0 × 0,70) = 2,34` | **2,3** |
-| Talles Souza da Cruz | 7,8 | 9,0 | `(7,8 × 0,30) + (9,0 × 0,70) = 8,64` | **8,6** |
-| Willian Ferreira dos Santos | 7,8 | 8,3 | `(7,8 × 0,30) + (8,3 × 0,70) = 8,15` | **8,2** |
+| Integrante                        | Coletiva | Individual |                              Cálculo | Nota composta |
+| --------------------------------- | -------: | ---------: | -----------------------------------: | ------------: |
+| Damares do Socorro Gonçalves Gaia |      7,8 |        8,5 | `(7,8 × 0,30) + (8,5 × 0,70) = 8,29` |       **8,3** |
+| Eduardo Cardoso Oliveira          |      7,8 |        9,0 | `(7,8 × 0,30) + (9,0 × 0,70) = 8,64` |       **8,6** |
+| Marcus Jhuan Epifanio Lima        |      7,8 |        0,0 | `(7,8 × 0,30) + (0,0 × 0,70) = 2,34` |       **2,3** |
+| Talles Souza da Cruz              |      7,8 |        9,0 | `(7,8 × 0,30) + (9,0 × 0,70) = 8,64` |       **8,6** |
+| Willian Ferreira dos Santos       |      7,8 |        8,3 | `(7,8 × 0,30) + (8,3 × 0,70) = 8,15` |       **8,2** |
 
 ## 4. Observações
 

@@ -216,16 +216,16 @@ Achado relacionado: A11 (item 2.5).
 
 ### Nota da Entrega
 
-| Critério | Máximo | Nota |
-|---|---:|---:|
-| Planejamento da Sprint 2 | 1,0 | 0,9 |
-| Incremento funcional central, integrado e demonstrável | 2,0 | 1,6 |
-| Testes automatizados coerentes e executáveis | 1,5 | 1,0 |
-| Pelo menos dois padrões OO justificados | 1,5 | 1,2 |
-| Métricas, riscos, backlog, board e contribuições | 1,0 | 0,6 |
-| Fluxo de trabalho e CI | 1,5 | 1,3 |
-| README, documentação, uso de IA e release | 1,5 | 1,1 |
-| **Total** | **10,0** | **7,7** |
+| Critério                                               |   Máximo |    Nota |
+| ------------------------------------------------------ | -------: | ------: |
+| Planejamento da Sprint 2                               |      1,0 |     0,9 |
+| Incremento funcional central, integrado e demonstrável |      2,0 |     1,6 |
+| Testes automatizados coerentes e executáveis           |      1,5 |     1,0 |
+| Pelo menos dois padrões OO justificados                |      1,5 |     1,2 |
+| Métricas, riscos, backlog, board e contribuições       |      1,0 |     0,6 |
+| Fluxo de trabalho e CI                                 |      1,5 |     1,3 |
+| README, documentação, uso de IA e release              |      1,5 |     1,1 |
+| **Total**                                              | **10,0** | **7,7** |
 
 ### Justificativa da Nota
 
@@ -239,13 +239,13 @@ Os impactos distinguem funcionamento, alcance dos testes, precisão do design, a
 
 Notas de contribuição na Sprint 2, independentes da nota técnica coletiva. Não se pressupõe desempenho pleno apenas pelo artefato final: oportunidade, previsibilidade e apoio ao fluxo coletivo também importam.
 
-| Integrante | Nota individual |
-|---|---:|
-| Damares do Socorro Gonçalves Gaia | **8,8** |
-| Eduardo Cardoso Oliveira | **9,0** |
-| Marcus Jhuan Epifanio Lima | **6,5** |
-| Talles Souza da Cruz | **8,0** |
-| Willian Ferreira dos Santos | **8,0** |
+| Integrante                        | Nota individual |
+| --------------------------------- | --------------: |
+| Damares do Socorro Gonçalves Gaia |         **8,8** |
+| Eduardo Cardoso Oliveira          |         **9,0** |
+| Marcus Jhuan Epifanio Lima        |         **6,5** |
+| Talles Souza da Cruz              |         **8,0** |
+| Willian Ferreira dos Santos       |         **8,0** |
 
 - **Damares — 8,8:** atuação ampla, incremental e central em planejamento, arquitetura, painel, revisão e fechamento; perdas por reconciliação documental/gerencial insuficiente.
 - **Eduardo — 9,0:** amplitude de integração, implementação e revisão substantiva, com apoio a infraestrutura; perdas por riscos/contrato incompletos e consolidação final, sem atribuir-lhe toda lacuna coletiva.
@@ -261,13 +261,13 @@ Conforme o modelo de registro solicitado pelo professor, combina-se 30% da colet
 
 `nota composta = (nota coletiva × 0,30) + (nota individual × 0,70)`
 
-| Integrante | Nota coletiva | Nota individual | Cálculo | Nota composta |
-|---|---:|---:|---:|---:|
-| Damares do Socorro Gonçalves Gaia | 7,7 | 8,8 | `(7,7 × 0,30) + (8,8 × 0,70) = 8,47` | **8,5** |
-| Eduardo Cardoso Oliveira | 7,7 | 9,0 | `(7,7 × 0,30) + (9,0 × 0,70) = 8,61` | **8,6** |
-| Marcus Jhuan Epifanio Lima | 7,7 | 6,5 | `(7,7 × 0,30) + (6,5 × 0,70) = 6,86` | **6,9** |
-| Talles Souza da Cruz | 7,7 | 8,0 | `(7,7 × 0,30) + (8,0 × 0,70) = 7,91` | **7,9** |
-| Willian Ferreira dos Santos | 7,7 | 8,0 | `(7,7 × 0,30) + (8,0 × 0,70) = 7,91` | **7,9** |
+| Integrante                        | Nota coletiva | Nota individual |                              Cálculo | Nota composta |
+| --------------------------------- | ------------: | --------------: | -----------------------------------: | ------------: |
+| Damares do Socorro Gonçalves Gaia |           7,7 |             8,8 | `(7,7 × 0,30) + (8,8 × 0,70) = 8,47` |       **8,5** |
+| Eduardo Cardoso Oliveira          |           7,7 |             9,0 | `(7,7 × 0,30) + (9,0 × 0,70) = 8,61` |       **8,6** |
+| Marcus Jhuan Epifanio Lima        |           7,7 |             6,5 | `(7,7 × 0,30) + (6,5 × 0,70) = 6,86` |       **6,9** |
+| Talles Souza da Cruz              |           7,7 |             8,0 | `(7,7 × 0,30) + (8,0 × 0,70) = 7,91` |       **7,9** |
+| Willian Ferreira dos Santos       |           7,7 |             8,0 | `(7,7 × 0,30) + (8,0 × 0,70) = 7,91` |       **7,9** |
 
 ## 4. Observações
 

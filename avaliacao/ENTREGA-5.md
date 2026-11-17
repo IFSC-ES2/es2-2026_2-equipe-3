@@ -116,13 +116,13 @@ As principais perdas decorrem da execução não reprodutível em checkout limpo
 
 As notas abaixo avaliam a contribuição individual observável e são independentes da nota coletiva da entrega.
 
-| Integrante | Nota individual |
-|---|---:|
-| Damares do Socorro Gonçalves Gaia | **9,0** |
-| Eduardo Cardoso Oliveira | **9,2** |
-| Marcus Jhuan Epifanio Lima | **8,0** |
-| Talles Souza da Cruz | **9,2** |
-| Willian Ferreira dos Santos | **8,0** |
+| Integrante                        | Nota individual |
+| --------------------------------- | --------------: |
+| Damares do Socorro Gonçalves Gaia |         **9,0** |
+| Eduardo Cardoso Oliveira          |         **9,2** |
+| Marcus Jhuan Epifanio Lima        |         **8,0** |
+| Talles Souza da Cruz              |         **9,2** |
+| Willian Ferreira dos Santos       |         **8,0** |
 
 - **Damares - 9,0:** contribuição forte em arquitetura, contrato, backend, testes e métrica, com baixa participação em reviews e valores provisórios em M-06.
 - **Eduardo - 9,2:** atuação ampla em implementação, planejamento, organização, métricas, documentação e reviews; a integração ocorreu após o prazo, com checks falhando e fechamento inconsistente.
@@ -136,13 +136,13 @@ As notas compostas combinam 30% da nota coletiva da entrega e 70% da nota indivi
 
 `nota composta = (nota coletiva × 0,30) + (nota individual × 0,70)`
 
-| Integrante | Nota coletiva | Nota individual | Cálculo | Nota composta |
-|---|---:|---:|---:|---:|
-| Damares do Socorro Gonçalves Gaia | 7,0 | 9,0 | `(7,0 × 0,30) + (9,0 × 0,70) = 8,40` | **8,4** |
-| Eduardo Cardoso Oliveira | 7,0 | 9,2 | `(7,0 × 0,30) + (9,2 × 0,70) = 8,54` | **8,5** |
-| Marcus Jhuan Epifanio Lima | 7,0 | 8,0 | `(7,0 × 0,30) + (8,0 × 0,70) = 7,70` | **7,7** |
-| Talles Souza da Cruz | 7,0 | 9,2 | `(7,0 × 0,30) + (9,2 × 0,70) = 8,54` | **8,5** |
-| Willian Ferreira dos Santos | 7,0 | 8,0 | `(7,0 × 0,30) + (8,0 × 0,70) = 7,70` | **7,7** |
+| Integrante                        | Nota coletiva | Nota individual |                              Cálculo | Nota composta |
+| --------------------------------- | ------------: | --------------: | -----------------------------------: | ------------: |
+| Damares do Socorro Gonçalves Gaia |           7,0 |             9,0 | `(7,0 × 0,30) + (9,0 × 0,70) = 8,40` |       **8,4** |
+| Eduardo Cardoso Oliveira          |           7,0 |             9,2 | `(7,0 × 0,30) + (9,2 × 0,70) = 8,54` |       **8,5** |
+| Marcus Jhuan Epifanio Lima        |           7,0 |             8,0 | `(7,0 × 0,30) + (8,0 × 0,70) = 7,70` |       **7,7** |
+| Talles Souza da Cruz              |           7,0 |             9,2 | `(7,0 × 0,30) + (9,2 × 0,70) = 8,54` |       **8,5** |
+| Willian Ferreira dos Santos       |           7,0 |             8,0 | `(7,0 × 0,30) + (8,0 × 0,70) = 7,70` |       **7,7** |
 
 As notas compostas da Entrega 5 são: Damares **8,4**; Eduardo **8,5**; Marcus **7,7**; Talles **8,5**; Willian **7,7**.
 
@@ -163,15 +163,15 @@ Todos os integrantes possuem contribuição rastreável. Eduardo e Talles aprese
 
 ## Nota da Entrega
 
-| Critério | Máximo | Nota |
-|---|---:|---:|
-| Planejamento inicial da Sprint 1 | 1,0 | 0,7 |
-| Primeiro incremento funcional como vertical slice | 2,0 | 1,4 |
-| Testes de unidade automatizados | 1,5 | 1,2 |
-| Escopo, backlog, board, métricas e contribuições | 1,5 | 1,0 |
-| Fluxo de trabalho | 2,0 | 1,5 |
-| README, documentação, uso de IA e release | 2,0 | 1,2 |
-| **Total** | **10,0** | **7,0** |
+| Critério                                          |   Máximo |    Nota |
+| ------------------------------------------------- | -------: | ------: |
+| Planejamento inicial da Sprint 1                  |      1,0 |     0,7 |
+| Primeiro incremento funcional como vertical slice |      2,0 |     1,4 |
+| Testes de unidade automatizados                   |      1,5 |     1,2 |
+| Escopo, backlog, board, métricas e contribuições  |      1,5 |     1,0 |
+| Fluxo de trabalho                                 |      2,0 |     1,5 |
+| README, documentação, uso de IA e release         |      2,0 |     1,2 |
+| **Total**                                         | **10,0** | **7,0** |
 
 ## Justificativa da Nota
 

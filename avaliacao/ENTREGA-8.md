@@ -64,7 +64,7 @@ O staging, entretanto, depende de máquina da equipe e de três Cloudflare Quick
 - **Atendido:** `.github/workflows/docker-build.yml` compila e publica imagens com tags `latest` e SHA no GHCR, depois dos jobs de teste; há Compose de produção e script de smoke test.
 - **Atendido:** o processo é reprodutível e documentado em `docs/DEPLOY.md`: túneis, variáveis, build, subida do Compose e smoke test.
 - **Parcialmente atendido:** a reprodução exige passos manuais repetidos a cada execução (iniciar três túneis, editar `.env` com URLs novas e reconstruir), mais sujeitos a erro (A3).
-- **Observação:** CD remoto não é exigido nesta entrega; o enunciado aceita deploy automatizado **ou** reprodutível. 
+- **Observação:** CD remoto não é exigido nesta entrega; o enunciado aceita deploy automatizado **ou** reprodutível.
 
 #### A3 — Deploy reprodutível depende de passos manuais a cada execução
 
