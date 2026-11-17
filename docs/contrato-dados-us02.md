@@ -139,7 +139,7 @@ Retornado quando um ou mais campos violam as regras estipuladas.
 
 ##### Conflito: `409 Conflict`
 
-Retornado caso o e-mail informado já esteja registrado para outro orientador.
+Retornado caso o e-mail informado já esteja registrado para outro usuário do sistema (orientador ou aluno).
 
 ```json
 {
@@ -147,7 +147,7 @@ Retornado caso o e-mail informado já esteja registrado para outro orientador.
   "status": 409,
   "erro": "Conflito de dados",
   "caminho": "/api/v1/orientadores",
-  "detalhes": "O e-mail informado já está cadastrado no sistema."
+  "detalhes": "Já existe um usuário cadastrado com o e-mail: joao@ifsc.edu.br"
 }
 ```
 

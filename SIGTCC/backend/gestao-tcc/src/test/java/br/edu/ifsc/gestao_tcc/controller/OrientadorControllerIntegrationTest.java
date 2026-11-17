@@ -278,7 +278,7 @@ class OrientadorControllerIntegrationTest {
                 .andExpect(jsonPath("$.erro").value("Conflito de dados"))
                 .andExpect(jsonPath("$.caminho").value(URL))
                 .andExpect(jsonPath("$.detalhes").value(
-                        "A operação viola uma restrição de integridade dos dados, como um valor que já está cadastrado."));
+                        "Já existe um usuário cadastrado com o e-mail: aluno.existente@example.com"));
     }
 
     @Test
