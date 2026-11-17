@@ -8,9 +8,15 @@ import br.edu.ifsc.gestao_tcc.dto.OrientadorResponseDTO;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.model.LinhaPesquisa;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
+import br.edu.ifsc.gestao_tcc.event.SolicitacaoStatusChangedEvent;
 import br.edu.ifsc.gestao_tcc.model.PerfilOrientador;
+import br.edu.ifsc.gestao_tcc.model.SolicitacaoOrientacao;
+import br.edu.ifsc.gestao_tcc.model.StatusSolicitacao;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
+import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
+import br.edu.ifsc.gestao_tcc.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,11 +36,14 @@ public class OrientadorService {
     private static final String MENSAGEM_EMAIL_IMUTAVEL = "O e-mail do orientador não pode ser alterado.";
 
     private final OrientadorRepository orientadorRepository;
+    private final SolicitacaoRepository solicitacaoRepository;
+    private final ApplicationEventPublisher eventPublisher;
+    private final UsuarioRepository usuarioRepository;
 
     @Transactional
     public Orientador cadastrar(OrientadorRequestDTO dto) {
-        if (orientadorRepository.existsByEmail(dto.getEmail())) {
-            throw new EmailDuplicadoException("Já existe um orientador cadastrado com o e-mail: " + dto.getEmail());
+        if (usuarioRepository.existsByEmailIgnoreCase(dto.getEmail())) {
+            throw new EmailDuplicadoException("Já existe um usuário cadastrado com o e-mail: " + dto.getEmail());
         }
 
         Orientador orientador = new Orientador();
@@ -171,8 +180,21 @@ public class OrientadorService {
 
         validarProprietario(orientador, emailUsuario);
 
+        cancelarSolicitacoesPendentes(id);
+
         orientador.setAtivo(false);
         orientadorRepository.save(orientador);
+    }
+
+    private void cancelarSolicitacoesPendentes(Long orientadorId) {
+        List<SolicitacaoOrientacao> pendentes = solicitacaoRepository
+                .findByOrientadorIdAndStatusOrderByCriadoEmDesc(orientadorId, StatusSolicitacao.PENDENTE);
+
+        pendentes.forEach(solicitacao -> {
+            solicitacao.setStatus(StatusSolicitacao.CANCELADA);
+            eventPublisher.publishEvent(new SolicitacaoStatusChangedEvent(
+                    solicitacao, StatusSolicitacao.PENDENTE, StatusSolicitacao.CANCELADA));
+        });
     }
 
     private void validarProprietario(Orientador orientador, String emailUsuario) {

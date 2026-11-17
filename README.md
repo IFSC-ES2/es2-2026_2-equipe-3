@@ -255,15 +255,14 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 
 A triagem final do relatório de bugs teve este resultado:
 
-- **Corrigidos (12):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`. O BUG-12 foi corrigido na issue `#262`, que também resolveu indiretamente o BUG-09. O BUG-17 foi corrigido na issue `#266`.
-- **Limitações conhecidas (10):** os demais, todos de severidade média ou baixa, listados abaixo.
+- **Corrigidos (13):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`. O BUG-09 foi corrigido na issue `#261`
+  (PR `#289`), o BUG-12 na issue `#262` (PR `#290`), o BUG-13 na issue `#263` (PR `#293`) e o BUG-17 na issue `#266`.
 
 Nenhum defeito conhecido impede a demonstração do MVP. Detalhes, passos de reprodução e sugestões de correção estão na seção 4 do relatório.
 
 | Bug    | Severidade | Limitação                                                                                                                        |
 | :----- | :--------- | :------------------------------------------------------------------------------------------------------------------------------- |
 | BUG-11 | Média      | `POST /orientadores` não limita o tamanho dos campos de texto. Valores grandes enviados direto à API geram `500`.                |
-| BUG-13 | Média      | A API do catálogo devolve orientadores desativados, e desativar um orientador não cancela as solicitações pendentes dele.        |
 | BUG-14 | Média      | O filtro por linha de pesquisa compara por substring ("IA" também traz "Mídias Digitais").                                       |
 | BUG-15 | Média      | O seed `V5` usa IDs fixos e pode sobrescrever dados de bancos criados antes dele. Não afeta bancos novos.                        |
 | BUG-16 | Baixa      | Chave `xspring.application.name` com erro de digitação, e `application.properties` fora de UTF-8.                                |

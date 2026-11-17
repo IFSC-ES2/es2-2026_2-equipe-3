@@ -139,7 +139,7 @@ Retornado quando um ou mais campos violam as regras estipuladas.
 
 ##### Conflito: `409 Conflict`
 
-Retornado caso o e-mail informado já esteja registrado para outro orientador.
+Retornado caso o e-mail informado já esteja registrado para outro usuário do sistema (orientador ou aluno).
 
 ```json
 {
@@ -147,7 +147,7 @@ Retornado caso o e-mail informado já esteja registrado para outro orientador.
   "status": 409,
   "erro": "Conflito de dados",
   "caminho": "/api/v1/orientadores",
-  "detalhes": "O e-mail informado já está cadastrado no sistema."
+  "detalhes": "Já existe um usuário cadastrado com o e-mail: joao@ifsc.edu.br"
 }
 ```
 
@@ -161,7 +161,7 @@ Retornado quando o token não possui `ROLE_PROFESSOR` (por exemplo, um aluno).
 
 - **Método HTTP:** `GET`
 - **Rota:** `/api/v1/orientadores`
-- **Descrição:** Retorna a relação de professores orientadores cadastrados, utilizada pelos alunos para consulta das vagas e linhas de pesquisa.
+- **Descrição:** Retorna a relação de professores orientadores **ativos**, utilizada pelos alunos para consulta das vagas e linhas de pesquisa. Orientadores desativados (`ativo: false`) não são retornados, com ou sem filtros. A consulta por identificador (seção 4.3) continua retornando o orientador mesmo desativado.
 
 #### Cabeçalhos da Requisição
 
@@ -330,7 +330,10 @@ Retornado quando o campo `email` é enviado com um valor diferente do e-mail atu
 
 - **Método HTTP:** `DELETE`
 - **Rota:** `/api/v1/orientadores/{id}`
-- **Descrição:** Remove o cadastro de um orientador do sistema ou altera seu status para inativo (`ativo: false`), impedindo novos vínculos.
+- **Descrição:** Desativa o cadastro do orientador (exclusão lógica, `ativo: false`), impedindo novos vínculos. Na mesma operação:
+  - as solicitações `PENDENTE` do orientador passam para `CANCELADA` (ver contrato da US04, seção 7);
+  - o orientador deixa de aparecer no catálogo (seção 4.2);
+  - o aceite de solicitações desse orientador passa a retornar `422`.
 
 #### Respostas Possíveis
 

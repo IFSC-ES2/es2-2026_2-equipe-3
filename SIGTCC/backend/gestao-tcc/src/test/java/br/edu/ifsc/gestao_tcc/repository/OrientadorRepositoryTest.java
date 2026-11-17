@@ -52,6 +52,23 @@ class OrientadorRepositoryTest {
     }
 
     @Test
+    @DisplayName("findByFiltros não deve retornar orientadores inativos, com ou sem filtros")
+    void findByFiltros_NaoDeveRetornarOrientadorInativo() {
+        Orientador ativo = salvarOrientadorComPerfil("Ativo", "ativo@ifsc.edu.br", "Redes");
+        Orientador inativo = salvarOrientadorComPerfil("Inativo", "inativo@ifsc.edu.br", "Redes");
+        inativo.setAtivo(false);
+        entityManager.persistAndFlush(inativo);
+        entityManager.clear();
+
+        assertThat(orientadorRepository.findByFiltros(null, null))
+                .extracting(Orientador::getEmail)
+                .containsExactly(ativo.getEmail());
+        assertThat(orientadorRepository.findByFiltros("Redes", true))
+                .extracting(Orientador::getEmail)
+                .containsExactly(ativo.getEmail());
+    }
+
+    @Test
     @DisplayName("Deve retornar true quando o email já existir no banco")
     void existsByEmail_QuandoEmailExiste_DeveRetornarTrue() {
         String email = "teste@ifsc.edu.br";
