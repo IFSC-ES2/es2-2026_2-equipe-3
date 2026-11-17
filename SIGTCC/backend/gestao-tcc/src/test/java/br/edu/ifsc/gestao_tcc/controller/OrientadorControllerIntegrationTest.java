@@ -160,6 +160,34 @@ class OrientadorControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("POST /orientadores - E-mail já cadastrado como aluno retorna 409 Conflict com ErrorResponseDTO")
+    void cadastrar_EmailJaCadastradoComoAluno_DeveRetornar409() throws Exception {
+        alunoRepository.saveAndFlush(Aluno.builder()
+                .nome("Aluno Existente")
+                .email(EMAIL_ALUNO)
+                .curso("Análise e Desenvolvimento de Sistemas")
+                .build());
+
+        String payload = """
+                {
+                  "nome": "Orientador Conflitante",
+                  "email": "%s",
+                  "linhasDePesquisa": ["IA"],
+                  "vagasDisponiveis": 2
+                }
+                """.formatted(EMAIL_ALUNO);
+
+        mockMvc.perform(post(URL)
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.erro").value("Conflito de dados"))
+                .andExpect(jsonPath("$.detalhes").isString());
+    }
+
+    @Test
     @DisplayName("PATCH /orientadores/{id} - Professor não pode editar o cadastro de outro professor (403 Forbidden)")
     void atualizar_ProfessorEditandoOutro_DeveRetornar403() throws Exception {
         mockMvc.perform(patch(URL + "/" + professorB.getId())
@@ -250,7 +278,7 @@ class OrientadorControllerIntegrationTest {
                 .andExpect(jsonPath("$.erro").value("Conflito de dados"))
                 .andExpect(jsonPath("$.caminho").value(URL))
                 .andExpect(jsonPath("$.detalhes").value(
-                        "A operação viola uma restrição de integridade dos dados, como um valor que já está cadastrado."));
+                        "Já existe um usuário cadastrado com o e-mail: aluno.existente@example.com"));
     }
 
     @Test

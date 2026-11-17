@@ -10,6 +10,7 @@ import br.edu.ifsc.gestao_tcc.model.LinhaPesquisa;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
 import br.edu.ifsc.gestao_tcc.model.PerfilOrientador;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
+import br.edu.ifsc.gestao_tcc.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,11 +31,12 @@ public class OrientadorService {
     private static final String MENSAGEM_EMAIL_IMUTAVEL = "O e-mail do orientador não pode ser alterado.";
 
     private final OrientadorRepository orientadorRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Transactional
     public Orientador cadastrar(OrientadorRequestDTO dto) {
-        if (orientadorRepository.existsByEmail(dto.getEmail())) {
-            throw new EmailDuplicadoException("Já existe um orientador cadastrado com o e-mail: " + dto.getEmail());
+        if (usuarioRepository.existsByEmailIgnoreCase(dto.getEmail())) {
+            throw new EmailDuplicadoException("Já existe um usuário cadastrado com o e-mail: " + dto.getEmail());
         }
 
         Orientador orientador = new Orientador();

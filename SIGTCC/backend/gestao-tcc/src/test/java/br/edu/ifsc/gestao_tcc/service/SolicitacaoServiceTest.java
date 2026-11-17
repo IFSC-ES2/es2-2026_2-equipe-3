@@ -9,6 +9,7 @@ import br.edu.ifsc.gestao_tcc.model.*;
 import br.edu.ifsc.gestao_tcc.repository.AlunoRepository;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
 import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
+import br.edu.ifsc.gestao_tcc.repository.UsuarioRepository;
 import br.edu.ifsc.gestao_tcc.validation.ValidacaoSolicitacaoOrientacao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +43,8 @@ class SolicitacaoServiceTest {
     @Mock
     private AlunoRepository alunoRepository;
     @Mock
+    private UsuarioRepository usuarioRepository;
+    @Mock
     private ApplicationEventPublisher eventPublisher;
     @Mock
     private ValidacaoSolicitacaoOrientacao validacaoMock;
@@ -54,6 +57,7 @@ class SolicitacaoServiceTest {
                 solicitacaoRepository,
                 orientadorRepository,
                 alunoRepository,
+                usuarioRepository,
                 eventPublisher,
                 List.of(validacaoMock)
         );
@@ -145,6 +149,23 @@ class SolicitacaoServiceTest {
         assertThrows(AcessoNegadoException.class,
                 () -> solicitacaoService.criarSolicitacao(requestDTO, " ", NOME_TOKEN));
         verifyNoInteractions(alunoRepository, solicitacaoRepository);
+    }
+
+    @Test
+    @DisplayName("Deve lançar EmailDuplicadoException quando o e-mail do token já pertencer a outro usuário (orientador)")
+    void criarSolicitacao_EmailJaCadastradoNaTabelaUsuarios_DeveLancarEmailDuplicado() {
+        SolicitacaoRequestDTO requestDTO = criarRequestDTO();
+        Orientador orientador = criarOrientadorMock(1L, 2);
+
+        when(orientadorRepository.findById(1L)).thenReturn(Optional.of(orientador));
+        when(alunoRepository.findByEmail(EMAIL_ORIENTADOR)).thenReturn(Optional.empty());
+        when(usuarioRepository.existsByEmailIgnoreCase(EMAIL_ORIENTADOR)).thenReturn(true);
+
+        assertThrows(EmailDuplicadoException.class,
+                () -> solicitacaoService.criarSolicitacao(requestDTO, EMAIL_ORIENTADOR, "Professor"));
+
+        verify(alunoRepository, never()).save(any(Aluno.class));
+        verify(solicitacaoRepository, never()).save(any(SolicitacaoOrientacao.class));
     }
 
     @Test

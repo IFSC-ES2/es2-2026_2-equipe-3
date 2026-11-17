@@ -5,6 +5,7 @@ import br.edu.ifsc.gestao_tcc.dto.SolicitacaoRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoResponseDTO;
 import br.edu.ifsc.gestao_tcc.event.SolicitacaoStatusChangedEvent;
 import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
+import br.edu.ifsc.gestao_tcc.exception.EmailDuplicadoException;
 import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.exception.SolicitacaoJaRespondidaException;
@@ -18,6 +19,7 @@ import br.edu.ifsc.gestao_tcc.model.StatusSolicitacao;
 import br.edu.ifsc.gestao_tcc.repository.AlunoRepository;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
 import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
+import br.edu.ifsc.gestao_tcc.repository.UsuarioRepository;
 import br.edu.ifsc.gestao_tcc.validation.ValidacaoSolicitacaoOrientacao;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
@@ -37,6 +39,7 @@ public class SolicitacaoService {
     private final SolicitacaoRepository solicitacaoRepository;
     private final OrientadorRepository orientadorRepository;
     private final AlunoRepository alunoRepository;
+    private final UsuarioRepository usuarioRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final List<ValidacaoSolicitacaoOrientacao> validacoes;
 
@@ -51,6 +54,9 @@ public class SolicitacaoService {
 
         Aluno aluno = alunoRepository.findByEmail(emailAluno)
                 .orElseGet(() -> {
+                    if (usuarioRepository.existsByEmailIgnoreCase(emailAluno)) {
+                        throw new EmailDuplicadoException("Já existe um usuário cadastrado com o e-mail: " + emailAluno);
+                    }
                     Aluno novoAluno = Aluno.builder()
                             .nome(nomeAluno == null || nomeAluno.isBlank() ? emailAluno : nomeAluno.trim())
                             .email(emailAluno)

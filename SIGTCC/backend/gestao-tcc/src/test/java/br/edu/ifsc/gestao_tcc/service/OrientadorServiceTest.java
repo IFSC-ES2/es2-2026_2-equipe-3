@@ -11,6 +11,7 @@ import br.edu.ifsc.gestao_tcc.model.LinhaPesquisa;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
 import br.edu.ifsc.gestao_tcc.model.PerfilOrientador;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
+import br.edu.ifsc.gestao_tcc.repository.UsuarioRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +35,9 @@ class OrientadorServiceTest {
     @Mock
     private OrientadorRepository orientadorRepository;
 
+    @Mock
+    private UsuarioRepository usuarioRepository;
+
     @InjectMocks
     private OrientadorService orientadorService;
 
@@ -48,7 +52,7 @@ class OrientadorServiceTest {
         requestDTO.setBiografia("Professor Doutor");
         requestDTO.setLinhasDePesquisa(List.of("IA", "Redes"));
 
-        when(orientadorRepository.existsByEmail(requestDTO.getEmail())).thenReturn(false);
+        when(usuarioRepository.existsByEmailIgnoreCase(requestDTO.getEmail())).thenReturn(false);
         when(orientadorRepository.save(any(Orientador.class))).thenAnswer(invocation -> {
             Orientador o = invocation.getArgument(0);
             o.setId(1L);
@@ -64,21 +68,21 @@ class OrientadorServiceTest {
         assertEquals(3, salvo.getPerfil().getVagasDisponiveis());
         assertEquals(2, salvo.getPerfil().getLinhasPesquisa().size());
 
-        verify(orientadorRepository, times(1)).existsByEmail(anyString());
+        verify(usuarioRepository, times(1)).existsByEmailIgnoreCase(anyString());
         verify(orientadorRepository, times(1)).save(any(Orientador.class));
     }
 
     @Test
-    @DisplayName("Deve lançar EmailDuplicadoException quando e-mail já existir no cadastro")
+    @DisplayName("Deve lançar EmailDuplicadoException quando e-mail já existir na tabela usuarios (orientador ou aluno)")
     void cadastrar_DeveLancarEmailDuplicadoException_QuandoEmailJaExiste() {
         OrientadorRequestDTO requestDTO = new OrientadorRequestDTO();
         requestDTO.setEmail("joao@ifsc.edu.br");
 
-        when(orientadorRepository.existsByEmail(requestDTO.getEmail())).thenReturn(true);
+        when(usuarioRepository.existsByEmailIgnoreCase(requestDTO.getEmail())).thenReturn(true);
 
         assertThrows(EmailDuplicadoException.class, () -> orientadorService.cadastrar(requestDTO));
 
-        verify(orientadorRepository, times(1)).existsByEmail(anyString());
+        verify(usuarioRepository, times(1)).existsByEmailIgnoreCase(anyString());
         verify(orientadorRepository, never()).save(any(Orientador.class));
     }
 
