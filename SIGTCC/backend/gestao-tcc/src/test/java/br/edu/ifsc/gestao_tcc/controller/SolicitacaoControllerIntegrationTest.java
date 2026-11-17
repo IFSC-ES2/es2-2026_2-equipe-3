@@ -325,6 +325,44 @@ class SolicitacaoControllerIntegrationTest {
     }
 
     @Test
+    @DisplayName("PATCH /solicitacoes/{id}/status - Aceitar solicitação de orientador inativo deve retornar 422 sem consumir vaga")
+    void atualizarStatus_AceitandoComOrientadorInativo_DeveRetornar422() throws Exception {
+        desativar(professorA);
+
+        mockMvc.perform(patch(URL + "/" + solicitacaoDeProfessorA.getId() + "/status")
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\": \"ACEITA\"}"))
+                .andExpect(status().is(422))
+                .andExpect(jsonPath("$.erro").value("Regra de negócio violada"))
+                .andExpect(jsonPath("$.detalhes").value("O orientador está inativo e não pode aceitar solicitações."));
+
+        SolicitacaoOrientacao persistida = solicitacaoRepository.findById(solicitacaoDeProfessorA.getId()).orElseThrow();
+        assertThat(persistida.getStatus()).isEqualTo(StatusSolicitacao.PENDENTE);
+        Orientador destinatario = orientadorRepository.findById(professorA.getId()).orElseThrow();
+        assertThat(destinatario.getPerfil().getVagasDisponiveis()).isEqualTo(2);
+    }
+
+    @Test
+    @DisplayName("PATCH /solicitacoes/{id}/status - Orientador inativo ainda pode recusar solicitação (200 OK)")
+    void atualizarStatus_RecusandoComOrientadorInativo_DeveRetornar200() throws Exception {
+        desativar(professorA);
+
+        mockMvc.perform(patch(URL + "/" + solicitacaoDeProfessorA.getId() + "/status")
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\": \"RECUSADA\", \"justificativa\": \"Não estou mais orientando.\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("RECUSADA"));
+    }
+
+    /** Simula um orientador desativado antes da correção da issue #263, ainda com solicitação PENDENTE. */
+    private void desativar(Orientador orientador) {
+        orientador.setAtivo(false);
+        orientadorRepository.saveAndFlush(orientador);
+    }
+
+    @Test
     @DisplayName("GET /solicitacoes/{id} - Aluno autor pode consultar sua solicitação (200)")
     void buscarPorId_AlunoAutor_DeveRetornar200() throws Exception {
         SolicitacaoOrientacao solicitacao =
