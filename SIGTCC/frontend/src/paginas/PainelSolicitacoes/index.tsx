@@ -9,6 +9,7 @@ import {
   atualizarStatusSolicitacao,
 } from "../../utils/solicitacaoService";
 import { obterPerfilProfessor } from "../../utils/professorService";
+import { obterOrientador } from "../../utils/orientadorService";
 import { ApiError } from "../../utils/apiErro";
 import "./PainelSolicitacoes.css";
 
@@ -40,16 +41,22 @@ export function PainelSolicitacoesPage() {
         if (!ativo) return;
         setPerfil(dadosPerfil);
 
+        const carregarVagas = obterOrientador(dadosPerfil.id)
+          .then((orientador) => {
+            if (ativo) {
+              setVagasDisponiveis(orientador.vagasDisponiveis);
+            }
+          })
+          .catch(() => undefined);
+
         const dados = await listarSolicitacoesPorOrientador(
           dadosPerfil.id,
           "PENDENTE",
         );
         if (ativo) {
           setSolicitacoes(dados);
-          if (dados.length > 0 && dados[0].orientador) {
-            setVagasDisponiveis(dados[0].orientador.vagasDisponiveis);
-          }
         }
+        await carregarVagas;
       } catch (erro) {
         if (ativo) {
           setPerfil(null);
