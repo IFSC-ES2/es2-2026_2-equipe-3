@@ -5,6 +5,7 @@ import br.edu.ifsc.gestao_tcc.dto.SolicitacaoRequestDTO;
 import br.edu.ifsc.gestao_tcc.dto.SolicitacaoResponseDTO;
 import br.edu.ifsc.gestao_tcc.event.SolicitacaoStatusChangedEvent;
 import br.edu.ifsc.gestao_tcc.exception.AcessoNegadoException;
+import br.edu.ifsc.gestao_tcc.exception.OrientadorInativoException;
 import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.exception.SolicitacaoJaRespondidaException;
@@ -170,6 +171,7 @@ public class SolicitacaoService {
         StatusSolicitacao statusAnterior = solicitacao.getStatus();
 
         if (novoStatus == StatusSolicitacao.ACEITA) {
+            validarOrientadorAtivo(solicitacao.getOrientador());
             validarVagasDisponiveis(solicitacao.getOrientador());
             solicitacao.setStatus(StatusSolicitacao.ACEITA);
             solicitacao.setJustificativa(null);
@@ -191,6 +193,12 @@ public class SolicitacaoService {
                 || orientador == null || orientador.getEmail() == null
                 || !emailOrientador.trim().equalsIgnoreCase(orientador.getEmail())) {
             throw new AcessoNegadoException(MENSAGEM_ACESSO_NEGADO);
+        }
+    }
+
+    private void validarOrientadorAtivo(Orientador orientador) {
+        if (!Boolean.TRUE.equals(orientador.getAtivo())) {
+            throw new OrientadorInativoException("O orientador está inativo e não pode aceitar solicitações.");
         }
     }
 
