@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
 
@@ -53,7 +54,7 @@ class SolicitacaoControllerTest {
         validator.afterPropertiesSet();
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(solicitacaoController)
-                .setControllerAdvice(new GlobalExceptionHandler())
+                .setControllerAdvice(new GlobalExceptionHandler(Clock.systemUTC()))
                 .setValidator(validator)
                 .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                 .build();

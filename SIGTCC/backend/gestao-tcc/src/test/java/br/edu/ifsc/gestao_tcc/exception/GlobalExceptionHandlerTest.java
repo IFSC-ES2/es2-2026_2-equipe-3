@@ -22,6 +22,9 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.server.ResponseStatusException;
 
 import java.lang.reflect.Method;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -32,14 +35,27 @@ import static org.mockito.Mockito.when;
 
 class GlobalExceptionHandlerTest {
 
+    private static final Instant INSTANTE_FIXO = Instant.parse("2026-11-17T10:00:00Z");
+    private final Clock clockFixo = Clock.fixed(INSTANTE_FIXO, ZoneOffset.UTC);
     private GlobalExceptionHandler exceptionHandler;
     private MockHttpServletRequest request;
 
     @BeforeEach
     void setUp() {
-        exceptionHandler = new GlobalExceptionHandler();
+        exceptionHandler = new GlobalExceptionHandler(clockFixo);
         request = new MockHttpServletRequest();
         request.setRequestURI("/api/v1/orientadores");
+    }
+
+    @Test
+    @DisplayName("Deve gerar timestamp no ErrorResponseDTO a partir do Clock injetado")
+    void deveUsarClockInjetadoParaGerarTimestamp() {
+        ResourceNotFoundException ex = new ResourceNotFoundException("Orientador não encontrado");
+
+        ResponseEntity<ErrorResponseDTO> response = exceptionHandler.handleResourceNotFoundException(ex, request);
+
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().timestamp()).isEqualTo(INSTANTE_FIXO.toString());
     }
 
     @Test
