@@ -305,4 +305,23 @@ Registro das atividades executadas pelos integrantes da equipe na Entrega 9 (Rel
 
 ### 10.5 Willian Ferreira dos Santos
 
-- _A preencher._
+- **Reconciliação do Backlog e Board com o Escopo Final do MVP (Issue [#255](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/255) / [PR #301](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/301)):**
+  - Conferência do backlog, dos milestones e do board do GitHub Projects em relação ao escopo final do MVP, verificando a situação das histórias US01 a US07 e seus respectivos critérios de aceitação;
+  - Revisão dos critérios de aceitação das US04 e US07, incluindo a adequação da descrição da US06 à implementação por link externo HTTPS, conforme a ADR-0013;
+  - Atualização de `docs/entregas/release-candidate.md`, incluindo a consolidação do backlog final e a rastreabilidade das histórias concluídas e postergadas;
+  - Registro do fechamento da US08 como fora do escopo do MVP, conforme a decisão documentada na seção 10.4 de `docs/entregas/sprint-4.md`.
+
+- **Revisão Final do Registro de Riscos (Issue [#283](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/283) / [PR #303](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/303)):**
+  - Revisão do registro de riscos em `docs/riscos.md`, consolidando a situação final dos riscos R01 a R13 e identificando os riscos residuais da release;
+  - Análise da correspondência entre os riscos registrados, o histórico das entregas, as correções documentadas em `docs/relatorio-de-bugs.md` e as decisões arquiteturais registradas nas ADRs;
+  - Atualização da seção de limitações e riscos residuais em `docs/entregas/release-candidate.md`, mantendo a rastreabilidade entre os riscos e as evidências do projeto.
+
+- **Atualização da Ficha de Métrica M-02 — Densidade de Defeitos Abertos:**
+  - Revisão da ficha `docs/metricas/M-02.md` para consolidar o acompanhamento da métrica na Entrega 9;
+  - Análise da quantidade de Issues abertas com as labels `bug` ou `defeito`, confirmando manualmente no GitHub a inexistência de defeitos em aberto na data do acompanhamento;
+  - Registro da densidade específica da Entrega 9 como não aplicável (N/A), devido à ausência de novos Story Points concluídos no período, e proposta de apresentação do resultado acumulado do MVP considerando as US01 a US07;
+  - Revisão dos critérios de coleta, interpretação e histórico da métrica, diferenciando defeitos em aberto de limitações conhecidas documentadas no relatório de bugs.
+
+- **Revisões de PRs Realizadas:**
+  - Revisão e aprovação do [PR #257](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/257) (Relatório final de bugs e registro de limitações conhecidas).
+- Revisão e aprovação do [PR #270](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/270) (Correção do filtro de orientadores por linha de pesquisa, substituindo a comparação por substring por igualdade exata, sem diferenciar maiúsculas de minúsculas).
