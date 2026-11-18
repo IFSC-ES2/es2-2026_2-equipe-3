@@ -1,4 +1,4 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import type { ReactNode } from "react";
 import { useAuth } from "./useAuth";
 import type { Papel } from "./authService";
@@ -14,13 +14,14 @@ export function ProtectedRoute({
   papelExigido,
 }: ProtectedRouteProps) {
   const { sessao, carregando, temPapel } = useAuth();
+  const location = useLocation();
 
   if (carregando) {
     return null;
   }
 
   if (!sessao) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/login" replace state={{ from: location }} />;
   }
 
   if (papelExigido && !temPapel(papelExigido)) {
