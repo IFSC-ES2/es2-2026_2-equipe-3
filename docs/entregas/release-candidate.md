@@ -228,7 +228,7 @@ A tabela abaixo consolida os vínculos já existentes no repositório até a `v0
 
 ## 10. Contribuições Individuais
 
-> _Seção a preencher ao final da entrega por cada integrante, com as respectivas issues, PRs, commits e revisões._
+Registro das atividades executadas pelos integrantes da equipe na Entrega 9 (Release Candidate), consolidando tarefas de planejamento, correções de bugs (hardening), melhorias de governança/CI, elaboração de documentação e revisões técnicas de Pull Requests.
 
 ### 10.1 Damares do Socorro Gonçalves Gaia
 
@@ -236,7 +236,22 @@ A tabela abaixo consolida os vínculos já existentes no repositório até a `v0
 
 ### 10.2 Eduardo Cardoso Oliveira
 
-- _A preencher._
+- **Planejamento e Condução da Entrega 9 (Issue [#253](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/253) / [PR #258](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/258)):**
+  - Elaboração, acompanhamento e consolidação do documento-mestre da Release Candidate [`docs/entregas/release-candidate.md`](release-candidate.md), estruturando metas, escopo congelado, matriz de rastreabilidade e governança (commits `5526804`, `ee52982`).
+- **Hardening — BUG-21: Timestamp determinístico com Clock no ErrorResponseDTO (Issue [#278](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/278) / [PR #294](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/294)):**
+  - Injeção de `Clock` gerenciado pelo Spring no `GlobalExceptionHandler` e refatoração de `ErrorResponseDTO` para exigir `Instant`;
+  - Adição de testes unitários em `OrientadorControllerTest` e `SolicitacaoControllerTest`, além de teste de integração determinístico com `@TestConfiguration` fixando o relógio institucional em `OrientadorControllerIntegrationTest` (commits `0b52bea`, `ba2e7b5`, `e4dbdcc`).
+- **Hardening — BUG-18: Preservação de rota e parâmetros após o login (Issue [#275](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/275) / [PR #297](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/297)):**
+  - Atualização do `ProtectedRoute.tsx` para passar `state={{ from: location }}` e refatoração do `LoginPage/index.tsx` para preservar caminhos, query parameters (`search`) e hashes, com salvaguarda contra loops em `/login` e redirecionamento seguro da raiz `/` evitando falsos "Acesso Negado";
+  - Adição de testes unitários e de fluxo completo ponta a ponta (`/acompanhar/15` → `/login` → `/acompanhar/15`) no Vitest (`ProtectedRoute.test.tsx` e `Login.test.tsx`) (commits `24c56e2`, `559fdbe`).
+- **Hardening — BUG-14: Filtro por linha de pesquisa com correspondência exata (Issue [#264](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/264) / [PR #270](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/270)):**
+  - Implementação de query estrita no `OrientadorRepository` e testes unitários de repositório em `OrientadorRepositoryTest` garantindo que buscas parciais (ex.: "IA") não retornem linhas não relacionadas (commit `9a84c16`).
+- **Revisões de PRs Realizadas:**
+  - Revisão e aprovação do [PR #293](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/293) (BUG-13: Inativação de orientador com cancelamento em cascata e migration `V9`);
+  - Revisão e aprovação do [PR #296](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/296) (BUG-11: Limites de tamanho nos DTOs de orientador);
+  - Revisão do [PR #301](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/301) (Reconciliação do backlog e board com escopo final do MVP);
+  - Revisão e ajustes do [PR #302](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/302) (Revisão arquitetural, C3 e status de ADRs);
+  - Revisão e aprovação do [PR #271](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/271) (Retrospectiva geral do projeto).
 
 ### 10.3 Marcus Jhuan Epifanio Lima
 
