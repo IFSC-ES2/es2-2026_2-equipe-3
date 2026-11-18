@@ -27,50 +27,44 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | ---------- | ---------- | ---------- | --------------------- |
 | Crítica    | 4          | 4          | 0                     |
 | Alta       | 4          | 4          | 0                     |
-| Média      | 7          | 5          | 2                     |
-| Baixa      | 7          | 3          | 4                     |
-| **Total**  | **22**     | **16**     | **6**                 |
+| Média      | 7          | 6          | 1                     |
+| Baixa      | 7          | 7          | 0                     |
+| **Total**  | **22**     | **21**     | **1**                 |
 
-| Bug    | Título resumido                                    | Severidade | Status final                   | Issue                                                              | PR                                                                          |
-| ------ | -------------------------------------------------- | ---------- | ------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
-| BUG-01 | Aceite/recusa de qualquer solicitação              | Crítica    | Corrigido                      | [#199](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/199) | [#212](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/212)            |
-| BUG-02 | CRUD de orientadores aberto                        | Crítica    | Corrigido                      | [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211)            |
-| BUG-03 | Solicitação com e-mail do corpo                    | Crítica    | Corrigido                      | [#201](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/201) | [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213)            |
-| BUG-04 | Leitura de qualquer solicitação (IDOR)             | Crítica    | Corrigido                      | [#202](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/202) | [#224](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/224)            |
-| BUG-05 | Painel mostra o orientador errado                  | Alta       | Corrigido                      | [#203](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/203) | [#214](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/214)            |
-| BUG-06 | "Meu perfil" depende do `localStorage`             | Alta       | Corrigido                      | [#204](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/204) | [#217](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/217)            |
-| BUG-07 | Sessão expira em ~5 minutos                        | Alta       | Corrigido                      | [#205](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/205) | [#225](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/225)            |
-| BUG-08 | Condição de corrida nas vagas                      | Alta       | Corrigido                      | [#206](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/206) | [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241)            |
-| BUG-09 | Conflito de e-mail aluno/orientador gera 500       | Média      | Corrigido                      | [#261](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/261) | [#289](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/289)            |
-| BUG-10 | PATCH de orientador sem checar e-mail duplicado    | Média      | Corrigido indiretamente        | [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211)            |
-| BUG-11 | Faltam limites de tamanho nos DTOs                 | Média      | Corrigido                      | [#273](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/273) | [#296](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/296)            |
-| BUG-12 | Sem handler genérico de exceções                   | Média      | Corrigido                      | [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) | PR da issue #262                                                            |
-| BUG-13 | Orientador desativado continua listado e operando  | Média      | Corrigido                      | [#263](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/263) | PR da issue #263                                                            |
-| BUG-14 | Filtro por linha de pesquisa compara por substring | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
-| BUG-15 | Seed V5 pode sobrescrever dados                    | Média      | Limitação conhecida            | [#274](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/274) | PR da issue #274                                                            |
-| BUG-16 | Erro de digitação em `application.properties`      | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
-| BUG-17 | Contador de vagas mostra "—"                       | Baixa      | Corrigido                      | [#266](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/266) | PR da issue #266                                                            |
-| BUG-18 | Redirecionamento após o login não acontece         | Baixa      | Corrigido                      | [#275](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/275) | PR da issue #275                                                            |
-| BUG-19 | Inputs controlados recebem `null`                  | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
-| BUG-20 | Calendário abre com a data vazia                   | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
-| BUG-21 | `ErrorResponseDTO` usa `Instant.now()`             | Baixa      | Corrigido                      | [#278](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/278) | [#294](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/294)            |
-| BUG-22 | Professor cadastra orientador com qualquer e-mail  | Baixa      | Limitação conhecida (mitigada) | —                                                                  | Mitigação: [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211) |
+| Bug    | Título resumido                                    | Severidade | Status final            | Issue                                                              | PR                                                               |
+| ------ | -------------------------------------------------- | ---------- | ----------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| BUG-01 | Aceite/recusa de qualquer solicitação              | Crítica    | Corrigido               | [#199](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/199) | [#212](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/212) |
+| BUG-02 | CRUD de orientadores aberto                        | Crítica    | Corrigido               | [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211) |
+| BUG-03 | Solicitação com e-mail do corpo                    | Crítica    | Corrigido               | [#201](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/201) | [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) |
+| BUG-04 | Leitura de qualquer solicitação (IDOR)             | Crítica    | Corrigido               | [#202](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/202) | [#224](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/224) |
+| BUG-05 | Painel mostra o orientador errado                  | Alta       | Corrigido               | [#203](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/203) | [#214](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/214) |
+| BUG-06 | "Meu perfil" depende do `localStorage`             | Alta       | Corrigido               | [#204](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/204) | [#217](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/217) |
+| BUG-07 | Sessão expira em ~5 minutos                        | Alta       | Corrigido               | [#205](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/205) | [#225](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/225) |
+| BUG-08 | Condição de corrida nas vagas                      | Alta       | Corrigido               | [#206](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/206) | [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241) |
+| BUG-09 | Conflito de e-mail aluno/orientador gera 500       | Média      | Corrigido               | [#261](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/261) | [#289](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/289) |
+| BUG-10 | PATCH de orientador sem checar e-mail duplicado    | Média      | Corrigido indiretamente | [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211) |
+| BUG-11 | Faltam limites de tamanho nos DTOs                 | Média      | Corrigido               | [#273](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/273) | [#296](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/296) |
+| BUG-12 | Sem handler genérico de exceções                   | Média      | Corrigido               | [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) | [#290](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/290) |
+| BUG-13 | Orientador desativado continua listado e operando  | Média      | Corrigido               | [#263](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/263) | [#293](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/293) |
+| BUG-14 | Filtro por linha de pesquisa compara por substring | Média      | Corrigido               | [#264](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/264) | [#270](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/270) |
+| BUG-15 | Seed V5 pode sobrescrever dados                    | Média      | Limitação conhecida     | [#274](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/274) | [#298](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/298) |
+| BUG-16 | Erro de digitação em `application.properties`      | Baixa      | Corrigido               | [#265](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/265) | [#268](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/268) |
+| BUG-17 | Contador de vagas mostra "—"                       | Baixa      | Corrigido               | [#266](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/266) | [#295](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/295) |
+| BUG-18 | Redirecionamento após o login não acontece         | Baixa      | Corrigido               | [#275](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/275) | [#297](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/297) |
+| BUG-19 | Inputs controlados recebem `null`                  | Baixa      | Corrigido               | [#277](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/277) | [#300](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/300) |
+| BUG-20 | Calendário abre com a data vazia                   | Baixa      | Corrigido               | [#276](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/276) | [#299](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/299) |
+| BUG-21 | `ErrorResponseDTO` usa `Instant.now()`             | Baixa      | Corrigido               | [#278](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/278) | [#294](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/294) |
+| BUG-22 | Professor cadastra orientador com qualquer e-mail  | Baixa      | Corrigido               | [#279](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/279) | [#300](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/300) |
 
-**Impacto no MVP:** nenhum defeito crítico ou alto permanece aberto. As limitações restantes são de severidade média ou baixa: afetam mensagens de erro, chamadas feitas direto à API ou detalhes de interface. Nenhuma impede a demonstração dos fluxos do MVP (login, catálogo, solicitação e aceite de orientação, calendário de prazos, submissão e avaliação de entregas).
+**Impacto no MVP:** 21 dos 22 achados foram corrigidos. Resta apenas o BUG-15, de severidade média, que não afeta bancos criados do zero, como o de _staging_. Nenhum defeito conhecido impede a demonstração dos fluxos do MVP (login, catálogo, solicitação e aceite de orientação, calendário de prazos, submissão e avaliação de entregas).
 
 ## 3. Limitações conhecidas
 
-Defeitos não corrigidos até o congelamento de código, com o efeito observável para quem usa o sistema. Esta lista é replicada no `README.md` e na descrição da release.
+Defeito não corrigido até o congelamento de código, com o efeito observável para quem usa o sistema. Esta lista é replicada no `README.md` e na descrição da release.
 
-| Bug    | Limitação                                                                                                                                                   | Contorno                                                                                                                                                                     |
-| ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| BUG-14 | O filtro por linha de pesquisa usa "contém": filtrar por "IA" também traz "Mídias Digitais".                                                                | —                                                                                                                                                                            |
-| BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele.                                                                       | Não ocorre em banco novo, como o de _staging_ ou o criado pelo `docker compose up` (verificado por teste automatizado). Bancos que já aplicaram a V5 não a executam de novo. |
-| BUG-16 | A chave `xspring.application.name` está com um "x" a mais, e o arquivo `application.properties` não está em UTF-8.                                          | Sem efeito funcional.                                                                                                                                                        |
-| BUG-18 | Ao abrir um link protegido sem estar logado, o usuário vai para a página inicial do seu papel após o login, e não para o link original.                     | Navegar de novo até a página desejada.                                                                                                                                       |
-| BUG-19 | Na edição do perfil, campos opcionais vazios (`departamento`, `biografia`) geram aviso de input não controlado no console, e o PATCH reenvia campos extras. | Sem efeito visível para o usuário.                                                                                                                                           |
-| BUG-20 | O calendário de prazos abre em "Editar prazo" com a data em branco, mesmo quando o prazo já existe.                                                         | Selecionar outro tipo de entrega e voltar, ou consultar a lista de prazos.                                                                                                   |
-| BUG-22 | Qualquer professor pode cadastrar um perfil de orientador com um e-mail digitado livremente, sem vínculo com a conta do Keycloak.                           | A edição e a remoção já são restritas ao dono do perfil (PR #211).                                                                                                           |
+| Bug    | Limitação                                                                             | Contorno                                                                                                                                                                     |
+| ------ | ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BUG-15 | O seed `V5` usa IDs fixos e pode sobrescrever registros de bancos criados antes dele. | Não ocorre em banco novo, como o de _staging_ ou o criado pelo `docker compose up` (verificado por teste automatizado). Bancos que já aplicaram a V5 não a executam de novo. |
 
 ## 4. Detalhamento dos bugs
 
@@ -202,7 +196,7 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-11: Faltam limites de tamanho nos DTOs (o banco rejeita com 500)
 
-- **Status:** Corrigido. Issue [#273](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/273). Antes, o PR [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) havia mitigado o defeito.
+- **Status:** Corrigido. Issue [#273](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/273), PR [#296](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/296). Antes, o PR [#213](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/213) havia mitigado o defeito.
 - **Local:**
   - `backend/.../dto/OrientadorRequestDTO.java`
   - `backend/.../dto/OrientadorUpdateDTO.java`
@@ -220,7 +214,7 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-12: Não há handler genérico de exceções
 
-- **Status:** Corrigido. Issue [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262). Antes, o PR [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241) já havia adicionado o handler de `OptimisticLockingFailureException` (409), como consequência da correção do BUG-08.
+- **Status:** Corrigido. Issue [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262), PR [#290](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/290). Antes, o PR [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241) já havia adicionado o handler de `OptimisticLockingFailureException` (409), como consequência da correção do BUG-08.
 - **Local:** `backend/.../exception/GlobalExceptionHandler.java`
 - **Descrição:** Não existiam handlers para `Exception` nem para `DataIntegrityViolationException`.
 - **Impacto (antes da correção):** Erros inesperados (BUG-09 e BUG-11) saíam no formato padrão do Spring, fora do `ErrorResponseDTO` previsto em `docs/contrato-dados-*.md`. O `utils/apiErro.ts` do frontend caía na mensagem genérica.
@@ -232,7 +226,7 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-13: Orientador desativado continua listado e operando
 
-- **Status:** Corrigido. Issue [#263](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/263).
+- **Status:** Corrigido. Issue [#263](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/263), PR [#293](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/293).
 - **Local:**
   - `backend/.../repository/OrientadorRepository.java` (`findByFiltros`)
   - `backend/.../service/OrientadorService.java` (`deletar`)
@@ -250,14 +244,14 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-14: O filtro por linha de pesquisa compara por substring
 
-- **Status:** Limitação conhecida. Sem issue nem PR.
+- **Status:** Corrigido. Issue [#264](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/264), PR [#270](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/270).
 - **Local:**
-  - `backend/.../repository/OrientadorRepository.java` (`LIKE CONCAT('%', :area, '%')`)
+  - `backend/.../repository/OrientadorRepository.java` (`findByFiltros`)
   - `frontend/src/components/OrientadorList/index.tsx`
-- **Descrição:** O frontend oferece um `<select>` com nomes exatos de linhas de pesquisa, mas o backend faz uma busca por "contém". Os caracteres `%` e `_` também não são escapados.
-- **Impacto:** Ao escolher a linha "IA", o catálogo também mostra orientadores de "Mídias Digitais", "Engenharia" e outros. O resultado não corresponde ao filtro escolhido.
-- **Como reproduzir:** Cadastre linhas "IA" e "Mídias Digitais" em orientadores diferentes e filtre por "IA".
-- **Sugestão:** Usar igualdade sem diferenciar maiúsculas (`LOWER(lp.nome) = LOWER(:area)`) quando o filtro vier do seletor.
+- **Descrição (antes da correção):** O frontend oferece um `<select>` com nomes exatos de linhas de pesquisa, mas o backend fazia uma busca por "contém" (`LIKE CONCAT('%', :area, '%')`). Os caracteres `%` e `_` também não eram escapados.
+- **Impacto (antes da correção):** Ao escolher a linha "IA", o catálogo também mostra orientadores de "Mídias Digitais", "Engenharia" e outros. O resultado não corresponde ao filtro escolhido.
+- **Como reproduzir (antes da correção):** Cadastre linhas "IA" e "Mídias Digitais" em orientadores diferentes e filtre por "IA".
+- **Correção:** A consulta passou a comparar por igualdade sem diferenciar maiúsculas (`LOWER(lp.nome) = LOWER(:area)`), coberta por `OrientadorRepositoryTest`.
 
 #### BUG-15: O seed V5 pode sobrescrever dados existentes
 
@@ -281,16 +275,16 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-16: Erro de digitação e codificação em `application.properties`
 
-- **Status:** Limitação conhecida. Sem issue nem PR.
+- **Status:** Corrigido. Issue [#265](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/265), PR [#268](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/268).
 - **Local:** `backend/gestao-tcc/src/main/resources/application.properties`, linha 1
-- **Descrição:**
-  - A chave está escrita `xspring.application.name`, com um "x" a mais, então o nome da aplicação nunca é definido.
-  - O arquivo não está em UTF-8: os comentários aparecem como `Configura��es`.
-- **Sugestão:** Corrigir a chave e converter o arquivo para UTF-8.
+- **Descrição (antes da correção):**
+  - A chave estava escrita `xspring.application.name`, com um "x" a mais, então o nome da aplicação nunca era definido.
+  - O arquivo não estava em UTF-8: os comentários apareciam como `Configura��es`.
+- **Correção:** A chave foi corrigida para `spring.application.name` e o arquivo foi convertido para UTF-8.
 
 #### BUG-17: O contador de vagas do painel mostra "—" quando não há solicitações pendentes
 
-- **Status:** Corrigido. Issue [#266](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/266).
+- **Status:** Corrigido. Issue [#266](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/266), PR [#295](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/295).
 - **Local:** `frontend/src/paginas/PainelSolicitacoes/index.tsx`
 - **Descrição (antes da correção):** As vagas eram lidas de `dados[0].orientador.vagasDisponiveis`, ou seja, só existiam quando havia pelo menos uma solicitação pendente.
 - **Impacto (antes da correção):** O professor sem pedidos pendentes não via quantas vagas tinha.
@@ -301,7 +295,7 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-18: O redirecionamento de volta após o login nunca acontece
 
-- **Status:** Corrigido. Issue [#275](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/275).
+- **Status:** Corrigido. Issue [#275](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/275), PR [#297](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/297).
 - **Local:**
   - `frontend/src/auth/ProtectedRoute.tsx`
   - `frontend/src/paginas/Login/index.tsx`
@@ -313,22 +307,22 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-19: Inputs controlados recebem `null` na edição de perfil
 
-- **Status:** Limitação conhecida. Sem issue nem PR.
+- **Status:** Corrigido. Issue [#277](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/277), PR [#300](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/300).
 - **Local:** `frontend/src/components/OrientadorForm/index.tsx`
-- **Descrição:** O estado é inicializado com o objeto do backend, em que `departamento` e `biografia` podem ser `null`. Isso resulta em `value={null}` nos inputs.
-- **Impacto:**
+- **Descrição (antes da correção):** O estado era inicializado com o objeto do backend, em que `departamento` e `biografia` podem ser `null`. Isso resultava em `value={null}` nos inputs.
+- **Impacto (antes da correção):**
   - Aviso do React sobre a troca entre input não controlado e controlado.
   - O PATCH reenvia campos extras (`id`, `ativo`).
   - Um campo esvaziado é enviado como `""`, sem ser tratado como "remover".
-- **Sugestão:** Normalizar os valores (`departamento ?? ""`, `biografia ?? ""`) e montar o payload só com os campos editáveis.
+- **Correção:** Os valores são normalizados (`departamento ?? ""`, `biografia ?? ""`) e o PATCH envia só os campos editáveis do perfil, coberto por `OrientadorForm.test.tsx`.
 
 #### BUG-20: O calendário abre em modo de edição com a data vazia
 
-- **Status:** Limitação conhecida. Sem issue nem PR.
-- **Local:** `frontend/src/components/GestaoCalendario/index.tsx` (linhas 27 a 29)
-- **Descrição:** O tipo `PROJETO_TCC` já vem selecionado e `dataLimite` começa como `""`. Se o prazo desse tipo já existe, o formulário mostra "Editar prazo" com o campo de data em branco.
-- **Impacto:** O usuário pode achar que o prazo não está cadastrado. Ao clicar em salvar, recebe "A data limite é obrigatória."
-- **Sugestão:** Depois de carregar os prazos, chamar `trocarTipoSelecionado(tipoSelecionado)` para preencher a data.
+- **Status:** Corrigido. Issue [#276](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/276), PR [#299](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/299).
+- **Local:** `frontend/src/components/GestaoCalendario/index.tsx`
+- **Descrição (antes da correção):** O tipo `PROJETO_TCC` já vinha selecionado e `dataLimite` começava como `""`. Se o prazo desse tipo já existia, o formulário mostrava "Editar prazo" com o campo de data em branco.
+- **Impacto (antes da correção):** O usuário pode achar que o prazo não está cadastrado. Ao clicar em salvar, recebe "A data limite é obrigatória."
+- **Correção:** Depois de carregar os prazos, a data limite do tipo inicialmente selecionado é preenchida, e a troca de tipo continua atualizando a data. Coberto por `GestaoCalendario.test.tsx`.
 
 #### BUG-21: `ErrorResponseDTO` usa `Instant.now()` em vez do `Clock`
 
@@ -340,14 +334,14 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-22: Qualquer professor cadastra orientadores com qualquer e-mail
 
-- **Status:** Limitação conhecida (mitigada). Sem issue própria. A mitigação veio com o PR [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211).
+- **Status:** Corrigido. Issue [#279](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/279), PR [#300](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/300). Antes, o PR [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211) já havia mitigado o defeito.
 - **Local:**
   - `backend/.../controller/OrientadorController.java` (`POST`)
   - `frontend/src/App.tsx` (rota `/`)
   - `frontend/src/paginas/OrientadorCadastro/index.tsx`
-- **Descrição:** A rota `/` (cadastro de orientador) fica disponível para todo `ROLE_PROFESSOR`, e o e-mail é digitado livremente. O `POST /orientadores` não compara esse e-mail com o do JWT, então nada liga o cadastro ao usuário do Keycloak.
-- **Mitigação:** Após o PR #211, só professores cadastram, e apenas o dono do perfil (e-mail do JWT) pode editá-lo ou desativá-lo. Um perfil criado em nome de um colega não fica sob controle de quem o criou.
-- **Impacto:** Surgem perfis "fantasmas" ou duplicados, sem conta no Keycloak correspondente.
-- **Sugestão:**
-  - Fazer o "primeiro acesso" criar o perfil com o e-mail do JWT, sem permitir edição desse campo.
-  - Restringir o cadastro de terceiros a um perfil administrativo.
+- **Descrição (antes da correção):** A rota `/` (cadastro de orientador) fica disponível para todo `ROLE_PROFESSOR`, e o e-mail era digitado livremente. O `POST /orientadores` não comparava esse e-mail com o do JWT, então nada ligava o cadastro ao usuário do Keycloak.
+- **Mitigação anterior:** Após o PR #211, só professores cadastram, e apenas o dono do perfil (e-mail do JWT) pode editá-lo ou desativá-lo. Um perfil criado em nome de um colega não fica sob controle de quem o criou.
+- **Impacto (antes da correção):** Surgiam perfis "fantasmas" ou duplicados, sem conta no Keycloak correspondente.
+- **Correção:**
+  - O frontend preenche o e-mail do cadastro com o do usuário autenticado e não permite editá-lo.
+  - O backend rejeita com `403` o cadastro cujo e-mail difere do claim `email` do JWT ("O e-mail do orientador deve corresponder ao e-mail do usuário autenticado."), coberto por `OrientadorControllerIntegrationTest`.

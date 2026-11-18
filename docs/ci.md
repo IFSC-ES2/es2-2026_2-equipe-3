@@ -25,6 +25,7 @@ O pipeline está sendo estruturado de forma incremental. Atualmente, ele garante
 - **O que avalia:**
   - Verifica se o arquivo `README.md` existe no repositório.
   - Valida a sintaxe dos arquivos `SIGTCC/docker-compose.yml` e `SIGTCC/docker-compose.prod.yml`.
+  - Verifica os **links internos** de todos os arquivos Markdown com o **lychee** (`lycheeverse/lychee-action`) em modo `--offline`: links relativos para arquivos e pastas do repositório e âncoras de seção (`--include-fragments`). URLs externas não são acessadas, para que o check não falhe por indisponibilidade de sites de terceiros (Issue #284).
   - Executa o **Prettier** para garantir que todos os arquivos do repositório sigam um padrão consistente de formatação (espaçamentos, quebras de linha, etc).
   - Executa o **actionlint** para validar a sintaxe e o esquema dos arquivos YAML de workflow do GitHub Actions (`.github/workflows/*.yml`), checando tipos de eventos, expressões e dependências entre jobs.
 

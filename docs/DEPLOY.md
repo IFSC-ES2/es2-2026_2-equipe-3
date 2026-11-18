@@ -12,7 +12,7 @@ Certifique-se de ter instalado na máquina:
 - **Docker** (24+) e **Docker Compose** (v2)
 - **Node.js** (versão 20+) e **npm** _(opcional, apenas caso deseje rodar o frontend fora do Docker)_
 - **JDK 21** _(opcional, apenas caso deseje rodar o backend fora do Docker)_
-- **Cloudflared** ([Cloudflare Tunnel client](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads/)) _(necessário apenas para expor o ambiente de staging externamente)_
+- **Tailscale** ([cliente Tailscale](https://tailscale.com/download)) com o **Funnel** habilitado no _tailnet_ _(necessário apenas na máquina anfitriã do ambiente de staging)_
 
 ### 1.1. Configuração das Variáveis de Ambiente
 
@@ -47,6 +47,12 @@ cp .env.example SIGTCC/.env
 | `VITE_API_URL`                     | URL base da API do backend injetada no build do frontend                                                                                             | `http://localhost:8080`                                                                        |
 | `KEYCLOAK_PUBLIC_URL`              | URL pública base do Keycloak no staging/produção para o issuer JWT e `--hostname`                                                                    | `http://localhost:8081`                                                                        |
 | `APP_CORS_ALLOWED_ORIGINS`         | Origens permitidas no CORS do backend Spring Boot (separadas por vírgula)                                                                            | `http://localhost`                                                                             |
+
+**Onde cada variável é usada:**
+
+- **`docker-compose.yml` (desenvolvimento):** `MYSQL_*`, `SPRING_DATASOURCE_*`, `KEYCLOAK_ADMIN_*` e `APP_SUBMISSAO_DOMINIOS_SUGERIDOS`. As URLs do frontend (`VITE_*`) já estão fixas em `localhost` no próprio compose.
+- **`docker-compose.prod.yml` (_staging_):** as mesmas variáveis, mais `VITE_API_URL` e `VITE_KEYCLOAK_URL` (injetadas no build do frontend), `KEYCLOAK_PUBLIC_URL` (hostname do Keycloak e _issuer_ do JWT validado pelo backend) e `APP_CORS_ALLOWED_ORIGINS`.
+- **`VITE_KEYCLOAK_REALM` e `VITE_KEYCLOAK_CLIENT_ID`:** não são lidas pelos arquivos do Compose; o frontend usa os valores padrão do código (`sigtcc` e `sigtcc-frontend`). Servem apenas para o `npm run dev` executado fora do Docker.
 
 ---
 
@@ -121,41 +127,53 @@ O ambiente de _staging_ utiliza o arquivo `SIGTCC/docker-compose.prod.yml` (com 
 | **Backend (API)**   | `https://sigtcc.cobbler-albacore.ts.net:8443`  | `8080`      |
 | **Keycloak (Auth)** | `https://sigtcc.cobbler-albacore.ts.net:10000` | `8081`      |
 
-### 3.2. Passo a Passo Resumido para Subir o Staging
+### 3.2. Passo a Passo para Subir o Staging Fixo
 
-1. **Configurar o arquivo `SIGTCC/.env`** com as URLs fixas:
+1. **Criar o `SIGTCC/.env` a partir do `.env.example`** e substituir o bloco de _staging_ pelas URLs fixas. As demais variáveis (banco, Keycloak e domínios sugeridos) seguem a tabela da seção 1.2; no _staging_, troque as senhas de exemplo por valores próprios.
 
 ```dotenv
+# --- Configurações de Staging (Tailscale Funnel - Issue #260) ---
 VITE_API_URL=https://sigtcc.cobbler-albacore.ts.net:8443
 VITE_KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000
 KEYCLOAK_PUBLIC_URL=https://sigtcc.cobbler-albacore.ts.net:10000
 APP_CORS_ALLOWED_ORIGINS=https://sigtcc.cobbler-albacore.ts.net
 ```
 
-2. **Ativar os túneis do Tailscale Funnel** para as três portas locais:
+> As variáveis `VITE_*` são gravadas no _bundle_ durante o build do frontend. Se forem alteradas, é preciso reconstruir a imagem (`--build`).
+
+2. **Ativar os túneis do Tailscale Funnel** para as três portas locais e conferir o mapeamento:
 
 ```bash
 tailscale funnel --bg --yes 80
 tailscale funnel --bg --yes --https=8443 8080
 tailscale funnel --bg --yes --https=10000 8081
+tailscale funnel status
 ```
 
-3. **Subir o stack na tag oficial (`v1.0.0-rc.1`):**
+O `status` deve listar as três URLs da seção 3.1 apontando para `localhost:80`, `localhost:8080` e `localhost:8081`.
+
+3. **Subir o stack na tag oficial (`v1.0.0-rc.1`) com o banco zerado:**
 
 ```bash
 git fetch --tags
 git checkout v1.0.0-rc.1
 cd SIGTCC
+docker compose -f docker-compose.prod.yml --env-file .env down -v
 docker compose -f docker-compose.prod.yml --env-file .env up -d --build
+docker compose -f docker-compose.prod.yml --env-file .env ps
 ```
 
-4. **Validar com o Smoke Test Automatizado:**
+Aguarde até que `db`, `keycloak` e `backend` apareçam como `healthy`. No primeiro start, o backend aplica as migrations `V1` a `V9` do Flyway e o Keycloak importa o realm `sigtcc`.
+
+4. **Validar com o Smoke Test Automatizado** (a partir da raiz do repositório):
 
 ```bash
 KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000 API_URL=https://sigtcc.cobbler-albacore.ts.net:8443 bash SIGTCC/scripts/smoke-test.sh
 ```
 
-> **Atenção:** O `smoke-test.sh` cadastra dados reais e não deve ser executado sobre um banco já populado com dados de demonstração. Execute-o uma única vez logo após a criação inicial do banco zerado (`down -v`).
+> **Atenção:** O `smoke-test.sh` cadastra dados reais (uma solicitação aceita e um prazo de entrega) e não deve ser executado sobre um banco já populado com dados de demonstração. Execute-o uma única vez, logo após o `down -v` do passo 3.
+
+5. **Preparar os dados de demonstração** conforme [`docs/staging.md`](staging.md) (issue [#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280)). Para reiniciar o ambiente sem perder os dados (por exemplo, após reiniciar a máquina anfitriã), use o procedimento de reinício descrito no mesmo documento, sem `down -v`.
 
 ---
 
@@ -176,8 +194,8 @@ docker compose -f docker-compose.prod.yml --env-file .env down -v
 2. **Reverter o código para o commit estável anterior:**
 
 ```bash
-git checkout <sha-estavel-anterior>
-# Exemplo: git checkout 687f2cb (ou para a tag estável v0.4.0)
+git checkout <tag-ou-sha-estavel-anterior>
+# Exemplo: git checkout v1.0.0-rc.1 (ou a release anterior, v0.4.0)
 ```
 
 3. **Reconstruir as imagens e subir o ambiente estabilizado:**
@@ -187,7 +205,9 @@ cd SIGTCC
 docker compose -f docker-compose.prod.yml --env-file .env up -d --build
 ```
 
-> **Sobre as Imagens do GHCR no Rollback:** O arquivo `SIGTCC/docker-compose.prod.yml` usa a diretiva `build:` para injetar as URLs dinâmicas dos túneis Cloudflare no frontend. Para utilizar diretamente as imagens estáveis do GitHub Container Registry (`ghcr.io/ifsc-es2/sigtcc-backend:<sha>` e `ghcr.io/ifsc-es2/sigtcc-frontend:<sha>`), seria necessário alterar o compose substituindo `build:` por `image: ghcr.io/...`, o que só é aplicável caso o staging utilize URLs estáticas pré-determinadas. Por essa razão, no fluxo padrão de staging o rollback é realizado via `git checkout <sha>` seguido de build local com `docker compose up -d --build`.
+4. **Revalidar o ambiente** com o _smoke test_ (seção 3.2, passo 4) e preparar novamente os dados de demonstração.
+
+> **Sobre as Imagens do GHCR no Rollback:** O arquivo `SIGTCC/docker-compose.prod.yml` usa a diretiva `build:` porque as URLs do _staging_ (`VITE_API_URL` e `VITE_KEYCLOAK_URL`) são gravadas no _bundle_ do frontend durante o build. As imagens publicadas no GitHub Container Registry (`ghcr.io/ifsc-es2/sigtcc-backend:<sha>` e `ghcr.io/ifsc-es2/sigtcc-frontend:<sha>`) são geradas pelo CI sem essas URLs; usá-las exigiria trocar `build:` por `image: ghcr.io/...` e reconstruir o frontend com as URLs fixas. Por isso, no fluxo padrão de _staging_ o rollback é feito com `git checkout <tag>` seguido de `docker compose up -d --build`.
 
 ---
 
