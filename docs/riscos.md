@@ -585,3 +585,34 @@ Esta seção consolida a revisão dos riscos do projeto no encerramento da Sprin
 | **R13** | Atraso em cadeia Backend, Frontend e QA na US07  | Prazo/Processo      |   Média (2)   | Médio (2) | Média (4)  | **Mitigado no fechamento (PRs #246 e #247 integrados)** |
 
 > **Riscos obsoletos após a `ADR-0013`:** riscos ligados a **storage local e custódia de arquivos binários** (espaço em disco, volumes Docker de mídia e validação de upload `MultipartFile`) deixaram de ser aplicáveis após a adoção de links externos HTTPS ([`docs/adrs/ADR-0013.md`](adrs/ADR-0013.md)), sendo substituídos por **R11** e **R12**.
+
+---
+
+## 7. Revisão Final para a Release Candidate (`v1.0.0-rc.1`)
+
+**Data de início da revisão:** 17/11/2026  
+**Issue de referência:** [#283 — Revisão final de `docs/riscos.md`](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/283)
+
+Esta seção consolida a revisão do registro de riscos para a preparação da Release Candidate `v1.0.0-rc.1`, tomando como ponto de partida a situação documentada ao término da Sprint 4, na seção 6.4.
+
+### 7.1 Escopo da revisão
+
+A revisão contempla os riscos R01 a R12, conforme estabelecido na issue #283. Entretanto, como o registro histórico do projeto também contém o risco R13 — Atraso em cadeia entre Backend, Frontend e QA na US07 —, ele também será considerado na avaliação final, preservando a rastreabilidade do histórico.
+
+### 7.2 Critérios de avaliação
+
+Para cada risco, será verificada a situação ao encerramento da Entrega 9, considerando:
+
+- **Fechado:** o risco deixou de representar uma ameaça relevante, com evidência de resolução.
+- **Mitigado:** as ações adotadas reduziram sua probabilidade ou impacto.
+- **Concretizado:** a situação de risco ocorreu durante o projeto, devendo ser registrada com suas consequências e tratamento.
+- **Residual:** permanece uma exposição que não foi completamente eliminada e que deverá ser considerada nas limitações da Release Candidate.
+
+A classificação final deverá estar acompanhada de evidências verificáveis, como issues, Pull Requests, testes automatizados, configurações de infraestrutura ou decisões arquiteturais.
+
+### 7.3 Consolidação dos riscos residuais
+
+Após a verificação individual dos riscos, aqueles classificados como residuais serão relacionados nesta seção e replicados na seção de limitações da Release Candidate em `docs/entregas/release-candidate.md`.
+
+> **Situação da revisão:** iniciada em 17/11/2026. A classificação final dos riscos e a consolidação das respectivas evidências permanecem pendentes de verificação.
+
