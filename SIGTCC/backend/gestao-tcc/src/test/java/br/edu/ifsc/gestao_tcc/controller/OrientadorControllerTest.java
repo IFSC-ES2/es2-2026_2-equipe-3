@@ -72,10 +72,14 @@ class OrientadorControllerTest {
     // Setup standalone não tem o filtro do Spring Security: o contexto é preenchido
     // diretamente para que o @AuthenticationPrincipal resolva o Jwt.
     private RequestPostProcessor tokenProfessor() {
+        return tokenProfessor(EMAIL_PROFESSOR);
+    }
+
+    private RequestPostProcessor tokenProfessor(String email) {
         return request -> {
             Jwt jwt = Jwt.withTokenValue("token")
                     .header("alg", "none")
-                    .claim("email", EMAIL_PROFESSOR)
+                    .claim("email", email)
                     .build();
             SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(jwt));
             return request;
@@ -88,18 +92,20 @@ class OrientadorControllerTest {
         Orientador orientadorMock = new Orientador();
         orientadorMock.setId(1L);
 
-        when(this.orientadorService.cadastrar(any(OrientadorRequestDTO.class))).thenReturn(orientadorMock);
+        when(this.orientadorService.cadastrar(
+                eq(EMAIL_PROFESSOR), any(OrientadorRequestDTO.class))).thenReturn(orientadorMock);
 
         String RequestBody = """
                 {
                     "nome": "João Silva",
-                    "email": "joao.silva@ifsc.edu.br",
+                    "email": "adriano.lima@ifsc.edu.br",
                     "linhasDePesquisa": ["IA"],
                     "vagasDisponiveis": 3
                 }
                 """;
 
         mockMvc.perform(post("/api/v1/orientadores")
+                        .with(tokenProfessor())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(RequestBody))
                 .andExpect(status().isCreated())
@@ -133,19 +139,20 @@ class OrientadorControllerTest {
     @Test
     @DisplayName("POST /orientadores - Deve retornar 409 Conflict quando email já existe")
     void cadastraOrientador_DeveRetornar409_QuandoEmailDuplicado() throws Exception {
-        when(orientadorService.cadastrar(any(OrientadorRequestDTO.class)))
+        when(orientadorService.cadastrar(eq(EMAIL_PROFESSOR), any(OrientadorRequestDTO.class)))
                 .thenThrow(new EmailDuplicadoException("Já existe um orientador cadastrado com o e-mail informado."));
 
         String RequestBody = """
                 {
                   "nome": "João Silva",
-                  "email": "joao.silva@ifsc.edu.br",
+                  "email": "adriano.lima@ifsc.edu.br",
                   "linhasDePesquisa": ["IA"],
                   "vagasDisponiveis": 3
                 }
                 """;
 
         mockMvc.perform(post("/api/v1/orientadores")
+                        .with(tokenProfessor())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(RequestBody))
                 .andExpect(status().isConflict())
@@ -421,7 +428,7 @@ class OrientadorControllerTest {
                 .andExpect(jsonPath("$.detalhes[?(@.campo == 'nome')].mensagem")
                         .value("O nome deve ter entre 3 e 100 caracteres."));
 
-        verify(orientadorService, never()).cadastrar(any());
+        verify(orientadorService, never()).cadastrar(any(String.class), any(OrientadorRequestDTO.class));
     }
 
     @Test
@@ -476,11 +483,14 @@ class OrientadorControllerTest {
     void cadastraOrientador_DeveRetornar201_QuandoValoresNoLimiteExato() throws Exception {
         Orientador orientadorMock = new Orientador();
         orientadorMock.setId(1L);
-        when(orientadorService.cadastrar(any(OrientadorRequestDTO.class))).thenReturn(orientadorMock);
+        String email = emailComTamanho(100);
+        when(orientadorService.cadastrar(
+                eq(email), any(OrientadorRequestDTO.class))).thenReturn(orientadorMock);
 
         mockMvc.perform(post(URL)
+                        .with(tokenProfessor(email))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(payloadCadastro("a".repeat(100), emailComTamanho(100),
+                        .content(payloadCadastro("a".repeat(100), email,
                                 "d".repeat(100), "b".repeat(500), "l".repeat(80))))
                 .andExpect(status().isCreated());
     }

@@ -33,6 +33,8 @@ public class OrientadorService {
 
     private static final String MENSAGEM_ACESSO_NEGADO =
             "Você só pode alterar o seu próprio cadastro de orientador.";
+    private static final String MENSAGEM_EMAIL_CADASTRO_DIVERGENTE =
+            "O e-mail do orientador deve corresponder ao e-mail do usuário autenticado.";
     private static final String MENSAGEM_EMAIL_IMUTAVEL = "O e-mail do orientador não pode ser alterado.";
 
     private final OrientadorRepository orientadorRepository;
@@ -41,7 +43,12 @@ public class OrientadorService {
     private final UsuarioRepository usuarioRepository;
 
     @Transactional
-    public Orientador cadastrar(OrientadorRequestDTO dto) {
+    public Orientador cadastrar(String emailUsuario, OrientadorRequestDTO dto) {
+        if (emailUsuario == null || emailUsuario.isBlank()
+                || !emailUsuario.equalsIgnoreCase(dto.getEmail())) {
+            throw new AcessoNegadoException(MENSAGEM_EMAIL_CADASTRO_DIVERGENTE);
+        }
+
         if (usuarioRepository.existsByEmailIgnoreCase(dto.getEmail())) {
             throw new EmailDuplicadoException("Já existe um usuário cadastrado com o e-mail: " + dto.getEmail());
         }

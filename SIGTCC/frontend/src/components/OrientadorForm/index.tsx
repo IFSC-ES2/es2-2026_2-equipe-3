@@ -9,6 +9,7 @@ import {
 import { LinhaPesquisaInput } from "../LinhaPesquisa";
 
 interface OrientadorFormProps {
+  emailAutenticado: string;
   orientador?: Orientador;
   onSucesso: (orientador: Orientador) => void;
   onErro: (mensagem: string) => void;
@@ -26,12 +27,19 @@ const valoresIniciais: OrientadorInput = {
 };
 
 export function OrientadorForm({
+  emailAutenticado,
   orientador,
   onSucesso,
   onErro,
 }: OrientadorFormProps) {
   const [dados, setDados] = useState<OrientadorInput>(
-    orientador ?? valoresIniciais,
+    orientador
+      ? {
+          ...orientador,
+          departamento: orientador.departamento ?? "",
+          biografia: orientador.biografia ?? "",
+        }
+      : { ...valoresIniciais, email: emailAutenticado },
   );
   const [erros, setErros] = useState<ErrosCampos>({});
   const [carregando, setCarregando] = useState(false);
@@ -79,10 +87,18 @@ export function OrientadorForm({
     setCarregando(true);
     try {
       const resultado = orientador
-        ? await atualizarOrientador(orientador.id, dados)
-        : await cadastrarOrientador(dados);
+        ? await atualizarOrientador(orientador.id, {
+            nome: dados.nome,
+            email: dados.email,
+            departamento: dados.departamento,
+            linhasDePesquisa: dados.linhasDePesquisa,
+            vagasDisponiveis: dados.vagasDisponiveis,
+            biografia: dados.biografia,
+          })
+        : await cadastrarOrientador({ ...dados, email: emailAutenticado });
       onSucesso(resultado);
-      if (!orientador) setDados(valoresIniciais);
+      if (!orientador)
+        setDados({ ...valoresIniciais, email: emailAutenticado });
     } catch (erro: unknown) {
       if (
         erro instanceof ApiError &&
@@ -136,7 +152,7 @@ export function OrientadorForm({
             value={dados.email}
             onChange={alterarCampo}
             placeholder="Seuemail@email.com.br"
-            disabled={carregando}
+            disabled={carregando || !orientador}
           />
           {erro("email")}
         </label>
@@ -145,7 +161,7 @@ export function OrientadorForm({
           <input
             id="departamento"
             name="departamento"
-            value={dados.departamento}
+            value={dados.departamento ?? ""}
             onChange={alterarCampo}
             placeholder="Seu Departamento"
             disabled={carregando}
@@ -171,7 +187,7 @@ export function OrientadorForm({
             id="biografia"
             name="biografia"
             rows={4}
-            value={dados.biografia}
+            value={dados.biografia ?? ""}
             onChange={alterarCampo}
             placeholder="Conte um pouco sobre sua experiência..."
             disabled={carregando}
