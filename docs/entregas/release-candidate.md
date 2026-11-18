@@ -249,32 +249,46 @@ A tabela abaixo consolida os vínculos já existentes no repositório até a `v0
 
 ---
 
-## 9. Resultado Final da Entrega 9
+## 9. Limitações Conhecidas e Riscos Residuais da Release Candidate
+
+Detalhamento em [`docs/riscos.md`](../riscos.md) (seção 7) e [`docs/relatorio-de-bugs.md`](../relatorio-de-bugs.md) (seção 3).
+
+- **US08 (R04):** agendamento de bancas fora do MVP (#15).
+- **Concorrência (R07):** aceitar e recusar a mesma solicitação ao mesmo tempo pode deixar a solicitação `RECUSADA` com a vaga já consumida.
+- **Autenticação (R09):** login por `grant_type=password` (ADR-0014).
+- **Staging (R10):** o ambiente de staging roda na máquina de um integrante (Tailscale Funnel) e depende de ela permanecer ligada e conectada. Procedimento de reinício em [`docs/staging.md`](../staging.md).
+- **Links de entrega (R11):** o sistema não verifica o acesso do orientador ao link.
+- **Conteúdo externo (R12):** o documento pode ser alterado após o envio. O reenvio substitui o link anterior.
+- **Defeitos conhecidos (R02):** ver o relatório de bugs.
+
+---
+
+## 10. Resultado Final da Entrega 9
 
 > _Seção a preencher ao encerrar a Entrega 9, após a conclusão das issues `#253` a `#256`, o merge da `entrega-9` na `main` e a publicação da release._
 
 ---
 
-## 10. Contribuições Individuais
+## 11. Contribuições Individuais
 
 > _Seção a preencher ao final da entrega por cada integrante, com as respectivas issues, PRs, commits e revisões._
 
-### 10.1 Damares do Socorro Gonçalves Gaia
+### 11.1 Damares do Socorro Gonçalves Gaia
 
 - _A preencher._
 
-### 10.2 Eduardo Cardoso Oliveira
+### 11.2 Eduardo Cardoso Oliveira
 
 - _A preencher._
 
-### 10.3 Marcus Jhuan Epifanio Lima
+### 11.3 Marcus Jhuan Epifanio Lima
 
 - _A preencher._
 
-### 10.4 Talles Souza da Cruz
+### 11.4 Talles Souza da Cruz
 
 - _A preencher._
 
-### 10.5 Willian Ferreira dos Santos
+### 11.5 Willian Ferreira dos Santos
 
 - _A preencher._
