@@ -232,7 +232,16 @@ Registro das atividades executadas pelos integrantes da equipe na Entrega 9 (Rel
 
 ### 10.1 Damares do Socorro Gonçalves Gaia
 
-- _A preencher._
+- **Revisão Final do MVP e Retrospectiva do Projeto (Issue [#254](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/254) / [PR #271](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/271)):**
+  - Elaboração de [`docs/RETROSPECTIVA.md`](../RETROSPECTIVA.md) com a tabela comparativa "planejado na Inception × efetivamente entregue" (`US01` a `US10`), justificativa das mudanças de escopo/ADRs e retrospectiva consolidada das Sprints 1 a 4, além da atualização com o hardening final da Entrega 9 (commits `07a0dd6`, `a4539e5`).
+- **Revisão Final de Arquitetura, Diagramas C4, ADRs e Padrões OO (Issue [#281](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/281) / [PR #302](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/302)):**
+  - Conferência e atualização de [`docs/ARQUITETURA.md`](../ARQUITETURA.md), [`docs/diagramas/c1-contexto.md`](../diagramas/c1-contexto.md) e [`docs/diagramas/c2-conteineres.md`](../diagramas/c2-conteineres.md) (incluindo Tailscale Funnel, Flyway `V1`–`V9` e busca de JWKS sob demanda), criação da visão C3 do backend em [`docs/diagramas/c3-componentes-backend.md`](../diagramas/c3-componentes-backend.md), revisão das ADRs `0001` a `0014` e sincronização de [`docs/PADROES-DE-PROJETO.md`](../PADROES-DE-PROJETO.md) separando consumidores implementados de extensões futuras (commits `32b413c`, `5b6b919`, `20e8b8d`).
+- **Hardening — BUG-09: Conflito de e-mail entre aluno e orientador (Issue [#261](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/261) / [PR #289](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/289)):**
+  - Criação de `UsuarioRepository.existsByEmailIgnoreCase` e validação unificada em `OrientadorService` e `SolicitacaoService` para retornar HTTP `409 Conflict` em conflitos entre aluno e orientador, com testes unitários e de integração (`OrientadorServiceTest`, `SolicitacaoServiceTest`, `OrientadorControllerIntegrationTest`, `SolicitacaoControllerIntegrationTest`) e atualização dos contratos US02/US04, `README.md` e `docs/relatorio-de-bugs.md` (commits `345d4d5`, `3dae1fd`).
+- **Atualização da Ficha de Métrica M-06 — Cumprimento da Capacidade (Issue [#282](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/282)):**
+  - Consolidação da memória de cálculo da Entrega 9 (`28h/28h`, 100%) e do cumprimento global do semestre em [`docs/metricas/M-06.md`](../metricas/M-06.md) (branch `docs/282-fechamento-metricas`).
+- **Revisões de PRs Realizadas:**
+  - Revisão técnica (`CHANGES_REQUESTED`) e aprovação formal (`APPROVED`) do [PR #258](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/258) (`docs/entregas/release-candidate.md`).
 
 ### 10.2 Eduardo Cardoso Oliveira
 
