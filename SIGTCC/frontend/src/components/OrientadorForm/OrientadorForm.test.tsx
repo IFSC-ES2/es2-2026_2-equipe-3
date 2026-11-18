@@ -41,7 +41,13 @@ describe("OrientadorForm", () => {
   });
 
   test("deve renderizar o formulário vazio para modo de cadastro", () => {
-    render(<OrientadorForm onSucesso={mockOnSucesso} onErro={mockOnErro} />);
+    render(
+      <OrientadorForm
+        emailAutenticado=""
+        onSucesso={mockOnSucesso}
+        onErro={mockOnErro}
+      />,
+    );
 
     expect(screen.getByText("Cadastrar Novo Orientador")).toBeInTheDocument();
     expect(
@@ -64,6 +70,7 @@ describe("OrientadorForm", () => {
 
     render(
       <OrientadorForm
+        emailAutenticado="teste@ifsc.edu.br"
         orientador={orientadorExistente}
         onSucesso={mockOnSucesso}
         onErro={mockOnErro}
@@ -80,7 +87,13 @@ describe("OrientadorForm", () => {
 
   test("deve exibir erros de validação local e bloquear envio se os campos obrigatórios estiverem vazios", async () => {
     const user = userEvent.setup();
-    render(<OrientadorForm onSucesso={mockOnSucesso} onErro={mockOnErro} />);
+    render(
+      <OrientadorForm
+        emailAutenticado=""
+        onSucesso={mockOnSucesso}
+        onErro={mockOnErro}
+      />,
+    );
 
     const botaoSubmit = screen.getByRole("button", {
       name: "Cadastrar orientador",
@@ -98,7 +111,13 @@ describe("OrientadorForm", () => {
 
   test("deve limpar o erro do campo ao voltar a digitar nele", async () => {
     const user = userEvent.setup();
-    render(<OrientadorForm onSucesso={mockOnSucesso} onErro={mockOnErro} />);
+    render(
+      <OrientadorForm
+        emailAutenticado=""
+        onSucesso={mockOnSucesso}
+        onErro={mockOnErro}
+      />,
+    );
 
     await user.click(
       screen.getByRole("button", { name: "Cadastrar orientador" }),
@@ -119,10 +138,19 @@ describe("OrientadorForm", () => {
       mockResultado as unknown as Orientador,
     );
 
-    render(<OrientadorForm onSucesso={mockOnSucesso} onErro={mockOnErro} />);
+    render(
+      <OrientadorForm
+        emailAutenticado="jwt.professor@ifsc.edu.br"
+        onSucesso={mockOnSucesso}
+        onErro={mockOnErro}
+      />,
+    );
 
     await user.type(screen.getByLabelText(/nome \*/i), "Novo Orientador");
-    await user.type(screen.getByLabelText(/e-mail \*/i), "novo@ifsc.edu.br");
+    expect(screen.getByLabelText(/e-mail \*/i)).toHaveValue(
+      "jwt.professor@ifsc.edu.br",
+    );
+    expect(screen.getByLabelText(/e-mail \*/i)).toBeDisabled();
 
     const inputVagas = screen.getByLabelText(/vagas disponíveis/i);
     await user.clear(inputVagas);
@@ -137,7 +165,7 @@ describe("OrientadorForm", () => {
     await waitFor(() => {
       expect(cadastrarOrientador).toHaveBeenCalledWith({
         nome: "Novo Orientador",
-        email: "novo@ifsc.edu.br",
+        email: "jwt.professor@ifsc.edu.br",
         departamento: "",
         biografia: "",
         vagasDisponiveis: 3,
@@ -172,6 +200,7 @@ describe("OrientadorForm", () => {
 
     render(
       <OrientadorForm
+        emailAutenticado="teste@ifsc.edu.br"
         orientador={orientadorExistente}
         onSucesso={mockOnSucesso}
         onErro={mockOnErro}
@@ -185,14 +214,55 @@ describe("OrientadorForm", () => {
     await user.click(screen.getByRole("button", { name: "Atualizar perfil" }));
 
     await waitFor(() => {
-      expect(atualizarOrientador).toHaveBeenCalledWith(
-        1,
-        expect.objectContaining({
-          nome: "Dr. Teste Atualizado",
-          email: "teste@ifsc.edu.br",
-        }),
-      );
+      expect(atualizarOrientador).toHaveBeenCalledWith(1, {
+        nome: "Dr. Teste Atualizado",
+        email: "teste@ifsc.edu.br",
+        departamento: "DAE",
+        linhasDePesquisa: ["IA"],
+        vagasDisponiveis: 2,
+        biografia: "Bio teste",
+      });
       expect(mockOnSucesso).toHaveBeenCalledWith(mockResultado);
+    });
+  });
+
+  test("normaliza campos nulos no perfil e envia apenas campos editáveis no PATCH", async () => {
+    const user = userEvent.setup();
+    const orientadorComCamposNulos: Orientador = {
+      id: 8,
+      nome: "Professora Exemplo",
+      email: "professora@ifsc.edu.br",
+      vagasDisponiveis: 1,
+      departamento: null,
+      biografia: null,
+      linhasDePesquisa: ["IA"],
+      ativo: true,
+    };
+    vi.mocked(atualizarOrientador).mockResolvedValue(orientadorComCamposNulos);
+
+    render(
+      <OrientadorForm
+        emailAutenticado="professora@ifsc.edu.br"
+        orientador={orientadorComCamposNulos}
+        onSucesso={mockOnSucesso}
+        onErro={mockOnErro}
+      />,
+    );
+
+    expect(screen.getByLabelText(/departamento/i)).toHaveValue("");
+    expect(screen.getByLabelText(/biografia/i)).toHaveValue("");
+
+    await user.click(screen.getByRole("button", { name: "Atualizar perfil" }));
+
+    await waitFor(() => {
+      expect(atualizarOrientador).toHaveBeenCalledWith(8, {
+        nome: "Professora Exemplo",
+        email: "professora@ifsc.edu.br",
+        departamento: "",
+        linhasDePesquisa: ["IA"],
+        vagasDisponiveis: 1,
+        biografia: "",
+      });
     });
   });
 
@@ -204,13 +274,15 @@ describe("OrientadorForm", () => {
       ]),
     );
 
-    render(<OrientadorForm onSucesso={mockOnSucesso} onErro={mockOnErro} />);
+    render(
+      <OrientadorForm
+        emailAutenticado="professor@ifsc.edu.br"
+        onSucesso={mockOnSucesso}
+        onErro={mockOnErro}
+      />,
+    );
 
     await user.type(screen.getByLabelText(/nome \*/i), "Fulano");
-    await user.type(
-      screen.getByLabelText(/e-mail \*/i),
-      "duplicado@ifsc.edu.br",
-    );
     await user.click(screen.getByTestId("mock-add-linha"));
 
     await user.click(

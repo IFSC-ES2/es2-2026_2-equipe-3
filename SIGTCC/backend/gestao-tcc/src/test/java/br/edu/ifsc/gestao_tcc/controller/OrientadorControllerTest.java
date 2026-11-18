@@ -27,12 +27,14 @@ import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
+import java.time.Clock;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -56,7 +58,7 @@ class OrientadorControllerTest {
         validator.afterPropertiesSet();
 
         this.mockMvc = MockMvcBuilders.standaloneSetup(orientadorController)
-                .setControllerAdvice(new GlobalExceptionHandler())
+                .setControllerAdvice(new GlobalExceptionHandler(Clock.systemUTC()))
                 .setValidator(validator)
                 .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                 .build();
@@ -70,10 +72,14 @@ class OrientadorControllerTest {
     // Setup standalone não tem o filtro do Spring Security: o contexto é preenchido
     // diretamente para que o @AuthenticationPrincipal resolva o Jwt.
     private RequestPostProcessor tokenProfessor() {
+        return tokenProfessor(EMAIL_PROFESSOR);
+    }
+
+    private RequestPostProcessor tokenProfessor(String email) {
         return request -> {
             Jwt jwt = Jwt.withTokenValue("token")
                     .header("alg", "none")
-                    .claim("email", EMAIL_PROFESSOR)
+                    .claim("email", email)
                     .build();
             SecurityContextHolder.getContext().setAuthentication(new JwtAuthenticationToken(jwt));
             return request;
@@ -86,18 +92,20 @@ class OrientadorControllerTest {
         Orientador orientadorMock = new Orientador();
         orientadorMock.setId(1L);
 
-        when(this.orientadorService.cadastrar(any(OrientadorRequestDTO.class))).thenReturn(orientadorMock);
+        when(this.orientadorService.cadastrar(
+                eq(EMAIL_PROFESSOR), any(OrientadorRequestDTO.class))).thenReturn(orientadorMock);
 
         String RequestBody = """
                 {
                     "nome": "João Silva",
-                    "email": "joao.silva@ifsc.edu.br",
+                    "email": "adriano.lima@ifsc.edu.br",
                     "linhasDePesquisa": ["IA"],
                     "vagasDisponiveis": 3
                 }
                 """;
 
         mockMvc.perform(post("/api/v1/orientadores")
+                        .with(tokenProfessor())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(RequestBody))
                 .andExpect(status().isCreated())
@@ -131,19 +139,20 @@ class OrientadorControllerTest {
     @Test
     @DisplayName("POST /orientadores - Deve retornar 409 Conflict quando email já existe")
     void cadastraOrientador_DeveRetornar409_QuandoEmailDuplicado() throws Exception {
-        when(orientadorService.cadastrar(any(OrientadorRequestDTO.class)))
+        when(orientadorService.cadastrar(eq(EMAIL_PROFESSOR), any(OrientadorRequestDTO.class)))
                 .thenThrow(new EmailDuplicadoException("Já existe um orientador cadastrado com o e-mail informado."));
 
         String RequestBody = """
                 {
                   "nome": "João Silva",
-                  "email": "joao.silva@ifsc.edu.br",
+                  "email": "adriano.lima@ifsc.edu.br",
                   "linhasDePesquisa": ["IA"],
                   "vagasDisponiveis": 3
                 }
                 """;
 
         mockMvc.perform(post("/api/v1/orientadores")
+                        .with(tokenProfessor())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(RequestBody))
                 .andExpect(status().isConflict())
@@ -383,5 +392,146 @@ class OrientadorControllerTest {
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.status").value(404))
                 .andExpect(jsonPath("$.erro").value("Recurso não encontrado"));
+    }
+
+    // --- Limites de tamanho dos DTOs (issue #273) ---
+
+    private static final String URL = "/api/v1/orientadores";
+
+    private String payloadCadastro(String nome, String email, String departamento, String biografia, String linha) {
+        return """
+                {
+                  "nome": "%s",
+                  "email": "%s",
+                  "departamento": "%s",
+                  "biografia": "%s",
+                  "linhasDePesquisa": ["%s"],
+                  "vagasDisponiveis": 3
+                }
+                """.formatted(nome, email, departamento, biografia, linha);
+    }
+
+    /** E-mail em formato válido (parte local ≤ 64 e rótulos de domínio ≤ 63) com o tamanho total pedido. */
+    private String emailComTamanho(int tamanho) {
+        String local = "a".repeat(40);
+        String sufixo = ".ifsc.edu.br";
+        return local + "@" + "b".repeat(tamanho - local.length() - 1 - sufixo.length()) + sufixo;
+    }
+
+    @Test
+    @DisplayName("POST /orientadores - nome com mais de 100 caracteres deve retornar 400")
+    void cadastraOrientador_DeveRetornar400_QuandoNomeExcedeLimite() throws Exception {
+        mockMvc.perform(post(URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payloadCadastro("a".repeat(101), "joao@ifsc.edu.br", "DAE", "Bio", "IA")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'nome')].mensagem")
+                        .value("O nome deve ter entre 3 e 100 caracteres."));
+
+        verify(orientadorService, never()).cadastrar(any(String.class), any(OrientadorRequestDTO.class));
+    }
+
+    @Test
+    @DisplayName("POST /orientadores - departamento acima de 100 e biografia acima de 500 caracteres devem retornar 400")
+    void cadastraOrientador_DeveRetornar400_QuandoDepartamentoEBiografiaExcedemLimite() throws Exception {
+        mockMvc.perform(post(URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payloadCadastro("João Silva", "joao@ifsc.edu.br",
+                                "d".repeat(101), "b".repeat(501), "IA")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'departamento')].mensagem")
+                        .value("O departamento deve ter no máximo 100 caracteres."))
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'biografia')].mensagem")
+                        .value("A biografia deve ter no máximo 500 caracteres."));
+    }
+
+    @Test
+    @DisplayName("POST /orientadores - e-mail válido com mais de 100 caracteres deve retornar 400")
+    void cadastraOrientador_DeveRetornar400_QuandoEmailExcedeLimite() throws Exception {
+        mockMvc.perform(post(URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payloadCadastro("João Silva", emailComTamanho(101), "DAE", "Bio", "IA")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'email')].mensagem")
+                        .value("O e-mail deve ter no máximo 100 caracteres."));
+    }
+
+    @Test
+    @DisplayName("POST /orientadores - linha de pesquisa com mais de 80 caracteres deve retornar 400 indicando o item")
+    void cadastraOrientador_DeveRetornar400_QuandoLinhaDePesquisaExcedeLimite() throws Exception {
+        mockMvc.perform(post(URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payloadCadastro("João Silva", "joao@ifsc.edu.br", "DAE", "Bio", "l".repeat(81))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'linhasDePesquisa[0]')].mensagem")
+                        .value("A linha de pesquisa deve ter entre 2 e 80 caracteres."));
+    }
+
+    @Test
+    @DisplayName("POST /orientadores - linha de pesquisa em branco deve retornar 400 indicando o item")
+    void cadastraOrientador_DeveRetornar400_QuandoLinhaDePesquisaEmBranco() throws Exception {
+        mockMvc.perform(post(URL)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payloadCadastro("João Silva", "joao@ifsc.edu.br", "DAE", "Bio", "   ")))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'linhasDePesquisa[0]' "
+                        + "&& @.mensagem == 'A linha de pesquisa não pode ficar em branco.')]").exists());
+    }
+
+    @Test
+    @DisplayName("POST /orientadores - valores exatamente no limite devem ser aceitos (201)")
+    void cadastraOrientador_DeveRetornar201_QuandoValoresNoLimiteExato() throws Exception {
+        Orientador orientadorMock = new Orientador();
+        orientadorMock.setId(1L);
+        String email = emailComTamanho(100);
+        when(orientadorService.cadastrar(
+                eq(email), any(OrientadorRequestDTO.class))).thenReturn(orientadorMock);
+
+        mockMvc.perform(post(URL)
+                        .with(tokenProfessor(email))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payloadCadastro("a".repeat(100), email,
+                                "d".repeat(100), "b".repeat(500), "l".repeat(80))))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("PATCH /orientadores/{id} - lista vazia de linhas de pesquisa deve retornar 400")
+    void atualizaOrientadorID_DeveRetornar400_QuandoListaDeLinhasVazia() throws Exception {
+        mockMvc.perform(patch(URL + "/1")
+                        .with(tokenProfessor())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"linhasDePesquisa\": []}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'linhasDePesquisa')].mensagem")
+                        .value("Informe ao menos uma linha de pesquisa."));
+
+        verify(orientadorService, never()).atualizar(any(), any(), any());
+    }
+
+    @Test
+    @DisplayName("PATCH /orientadores/{id} - linha de pesquisa com mais de 80 caracteres deve retornar 400")
+    void atualizaOrientadorID_DeveRetornar400_QuandoLinhaDePesquisaExcedeLimite() throws Exception {
+        mockMvc.perform(patch(URL + "/1")
+                        .with(tokenProfessor())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"linhasDePesquisa\": [\"" + "l".repeat(81) + "\"]}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.detalhes[?(@.campo == 'linhasDePesquisa[0]')]").exists());
+    }
+
+    @Test
+    @DisplayName("PATCH /orientadores/{id} - sem linhasDePesquisa continua sendo atualização parcial válida (200)")
+    void atualizaOrientadorID_DeveRetornar200_QuandoLinhasDePesquisaOmitidas() throws Exception {
+        when(orientadorService.atualizar(eq(1L), any(), eq(EMAIL_PROFESSOR)))
+                .thenReturn(new OrientadorResponseDTO(1L, "Dr. Adriano Lima", EMAIL_PROFESSOR, "DAE",
+                        List.of("Engenharia de Software"), 4, "Bio", true));
+
+        mockMvc.perform(patch(URL + "/1")
+                        .with(tokenProfessor())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"vagasDisponiveis\": 4}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.vagasDisponiveis").value(4));
     }
 }

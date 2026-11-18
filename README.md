@@ -256,32 +256,38 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 
 A triagem final do relatório de bugs teve este resultado:
 
-- **Corrigidos (9):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`.
-- **Limitações conhecidas (13):** os demais, todos de severidade média ou baixa, listados abaixo.
+- **Corrigidos (15):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`. O BUG-09 foi corrigido na issue `#261` (PR `#289`), o BUG-12 na issue `#262` (PR `#290`), o BUG-13 na issue `#263` (PR `#293`), o BUG-17 na issue `#266` (PR `#295`), o BUG-21 na issue `#278` (PR `#294`) e o BUG-11 na issue `#273`.
+- **Limitações conhecidas (7):** os demais, todos de severidade média ou baixa, listados abaixo.
 
 Nenhum defeito conhecido impede a demonstração do MVP. Detalhes, passos de reprodução e sugestões de correção estão na seção 4 do relatório.
 
-| Bug    | Severidade | Limitação                                                                                                                        |
-| :----- | :--------- | :------------------------------------------------------------------------------------------------------------------------------- |
-| BUG-09 | Média      | Cadastrar orientador com o e-mail de um aluno existente retorna `500` em vez de `409`.                                           |
-| BUG-11 | Média      | `POST /orientadores` não limita o tamanho dos campos de texto. Valores grandes enviados direto à API geram `500`.                |
-| BUG-12 | Média      | Não há handler genérico de exceções: erros inesperados saem fora do formato `ErrorResponseDTO`.                                  |
-| BUG-13 | Média      | A API do catálogo devolve orientadores desativados, e desativar um orientador não cancela as solicitações pendentes dele.        |
-| BUG-14 | Média      | O filtro por linha de pesquisa compara por substring ("IA" também traz "Mídias Digitais").                                       |
-| BUG-15 | Média      | O seed `V5` usa IDs fixos e pode sobrescrever dados de bancos criados antes dele. Não afeta bancos novos.                        |
-| BUG-16 | Baixa      | Chave `xspring.application.name` com erro de digitação, e `application.properties` fora de UTF-8.                                |
-| BUG-17 | Baixa      | O painel do professor mostra "—" em vagas disponíveis quando não há solicitações pendentes.                                      |
-| BUG-18 | Baixa      | Após o login, o usuário não volta ao link protegido que tentou abrir.                                                            |
-| BUG-19 | Baixa      | Na edição do perfil, campos opcionais nulos geram aviso de input não controlado, e o PATCH reenvia campos extras.                |
-| BUG-20 | Baixa      | O calendário de prazos abre em "Editar prazo" com a data em branco.                                                              |
-| BUG-21 | Baixa      | O `timestamp` das respostas de erro usa `Instant.now()` em vez do `Clock` do projeto.                                            |
-| BUG-22 | Baixa      | Qualquer professor pode cadastrar um perfil de orientador com e-mail livre. Edição e remoção já são restritas ao dono do perfil. |
+| Bug    | Severidade | Limitação                                                                                                                                                            |
+| :----- | :--------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| BUG-14 | Média      | O filtro por linha de pesquisa compara por substring ("IA" também traz "Mídias Digitais").                                                                           |
+| BUG-15 | Média      | O seed `V5` usa IDs fixos e pode sobrescrever dados de bancos criados antes dele. Não afeta bancos novos (verificado por teste); decisão registrada na issue `#274`. |
+| BUG-16 | Baixa      | Chave `xspring.application.name` com erro de digitação, e `application.properties` fora de UTF-8.                                                                    |
+| BUG-18 | Baixa      | Após o login, o usuário não volta ao link protegido que tentou abrir.                                                                                                |
+| BUG-19 | Baixa      | Na edição do perfil, campos opcionais nulos geram aviso de input não controlado, e o PATCH reenvia campos extras.                                                    |
+| BUG-20 | Baixa      | O calendário de prazos abre em "Editar prazo" com a data em branco.                                                                                                  |
+| BUG-22 | Baixa      | Qualquer professor pode cadastrar um perfil de orientador com e-mail livre. Edição e remoção já são restritas ao dono do perfil.                                     |
 
-## 12. Como executar o aplicativo
+## 12. Ambiente de Staging e Execução
+
+### 12.1. Ambiente de Staging Oficial (URLs Fixas até a Defesa)
+
+O ambiente de _staging_ está publicado e acessível publicamente via URLs fixas com HTTPS para avaliação contínua até a apresentação final e defesa técnica:
+
+- **Frontend (Aplicação Web):** [https://sigtcc.cobbler-albacore.ts.net](https://sigtcc.cobbler-albacore.ts.net)
+- **Backend (API Spring Boot):** [https://sigtcc.cobbler-albacore.ts.net:8443](https://sigtcc.cobbler-albacore.ts.net:8443)
+- **Keycloak (Autenticação):** [https://sigtcc.cobbler-albacore.ts.net:10000](https://sigtcc.cobbler-albacore.ts.net:10000)
+
+> Para detalhes de configuração, procedimentos operacionais de reinício, responsável pela disponibilidade e script de verificação automatizada (_smoke test_), consulte [`docs/staging.md`](docs/staging.md).
+
+### 12.2. Como executar o aplicativo localmente
 
 Para facilitar a execução dos ambientes de frontend, backend, Keycloak e banco de dados simultaneamente, o projeto está configurado com Docker Compose.
 
-> **Documentação de Deploy e Staging:** Para instruções detalhadas sobre variáveis de ambiente (`.env.example`), execução do ambiente de _staging_ (com `docker-compose.prod.yml` e túneis Cloudflare), estratégia de _rollback_ e limitações conhecidas, consulte o **[Guia de Deploy e Staging (`docs/DEPLOY.md`)](docs/DEPLOY.md)**.
+> **Documentação de Deploy e Staging:** Para instruções detalhadas sobre variáveis de ambiente (`.env.example`), execução do ambiente de _staging_ (com `docker-compose.prod.yml`), estratégia de _rollback_ e limitações conhecidas, consulte o **[Guia de Deploy e Staging (`docs/DEPLOY.md`)](docs/DEPLOY.md)**.
 
 ### Pré-requisitos
 
