@@ -324,4 +324,4 @@ Registro das atividades executadas pelos integrantes da equipe na Entrega 9 (Rel
 
 - **Revisões de PRs Realizadas:**
   - Revisão e aprovação do [PR #257](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/257) (Relatório final de bugs e registro de limitações conhecidas).
-- Revisão e aprovação do [PR #270](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/270) (Correção do filtro de orientadores por linha de pesquisa, substituindo a comparação por substring por igualdade exata, sem diferenciar maiúsculas de minúsculas).
+  - Revisão e aprovação do [PR #270](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/270) (Correção do filtro de orientadores por linha de pesquisa, substituindo a comparação por substring por igualdade exata, sem diferenciar maiúsculas de minúsculas).
