@@ -558,3 +558,86 @@ Validação Técnica: Conferência dos resultados das execuções e verificaçã
 Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. As sugestões foram utilizadas como apoio ao planejamento, à implementação, à análise de requisitos, à elaboração de testes e à revisão técnica, sem substituir a tomada de decisões ou a responsabilidade do integrante. Os testes automatizados foram executados localmente para verificar o comportamento das funcionalidades e a consistência das alterações com os contratos de dados e critérios de aceitação do projeto.
 
 O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto, pelas alterações realizadas e pelos artefatos entregues.
+
+---
+
+## Entrega 9 (Release Candidate):
+
+Em conformidade com as diretrizes da disciplina e visando garantir a transparência, rastreabilidade e integridade acadêmica, apresentamos as declarações de uso de Inteligência Artificial generativa referentes à Entrega 9 (Release Candidate - 16/11/2026 a 18/11/2026), organizadas por integrante responsável:
+
+---
+
+### Eduardo Cardoso Oliveira
+
+#### Planejamento e Condução da Entrega 9 (Issue #253 / PR #258)
+
+- **Data:** 16/11/2026 a 17/11/2026
+- **Ferramenta:** Gemini
+- **Artefatos:** `docs/entregas/release-candidate.md`
+- **Aproveitamento:** Apoio na estruturação inicial do documento-mestre da Release Candidate, formatação de tabelas da matriz de rastreabilidade, definição dos critérios de aceitação da entrega e consolidação das metas.
+- **Adaptação/Descarte:** Foram ajustadas manualmente as contagens de story points (congelamento em 29 SP), o escopo congelado de hardening dos 10 bugs selecionados da triagem e alinhamento do branch ruleset para a `entrega-9`.
+- **Validação Técnica:** Verificação de links relativos, formatação com Prettier, revisão com apontamentos da Arquiteta de Software (Damares) e merge do PR #258 na branch `entrega-9`.
+
+#### Hardening — BUG-21: Timestamp determinístico com Clock no ErrorResponseDTO (Issue #278 / PR #294)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude 3.5 Sonnet
+- **Artefatos:** `backend/src/main/java/br/edu/ifsc/gestao_tcc/config/ClockConfig.java`, `backend/src/main/java/br/edu/ifsc/gestao_tcc/dto/ErrorResponseDTO.java`, `backend/src/main/java/br/edu/ifsc/gestao_tcc/exception/GlobalExceptionHandler.java`, `backend/src/test/java/br/edu/ifsc/gestao_tcc/controller/OrientadorControllerTest.java`, `backend/src/test/java/br/edu/ifsc/gestao_tcc/controller/SolicitacaoControllerTest.java` e `backend/src/test/java/br/edu/ifsc/gestao_tcc/integration/OrientadorControllerIntegrationTest.java`
+- **Aproveitamento:** Apoio na identificação da causa raiz do teste instável (timestamp não determinístico gerado com `Instant.now()` dentro do DTO), sugestão de injeção de `Clock` no `GlobalExceptionHandler` e esqueleto da classe `@TestConfiguration` para fixar o relógio (`Clock.fixed(...)`) nos testes de integração.
+- **Adaptação/Descarte:** Refatoração manual de todos os construtores de `ErrorResponseDTO` para exigir `Instant timestamp`, remoção do construtor padrão que chamava `Instant.now()`, injeção do bean de `Clock` no Spring context e atualização dos `MockMvc` assertions para comparar o timestamp exato do mock.
+- **Validação Técnica:** Execução bem-sucedida de `./gradlew test` passando 100% dos testes unitários e de integração (`OrientadorControllerIntegrationTest`), garantindo 0 testes flutuantes; aprovado e integrado no PR #294.
+
+#### Hardening — BUG-18: Preservação de rota e parâmetros após o login (Issue #275 / PR #297)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude 3.5 Sonnet
+- **Artefatos:** `frontend/src/rotas/ProtectedRoute.tsx`, `frontend/src/paginas/LoginPage/index.tsx`, `frontend/src/rotas/ProtectedRoute.test.tsx` e `frontend/src/paginas/LoginPage/Login.test.tsx`
+- **Aproveitamento:** Apoio na formulação da lógica de preservação do `location.state.from` no React Router v6, recuperação de query parameters (`search`) e hash, e sugestão de cenários de teste automatizados para o Vitest.
+- **Adaptação/Descarte:** Correção manual contra loops infinitos de redirecionamento quando a rota de origem é o próprio `/login`, tratamento seguro para evitar "Acesso Negado" espúrio ao logar a partir da raiz `/`, e adaptação dos mocks do `useAuth` e `MemoryRouter` nos testes.
+- **Validação Técnica:** Execução de `npm test` no frontend com 100% de sucesso em 17 testes de rotas e login, incluindo teste simulando o fluxo ponta a ponta (`/acompanhar/15?tab=orientadores#topo` -> `/login` -> redirecionamento com parâmetros preservados); aprovado e integrado no PR #297.
+
+#### Hardening — BUG-14: Filtro por linha de pesquisa com correspondência exata (Issue #264 / PR #270)
+
+- **Data:** 16/11/2026 a 17/11/2026
+- **Ferramenta:** Claude 3.5 Sonnet
+- **Artefatos:** `backend/src/main/java/br/edu/ifsc/gestao_tcc/repository/OrientadorRepository.java` e `backend/src/test/java/br/edu/ifsc/gestao_tcc/repository/OrientadorRepositoryTest.java`
+- **Aproveitamento:** Auxílio na análise da consulta JPQL de filtragem de linhas de pesquisa.
+- **Adaptação/Descarte:** Ajuste manual da cláusula `JOIN` e predicado de igualdade estrita (`= :linhaPesquisa`) no Spring Data JPA para prevenir falsos positivos com substrings em `Set<String> linhasDePesquisa`, além da criação de massa de dados isolada no teste.
+- **Validação Técnica:** Execução local de `./gradlew test --tests OrientadorRepositoryTest` e testes de API com sucesso; aprovado e integrado no PR #270.
+
+#### Revisão Técnica de Pull Requests (PRs #271, #293, #296, #301 e #302)
+
+- **Data:** 17/11/2026 a 18/11/2026
+- **Ferramenta:** Claude 3.5 Sonnet (Antigravity)
+- **Artefatos:** PR #271 (`docs/RETROSPECTIVA.md`), PR #293 (`OrientadorService.java`, migration `V9`), PR #296 (`OrientadorRequestDTO.java`, `docs/contrato-dados-us02.md`), PR #301 (`docs/entregas/release-candidate.md`) e PR #302 (`docs/ARQUITETURA.md`, `docs/PADROES-DE-PROJETO.md`, ADRs e diagramas C4)
+- **Aproveitamento:** Apoio na conferência de contratos de dados e validação de compatibilidade com migrações Flyway.
+- **Adaptação/Descarte:** Análise crítica dos apontamentos fornecidos pela IA, conferência manual contra a árvore do Git e execução dos comandos de teste e build antes de registrar a revisão técnica ou aprovar formalmente no GitHub.
+- **Validação Técnica:** Aprovação formal registrada no GitHub, com checks de CI 100% verdes em todos os PRs revisados.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
+
+---
+
+### Damares do Socorro Gonçalves Gaia
+
+- _A preencher._
+
+---
+
+### Marcus Jhuan Epifanio Lima
+
+- _A preencher._
+
+---
+
+### Talles Souza da Cruz
+
+- _A preencher._
+
+---
+
+### Willian Ferreira dos Santos
+
+- _A preencher._
