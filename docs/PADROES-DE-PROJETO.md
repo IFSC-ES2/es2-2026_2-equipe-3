@@ -45,6 +45,7 @@ classDiagram
         -SolicitacaoRepository solicitacaoRepository
         -OrientadorRepository orientadorRepository
         -AlunoRepository alunoRepository
+        -UsuarioRepository usuarioRepository
         -ApplicationEventPublisher eventPublisher
         -List~ValidacaoSolicitacaoOrientacao~ validacoes
         +SolicitacaoResponseDTO criarSolicitacao(SolicitacaoRequestDTO dto, String emailAluno, String nomeAluno)
@@ -274,7 +275,7 @@ Ao transitar para `ACEITA`:
 
 Se essa operação de decremento for acoplada diretamente no fluxo transacional do `SolicitacaoService`, cria-se acoplamento entre domínios distintos e violação do princípio da Responsabilidade Única (SRP).
 
-O padrão **Observer** resolve essa questão publicando o evento de domínio `SolicitacaoStatusChangedEvent` via `ApplicationEventPublisher`. O Spring Boot despacha o evento para o ouvinte cadastrado (`AtualizadorVagasObserver`), mantendo a máquina de estados da solicitação isolada da manipulação das cotas de vagas do orientador.
+O padrão **Observer** resolve essa questão publicando o evento de domínio `SolicitacaoStatusChangedEvent` via `ApplicationEventPublisher` nas transições de status (`ACEITA`, `RECUSADA` e `CANCELADA`, tanto em `SolicitacaoService` quanto no cancelamento em cascata de pendências ao inativar orientador em `OrientadorService.deletar`). O Spring Boot despacha o evento para o ouvinte cadastrado (`AtualizadorVagasObserver`), mantendo a máquina de estados da solicitação isolada da manipulação das cotas de vagas do orientador.
 
 ### 3.2 Diagrama de Classes e Sequência (Observer)
 
