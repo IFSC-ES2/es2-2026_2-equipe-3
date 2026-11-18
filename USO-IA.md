@@ -777,4 +777,33 @@ Todo o conteúdo, código, testes e documentação elaborados ou revisados com o
 
 ### Willian Ferreira dos Santos
 
-- _A preencher._
+#### Backlog final do MVP e critérios de aceitação das histórias (Issue #255 / PR #301)
+
+- **Data:** 17/11/2026 a 18/11/2026
+- **Ferramenta:** Claude Sonnet 5.5 (Anthropic)
+- **Artefatos:** `docs/entregas/release-candidate.md` (seções 3.5, 4, 4.1 e 7) e critérios de aceitação das issues #11 (US04) e #14 (US07)
+- **Aproveitamento:** Conferência das instruções de execução da issue contra o conteúdo da branch `entrega-9`, apontando divergências; verificação dos critérios de aceitação das US01 a US05 e US07 contra o código e os contratos de dados; proposta de redação dos critérios da US04 e da US07, do texto da subseção 4.1 "Backlog Final do MVP" e da descrição do PR.
+- **Adaptação/Descarte:** As propostas foram conferidas pelo integrante com o estado real das issues, do board e do repositório antes de serem aplicadas. O fechamento da US08 como fora do escopo do MVP segue a seção 10.4 de `docs/entregas/sprint-4.md`, definida pela equipe.
+- **Validação Técnica:** Conferência das referências de issues, PRs e versões com a matriz da seção 8 do `release-candidate.md`, verificação da formatação e revisão do PR #301 por outro integrante.
+
+#### Revisão final do registro de riscos (Issue #283 / PR #303)
+
+- **Data:** 17/11/2026 a 18/11/2026
+- **Ferramenta:** Claude Sonnet 5.5 (Anthropic)
+- **Artefatos:** `docs/riscos.md` (seção 7) e seção de limitações e riscos residuais de `docs/entregas/release-candidate.md`
+- **Aproveitamento:** Proposta de classificação final dos riscos R01 a R13 e dos riscos residuais da release (R02, R04, R07, R09, R11 e R12).
+- **Adaptação/Descarte:** A classificação foi comparada pelo integrante com o histórico das seções 4 a 6 do `riscos.md`, com `docs/relatorio-de-bugs.md` e com as ADRs citadas, e ajustada antes do commit.
+- **Validação Técnica:** Conferência dos números de issues e PRs, verificação da formatação e revisão do PR #303 por outro integrante.
+
+#### Atualização da Métrica M-02 - Densidade de Defeitos Abertos
+
+- **Data:** 18/11/2026.
+- **Ferramenta:** ChatGPT (OpenAI).
+- **Artefatos:** `docs/metricas/M-02.md` e `docs/relatorio-de-bugs.md`.
+- **Aproveitamento:** Apoio na análise da ficha da métrica M-02, na interpretação dos resultados da Entrega 9 e na definição da forma de registrar a quantidade de defeitos em aberto. Auxílio na avaliação da aplicabilidade da fórmula de densidade de defeitos para uma entrega voltada à estabilização do MVP, sem conclusão de novas User Stories pontuadas.
+- **Adaptação/Descarte:** A quantidade de Issues abertas com as labels `bug` ou `defeito` foi consultada e confirmada manualmente pelo integrante no GitHub, resultando em zero defeitos em aberto. A proposta de registro diferenciou o resultado específico da Entrega 9, cuja densidade é não aplicável pela ausência de novos Story Points concluídos, de uma possível visão acumulada do MVP. As informações e os critérios de cálculo foram avaliados pelo integrante antes de sua inclusão na documentação.
+- **Validação Técnica:** Conferência da quantidade de Issues abertas diretamente no GitHub, análise da fórmula e dos critérios de interpretação da métrica e revisão da consistência do histórico de acompanhamento.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
