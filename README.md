@@ -256,8 +256,8 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 
 A triagem final do relatório de bugs teve este resultado:
 
-- **Corrigidos (15):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`. O BUG-09 foi corrigido na issue `#261` (PR `#289`), o BUG-12 na issue `#262` (PR `#290`), o BUG-13 na issue `#263` (PR `#293`), o BUG-17 na issue `#266` (PR `#295`), o BUG-21 na issue `#278` (PR `#294`) e o BUG-11 na issue `#273`.
-- **Limitações conhecidas (7):** os demais, todos de severidade média ou baixa, listados abaixo.
+- **Corrigidos (16):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`. O BUG-09 foi corrigido na issue `#261` (PR `#289`), o BUG-12 na issue `#262` (PR `#290`), o BUG-13 na issue `#263` (PR `#293`), o BUG-17 na issue `#266` (PR `#295`), o BUG-21 na issue `#278` (PR `#294`), o BUG-11 na issue `#273` (PR `#296`) e o BUG-18 na issue `#275`.
+- **Limitações conhecidas (6):** os demais, todos de severidade média ou baixa, listados abaixo.
 
 Nenhum defeito conhecido impede a demonstração do MVP. Detalhes, passos de reprodução e sugestões de correção estão na seção 4 do relatório.
 
