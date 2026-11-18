@@ -643,7 +643,88 @@ Todo o conteúdo, código, testes e documentação elaborados ou revisados com o
 
 ### Talles Souza da Cruz
 
-- _A preencher._
+#### Relatório de Bugs e Limitações Conhecidas (Issue #256 / PR #257)
+
+- **Data:** 16/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `docs/relatorio-de-bugs.md` e `README.md`
+- **Aproveitamento:** Apoio na consolidação dos bugs triados em tabela (ID, severidade, status, issue e PR), na redação das seções de contorno e detalhamento de cada bug e na estrutura da tabela de limitações conhecidas no README.
+- **Adaptação/Descarte:** Severidades e status revisados manualmente contra as issues abertas no GitHub, descarte de itens que não se reproduziam e ajuste da formatação com Prettier.
+- **Validação Técnica:** `npx prettier --check` sem erros e revisão aprovada no PR #257.
+
+#### Hardening — Chave `spring.application.name` e codificação do `application.properties` (Issue #265 / PR #268)
+
+- **Data:** 16/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `backend/src/main/resources/application.properties` e `README.md`
+- **Aproveitamento:** Identificação da chave inválida (`xspring.application.name`) e dos comentários com acentuação corrompida pela codificação do arquivo.
+- **Adaptação/Descarte:** Correção restrita à chave e à conversão do arquivo para UTF-8, sem as demais alterações de configuração sugeridas pela IA.
+- **Validação Técnica:** `./gradlew build` com sucesso e backend iniciando com o nome correto da aplicação no log; aprovado e integrado no PR #268.
+
+#### Hardening — Ausência de handler genérico de exceções (Issue #262 / PR #290)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `backend/.../exception/GlobalExceptionHandler.java`, `backend/.../exception/GlobalExceptionHandlerTest.java`, `backend/.../integration/OrientadorControllerIntegrationTest.java`, `docs/contrato-dados-us04.md`, `docs/relatorio-de-bugs.md` e `README.md`
+- **Aproveitamento:** Esqueleto dos handlers de `DataIntegrityViolationException` (409) e `Exception` (500) retornando `ErrorResponseDTO`, e sugestão de cenários de teste para cada um.
+- **Adaptação/Descarte:** Preservação do status original das exceções do próprio Spring (ex.: 404 de rota inexistente) em vez de convertê-las em 500, mensagens alinhadas aos contratos de dados e remoção de detalhes internos (stack trace) da resposta.
+- **Validação Técnica:** `./gradlew test` com os novos testes unitários e de integração passando e contrato US04 atualizado; aprovado e integrado no PR #290.
+
+#### Hardening — BUG-13: Orientador desativado continuava listado e operando (Issue #263 / PR #293)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `OrientadorRepository.java`, `OrientadorService.java`, `SolicitacaoService.java`, migration `V9__cancelar_solicitacoes_de_orientadores_inativos.sql`, `OrientadorServiceTest.java`, `SolicitacaoServiceTest.java`, `OrientadorRepositoryTest.java`, testes de integração de orientador e solicitação, `docs/contrato-dados-us02.md`, `docs/contrato-dados-us04.md`, `docs/relatorio-de-bugs.md` e `README.md`
+- **Aproveitamento:** Análise dos pontos em que o orientador inativo ainda aparecia ou operava (listagem, novas solicitações, aceite/recusa), escrita dos testes antes da correção e proposta da migration de saneamento das solicitações pendentes.
+- **Adaptação/Descarte:** Ajuste das regras de negócio e mensagens aos contratos de dados, resolução manual dos conflitos com o PR #289 e correção de um mock ausente que surgiu após o merge.
+- **Validação Técnica:** `./gradlew build` com sucesso (testes unitários e de integração) e CI verde; aprovado e integrado no PR #293.
+
+#### Hardening — Contador de vagas do painel não aparecia sem solicitações (Issue #266 / PR #295)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `frontend/src/paginas/PainelSolicitacoes/index.tsx`, `frontend/src/paginas/PainelSolicitacoes/PainelSolicitacoes.test.tsx`, `docs/relatorio-de-bugs.md` e `README.md`
+- **Aproveitamento:** Identificação da renderização condicional que escondia o contador quando não havia solicitações e sugestão de cenários de teste com lista vazia.
+- **Adaptação/Descarte:** Texto e estilo do contador mantidos no padrão da página e resolução manual de conflito no relatório de bugs.
+- **Validação Técnica:** `npm test`, `npm run lint` e `npm run build` com sucesso, além de conferência visual no painel do professor; aprovado e integrado no PR #295.
+
+#### Hardening — Limites de tamanho nos DTOs de orientador (Issue #273 / PR #296)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `OrientadorRequestDTO.java`, `OrientadorUpdateDTO.java`, `OrientadorControllerTest.java`, `docs/contrato-dados-us02.md`, `docs/relatorio-de-bugs.md` e `README.md`
+- **Aproveitamento:** Levantamento do tamanho das colunas nas migrations para definir as anotações `@Size` e geração dos testes de limite (valor no limite e acima dele).
+- **Adaptação/Descarte:** Limites conferidos manualmente com o schema, mensagens de validação em português e correção da tabela de limitações conhecidas, que havia quebrado no relatório após a resolução de conflitos.
+- **Validação Técnica:** `./gradlew build` e `npx prettier --check` com sucesso e CI verde; aprovado e integrado no PR #296.
+
+#### Hardening — BUG-15: Seed V5 pode sobrescrever dados existentes (Issue #274 / PR #298)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `backend/.../repository/MigracoesFlywayTest.java`, `docs/relatorio-de-bugs.md`, `docs/ARQUITETURA.md` e `README.md`
+- **Aproveitamento:** Análise do comportamento do Flyway (imutabilidade e checksum das migrations) e das alternativas (editar a V5, criar uma V10 ou registrar como limitação), criação do teste que executa todas as migrations em um H2 vazio e redação da justificativa e da descrição do PR.
+- **Adaptação/Descarte:** A decisão de manter o bug como limitação conhecida foi do integrante; foi descartada a criação de uma V10, que não preveniria nem desfaria o problema, e a ADR-0009 não foi alterada. A lista de migrations da `ARQUITETURA.md` foi corrigida para incluir a V9.
+- **Validação Técnica:** `MigracoesFlywayTest` com 3/3 testes passando, `./gradlew build` com sucesso e CI verde; aprovado e integrado no PR #298.
+
+#### Revisão Técnica de Pull Requests (PRs #269, #271, #289, #291, #297, #301 e #303)
+
+- **Data:** 17/11/2026 a 18/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:**
+  - PR #269: `docs/staging.md`, `docs/DEPLOY.md` e `realm-import.json`;
+  - PR #271: `docs/RETROSPECTIVA.md`;
+  - PR #289: `OrientadorService.java`, `SolicitacaoService.java`, `UsuarioRepository.java` e contratos US02/US04;
+  - PR #291: workflows em `.github/workflows/` e `docs/ci.md`;
+  - PR #297: `ProtectedRoute.tsx` e `Login/index.tsx`, com seus testes;
+  - PR #301: `docs/entregas/release-candidate.md`;
+  - PR #303: `docs/riscos.md`.
+- **Aproveitamento:** Apoio na leitura dos diffs, na conferência da consistência com os contratos de dados, o relatório de bugs e o README, e na resolução de conflitos de merge com a `entrega-9`.
+- **Adaptação/Descarte:** Os apontamentos da IA foram analisados criticamente e conferidos manualmente contra o código e a documentação. Foram descartadas as sugestões fora do escopo de cada PR, e os conflitos foram resolvidos manualmente, preservando as alterações dos dois lados.
+- **Validação Técnica:** Execução local dos testes e do build quando o PR alterava código (`./gradlew build` e `npm test`), CI verde e aprovação formal registrada no GitHub antes do merge na `entrega-9`.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
 
 ---
 
