@@ -108,8 +108,10 @@ flowchart TB
         nuvem["<b>Plataformas em Nuvem</b><br/>Google Drive / OneDrive / GitHub"]:::cloud
     end
 
-    aluno -->|"Acessa SPA [HTTPS via Funnel em Staging / HTTP em Dev]"| funnel
-    professor -->|"Acessa SPA [HTTPS via Funnel em Staging / HTTP em Dev]"| funnel
+    aluno -->|"HTTPS (Staging)"| funnel
+    professor -->|"HTTPS (Staging)"| funnel
+    aluno -.->|"HTTP direto (Dev local :5173)"| frontend
+    professor -.->|"HTTP direto (Dev local :5173)"| frontend
     funnel -->|"Encaminha tráfego local [HTTP]"| frontend
     funnel <-->|"Token ROPC [HTTP local]"| keycloak
     funnel -->|"API REST [HTTP local]"| backend
@@ -124,7 +126,7 @@ flowchart TB
     professor -.->|"Acessa link do trabalho submetido [HTTPS]"| nuvem
 ```
 
-> Diagrama detalhado disponível em: [`docs/diagramas/c2-conteineres.md`](diagramas/c2-conteineres.md).
+> **Nota de Ambiente:** Em desenvolvimento local (`docker-compose.yml`), o Tailscale Funnel não é utilizado; o navegador acessa os contêineres diretamente via `localhost` (`:5173` para frontend, `:8080` para backend e `:8081` para Keycloak). O Funnel atua exclusivamente no ambiente de _staging_ (`docker-compose.prod.yml`). Diagrama detalhado disponível em: [`docs/diagramas/c2-conteineres.md`](diagramas/c2-conteineres.md).
 
 ### 2.3 Visão de Componentes do Backend (C3)
 
