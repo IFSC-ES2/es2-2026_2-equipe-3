@@ -255,7 +255,17 @@ Registro das atividades executadas pelos integrantes da equipe na Entrega 9 (Rel
 
 ### 10.3 Marcus Jhuan Epifanio Lima
 
-- _A preencher._
+- **Correção de BUG — Issue [#276](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/276) / PR [#299](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/299):**
+  - Ajuste do carregamento inicial da data limite no componente `GestaoCalendario`, garantindo o preenchimento do prazo do tipo inicialmente selecionado e a atualização da data ao trocar o tipo.
+  - Adição de teste cobrindo o carregamento inicial e a troca de tipo ([commit 4d5b93c](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/commit/4d5b93c)).
+- **Correção de BUG — Issue [#277](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/277) / PR [#300](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/300):**
+  - Normalização dos campos `departamento` e `biografia` quando recebidos como `null` e ajuste do PATCH para enviar somente os campos editáveis do perfil de orientador.
+  - Atualização dos testes de edição do perfil ([commit dfe6373](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/commit/dfe6373)).
+- **Correção de BUG — Issue [#279](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/279) / PR [#300](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/300):**
+  - Vinculação do cadastro de orientador ao e-mail do usuário autenticado no Keycloak, impedindo a edição desse campo no frontend.
+  - Validação no backend para rejeitar o cadastro quando o e-mail informado diverge do e-mail do usuário autenticado, com teste cobrindo essa tentativa ([commit dfe6373](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/commit/dfe6373)).
+- **Revisões de PRs Realizadas:**
+  - Eduardo Cardoso aprovou os PRs [#299](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/299) e [#300](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/300).
 
 ### 10.4 Talles Souza da Cruz
 
