@@ -64,8 +64,8 @@ A Entrega 9 opera sem adição de novas funcionalidades de produto, concentrando
 
 ### 3.3 Preparação para a Apresentação e Demonstração Final (Item 2.8 do Edital)
 
-1. **Dados, usuários e cenário de demonstração ([#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280)):** Garantir massa de dados mínima e usuários de teste previsíveis e documentados no README e em `docs/staging.md` (perfis de aluno, orientador e responsável pela turma) para viabilizar avaliação independente pelo professor.
-2. **Roteiro da demonstração final ([#286](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/286)):** Elaborar roteiro estruturado sequencial para apresentação técnica de 15 minutos cobrindo: login → catálogo e busca → solicitação de orientação → aceite pelo orientador → configuração de prazos → submissão por link externo HTTPS → avaliação e parecer → reenvio após ajustes, destacando a versão `v1.0.0-rc.1` e os riscos/limitações residuais conhecidos.
+1. **Dados, usuários e cenário de demonstração ([#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280)):** Garantir massa de dados mínima e usuários de teste previsíveis e documentados no README e em `docs/staging.md` (perfis de aluno, orientador e responsável pela turma), com script reprodutível `SIGTCC/scripts/seed-demo.sh`, para viabilizar avaliação independente pelo professor.
+2. **Roteiro da demonstração final ([#286](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/286)):** Elaborar roteiro estruturado sequencial em [`docs/ROTEIRO-DEMONSTRACAO.md`](../ROTEIRO-DEMONSTRACAO.md) para apresentação técnica de 15 minutos cobrindo: login → catálogo e busca → solicitação de orientação → aceite pelo orientador → configuração de prazos → submissão por link externo HTTPS → avaliação e parecer → reenvio após ajustes, destacando a versão `v1.0.0-rc.1` e os riscos/limitações residuais conhecidos.
 
 ### 3.4 Hardening Técnico, Correção de Bugs e Estabilização de Staging
 

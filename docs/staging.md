@@ -91,7 +91,9 @@ KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000 API_URL=https://sigtcc
 
 > **Importante:** O `smoke-test.sh` cadastra dados reais (uma solicitação aceita e um prazo de entrega) para validar o fluxo ponta a ponta. Portanto, ele só deve ser executado **uma única vez** logo após subir o ambiente com banco zerado (`down -v`), antes do cadastro dos dados oficiais de demonstração. Execuções repetidas sobre o mesmo banco retornarão conflito (HTTP 409) de dados já cadastrados.
 
-## 5. Credenciais de Teste e Cenário de Demonstração (Issue #280)
+## 5. Credenciais de Teste e Cenário de Demonstração (Issues #280 e #286)
+
+> **Roteiro Completo da Demonstração (`v1.0.0-rc.1`):** O passo a passo completo dos 8 blocos da demonstração (usuário, rota, dados inseridos e resultado esperado em cada etapa), bem como as limitações residuais e o guia de defesa técnica, está documentado em **[`docs/ROTEIRO-DEMONSTRACAO.md`](ROTEIRO-DEMONSTRACAO.md)**.
 
 Os usuários de teste pré-cadastrados no realm (`sigtcc`) para homologação, avaliação pelo professor e demonstração são:
 

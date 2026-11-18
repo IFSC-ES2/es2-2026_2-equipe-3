@@ -251,6 +251,7 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 
 - **[Revisão Final do MVP e Retrospectiva do Projeto](docs/RETROSPECTIVA.md):** Comparação "planejado × entregue" de cada funcionalidade da Inception, registro justificado das mudanças de escopo, retrospectiva consolidada das Sprints 1 a 4 (processo, colaboração, riscos, qualidade e previsibilidade), lições aprendidas e o que a equipe faria diferente ([#254](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/254)).
 - **[Relatório de Bugs](docs/relatorio-de-bugs.md):** Triagem final dos 22 achados da revisão estática ([#256](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/256)), com o status de cada bug, as issues e os PRs relacionados.
+- **[Roteiro da Demonstração Final do MVP](docs/ROTEIRO-DEMONSTRACAO.md):** Roteiro estruturado passo a passo da versão `v1.0.0-rc.1` (login → catálogo e filtro → solicitação → aceite → prazos → submissão por link → parecer → reenvio após ajustes), usuários e dados de cada passo, limitações residuais e guia de defesa técnica ([#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280) e [#286](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/286)).
 
 ### 11.1. Limitações Conhecidas
 

@@ -8,8 +8,11 @@
 #   4. Cadastra (ou atualiza, de forma idempotente) os 3 prazos da turma vigente
 #      (PROJETO_TCC em +30 dias, TCC1 em +60 dias e TCC2 em +90 dias).
 #
-# Uso local:
+# Uso local (apenas preparar cenário limpo para demonstração manual):
 #   bash SIGTCC/scripts/seed-demo.sh
+#
+# Uso local (preparar cenário e validar todos os 8 passos do roteiro da Issue #286):
+#   bash SIGTCC/scripts/seed-demo.sh --validar-roteiro
 #
 # Uso no staging:
 #   KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000 \
@@ -176,5 +179,80 @@ esperar "calendário de prazos visível para o aluno" "200"
 conter "prazo PROJETO_TCC registrado" '"tipo":"PROJETO_TCC"'
 conter "prazo TCC1 registrado" '"tipo":"TCC1"'
 conter "prazo TCC2 registrado" '"tipo":"TCC2"'
+
+if [ "${1:-}" = "--validar-roteiro" ]; then
+  echo; echo "6) Validando os 8 passos do Roteiro da Demonstração (docs/ROTEIRO-DEMONSTRACAO.md)"
+
+  # Passo 1: Controle de acesso sem token
+  chamar GET /api/v1/entregas/minhas ""
+  esperar "Passo 1: rota protegida rejeita acesso sem token" "401"
+
+  # Passo 2: Catálogo e filtros combinados (US02 e US03)
+  chamar GET "/api/v1/orientadores?area=Arquitetura%20de%20Sistemas&temVagas=true" "$TK_ALUNO"
+  esperar "Passo 2: filtro exato por 'Arquitetura de Sistemas' + temVagas=true" "200"
+  conter "Passo 2: retorna Professor Orientador" '"email":"professor.orientador@example.com"'
+
+  chamar GET "/api/v1/orientadores?area=Computacao%20Quantica" "$TK_ALUNO"
+  esperar "Passo 2: filtro sem correspondência retorna lista vazia" "200"
+  conter "Passo 2: estado vazio []" "[]"
+
+  # Passo 3: Solicitação de orientação pelo aluno (US04)
+  chamar GET "/api/v1/solicitacoes/orientador/1?status=PENDENTE" "$TK_ORIENTADOR"
+  PEND_ID="$(printf '%s' "$CORPO" | sed -n 's/^\[{"id":\([0-9][0-9]*\).*/\1/p' | head -n1)"
+  if [ -n "$PEND_ID" ]; then
+    chamar PATCH "/api/v1/solicitacoes/$PEND_ID/status" "$TK_ORIENTADOR" \
+      '{"status":"RECUSADA","justificativa":"Limpeza preliminar para validacao do roteiro."}'
+  fi
+  chamar POST /api/v1/solicitacoes "$TK_ALUNO" \
+    '{"orientadorId":1,"curso":"Engenharia de Software","tema":"Arquitetura de Microsserviços e Observabilidade em Sistemas Acadêmicos","mensagem":"Olá professor, gostaria de desenvolver meu TCC na linha de Arquitetura de Sistemas aplicando padrões de resiliência."}'
+  esperar "Passo 3: aluno envia solicitação de orientação" "201"
+  SOL_ID="$(printf '%s' "$CORPO" | sed -n 's/^{"id":\([0-9][0-9]*\).*/\1/p' | head -n1)"
+  conter "Passo 3: solicitação nasce PENDENTE" '"status":"PENDENTE"'
+
+  # Passo 4: Aceite pelo orientador e decremento de vagas via Observer (US04)
+  chamar PATCH "/api/v1/solicitacoes/$SOL_ID/status" "$TK_ORIENTADOR" '{"status":"ACEITA"}'
+  esperar "Passo 4: orientador aceita a solicitação" "200"
+  conter "Passo 4: status transita para ACEITA" '"status":"ACEITA"'
+  chamar GET /api/v1/orientadores/1 "$TK_ORIENTADOR"
+  esperar "Passo 4: consulta de vagas do orientador 1" "200"
+  conter "Passo 4: Observer decrementou vagasDisponiveis de 3 para 2" '"vagasDisponiveis":2'
+
+  # Passo 5: Gestão do calendário pelo professor responsável (US05)
+  chamar GET /api/v1/prazos "$TK_RESPONSAVEL"
+  ID_PROJ="$(extrair_id_prazo "PROJETO_TCC")"
+  chamar PATCH "/api/v1/prazos/$ID_PROJ" "$TK_RESPONSAVEL" '{"dataLimite":"2025-01-10"}'
+  esperar "Passo 5: data limite no passado é rejeitada" "400"
+  PRAZO_AJUSTADO="$(data_futura 25)"
+  chamar PATCH "/api/v1/prazos/$ID_PROJ" "$TK_RESPONSAVEL" "{\"dataLimite\":\"$PRAZO_AJUSTADO\"}"
+  esperar "Passo 5: professor responsável atualiza prazo de PROJETO_TCC" "200"
+
+  # Passo 6: Submissão de entrega por link externo HTTPS pelo aluno (US06)
+  chamar POST /api/v1/entregas "$TK_ALUNO" \
+    '{"tipo":"PROJETO_TCC","urlDocumento":"http://drive.google.com/file/d/1A2B3C-projeto-tcc-v1/view"}'
+  esperar "Passo 6: link http:// inseguro é rejeitado" "400"
+  chamar POST /api/v1/entregas "$TK_ALUNO" \
+    '{"tipo":"PROJETO_TCC","urlDocumento":"https://drive.google.com/file/d/1A2B3C-projeto-tcc-v1/view"}'
+  esperar "Passo 6: aluno submete link https:// válido" "201"
+  ENT_ID="$(printf '%s' "$CORPO" | sed -n 's/^{"id":\([0-9][0-9]*\).*/\1/p' | head -n1)"
+  conter "Passo 6: entrega criada com status SUBMETIDO" '"status":"SUBMETIDO"'
+
+  # Passo 7: Avaliação com parecer AJUSTES_NECESSARIOS pelo orientador (US07)
+  chamar POST "/api/v1/entregas/$ENT_ID/parecer" "$TK_ORIENTADOR" '{"resultado":"AJUSTES_NECESSARIOS"}'
+  esperar "Passo 7: parecer AJUSTES_NECESSARIOS sem comentário é rejeitado" "422"
+  chamar POST "/api/v1/entregas/$ENT_ID/parecer" "$TK_ORIENTADOR" \
+    '{"resultado":"AJUSTES_NECESSARIOS","comentario":"A fundamentação teórica está consistente, mas é necessário detalhar o diagrama de componentes C3 na seção 4 antes da aprovação."}'
+  esperar "Passo 7: orientador registra parecer AJUSTES_NECESSARIOS" "200"
+  conter "Passo 7: status da entrega muda para AJUSTES_NECESSARIOS" '"status":"AJUSTES_NECESSARIOS"'
+
+  # Passo 8: Reenvio pelo aluno e aprovação final pelo orientador (US06 e US07)
+  chamar POST /api/v1/entregas "$TK_ALUNO" \
+    '{"tipo":"PROJETO_TCC","urlDocumento":"https://drive.google.com/file/d/1A2B3C-projeto-tcc-v2-revisado/view"}'
+  esperar "Passo 8: aluno reenvia entrega após ajustes" "200"
+  conter "Passo 8: status volta para SUBMETIDO" '"status":"SUBMETIDO"'
+  chamar POST "/api/v1/entregas/$ENT_ID/parecer" "$TK_ORIENTADOR" \
+    '{"resultado":"APROVADO","comentario":"Ajustes no diagrama C3 verificados. Projeto de TCC aprovado!"}'
+  esperar "Passo 8: orientador registra parecer final APROVADO" "200"
+  conter "Passo 8: status final APROVADO" '"status":"APROVADO"'
+fi
 
 echo; echo "Cenário de demonstração pronto ($PASSOU verificações concluídas com sucesso)."
