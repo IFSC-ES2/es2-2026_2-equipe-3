@@ -628,7 +628,16 @@ Todo o conteúdo, código, testes e documentação elaborados ou revisados com o
 
 ### Marcus Jhuan Epifanio Lima
 
-- _A preencher._
+#### Correção de BUGs (#276 e #279)
+
+- **Data:** 16/11/2026 a 18/11/2026
+- **Ferramenta:** Copilot
+- **Artefatos:** `GestaoCalendario` (`index.tsx` e teste), página de cadastro de orientador, tipos TypeScript do frontend, `OrientadorController`, `OrientadorService`, DTOs e testes automatizados do backend.
+- **Aproveitamento:** Utilização da IA como apoio à compreensão dos problemas e à investigação de possíveis causas:
+  - **#276:** auxílio na análise do fluxo de carregamento dos dados do calendário, especialmente na relação entre o tipo selecionado e a respectiva data limite durante a edição.
+  - **#279:** apoio na compreensão da integração entre o usuário autenticado no Keycloak e os dados de orientador, considerando a obtenção do e-mail associado à autenticação e as validações necessárias para impedir alterações indevidas.
+- **Adaptação/Descarte:** As orientações fornecidas pela IA serviram como referência para a compreensão dos fluxos envolvidos nos problemas #276 e #279, considerando as particularidades da arquitetura e dos contratos existentes na aplicação.
+- **Validação Técnica:** Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
 
 ---
 
