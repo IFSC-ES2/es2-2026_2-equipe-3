@@ -269,7 +269,30 @@ Registro das atividades executadas pelos integrantes da equipe na Entrega 9 (Rel
 
 ### 10.4 Talles Souza da Cruz
 
-- _A preencher._
+- **Relatório de Bugs e Limitações Conhecidas (Issue [#256](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/256) / [PR #257](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/257)):**
+  - Versionamento de [`docs/relatorio-de-bugs.md`](../relatorio-de-bugs.md) com a triagem final dos bugs (ID, severidade, status, issue e PR), contornos e detalhamento de cada item;
+  - Inclusão da tabela de limitações conhecidas no `README.md` e manutenção do relatório atualizado a cada correção de bug da entrega (commits `7aaf7b1`, `90f3d5d`).
+- **Hardening — BUG-16: Chave `spring.application.name` e codificação do `application.properties` (Issue [#265](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/265) / [PR #268](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/268)):**
+  - Correção da chave inválida `xspring.application.name` e conversão do arquivo para UTF-8, eliminando os comentários com acentuação corrompida (commits `ed201a8`, `2256625`).
+- **Hardening — BUG-12: Ausência de handler genérico de exceções (Issue [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) / [PR #290](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/290)):**
+  - Adição dos handlers de `DataIntegrityViolationException` (409) e `Exception` (500) no `GlobalExceptionHandler`, preservando o status original das exceções do próprio Spring e sem expor detalhes internos na resposta;
+  - Testes unitários em `GlobalExceptionHandlerTest`, teste de integração em `OrientadorControllerIntegrationTest` e atualização do contrato `docs/contrato-dados-us04.md` (commits `656b534`, `474a902`, `5fdd0e4`, `f7fae8c`).
+- **Hardening — BUG-13: Orientador desativado continuava listado e operando (Issue [#263](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/263) / [PR #293](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/293)):**
+  - Remoção do orientador inativo do catálogo, bloqueio de novas solicitações e do aceite/recusa por orientador desativado em `OrientadorService` e `SolicitacaoService`, e migration `V9` para cancelar solicitações `PENDENTE` de orientadores já desativados;
+  - Testes unitários, de repositório e de integração escritos antes da correção, atualização dos contratos US02 e US04 e resolução dos conflitos com o PR #289 (commits `43f9417`, `e67eb14`, `3319db7`, `508379c`, `677ed70`).
+- **Hardening — BUG-17: Contador de vagas exibia "—" sem solicitações (Issue [#266](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/266) / [PR #295](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/295)):**
+  - Ajuste do `PainelSolicitacoes` para exibir as vagas disponíveis mesmo quando o orientador ainda não recebeu solicitações, com novos testes no Vitest (commits `5793089`, `cfdf21d`).
+- **Hardening — BUG-11: Limites de tamanho nos DTOs de orientador (Issue [#273](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/273) / [PR #296](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/296)):**
+  - Anotações `@Size` em `OrientadorRequestDTO` e `OrientadorUpdateDTO` alinhadas ao tamanho das colunas do banco, testes de limite em `OrientadorControllerTest` e atualização do contrato `docs/contrato-dados-us02.md` (commits `95a31de`, `ac7893e`, `5d8fcb3`, `8dbb7ed`, `905e390`).
+- **Hardening — BUG-15: Seed V5 pode sobrescrever dados existentes (Issue [#274](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/274) / [PR #298](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/298)):**
+  - Análise do comportamento do Flyway e decisão registrada de manter o bug como limitação conhecida, já que uma nova migration não preveniria nem desfaria o problema;
+  - Criação do `MigracoesFlywayTest`, que executa todas as migrations em banco vazio e verifica o estado deixado pelo seed, e correção da lista de migrations em `docs/ARQUITETURA.md` (commit `8c2a7a9`).
+- **Revisões de PRs Realizadas:**
+  - Revisão e aprovação do [PR #289](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/289) (BUG-09: Conflito de e-mail entre aluno e orientador);
+  - Revisão e aprovação do [PR #291](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/291) (Atualização das GitHub Actions e ruleset);
+  - Revisão e aprovação do [PR #294](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/294) (BUG-21: Timestamp determinístico com Clock);
+  - Revisão do [PR #258](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/258) (Planejamento e condução da Entrega 9);
+  - Revisão e integração dos PRs [#269](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/269) (staging estável), [#271](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/271) (retrospectiva), [#297](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/297) (BUG-18: redirecionamento após o login), [#301](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/301) (backlog e board) e [#303](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/303) (revisão final de riscos).
 
 ### 10.5 Willian Ferreira dos Santos
 
