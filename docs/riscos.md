@@ -633,3 +633,14 @@ Após a verificação individual dos riscos, aqueles classificados como residuai
 | **R11** | Links externos privados/inacessíveis | **Residual** (mitigado parcialmente) | Link HTTPS validado (PR #236). Orientação na tela (PR #242). Reenvio por `AJUSTES_NECESSARIOS` (PR #237). | **Sim** |
 | **R12** | Alteração do trabalho após o prazo | **Residual** (aceito, ADR-0013) | `enviadoEm` e `atrasada` registrados pelo servidor (PR #236). | **Sim** |
 | **R13** | Atraso em cadeia Backend/Frontend/QA (US07) | **Concretizado** parcialmente; mitigado | Seção 6.3 (QA concentrada em 11/11, PRs #246 e #247, CI verde). | Não |
+
+### 7.5 Riscos residuais da Release Candidate
+
+| ID | Exposição residual | Efeito observável | Contorno / ação futura |
+| :-: | :----------------- | :---------------- | :--------------------- |
+| **R02** | Defeitos não corrigidos do relatório de bugs. | Ver `docs/relatorio-de-bugs.md`, seção 3. | Contornos descritos no relatório. |
+| **R04** | US08 (#15) fora do MVP. | Não há agendamento de bancas. | Trabalho futuro, registrado em `docs/entregas/release-candidate.md` (seção 4.1). |
+| **R07** | `@Version` só em `PerfilOrientador`. Aceitar e recusar a mesma solicitação ao mesmo tempo pode deixá-la `RECUSADA` com a vaga já consumida. | Raro (só o próprio orientador responde). | Adicionar `@Version` em `SolicitacaoOrientacao`. |
+| **R09** | Login por `grant_type=password` (Direct Access Grant, ADR-0014). | Sem efeito para o MVP. | Migrar para Authorization Code + PKCE. |
+| **R11** | O sistema não valida se o orientador consegue abrir o link. Os domínios sugeridos (`APP_SUBMISSAO_DOMINIOS_SUGERIDOS`) não aparecem na interface. | O parecer `AJUSTES_NECESSARIOS` atrasa a avaliação. | Exibir os domínios sugeridos. |
+| **R12** | O conteúdo externo pode mudar depois do envio. O reenvio substitui o link anterior, sem histórico. | O orientador pode avaliar versão diferente da enviada. | Orientar o uso de link de versão fixa. Registrar o histórico de links. |
