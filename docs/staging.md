@@ -91,17 +91,58 @@ KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000 API_URL=https://sigtcc
 
 > **Importante:** O `smoke-test.sh` cadastra dados reais (uma solicitação aceita e um prazo de entrega) para validar o fluxo ponta a ponta. Portanto, ele só deve ser executado **uma única vez** logo após subir o ambiente com banco zerado (`down -v`), antes do cadastro dos dados oficiais de demonstração. Execuções repetidas sobre o mesmo banco retornarão conflito (HTTP 409) de dados já cadastrados.
 
-## 5. Credenciais de Teste
+## 5. Credenciais de Teste e Cenário de Demonstração (Issue #280)
 
-Os usuários de teste pré-cadastrados no realm (`sigtcc`) para homologação, avaliação e demonstração são:
+Os usuários de teste pré-cadastrados no realm (`sigtcc`) para homologação, avaliação pelo professor e demonstração são:
 
-| Papel                     | E-mail / Usuário                    | Senha          | Finalidade de Teste                                           |
-| :------------------------ | :---------------------------------- | :------------- | :------------------------------------------------------------ |
-| **Aluno**                 | `aluno@example.com`                 | `aluno123`     | Solicitar orientação e submeter entrega por link HTTPS (US06) |
-| **Professor Orientador**  | `professor.orientador@example.com`  | `professor123` | Aceitar solicitações e emitir parecer com avaliação (US07)    |
-| **Professor Responsável** | `professor.responsavel@example.com` | `professor123` | Cadastrar prazos e gerenciar configurações da turma vigente   |
+| Papel                     | E-mail / Usuário                    | Senha          | Role no Keycloak | Finalidade de Teste e Vínculo Inicial                                                                         |
+| :------------------------ | :---------------------------------- | :------------- | :--------------- | :------------------------------------------------------------------------------------------------------------ |
+| **Aluno**                 | `aluno@example.com`                 | `aluno123`     | `ROLE_ALUNO`     | Consultar catálogo/prazos, solicitar orientação (US04) e submeter/reenviar entrega por link HTTPS (US06)      |
+| **Professor Orientador**  | `professor.orientador@example.com`  | `professor123` | `ROLE_PROFESSOR` | Orientador ativo (`ID 1`, `3` vagas); aceitar/recusar solicitações (US04) e emitir parecer (US07)             |
+| **Professor Responsável** | `professor.responsavel@example.com` | `professor123` | `ROLE_PROFESSOR` | Orientador ativo (`ID 2`, `3` vagas) e responsável pela `Turma_TCC` `2026/2` vigente; gerir calendário (US05) |
 
 > **Console Administrativo do Keycloak:** O acesso ao console administrativo do Keycloak (`https://sigtcc.cobbler-albacore.ts.net:10000`) é de uso estritamente restrito do responsável pela infraestrutura do ambiente. As credenciais do administrador não são publicadas por motivos de segurança operacional.
+
+### 5.1. Dados de Demonstração e Como Recriar o Cenário
+
+Para preparar ou restaurar o cenário previsível de demonstração (orientadores com linhas de pesquisa e vagas, turma vigente `2026/2` e prazos `PROJETO_TCC`, `TCC1` e `TCC2` cadastrados), o repositório disponibiliza o script idempotente `SIGTCC/scripts/seed-demo.sh`:
+
+- **No ambiente de _staging_:**
+
+```bash
+KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000 \
+API_URL=https://sigtcc.cobbler-albacore.ts.net:8443 \
+bash SIGTCC/scripts/seed-demo.sh
+```
+
+- **No ambiente local (`localhost`):**
+
+```bash
+bash SIGTCC/scripts/seed-demo.sh
+```
+
+O script configura e valida automaticamente (18 verificações):
+
+1. **Orientadores ativos com linhas de pesquisa e vagas (`GET /api/v1/orientadores`):**
+   - `Professor Orientador` (`professor.orientador@example.com`, depto `DAELN`, `3` vagas): linhas `Engenharia de Software`, `Arquitetura de Sistemas` e `Qualidade de Software`.
+   - `Professor Responsável pela Turma` (`professor.responsavel@example.com`, depto `DAELN`, `3` vagas): linhas `Inteligência Artificial`, `Ciência de Dados` e `Engenharia de Software`.
+2. **Turma vigente (`2026/2`):** confirmada com `responsavelTurma: true` para `professor.responsavel@example.com` (`GET /api/v1/professores/me`).
+3. **Prazos da turma vigente (`GET /api/v1/prazos`):**
+   - `PROJETO_TCC`: data limite em `+30 dias`
+   - `TCC1`: data limite em `+60 dias`
+   - `TCC2`: data limite em `+90 dias`
+
+Caso seja necessário **zerar completamente o banco de _staging_** (por exemplo, após a execução do `smoke-test.sh` ou de testes exploratórios) para deixar o ambiente limpo para a demonstração final:
+
+```bash
+cd SIGTCC
+docker compose -f docker-compose.prod.yml --env-file .env down -v
+docker compose -f docker-compose.prod.yml --env-file .env up -d
+cd ..
+KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000 \
+API_URL=https://sigtcc.cobbler-albacore.ts.net:8443 \
+bash SIGTCC/scripts/seed-demo.sh
+```
 
 ## 6. Histórico de Execução e Validação
 

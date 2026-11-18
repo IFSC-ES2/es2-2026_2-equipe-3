@@ -320,13 +320,41 @@ docker compose up
 
 4. Faça login no frontend com um dos usuários de teste do realm `sigtcc`:
 
-| E-mail                              | Senha          | Perfil                                         |
-| :---------------------------------- | :------------- | :--------------------------------------------- |
-| `aluno@example.com`                 | `aluno123`     | Aluno                                          |
-| `professor.orientador@example.com`  | `professor123` | Professor orientador                           |
-| `professor.responsavel@example.com` | `professor123` | Professor responsável pela `Turma_TCC` vigente |
+| Papel                     | E-mail / Usuário                    | Senha          | Role no Keycloak | Vínculo inicial no Banco                                                                                                               |
+| :------------------------ | :---------------------------------- | :------------- | :--------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| **Aluno**                 | `aluno@example.com`                 | `aluno123`     | `ROLE_ALUNO`     | Criado automaticamente no primeiro envio de solicitação (`POST /api/v1/solicitacoes`).                                                 |
+| **Professor Orientador**  | `professor.orientador@example.com`  | `professor123` | `ROLE_PROFESSOR` | Orientador ativo (`ID 1`, depto `DAELN`, `3` vagas disponíveis).                                                                       |
+| **Professor Responsável** | `professor.responsavel@example.com` | `professor123` | `ROLE_PROFESSOR` | Orientador ativo (`ID 2`, depto `DAELN`, `3` vagas disponíveis) e responsável pela `Turma_TCC` vigente (`2026/2`, `responsavelTurma`). |
 
 > **Nota:** O realm é importado automaticamente na primeira subida do Keycloak. Detalhes da configuração e de como alterá-la em [`docs/keycloak/keycloak.md`](docs/keycloak/keycloak.md).
+
+### 12.3. Dados, Usuários e Cenário de Demonstração (Reprodutível)
+
+Ao subir o ambiente do zero (`docker compose up`), a migração Flyway `V5__seed_professores_e_turma_vigente.sql` cria os dois orientadores base e a turma vigente `2026/2`. Para popular de forma reprodutível e idempotente as **linhas de pesquisa** dos orientadores e os **três prazos oficiais da turma vigente** (`PROJETO_TCC`, `TCC1` e `TCC2`), execute a partir da raiz do repositório:
+
+```bash
+bash SIGTCC/scripts/seed-demo.sh
+```
+
+Esse script autentica os três usuários de teste no Keycloak e configura via API REST o seguinte cenário previsível de demonstração:
+
+- **Catálogo de Orientadores (`GET /api/v1/orientadores`):**
+  - `Professor Orientador` (`professor.orientador@example.com`): departamento `DAELN`, `3` vagas disponíveis, linhas de pesquisa `Engenharia de Software`, `Arquitetura de Sistemas` e `Qualidade de Software`.
+  - `Professor Responsável pela Turma` (`professor.responsavel@example.com`): departamento `DAELN`, `3` vagas disponíveis, linhas de pesquisa `Inteligência Artificial`, `Ciência de Dados` e `Engenharia de Software`.
+- **Turma Vigente e Calendário de Prazos (`GET /api/v1/prazos`):**
+  - Turma `2026/2` (`vigente = true`), sob responsabilidade de `professor.responsavel@example.com`.
+  - Prazos cadastrados em ordem cronológica futura: `PROJETO_TCC` (`+30 dias`), `TCC1` (`+60 dias`) e `TCC2` (`+90 dias`).
+- **Aluno (`aluno@example.com`):** sem solicitações ou entregas prévias, permitindo executar do início ao fim o roteiro da demonstração (login → busca e filtro por linha de pesquisa e vagas → envio de solicitação → aceite pelo orientador com decremento de vaga → consulta/edição de prazos → submissão de entrega por link HTTPS → avaliação com parecer `AJUSTES_NECESSARIOS` → reenvio e parecer `APROVADO`).
+
+Para **recriar o cenário limpo do zero** a qualquer momento (por exemplo, antes de uma nova bateria de avaliação ou apresentação):
+
+```bash
+cd SIGTCC
+docker compose down -v
+docker compose up -d
+cd ..
+bash SIGTCC/scripts/seed-demo.sh
+```
 
 ### Comandos Úteis
 
