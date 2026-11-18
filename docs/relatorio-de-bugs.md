@@ -28,8 +28,8 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | Crítica    | 4          | 4          | 0                     |
 | Alta       | 4          | 4          | 0                     |
 | Média      | 7          | 5          | 2                     |
-| Baixa      | 7          | 2          | 5                     |
-| **Total**  | **22**     | **15**     | **7**                 |
+| Baixa      | 7          | 3          | 4                     |
+| **Total**  | **22**     | **16**     | **6**                 |
 
 | Bug    | Título resumido                                    | Severidade | Status final                   | Issue                                                              | PR                                                                          |
 | ------ | -------------------------------------------------- | ---------- | ------------------------------ | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
@@ -43,14 +43,14 @@ Os caminhos são relativos a `SIGTCC/`, e o pacote `br/edu/ifsc/gestao_tcc` foi 
 | BUG-08 | Condição de corrida nas vagas                      | Alta       | Corrigido                      | [#206](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/206) | [#241](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/241)            |
 | BUG-09 | Conflito de e-mail aluno/orientador gera 500       | Média      | Corrigido                      | [#261](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/261) | [#289](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/289)            |
 | BUG-10 | PATCH de orientador sem checar e-mail duplicado    | Média      | Corrigido indiretamente        | [#200](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/200) | [#211](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/211)            |
-| BUG-11 | Faltam limites de tamanho nos DTOs                 | Média      | Corrigido                      | [#273](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/273) | PR da issue #273                                                            |
+| BUG-11 | Faltam limites de tamanho nos DTOs                 | Média      | Corrigido                      | [#273](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/273) | [#296](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/296)            |
 | BUG-12 | Sem handler genérico de exceções                   | Média      | Corrigido                      | [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) | PR da issue #262                                                            |
 | BUG-13 | Orientador desativado continua listado e operando  | Média      | Corrigido                      | [#263](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/263) | PR da issue #263                                                            |
 | BUG-14 | Filtro por linha de pesquisa compara por substring | Média      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-15 | Seed V5 pode sobrescrever dados                    | Média      | Limitação conhecida            | [#274](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/274) | PR da issue #274                                                            |
 | BUG-16 | Erro de digitação em `application.properties`      | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-17 | Contador de vagas mostra "—"                       | Baixa      | Corrigido                      | [#266](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/266) | PR da issue #266                                                            |
-| BUG-18 | Redirecionamento após o login não acontece         | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
+| BUG-18 | Redirecionamento após o login não acontece         | Baixa      | Corrigido                      | [#275](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/275) | PR da issue #275                                                            |
 | BUG-19 | Inputs controlados recebem `null`                  | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-20 | Calendário abre com a data vazia                   | Baixa      | Limitação conhecida            | —                                                                  | —                                                                           |
 | BUG-21 | `ErrorResponseDTO` usa `Instant.now()`             | Baixa      | Corrigido                      | [#278](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/278) | [#294](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/294)            |
@@ -301,13 +301,15 @@ Defeitos não corrigidos até o congelamento de código, com o efeito observáve
 
 #### BUG-18: O redirecionamento de volta após o login nunca acontece
 
-- **Status:** Limitação conhecida. Sem issue nem PR.
+- **Status:** Corrigido. Issue [#275](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/275).
 - **Local:**
-  - `frontend/src/auth/ProtectedRoute.tsx`, linha 23
-  - `frontend/src/paginas/Login/index.tsx`, linha 29
-- **Descrição:** O `LoginPage` lê `location.state.from`, mas o `<Navigate to="/login" replace />` não envia esse `state`.
-- **Impacto:** Quem abre um link direto (por exemplo, `/acompanhar/15`) sem estar logado é levado à rota inicial do seu papel depois do login, e não à página que tentou acessar.
-- **Sugestão:** Usar `<Navigate to="/login" replace state={{ from: location }} />`.
+  - `frontend/src/auth/ProtectedRoute.tsx`
+  - `frontend/src/paginas/Login/index.tsx`
+- **Descrição (antes da correção):** O `LoginPage` lia `location.state.from`, mas o `<Navigate to="/login" replace />` não enviava esse `state`.
+- **Impacto (antes da correção):** Quem abria um link direto (por exemplo, `/acompanhar/15`) sem estar logado era levado à rota inicial do seu papel depois do login, e não à página que tentou acessar.
+- **Correção:**
+  - `ProtectedRoute` agora repassa a rota tentada: `<Navigate to="/login" replace state={{ from: location }} />`.
+  - `LoginPage` normaliza o destino a partir de `location.state.from`, preservando caminho, query parameters e hash (`pathname`, `search`, `hash`), evitando loops caso o destino seja `/login`, ou recorrendo à rota inicial do papel caso o login tenha sido direto.
 
 #### BUG-19: Inputs controlados recebem `null` na edição de perfil
 

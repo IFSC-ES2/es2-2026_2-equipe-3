@@ -249,14 +249,16 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 
 ## 11. Entrega 9: Release Candidate
 
+- **[Revisão Final do MVP e Retrospectiva do Projeto](docs/RETROSPECTIVA.md):** Comparação "planejado × entregue" de cada funcionalidade da Inception, registro justificado das mudanças de escopo, retrospectiva consolidada das Sprints 1 a 4 (processo, colaboração, riscos, qualidade e previsibilidade), lições aprendidas e o que a equipe faria diferente ([#254](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/254)).
 - **[Relatório de Bugs](docs/relatorio-de-bugs.md):** Triagem final dos 22 achados da revisão estática ([#256](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/256)), com o status de cada bug, as issues e os PRs relacionados.
+- **[Testes de Aceitação do MVP](docs/ACEITACAO.md):** Definição, execução e registro dos resultados dos casos de teste de aceitação `AT-01` a `AT-07` cobrindo as histórias centrais US01 a US07 (cenários positivos e negativos de segurança e regras de negócio), homologados com 100% de aprovação ([#267](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/267)).
 
 ### 11.1. Limitações Conhecidas
 
 A triagem final do relatório de bugs teve este resultado:
 
-- **Corrigidos (15):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`. O BUG-09 foi corrigido na issue `#261` (PR `#289`), o BUG-12 na issue `#262` (PR `#290`), o BUG-13 na issue `#263` (PR `#293`), o BUG-17 na issue `#266` (PR `#295`), o BUG-21 na issue `#278` (PR `#294`) e o BUG-11 na issue `#273`.
-- **Limitações conhecidas (7):** os demais, todos de severidade média ou baixa, listados abaixo.
+- **Corrigidos (16):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`. O BUG-09 foi corrigido na issue `#261` (PR `#289`), o BUG-12 na issue `#262` (PR `#290`), o BUG-13 na issue `#263` (PR `#293`), o BUG-17 na issue `#266` (PR `#295`), o BUG-21 na issue `#278` (PR `#294`), o BUG-11 na issue `#273` (PR `#296`) e o BUG-18 na issue `#275`.
+- **Limitações conhecidas (6):** os demais, todos de severidade média ou baixa, listados abaixo.
 
 Nenhum defeito conhecido impede a demonstração do MVP. Detalhes, passos de reprodução e sugestões de correção estão na seção 4 do relatório.
 

@@ -5,7 +5,7 @@ import { CredenciaisInvalidasError } from "../../auth/authService";
 import { rotaInicialPorPapel } from "../../auth/rotaInicial";
 
 interface LocationState {
-  from?: { pathname: string };
+  from?: { pathname: string; search?: string; hash?: string } | string;
 }
 
 export function LoginPage() {
@@ -22,13 +22,26 @@ export function LoginPage() {
     event.preventDefault();
     setErro(null);
     setEnviando(true);
-
     try {
       const sessao = await autenticar(email, senha);
-      const destino =
-        (location.state as LocationState | null)?.from?.pathname ??
-        rotaInicialPorPapel(sessao.papeis);
-      navigate(destino, { replace: true });
+      const from = (location.state as LocationState | null)?.from;
+      let destino: string | undefined;
+
+      if (typeof from === "string" && from !== "/login" && from !== "/") {
+        destino = from;
+      } else if (
+        from &&
+        typeof from === "object" &&
+        from.pathname &&
+        from.pathname !== "/login" &&
+        from.pathname !== "/"
+      ) {
+        destino = `${from.pathname}${from.search ?? ""}${from.hash ?? ""}`;
+      }
+
+      navigate(destino ?? rotaInicialPorPapel(sessao.papeis), {
+        replace: true,
+      });
     } catch (erroCapturado) {
       if (erroCapturado instanceof CredenciaisInvalidasError) {
         setErro("Credenciais inválidas");
