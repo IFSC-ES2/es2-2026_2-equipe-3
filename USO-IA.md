@@ -622,7 +622,54 @@ Todo o conteúdo, código, testes e documentação elaborados ou revisados com o
 
 ### Damares do Socorro Gonçalves Gaia
 
-- _A preencher._
+#### Revisão Final do MVP e Retrospectiva Geral (Issue #254 / PR #271)
+
+- **Data:** 16/11/2026 a 18/11/2026
+- **Ferramenta:** Gemini
+- **Artefatos:** `docs/RETROSPECTIVA.md`, `README.md` e `docs/entregas/release-candidate.md`
+- **Aproveitamento:** Estruturação da tabela comparativa "planejado na Inception × efetivamente entregue", organização da retrospectiva consolidada das Sprints 1 a 4 e atualização após o hardening final da Entrega 9.
+- **Adaptação/Descarte:** Conferência linha a linha de cada história (`US01` a `US10`), ADRs (`ADR-0007` a `ADR-0014`), riscos (`R01` a `R13`) e métricas (`M-01` a `M-06`) contra os documentos reais do repositório, removendo referências genéricas e ajustando os números finais.
+- **Validação Técnica:** Revisão de links, formatação Prettier e aprovação formal no PR #271 com todos os checks do CI verdes.
+
+#### Revisão Final de Arquitetura, Diagramas C4, ADRs e Padrões OO (Issue #281 / PR #302)
+
+- **Data:** 17/11/2026 a 18/11/2026
+- **Ferramenta:** Gemini
+- **Artefatos:** `docs/ARQUITETURA.md`, `docs/PADROES-DE-PROJETO.md`, `docs/diagramas/c1-contexto.md`, `docs/diagramas/c2-conteineres.md`, `docs/diagramas/c3-componentes-backend.md` e `docs/adrs/ADR-0001.md` a `ADR-0014.md`
+- **Aproveitamento:** Conferência cruzada entre os pacotes reais do backend/frontend e a documentação arquitetural, criação da visão C3 do backend e revisão das notas de status das ADRs.
+- **Adaptação/Descarte:** Ajuste manual para refletir o túnel Tailscale Funnel no C2, manutenção do acesso HTTP local de desenvolvimento, sincronização com a correção do BUG-13 (`#263`) e separação explícita entre consumidores Observer implementados e extensões futuras em `PADROES-DE-PROJETO.md`.
+- **Validação Técnica:** Formatação com `npx prettier --write`, revisão de equipe e integração no PR #302 com todos os checks do CI verdes.
+
+#### Hardening — BUG-09: Conflito de e-mail entre aluno e orientador (Issue #261 / PR #289)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Gemini
+- **Artefatos:** `SIGTCC/backend/gestao-tcc/src/main/java/br/edu/ifsc/gestao_tcc/repository/UsuarioRepository.java`, `OrientadorService.java`, `SolicitacaoService.java`, `OrientadorServiceTest.java`, `SolicitacaoServiceTest.java`, `OrientadorControllerIntegrationTest.java`, `SolicitacaoControllerIntegrationTest.java`, `docs/contrato-dados-us02.md`, `docs/contrato-dados-us04.md` e `docs/relatorio-de-bugs.md`
+- **Aproveitamento:** Apoio na modelagem da verificação unificada de e-mail em `UsuarioRepository.existsByEmailIgnoreCase`, na geração dos cenários de teste unitário e de integração (retorno HTTP 409) e na revisão dos contratos de dados.
+- **Adaptação/Descarte:** Revisão manual das assinaturas dos serviços e mocks nos testes existentes para preservar o comportamento de reutilização do mesmo aluno/orientador sem regressões, além da atualização manual do `README.md` e `docs/relatorio-de-bugs.md`.
+- **Validação Técnica:** Execução da suíte de testes no backend e verificação dos 5 checks verdes no GitHub Actions do PR #289.
+
+#### Atualização da Ficha de Métrica M-06 — Cumprimento da Capacidade (Issue #282)
+
+- **Data:** 18/11/2026
+- **Ferramenta:** Gemini
+- **Artefatos:** `docs/metricas/M-06.md`
+- **Aproveitamento:** Apoio na consolidação da memória de cálculo da Entrega 9, organização dos dados de commits (`git shortlog`) e PRs por integrante e cálculo do cumprimento acumulado do semestre.
+- **Adaptação/Descarte:** Descarte das alterações sugeridas nas demais fichas (`M-01` a `M-05` e `docs/METRICAS.md`) para restringir o escopo exclusivamente à métrica sob responsabilidade da Arquiteta de Software (`M-06`), além de conferência explícita dos apontamentos de horas e PRs.
+- **Validação Técnica:** Conferência dos comandos `git shortlog -sne origin/main..origin/entrega-9 --no-merges`, consulta à API do GitHub e formatação com Prettier.
+
+#### Revisão Técnica de Pull Request (PR #258)
+
+- **Data:** 16/11/2026 a 17/11/2026
+- **Ferramenta:** Gemini
+- **Artefatos:** PR #258 (`docs/entregas/release-candidate.md`)
+- **Aproveitamento:** Apoio na conferência dos itens obrigatórios do edital da Entrega 9 no `docs/entregas/release-candidate.md`, solicitando a inclusão das seções de testes de aceitação (item 2.5) e preparação para apresentação final (item 2.8), além da atualização de status dos PRs integrados.
+- **Adaptação/Descarte:** Inspeção direta dos commits e diffs no repositório para verificar se todos os apontamentos solicitados (`CHANGES_REQUESTED`) haviam sido aplicados antes de aprovar formalmente o PR no GitHub.
+- **Validação Técnica:** Aprovação formal (`APPROVED`) registrada no PR #258 após verificação das correções aplicadas pelo autor e execução verde dos checks do CI.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
 
 ---
 
