@@ -644,3 +644,7 @@ Após a verificação individual dos riscos, aqueles classificados como residuai
 | **R09** | Login por `grant_type=password` (Direct Access Grant, ADR-0014). | Sem efeito para o MVP. | Migrar para Authorization Code + PKCE. |
 | **R11** | O sistema não valida se o orientador consegue abrir o link. Os domínios sugeridos (`APP_SUBMISSAO_DOMINIOS_SUGERIDOS`) não aparecem na interface. | O parecer `AJUSTES_NECESSARIOS` atrasa a avaliação. | Exibir os domínios sugeridos. |
 | **R12** | O conteúdo externo pode mudar depois do envio. O reenvio substitui o link anterior, sem histórico. | O orientador pode avaliar versão diferente da enviada. | Orientar o uso de link de versão fixa. Registrar o histórico de links. |
+
+### 7.6 Replicação nas limitações da release
+
+Os riscos residuais acima foram replicados na seção "Limitações conhecidas e riscos residuais" de [`docs/entregas/release-candidate.md`](entregas/release-candidate.md).
