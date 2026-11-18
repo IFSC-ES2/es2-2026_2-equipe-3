@@ -1,7 +1,7 @@
 # Documento de Arquitetura do Sistema (SIGTCC)
 
 - **Sistema:** Sistema de Gestão Centralizada de TCC (SIGTCC)
-- **Marco de Release:** `v0.4.0` (Sprint 4 – Entrega 8)
+- **Marco de Release:** `v1.0.0-rc.1` (Entrega 9 – Release Candidate)
 - **Responsável Técnica:** Damares do Socorro Gonçalves Gaia (Arquiteta de Software)
 - **Data de Consolidação:** Novembro de 2026
 
@@ -9,7 +9,7 @@
 
 ## 1. Visão Geral e Propósito do Documento
 
-Este documento descreve a arquitetura técnica real e efetivamente implementada do **Sistema de Gestão Centralizada de TCC (SIGTCC)** na Sprint 4. Ele estabelece a organização dos módulos, as responsabilidades de cada contêiner, os padrões de comunicação, os trade-offs de engenharia adotados e a rastreabilidade entre as decisões arquiteturais registradas nas [ADRs](adrs/) e o código em execução.
+Este documento descreve a arquitetura técnica real e efetivamente implementada do **Sistema de Gestão Centralizada de TCC (SIGTCC)** na versão candidata `v1.0.0-rc.1` (Entrega 9). Ele estabelece a organização dos módulos, as responsabilidades de cada contêiner, os padrões de comunicação, os trade-offs de engenharia adotados e a rastreabilidade entre as decisões arquiteturais registradas nas [ADRs](adrs/) e o código em execução.
 
 O SIGTCC é concebido como uma aplicação web desacoplada, composta por:
 
@@ -65,11 +65,12 @@ flowchart TB
 
 ### 2.2 Visão de Contêineres (C2)
 
-A visão de contêineres apresenta as unidades implantáveis e executáveis em tempo de execução no ambiente Docker:
+A visão de contêineres apresenta as unidades implantáveis e executáveis em tempo de execução no ambiente Docker (tanto em desenvolvimento local com `docker-compose.yml` quanto em _staging_ com `docker-compose.prod.yml` e **Tailscale Funnel**):
 
 ```mermaid
 flowchart TB
     classDef actor fill:#1e40af,stroke:#1d4ed8,stroke-width:2px,color:#ffffff;
+    classDef tunnel fill:#334155,stroke:#1e293b,stroke-width:2px,color:#ffffff;
     classDef front fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff;
     classDef back fill:#0369a1,stroke:#075985,stroke-width:2px,color:#ffffff;
     classDef db fill:#0f766e,stroke:#115e59,stroke-width:2px,color:#ffffff;
@@ -81,9 +82,13 @@ flowchart TB
         professor["<b>Professor / Orientador</b><br/>Navegador Web"]:::actor
     end
 
-    subgraph Docker["Ambiente Docker Compose (Infraestrutura Local)"]
+    subgraph Edge["Exposição Externa (Ambiente de Staging)"]
+        funnel["<b>Tailscale Funnel</b><br/>Proxy Reverso TLS Fixo<br/><i>:443 → :80 | :8443 → :8080 | :10000 → :8081</i>"]:::tunnel
+    end
+
+    subgraph Docker["Ambiente Docker Compose (Dev Local: HTTP | Staging: Nginx :80)"]
         subgraph FrontCont["Camada de Apresentação"]
-            frontend["<b>Frontend SPA</b><br/>React 19.2 + TypeScript + Vite<br/><i>Porta 5173</i>"]:::front
+            frontend["<b>Frontend SPA</b><br/>React 19.2 + TypeScript + Vite / Nginx<br/><i>Dev :5173 | Prod/Staging :80</i>"]:::front
         end
 
         subgraph BackCont["Camada de Serviços e Negócio"]
@@ -91,11 +96,11 @@ flowchart TB
         end
 
         subgraph DbCont["Persistência Relacional"]
-            db[("<b>Banco de Dados MySQL 8.0</b><br/>Migrações Flyway (V1 a V8)<br/><i>Porta 3306</i>")]:::db
+            db[("<b>Banco de Dados MySQL 8.0</b><br/>Migrações Flyway (V1 a V9)<br/><i>Porta 3306</i>")]:::db
         end
 
         subgraph IamCont["Segurança e Identidade"]
-            keycloak["<b>Keycloak 26.8.0 (IAM)</b><br/>Realm sigtcc / JWT RS256<br/><i>Porta 8081</i>"]:::iam
+            keycloak["<b>Keycloak 26.8.0 (IAM)</b><br/>Realm sigtcc / JWT RS256<br/><i>Porta 8081 (interna 8080)</i>"]:::iam
         end
     end
 
@@ -103,11 +108,16 @@ flowchart TB
         nuvem["<b>Plataformas em Nuvem</b><br/>Google Drive / OneDrive / GitHub"]:::cloud
     end
 
-    aluno -->|"Acessa SPA [HTTPS / :5173]"| frontend
-    professor -->|"Acessa SPA [HTTPS / :5173]"| frontend
+    aluno -->|"HTTPS (Staging)"| funnel
+    professor -->|"HTTPS (Staging)"| funnel
+    aluno -.->|"HTTP direto (Dev local :5173)"| frontend
+    professor -.->|"HTTP direto (Dev local :5173)"| frontend
+    funnel -->|"Encaminha tráfego local [HTTP]"| frontend
+    funnel <-->|"Token ROPC [HTTP local]"| keycloak
+    funnel -->|"API REST [HTTP local]"| backend
 
-    frontend <-->|"Login via Direct Access Grant (ROPC) [HTTPS / grant_type=password]"| keycloak
-    frontend -->|"Requisições REST [HTTPS / Bearer JWT]"| backend
+    frontend <-->|"Login via Direct Access Grant (ROPC) [grant_type=password]"| keycloak
+    frontend -->|"Requisições REST [Bearer JWT]"| backend
 
     backend <-->|"Valida JWT localmente via JWKS [/certs]"| keycloak
     backend <-->|"Persistência transacional [TCP / JDBC :3306]"| db
@@ -116,7 +126,11 @@ flowchart TB
     professor -.->|"Acessa link do trabalho submetido [HTTPS]"| nuvem
 ```
 
-> Diagrama detalhado disponível em: [`docs/diagramas/c2-conteineres.md`](diagramas/c2-conteineres.md).
+> **Nota de Ambiente:** Em desenvolvimento local (`docker-compose.yml`), o Tailscale Funnel não é utilizado; o navegador acessa os contêineres diretamente via `localhost` (`:5173` para frontend, `:8080` para backend e `:8081` para Keycloak). O Funnel atua exclusivamente no ambiente de _staging_ (`docker-compose.prod.yml`). Diagrama detalhado disponível em: [`docs/diagramas/c2-conteineres.md`](diagramas/c2-conteineres.md).
+
+### 2.3 Visão de Componentes do Backend (C3)
+
+Para detalhar a organização interna da API REST em Spring Boot (`config`, `controller`, `exception`, `service`, `validation`, `event`, `observer`, `repository` e `model`), foi adicionado o diagrama de componentes C3 em [`docs/diagramas/c3-componentes-backend.md`](diagramas/c3-componentes-backend.md).
 
 ---
 
@@ -128,7 +142,7 @@ flowchart TB
 - **Contêiner:** `gestao_tcc_frontend_dev` (Porta externa `5173`).
 - **Responsabilidades:**
   - Renderizar a interface de usuário reativa, acessível e responsiva.
-  - Implementar o formulário de login reativo próprio (`Login/index.tsx`) integrado ao Keycloak via Direct Access Grant (Resource Owner Password Credentials - ROPC) ([ADR-0014](adrs/ADR-0014.md)).
+  - Implementar o formulário de login reativo próprio (`paginas/Login/index.tsx`) integrado ao Keycloak via Direct Access Grant (Resource Owner Password Credentials - ROPC) ([ADR-0014](adrs/ADR-0014.md)).
   - Gerenciar o estado de autenticação centralizado através do `AuthContext.tsx`.
   - Controlar o acesso a rotas públicas e rotas protegidas por permissão (`ROLE_ALUNO`, `ROLE_PROFESSOR`) através do componente guardião `ProtectedRoute.tsx`.
   - Anexar o token de acesso JWT no cabeçalho `Authorization: Bearer <token>` em todas as requisições destinadas à API REST por meio do cliente HTTP centralizado (`api.ts`), realizando renovação preventiva via `refresh_token` e nova tentativa automática em respostas `401 Unauthorized` (`authService.ts`).
@@ -150,7 +164,8 @@ flowchart TB
     - `service`: Orquestração de regras de negócio e transações gerenciadas (`@Transactional`);
     - `repository`: Interfaces de persistência estendendo `JpaRepository` com consultas especializadas;
     - `model`: Entidades de domínio JPA com integridade relacional estrita;
-    - `config`: Configuração de segurança centralizada sem estado (`STATELESS`), política de CORS unificada e conversão de papéis.
+    - `config`: Configuração de segurança centralizada sem estado (`STATELESS`), política de CORS unificada, `ClockConfig` e conversão de papéis;
+    - `exception`: Tratamento padronizado de exceções de domínio, validação, concorrência e erros genéricos (`GlobalExceptionHandler` com `ErrorResponseDTO` e `Clock` injetado).
   - Aplicar padrões de projeto orientados a objetos ([ADR-0007](adrs/ADR-0007.md)):
     - **Strategy:** Validações desacopladas de elegibilidade de solicitações compostas pela interface `ValidacaoSolicitacaoOrientacao` e suas implementações concretas `ValidacaoVagasDisponiveis`, `ValidacaoOrientadorAtivo` e `ValidacaoSolicitacaoDuplicada`;
     - **Observer:** Disparo e tratamento desacoplado de eventos de mudança de status (`SolicitacaoStatusChangedEvent` consumido por `AtualizadorVagasObserver` para decrementar vagas de forma transacional, protegido contra condições de corrida por bloqueio otimista `@Version` em `PerfilOrientador`).
@@ -196,7 +211,7 @@ A arquitetura foi estruturada para suportar as histórias do escopo priorizado d
 
 | Funcionalidade do MVP                          | História        | Suporte Arquitetural e Decisões Aplicadas                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | :--------------------------------------------- | :-------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Autenticação e Perfis**                      | **US01**        | Delegada ao Keycloak ([ADR-0011](adrs/ADR-0011.md), [ADR-0014](adrs/ADR-0014.md)). O backend valida localmente os tokens JWT como Resource Server ([ADR-0012](adrs/ADR-0012.md)), eliminando custos de desenvolvimento de fluxos manuais de autenticação e mitigando integralmente o risco R06.                                                                                                                                                                                                                                         |
+| **Autenticação e Perfis**                      | **US01**        | Delegada ao Keycloak ([ADR-0011](adrs/ADR-0011.md), [ADR-0014](adrs/ADR-0014.md)). O backend valida localmente os tokens JWT como Resource Server ([ADR-0012](adrs/ADR-0012.md)) e aplica autorização por papel e titularidade na `SecurityConfig` e nos serviços, mitigando o risco R06.                                                                                                                                                                                                                                               |
 | **Cadastro e Edição de Perfil de Orientador**  | **US02**        | Suportada pela hierarquia de entidades JPA (`Usuario` -> `Orientador` -> `PerfilProfessor` -> `LinhaPesquisa`). Operações protegidas com transações declarativas e validações de e-mail institucional único.                                                                                                                                                                                                                                                                                                                            |
 | **Busca e Filtragem de Orientadores**          | **US03**        | Consulta otimizada implementada no repositório (`OrientadorRepository.findByFiltros`), suportando de forma combinada o filtro textual por linha de pesquisa e a restrição booleana por disponibilidade de vagas (`temVagas=true`).                                                                                                                                                                                                                                                                                                      |
 | **Solicitação e Aceite de Orientação (Match)** | **US04**        | Orquestrada com padrões orientados a objetos ([ADR-0007](adrs/ADR-0007.md)). O padrão _Strategy_ avalia as regras de negócio de elegibilidade (vagas, status ativo, ausência de duplicidade), e o padrão _Observer_ garante o decremento transacional de vagas quando o status transiciona para `ACEITA`.                                                                                                                                                                                                                               |
@@ -247,3 +262,5 @@ Todas as escolhas estruturais do projeto estão registradas e justificadas forma
 | [`ADR-0012`](adrs/ADR-0012.md) | Backend como Resource Server OAuth2 com Validação Local de JWT                                     | Aprovada | Backend / Segurança  |
 | [`ADR-0013`](adrs/ADR-0013.md) | Adoção de Submissão por Link Externo em Substituição ao Upload Físico                              | Aprovada | Backend / Frontend   |
 | [`ADR-0014`](adrs/ADR-0014.md) | Autenticação do Frontend via Direct Access Grant (Resource Owner Password Credentials) do Keycloak | Aprovada | Frontend / IAM       |
+
+> **Nota sobre a Entrega 9 (Release Candidate):** A Entrega 9 teve foco exclusivo em consolidação e _hardening_ (correções de bugs, testes de aceitação e estabilização do _staging_ com Tailscale Funnel documentada em [`docs/staging.md`](staging.md)), sem alterações arquiteturais estruturais que demandassem uma nova ADR além das 14 decisões vigentes.
