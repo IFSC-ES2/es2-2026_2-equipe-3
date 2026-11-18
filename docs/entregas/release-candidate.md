@@ -256,6 +256,7 @@ Detalhamento em [`docs/riscos.md`](../riscos.md) (seção 7) e [`docs/relatorio-
 - **US08 (R04):** agendamento de bancas fora do MVP (#15).
 - **Concorrência (R07):** aceitar e recusar a mesma solicitação ao mesmo tempo pode deixar a solicitação `RECUSADA` com a vaga já consumida.
 - **Autenticação (R09):** login por `grant_type=password` (ADR-0014).
+- **Staging (R10):** o ambiente de staging roda na máquina de um integrante (Tailscale Funnel) e depende de ela permanecer ligada e conectada. Procedimento de reinício em [`docs/staging.md`](../staging.md).
 - **Links de entrega (R11):** o sistema não verifica o acesso do orientador ao link.
 - **Conteúdo externo (R12):** o documento pode ser alterado após o envio. O reenvio substitui o link anterior.
 - **Defeitos conhecidos (R02):** ver o relatório de bugs.
