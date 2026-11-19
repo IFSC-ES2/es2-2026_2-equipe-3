@@ -148,7 +148,9 @@ bash SIGTCC/scripts/seed-demo.sh
 
 ## 6. Histórico de Execução e Validação
 
-O fluxo completo de autenticação OAuth2/OIDC, autorização por papéis, controle de concorrência, submissão de entregas e emissão de pareceres foi homologado contra os endpoints HTTPS do Tailscale Funnel através do script `SIGTCC/scripts/smoke-test.sh`, totalizando **22 verificações bem-sucedidas** (3 autenticações de papéis de usuários + 19 verificações de regras de negócio e proteção de endpoints).
+- **19/11/2026 — Preparação para a Apresentação Final (`v1.0.0`):**
+  - **Smoke test (`SIGTCC/scripts/smoke-test.sh`):** Executado contra os endpoints HTTPS do Tailscale Funnel (`https://sigtcc.cobbler-albacore.ts.net:8443` e `:10000`) com banco recém-criado, totalizando **22 verificações bem-sucedidas** (3 autenticações de papéis de usuários + 19 verificações de regras de negócio, concorrência e proteção de endpoints).
+  - **Cenário limpo de demonstração (`SIGTCC/scripts/seed-demo.sh`):** Após novo reset completo dos volumes (`down -v && up -d`), o script foi executado sem `--validar-roteiro`, concluindo **18 de 18 verificações com sucesso** (login dos 3 perfis no Keycloak, 2 orientadores configurados com 3 vagas disponíveis, turma vigente `2026/2` e prazos `PROJETO_TCC`, `TCC1` e `TCC2` cadastrados, sem solicitações ou entregas prévias do aluno de teste).
 
 ## 7. Limitações Conhecidas
 
