@@ -1,6 +1,6 @@
 # Keycloak: Realm, Clients e Roles do SIGTCC
 
-Este documento descreve a configuração de autenticação do SIGTCC no Keycloak e como reproduzi-la no ambiente de desenvolvimento. A configuração é versionada em [`SIGTCC/keycloak/sigtcc-realm.json`](../SIGTCC/keycloak/sigtcc-realm.json) e importada automaticamente quando o contêiner sobe.
+Este documento descreve a configuração de autenticação do SIGTCC no Keycloak e como reproduzi-la no ambiente de desenvolvimento. A configuração é versionada em [`SIGTCC/keycloak/realm-import.json`](../../SIGTCC/keycloak/realm-import.json) e importada automaticamente quando o contêiner sobe.
 
 > **Somente desenvolvimento.** O arquivo do realm contém usuários e senhas de teste e URLs de `localhost`. Ele não deve ser usado em produção.
 
@@ -36,7 +36,7 @@ Roles de realm, publicadas no token de acesso em `realm_access.roles`:
 | `ROLE_ALUNO`     | Alunos de TCC.                       |
 | `ROLE_PROFESSOR` | Qualquer docente, orientador ou não. |
 
-Não existe role de coordenador. Conforme a seção 1.1 do [relatório de refatoração de escopo](refatoracao-escopo-sprint-3.md), a permissão de gerir a turma e o calendário é verificada no banco de dados, checando se o professor autenticado é o responsável pela `Turma_TCC` do semestre vigente.
+Não existe role de coordenador. Conforme a seção 3 do [relatório de refatoração de escopo da Sprint 3](../entregas/sprint-3.md#3-ajustes-de-escopo), a permissão de gerir a turma e o calendário é verificada no banco de dados, checando se o professor autenticado é o responsável pela `Turma_TCC` do semestre vigente.
 
 ### 1.4 Usuários de teste
 

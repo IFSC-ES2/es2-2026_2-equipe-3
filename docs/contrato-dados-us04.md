@@ -5,7 +5,7 @@
 - **Última Atualização:** 01/11/2026: o aluno do `POST` passa a ser identificado pelo token JWT
 - **Responsável Arquitetural:** Damares Gaia (Arquiteta de Software)
 - **História de Usuário Relacionada:** US04 – Solicitação e Aceite de Orientação (com a fatia operacional da US03 - botão "Solicitar Orientação" no catálogo)
-- **Issue de Critérios de Aceitação:** #11 (cenários 1–2 nativos da issue, com "Aprovado" corrigido para "Aceita"; cenários 3–10 desta seção [11](#11-critérios-de-aceitação-da-us04-formato-bdd) incorporados)
+- **Issue de Critérios de Aceitação:** #11 (cenários 1–2 nativos da issue, com "Aprovado" corrigido para "Aceita"; cenários 3–10 incorporados aos casos de aceitação da issue #11)
 - **Status:** Aprovado para Implementação
 
 ---

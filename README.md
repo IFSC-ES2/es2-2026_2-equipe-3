@@ -1,5 +1,70 @@
 # Sistema de Gestão Centralizada de TCC
 
+O **SIGTCC** é uma aplicação Web que centraliza o fluxo inicial do Trabalho de Conclusão de Curso. Ela reúne o catálogo de orientadores, a solicitação e o aceite de orientação, o calendário de prazos da turma e a submissão e avaliação das entregas do TCC. A versão candidata atual é a **`v1.0.0-rc.1`** (Entrega 9).
+
+## MVP entregue — v1.0.0-rc.1
+
+**Funcionalidades incluídas** (US01 a US07, 29 SP, 100% do [`BASELINE.md`](docs/BASELINE.md)):
+
+| História | Funcionalidade                           | O que o usuário consegue fazer                                                                                                                               |
+| :------- | :--------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| US01     | Autenticação e Perfis de Usuário         | Entrar com e-mail e senha (Keycloak) e ser direcionado ao painel de Aluno ou de Professor, com rotas e endpoints protegidos por papel.                       |
+| US02     | Cadastro de Perfil de Orientador e Vagas | O professor cadastra e edita o próprio perfil de orientador, com departamento, linhas de pesquisa, biografia e número de vagas.                              |
+| US03     | Busca e Filtragem de Orientadores        | O aluno consulta o catálogo e filtra por linha de pesquisa e por disponibilidade de vagas.                                                                   |
+| US04     | Solicitação e Aceite de Orientação       | O aluno envia uma solicitação de orientação; o orientador aceita (consumindo uma vaga) ou recusa com justificativa, e o aluno acompanha o status.            |
+| US05     | Configuração do Calendário de Entregas   | O professor responsável pela turma vigente cadastra os prazos de Projeto de TCC, TCC 1 e TCC 2; alunos e professores veem a contagem regressiva.             |
+| US06     | Submissão de Entregas do TCC             | O aluno com orientação aceita submete cada etapa por link HTTPS, com marcação de atraso e reenvio após pedido de ajustes.                                    |
+| US07     | Avaliação e Parecer das Entregas         | O orientador lista as entregas dos orientandos e registra o parecer (`APROVADO`, `AJUSTES_NECESSARIOS` ou `REPROVADO`), que o aluno acompanha no seu painel. |
+
+**Fora do escopo do MVP** (registrado em [`docs/RETROSPECTIVA.md`](docs/RETROSPECTIVA.md) e na seção 4.1 de [`docs/entregas/release-candidate.md`](docs/entregas/release-candidate.md)):
+
+- **US08 — Agendamento e Organização de Banca:** postergada na Sprint 4 e fechada como fora do escopo do MVP.
+- **Acervo público de TCCs (US09 e US10):** publicação e consulta pública dos trabalhos concluídos.
+- **Upload de arquivos:** substituído pela submissão por link externo HTTPS ([`ADR-0013`](docs/adrs/ADR-0013.md)).
+- **Perfil de Coordenador:** substituído pelo professor responsável pela `Turma_TCC` vigente ([`ADR-0010`](docs/adrs/ADR-0010.md)).
+- Notificações por e-mail, push ou WebSocket; aplicativo mobile; assinatura digital (gov.br); geração de PDFs; integração com o sistema acadêmico (SIGAA).
+
+**Limitação conhecida:** resta apenas o BUG-15 (seed `V5` com IDs fixos), que não afeta bancos criados do zero. Ver a seção [11.1](#111-limitações-conhecidas) e o [relatório de bugs](docs/relatorio-de-bugs.md).
+
+## Acesso rápido
+
+**Ambiente de _staging_** (URLs fixas com HTTPS até a defesa; detalhes na seção [12.1](#121-ambiente-de-staging-oficial-urls-fixas-até-a-defesa)):
+
+| Serviço             | URL                                                                                          |
+| :------------------ | :------------------------------------------------------------------------------------------- |
+| Frontend            | [https://sigtcc.cobbler-albacore.ts.net](https://sigtcc.cobbler-albacore.ts.net)             |
+| Backend (API)       | [https://sigtcc.cobbler-albacore.ts.net:8443](https://sigtcc.cobbler-albacore.ts.net:8443)   |
+| Keycloak (Auth/IAM) | [https://sigtcc.cobbler-albacore.ts.net:10000](https://sigtcc.cobbler-albacore.ts.net:10000) |
+
+**Credenciais de teste** (realm `sigtcc`, válidas no _staging_ e na execução local):
+
+| E-mail                              | Senha          | Perfil                                                    |
+| :---------------------------------- | :------------- | :-------------------------------------------------------- |
+| `aluno@example.com`                 | `aluno123`     | Aluno (`ROLE_ALUNO`)                                      |
+| `professor.orientador@example.com`  | `professor123` | Professor orientador (`ROLE_PROFESSOR`)                   |
+| `professor.responsavel@example.com` | `professor123` | Professor responsável pela `Turma_TCC` vigente (`2026/2`) |
+
+**Dados de demonstração:** em um banco novo, a migration `V5` cria os dois professores acima como orientadores ativos (3 vagas cada) e a turma vigente `2026/2`, sob responsabilidade de `professor.responsavel@example.com`. O aluno não tem solicitações nem entregas, o que permite percorrer o fluxo completo do MVP do início. A preparação do cenário completo de demonstração (linhas de pesquisa e prazos da turma) e o procedimento para recriá-lo ficam em [`docs/staging.md`](docs/staging.md), conforme as issues [#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280) e [#286](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/286).
+
+## Documentação do projeto
+
+| Documento                                                               | Conteúdo                                                                                                                                                                                                                       |
+| :---------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Release Candidate](docs/entregas/release-candidate.md)                 | Planejamento, escopo, rastreabilidade, PRs e contribuições da Entrega 9 (`v1.0.0-rc.1`).                                                                                                                                       |
+| [Testes de Aceitação](docs/ACEITACAO.md)                                | Casos `AT-01` a `AT-07` do MVP, com cenários, usuários e resultados.                                                                                                                                                           |
+| [Arquitetura](docs/ARQUITETURA.md)                                      | Componentes, integrações, migrations e diagramas C4 da arquitetura implementada.                                                                                                                                               |
+| [Decisões Arquiteturais (ADRs)](docs/adrs/)                             | `ADR-0001` a `ADR-0014`, com o status de cada decisão.                                                                                                                                                                         |
+| [Padrões de Projeto](docs/PADROES-DE-PROJETO.md)                        | Strategy (elegibilidade da solicitação) e Observer (atualização de vagas e cancelamentos).                                                                                                                                     |
+| [Métricas](docs/METRICAS.md)                                            | Plano de medição e fichas [`M-01`](docs/metricas/M-01.md) a [`M-06`](docs/metricas/M-06.md).                                                                                                                                   |
+| [Riscos](docs/riscos.md)                                                | Registro, priorização e revisão final dos riscos do projeto.                                                                                                                                                                   |
+| [Retrospectiva](docs/RETROSPECTIVA.md)                                  | Revisão final do MVP (planejado × entregue), retrospectiva das sprints e lições aprendidas.                                                                                                                                    |
+| [Relatório de Bugs](docs/relatorio-de-bugs.md)                          | Triagem final dos 22 achados da revisão estática, com issue e PR de cada correção.                                                                                                                                             |
+| [Deploy e Staging](docs/DEPLOY.md) e [Staging estável](docs/staging.md) | Variáveis de ambiente, execução local, _staging_ fixo, reinício e _rollback_.                                                                                                                                                  |
+| [Integração Contínua](docs/ci.md)                                       | Workflows do GitHub Actions e checks obrigatórios dos PRs.                                                                                                                                                                     |
+| [Fluxo de Trabalho](docs/fluxo-de-trabalho.md)                          | Branches, commits, Pull Requests e cerimônias.                                                                                                                                                                                 |
+| [Declaração de Uso de IA](USO-IA.md)                                    | Uso de ferramentas de IA generativa por entrega e por integrante.                                                                                                                                                              |
+| Contratos de dados da API                                               | [US01](docs/contrato-dados-us01.md), [US02](docs/contrato-dados-us02.md), [US04](docs/contrato-dados-us04.md), [US05](docs/contrato-dados-us05.md), [US06](docs/contrato-dados-us06.md) e [US07](docs/contrato-dados-us07.md). |
+
 ## 1. Equipe
 
 - **DAMARES DO SOCORRO GONCALVES GAIA** (Matrícula: 202510703590)
@@ -12,13 +77,13 @@
 
 Os papéis foram revistos a cada sprint. O papel de Scrum Master é rotativo.
 
-| Integrante                        | Sprint 1 (Entrega 5)                        | Sprint 2 (Entrega 6)                     | Sprint 3 (Entrega 7)                     | Sprint 4 (Entrega 8)                            |
-| :-------------------------------- | :------------------------------------------ | :--------------------------------------- | :--------------------------------------- | :---------------------------------------------- |
-| Damares do Socorro Gonçalves Gaia | Arquiteta de Software                       | **Scrum Master** e Arquiteta de Software | Arquiteta de Software                    | Arquiteta de Software e Desenvolvedora Backend  |
-| Eduardo Cardoso Oliveira          | **Scrum Master** e Engenheiro de Requisitos | Engenheiro de Requisitos                 | Engenheiro de Qualidade (QA)             | DevOps/Infraestrutura                           |
-| Marcus Jhuan Epifanio Lima        | Designer de UX/UI                           | Designer de UX/UI                        | Designer de UX/UI                        | Desenvolvedor Frontend                          |
-| Talles Souza da Cruz              | Engenheiro de Qualidade (QA)                | Engenheiro de Qualidade (QA)             | **Scrum Master** e Desenvolvedor Backend | Desenvolvedor Backend                           |
-| Willian Ferreira dos Santos       | DevOps/Infra                                | DevOps/Infra                             | DevOps/Infra                             | **Scrum Master** e Engenheiro de Qualidade (QA) |
+| Integrante                        | Sprint 1 (Entrega 5)                        | Sprint 2 (Entrega 6)                     | Sprint 3 (Entrega 7)                     | Sprint 4 (Entrega 8)                            | Release Candidate (Entrega 9)                   |
+| :-------------------------------- | :------------------------------------------ | :--------------------------------------- | :--------------------------------------- | :---------------------------------------------- | :---------------------------------------------- |
+| Damares do Socorro Gonçalves Gaia | Arquiteta de Software                       | **Scrum Master** e Arquiteta de Software | Arquiteta de Software                    | Arquiteta de Software e Desenvolvedora Backend  | Arquiteta de Software e Governança              |
+| Eduardo Cardoso Oliveira          | **Scrum Master** e Engenheiro de Requisitos | Engenheiro de Requisitos                 | Engenheiro de Qualidade (QA)             | DevOps/Infraestrutura                           | Coordenação da Entrega 9, DevOps e Governança   |
+| Marcus Jhuan Epifanio Lima        | Designer de UX/UI                           | Designer de UX/UI                        | Designer de UX/UI                        | Desenvolvedor Frontend                          | Desenvolvedor Frontend e UX                     |
+| Talles Souza da Cruz              | Engenheiro de Qualidade (QA)                | Engenheiro de Qualidade (QA)             | **Scrum Master** e Desenvolvedor Backend | Desenvolvedor Backend                           | Coordenação da Entrega 9, QA e Backend          |
+| Willian Ferreira dos Santos       | DevOps/Infra                                | DevOps/Infra                             | DevOps/Infra                             | **Scrum Master** e Engenheiro de Qualidade (QA) | **Scrum Master**, Engenheiro de QA e Governança |
 
 ## 2. Definição e Contextualização do Tema
 
@@ -251,6 +316,8 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 
 - **[Revisão Final do MVP e Retrospectiva do Projeto](docs/RETROSPECTIVA.md):** Comparação "planejado × entregue" de cada funcionalidade da Inception, registro justificado das mudanças de escopo, retrospectiva consolidada das Sprints 1 a 4 (processo, colaboração, riscos, qualidade e previsibilidade), lições aprendidas e o que a equipe faria diferente ([#254](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/254)).
 - **[Relatório de Bugs](docs/relatorio-de-bugs.md):** Triagem final dos 22 achados da revisão estática ([#256](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/256)), com o status de cada bug, as issues e os PRs relacionados.
+- **[Planejamento e Condução da Release Candidate](docs/entregas/release-candidate.md):** Metas, escopo congelado, cronograma, backlog final, matriz de rastreabilidade, Pull Requests e contribuições individuais da Entrega 9 ([#253](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/253)).
+- **[Guia de Deploy e Staging](docs/DEPLOY.md) e [Staging estável](docs/staging.md):** URLs fixas via Tailscale Funnel, restrição de `webOrigins` no Keycloak, procedimento de reinício e _rollback_ ([#260](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/260) e [#284](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/284)).
 - **[Roteiro da Demonstração Final do MVP](docs/ROTEIRO-DEMONSTRACAO.md):** Roteiro estruturado passo a passo da versão `v1.0.0-rc.1` (login → catálogo e filtro → solicitação → aceite → prazos → submissão por link → parecer → reenvio após ajustes), usuários e dados de cada passo, limitações residuais e guia de defesa técnica ([#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280) e [#286](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/286)).
 - **[Testes de Aceitação do MVP](docs/ACEITACAO.md):** Definição, execução e registro dos resultados dos casos de teste de aceitação `AT-01` a `AT-07` cobrindo as histórias centrais US01 a US07 (cenários positivos e negativos de segurança e regras de negócio), homologados com 100% de aprovação ([#267](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/267)).
 
@@ -258,20 +325,16 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 
 A triagem final do relatório de bugs teve este resultado:
 
-- **Corrigidos (16):** BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206`. O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`. O BUG-09 foi corrigido na issue `#261` (PR `#289`), o BUG-12 na issue `#262` (PR `#290`), o BUG-13 na issue `#263` (PR `#293`), o BUG-17 na issue `#266` (PR `#295`), o BUG-21 na issue `#278` (PR `#294`), o BUG-11 na issue `#273` (PR `#296`) e o BUG-18 na issue `#275`.
-- **Limitações conhecidas (6):** os demais, todos de severidade média ou baixa, listados abaixo.
+- **Corrigidos (21):**
+  - BUG-01 a BUG-08, todos os críticos e altos, nas issues `#199` a `#206` (Sprint 4). O BUG-10 também foi corrigido, de forma indireta, pelo PR `#211`.
+  - Na Entrega 9: BUG-09 (issue `#261`, PR `#289`), BUG-11 (`#273`, PR `#296`), BUG-12 (`#262`, PR `#290`), BUG-13 (`#263`, PR `#293`), BUG-14 (`#264`, PR `#270`), BUG-16 (`#265`, PR `#268`), BUG-17 (`#266`, PR `#295`), BUG-18 (`#275`, PR `#297`), BUG-19 (`#277`, PR `#300`), BUG-20 (`#276`, PR `#299`), BUG-21 (`#278`, PR `#294`) e BUG-22 (`#279`, PR `#300`).
+- **Limitações conhecidas (1):** o BUG-15, descrito abaixo.
 
-Nenhum defeito conhecido impede a demonstração do MVP. Detalhes, passos de reprodução e sugestões de correção estão na seção 4 do relatório.
+Nenhum defeito conhecido impede a demonstração do MVP. Detalhes, passos de reprodução e correções estão na seção 4 do relatório.
 
 | Bug    | Severidade | Limitação                                                                                                                                                            |
 | :----- | :--------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| BUG-14 | Média      | O filtro por linha de pesquisa compara por substring ("IA" também traz "Mídias Digitais").                                                                           |
 | BUG-15 | Média      | O seed `V5` usa IDs fixos e pode sobrescrever dados de bancos criados antes dele. Não afeta bancos novos (verificado por teste); decisão registrada na issue `#274`. |
-| BUG-16 | Baixa      | Chave `xspring.application.name` com erro de digitação, e `application.properties` fora de UTF-8.                                                                    |
-| BUG-18 | Baixa      | Após o login, o usuário não volta ao link protegido que tentou abrir.                                                                                                |
-| BUG-19 | Baixa      | Na edição do perfil, campos opcionais nulos geram aviso de input não controlado, e o PATCH reenvia campos extras.                                                    |
-| BUG-20 | Baixa      | O calendário de prazos abre em "Editar prazo" com a data em branco.                                                                                                  |
-| BUG-22 | Baixa      | Qualquer professor pode cadastrar um perfil de orientador com e-mail livre. Edição e remoção já são restritas ao dono do perfil.                                     |
 
 ## 12. Ambiente de Staging e Execução
 
@@ -287,41 +350,42 @@ O ambiente de _staging_ está publicado e acessível publicamente via URLs fixas
 
 ### 12.2. Como executar o aplicativo localmente
 
-Para facilitar a execução dos ambientes de frontend, backend, Keycloak e banco de dados simultaneamente, o projeto está configurado com Docker Compose.
+O projeto pode ser executado inteiramente com Docker Compose (opção A) ou com o banco e o Keycloak no Docker e o backend e o frontend direto na máquina (opção B).
 
 > **Documentação de Deploy e Staging:** Para instruções detalhadas sobre variáveis de ambiente (`.env.example`), execução do ambiente de _staging_ (com `docker-compose.prod.yml`), estratégia de _rollback_ e limitações conhecidas, consulte o **[Guia de Deploy e Staging (`docs/DEPLOY.md`)](docs/DEPLOY.md)**.
 
 ### Pré-requisitos
 
-Certifique-se de ter instalado em sua máquina:
+- [Git](https://git-scm.com/)
+- [Docker](https://docs.docker.com/get-docker/) com [Docker Compose](https://docs.docker.com/compose/install/) v2
+- Apenas para a opção B: **JDK 21** e **Node.js 20+** com npm
 
-- [Docker](https://docs.docker.com/get-docker/)
-- [Docker Compose](https://docs.docker.com/compose/install/)
-
-### Passo a Passo
-
-1. Clone o repositório, crie o arquivo `.env` a partir do `.env.example` e acesse a pasta `SIGTCC`:
+Em qualquer opção, clone o repositório e crie o arquivo `SIGTCC/.env` a partir do `.env.example`:
 
 ```bash
 git clone https://github.com/IFSC-ES2/es2-2026_2-equipe-3.git
 cd es2-2026_2-equipe-3
 cp .env.example SIGTCC/.env
-cd SIGTCC
 ```
 
-2. Construa as imagens e suba os contêineres:
+### Opção A: tudo no Docker (recomendado)
+
+1. Na pasta `SIGTCC`, suba os quatro serviços (`db`, `keycloak`, `backend` e `frontend`):
 
 ```bash
+cd SIGTCC
 docker compose up
 ```
 
-3. Acesse a aplicação no seu navegador:
+A primeira subida leva alguns minutos: o backend baixa as dependências do Gradle e aplica as migrations do Flyway, e o frontend instala as dependências do npm.
+
+2. Acesse a aplicação no navegador:
 
 - **Frontend:** [http://localhost:5173](http://localhost:5173)
 - **Backend (API):** [http://localhost:8080](http://localhost:8080)
 - **Keycloak (console administrativo):** [http://localhost:8081](http://localhost:8081)
 
-4. Faça login no frontend com um dos usuários de teste do realm `sigtcc`:
+3. Faça login no frontend com um dos usuários de teste do realm `sigtcc`:
 
 | Papel                     | E-mail / Usuário                    | Senha          | Role no Keycloak | Vínculo inicial no Banco                                                                                                               |
 | :------------------------ | :---------------------------------- | :------------- | :--------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
@@ -330,6 +394,47 @@ docker compose up
 | **Professor Responsável** | `professor.responsavel@example.com` | `professor123` | `ROLE_PROFESSOR` | Orientador ativo (`ID 2`, depto `DAELN`, `3` vagas disponíveis) e responsável pela `Turma_TCC` vigente (`2026/2`, `responsavelTurma`). |
 
 > **Nota:** O realm é importado automaticamente na primeira subida do Keycloak. Detalhes da configuração e de como alterá-la em [`docs/keycloak/keycloak.md`](docs/keycloak/keycloak.md).
+
+### Opção B: execução manual do backend e do frontend
+
+1. Suba apenas o banco e o Keycloak:
+
+```bash
+cd SIGTCC
+docker compose up -d db keycloak
+```
+
+2. Em outro terminal, execute o backend apontando para o MySQL exposto em `localhost:3306`. As credenciais são as de `MYSQL_USER` e `MYSQL_PASSWORD` do `SIGTCC/.env`:
+
+- **No Linux / macOS:**
+
+```bash
+cd SIGTCC/backend/gestao-tcc
+SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/gestao_tcc \
+SPRING_DATASOURCE_USERNAME=tcc_user \
+SPRING_DATASOURCE_PASSWORD=tcc_password \
+./gradlew bootRun
+```
+
+- **No Windows (PowerShell):**
+
+```powershell
+cd SIGTCC/backend/gestao-tcc
+$env:SPRING_DATASOURCE_URL = "jdbc:mysql://localhost:3306/gestao_tcc"
+$env:SPRING_DATASOURCE_USERNAME = "tcc_user"
+$env:SPRING_DATASOURCE_PASSWORD = "tcc_password"
+.\gradlew bootRun
+```
+
+3. Em um terceiro terminal, execute o frontend. Sem variáveis definidas, ele usa `http://localhost:8080` para a API e `http://localhost:8081` para o Keycloak:
+
+```bash
+cd SIGTCC/frontend
+npm install
+npm run dev
+```
+
+4. Acesse [http://localhost:5173](http://localhost:5173) e faça login com um dos usuários de teste.
 
 ### 12.3. Dados, Usuários e Cenário de Demonstração (Reprodutível)
 
@@ -365,14 +470,18 @@ Para acompanhar os logs da aplicação em tempo real:
 
 ```bash
 docker compose logs -f
-
 ```
 
 Para parar a execução e remover os contêineres:
 
 ```bash
 docker compose down
+```
 
+Para recriar o ambiente do zero, apagando também os volumes do banco e do Keycloak:
+
+```bash
+docker compose down -v
 ```
 
 ## 13. Como executar os testes unitários
@@ -384,49 +493,49 @@ O projeto possui suítes de testes isoladas para as camadas de frontend e backen
 1. Acesse o diretório do frontend a partir da raiz do projeto:
 
 ```bash
-   cd SIGTCC/frontend
+cd SIGTCC/frontend
 ```
 
 2. Instale as dependências locais (caso seja a primeira execução fora do Docker):
 
 ```bash
-   npm install
+npm install
 ```
 
 3. Execute a suíte de testes:
 
 ```bash
-   npm run test
+npm test
 ```
 
 4. Para gerar o relatório de cobertura de código (Code Coverage):
 
 ```bash
-   npm run coverage
+npm run coverage
 ```
 
-> **Nota:** O relatório de cobertura em HTML será gerado na pasta `frontend/coverage`. Você pode abrir o arquivo `index.html` diretamente no seu navegador.
+> **Nota:** O relatório de cobertura em HTML é gerado na pasta `SIGTCC/frontend/coverage`. Você pode abrir o arquivo `index.html` diretamente no navegador.
 
 ### Backend (Spring Boot + Java)
 
 1. Acesse o diretório base do backend:
 
 ```bash
-   cd SIGTCC/backend/gestao-tcc
+cd SIGTCC/backend/gestao-tcc
 ```
 
-2. Execute os testes automatizados utilizando o wrapper do Gradle:
+2. Execute os testes automatizados (unitários e de integração, com H2 em memória) utilizando o wrapper do Gradle:
 
 - **No Linux / macOS:**
 
 ```bash
-     ./gradlew test
+./gradlew test
 ```
 
 - **No Windows (CMD ou PowerShell):**
 
 ```cmd
-     .\gradlew test
+.\gradlew test
 ```
 
-> **Nota:** Para visualizar a cobertura de código do backend, recomenda-se executar os testes diretamente pela sua IDE (como o IntelliJ IDEA) utilizando a opção "Run with Coverage".
+> **Nota:** O `./gradlew build` compila e executa os testes, como no CI. O build não gera relatório de cobertura; para medi-la, use a opção "Run with Coverage" da IDE (como o IntelliJ IDEA). Os valores acompanhados pela equipe estão na métrica [`M-01`](docs/metricas/M-01.md).
