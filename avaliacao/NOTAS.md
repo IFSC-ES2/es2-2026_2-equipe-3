@@ -17,10 +17,10 @@ Todas as notas numéricas estão em escala de **0 a 10**.
 
 ## Nota Parcial
 
-| Integrante | Nota parcial |
-|---|---:|
+| Integrante                        | Nota parcial |
+| --------------------------------- | -----------: |
 | Damares do Socorro Gonçalves Gaia | **8,5 / 10** |
-| Eduardo Cardoso Oliveira | **8,6 / 10** |
-| Marcus Jhuan Epifanio Lima | **7,0 / 10** |
-| Talles Souza da Cruz | **8,5 / 10** |
-| Willian Ferreira dos Santos | **8,3 / 10** |
+| Eduardo Cardoso Oliveira          | **8,6 / 10** |
+| Marcus Jhuan Epifanio Lima        | **7,0 / 10** |
+| Talles Souza da Cruz              | **8,5 / 10** |
+| Willian Ferreira dos Santos       | **8,3 / 10** |
