@@ -2,6 +2,8 @@
 
 Este documento apresenta a **Visão de Contexto (Nível 1 do modelo C4)** do **Sistema de Gestão Centralizada de TCC (SIGTCC)**, destacando os atores humanos do sistema, as fronteiras da aplicação e os sistemas externos com os quais interage.
 
+> **Marco:** `v1.0.0-rc.1` (Entrega 9 – Release Candidate). Em ambiente de _staging_, o acesso externo ocorre via HTTPS (Tailscale Funnel); em desenvolvimento local, via HTTP.
+
 ---
 
 ## 1. Diagrama de Contexto (C1)
