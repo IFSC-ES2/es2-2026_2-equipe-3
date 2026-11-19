@@ -318,6 +318,7 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 - **[Relatório de Bugs](docs/relatorio-de-bugs.md):** Triagem final dos 22 achados da revisão estática ([#256](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/256)), com o status de cada bug, as issues e os PRs relacionados.
 - **[Planejamento e Condução da Release Candidate](docs/entregas/release-candidate.md):** Metas, escopo congelado, cronograma, backlog final, matriz de rastreabilidade, Pull Requests e contribuições individuais da Entrega 9 ([#253](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/253)).
 - **[Guia de Deploy e Staging](docs/DEPLOY.md) e [Staging estável](docs/staging.md):** URLs fixas via Tailscale Funnel, restrição de `webOrigins` no Keycloak, procedimento de reinício e _rollback_ ([#260](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/260) e [#284](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/284)).
+- **[Roteiro da Demonstração Final do MVP](docs/ROTEIRO-DEMONSTRACAO.md):** Roteiro estruturado passo a passo da versão `v1.0.0-rc.1` (login → catálogo e filtro → solicitação → aceite → prazos → submissão por link → parecer → reenvio após ajustes), usuários e dados de cada passo, limitações residuais e guia de defesa técnica ([#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280) e [#286](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/286)).
 - **[Testes de Aceitação do MVP](docs/ACEITACAO.md):** Definição, execução e registro dos resultados dos casos de teste de aceitação `AT-01` a `AT-07` cobrindo as histórias centrais US01 a US07 (cenários positivos e negativos de segurança e regras de negócio), homologados com 100% de aprovação ([#267](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/267)).
 
 ### 11.1. Limitações Conhecidas
@@ -384,7 +385,13 @@ A primeira subida leva alguns minutos: o backend baixa as dependências do Gradl
 - **Backend (API):** [http://localhost:8080](http://localhost:8080)
 - **Keycloak (console administrativo):** [http://localhost:8081](http://localhost:8081)
 
-3. Faça login com um dos usuários de teste listados em [Acesso rápido](#acesso-rápido).
+3. Faça login no frontend com um dos usuários de teste do realm `sigtcc`:
+
+| Papel                     | E-mail / Usuário                    | Senha          | Role no Keycloak | Vínculo inicial no Banco                                                                                                               |
+| :------------------------ | :---------------------------------- | :------------- | :--------------- | :------------------------------------------------------------------------------------------------------------------------------------- |
+| **Aluno**                 | `aluno@example.com`                 | `aluno123`     | `ROLE_ALUNO`     | Criado automaticamente no primeiro envio de solicitação (`POST /api/v1/solicitacoes`).                                                 |
+| **Professor Orientador**  | `professor.orientador@example.com`  | `professor123` | `ROLE_PROFESSOR` | Orientador ativo (`ID 1`, depto `DAELN`, `3` vagas disponíveis).                                                                       |
+| **Professor Responsável** | `professor.responsavel@example.com` | `professor123` | `ROLE_PROFESSOR` | Orientador ativo (`ID 2`, depto `DAELN`, `3` vagas disponíveis) e responsável pela `Turma_TCC` vigente (`2026/2`, `responsavelTurma`). |
 
 > **Nota:** O realm é importado automaticamente na primeira subida do Keycloak. Detalhes da configuração e de como alterá-la em [`docs/keycloak/keycloak.md`](docs/keycloak/keycloak.md).
 
@@ -428,6 +435,34 @@ npm run dev
 ```
 
 4. Acesse [http://localhost:5173](http://localhost:5173) e faça login com um dos usuários de teste.
+
+### 12.3. Dados, Usuários e Cenário de Demonstração (Reprodutível)
+
+Ao subir o ambiente do zero (`docker compose up`), a migração Flyway `V5__seed_professores_e_turma_vigente.sql` cria os dois orientadores base e a turma vigente `2026/2`. Para popular de forma reprodutível e idempotente as **linhas de pesquisa** dos orientadores e os **três prazos oficiais da turma vigente** (`PROJETO_TCC`, `TCC1` e `TCC2`), execute a partir da raiz do repositório:
+
+```bash
+bash SIGTCC/scripts/seed-demo.sh
+```
+
+Esse script autentica os três usuários de teste no Keycloak e configura via API REST o seguinte cenário previsível de demonstração:
+
+- **Catálogo de Orientadores (`GET /api/v1/orientadores`):**
+  - `Professor Orientador` (`professor.orientador@example.com`): departamento `DAELN`, `3` vagas disponíveis, linhas de pesquisa `Engenharia de Software`, `Arquitetura de Sistemas` e `Qualidade de Software`.
+  - `Professor Responsável pela Turma` (`professor.responsavel@example.com`): departamento `DAELN`, `3` vagas disponíveis, linhas de pesquisa `Inteligência Artificial`, `Ciência de Dados` e `Engenharia de Software`.
+- **Turma Vigente e Calendário de Prazos (`GET /api/v1/prazos`):**
+  - Turma `2026/2` (`vigente = true`), sob responsabilidade de `professor.responsavel@example.com`.
+  - Prazos cadastrados em ordem cronológica futura: `PROJETO_TCC` (`+30 dias`), `TCC1` (`+60 dias`) e `TCC2` (`+90 dias`).
+- **Aluno (`aluno@example.com`):** sem solicitações ou entregas prévias, permitindo executar do início ao fim o roteiro da demonstração (login → busca e filtro por linha de pesquisa e vagas → envio de solicitação → aceite pelo orientador com decremento de vaga → consulta/edição de prazos → submissão de entrega por link HTTPS → avaliação com parecer `AJUSTES_NECESSARIOS` → reenvio e parecer `APROVADO`).
+
+Para **recriar o cenário limpo do zero** a qualquer momento (por exemplo, antes de uma nova bateria de avaliação ou apresentação):
+
+```bash
+cd SIGTCC
+docker compose down -v
+docker compose up -d
+cd ..
+bash SIGTCC/scripts/seed-demo.sh
+```
 
 ### Comandos Úteis
 

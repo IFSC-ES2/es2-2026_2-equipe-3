@@ -64,8 +64,8 @@ A Entrega 9 opera sem adição de novas funcionalidades de produto, concentrando
 
 ### 3.3 Preparação para a Apresentação e Demonstração Final (Item 2.8 do Edital)
 
-1. **Dados, usuários e cenário de demonstração ([#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280)):** Garantir massa de dados mínima e usuários de teste previsíveis e documentados no README e em `docs/staging.md` (perfis de aluno, orientador e responsável pela turma) para viabilizar avaliação independente pelo professor.
-2. **Roteiro da demonstração final ([#286](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/286)):** Elaborar roteiro estruturado sequencial para apresentação técnica de 15 minutos cobrindo: login → catálogo e busca → solicitação de orientação → aceite pelo orientador → configuração de prazos → submissão por link externo HTTPS → avaliação e parecer → reenvio após ajustes, destacando a versão `v1.0.0-rc.1` e os riscos/limitações residuais conhecidos.
+1. **Dados, usuários e cenário de demonstração ([#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280)):** Garantir massa de dados mínima e usuários de teste previsíveis e documentados no README e em `docs/staging.md` (perfis de aluno, orientador e responsável pela turma), com script reprodutível `SIGTCC/scripts/seed-demo.sh`, para viabilizar avaliação independente pelo professor.
+2. **Roteiro da demonstração final ([#286](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/286)):** Elaborar roteiro estruturado sequencial em [`docs/ROTEIRO-DEMONSTRACAO.md`](../ROTEIRO-DEMONSTRACAO.md) para apresentação técnica de 15 minutos cobrindo: login → catálogo e busca → solicitação de orientação → aceite pelo orientador → configuração de prazos → submissão por link externo HTTPS → avaliação e parecer → reenvio após ajustes, destacando a versão `v1.0.0-rc.1` e os riscos/limitações residuais conhecidos.
 
 ### 3.4 Hardening Técnico, Correção de Bugs e Estabilização de Staging
 
@@ -271,24 +271,100 @@ Detalhamento em [`docs/riscos.md`](../riscos.md) (seção 7) e [`docs/relatorio-
 
 ## 11. Contribuições Individuais
 
-> _Seção a preencher ao final da entrega por cada integrante, com as respectivas issues, PRs, commits e revisões._
+Registro das atividades executadas pelos integrantes da equipe na Entrega 9 (Release Candidate), consolidando tarefas de planejamento, correções de bugs (hardening), melhorias de governança/CI, elaboração de documentação e revisões técnicas de Pull Requests.
 
 ### 11.1 Damares do Socorro Gonçalves Gaia
 
-- _A preencher._
+- **Revisão Final do MVP e Retrospectiva do Projeto (Issue [#254](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/254) / [PR #271](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/271)):**
+  - Elaboração de [`docs/RETROSPECTIVA.md`](../RETROSPECTIVA.md) com a tabela comparativa "planejado na Inception × efetivamente entregue" (`US01` a `US10`), justificativa das mudanças de escopo/ADRs e retrospectiva consolidada das Sprints 1 a 4, além da atualização com o hardening final da Entrega 9 (commits `07a0dd6`, `a4539e5`).
+- **Revisão Final de Arquitetura, Diagramas C4, ADRs e Padrões OO (Issue [#281](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/281) / [PR #302](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/302)):**
+  - Conferência e atualização de [`docs/ARQUITETURA.md`](../ARQUITETURA.md), [`docs/diagramas/c1-contexto.md`](../diagramas/c1-contexto.md) e [`docs/diagramas/c2-conteineres.md`](../diagramas/c2-conteineres.md) (incluindo Tailscale Funnel, Flyway `V1`–`V9` e busca de JWKS sob demanda), criação da visão C3 do backend em [`docs/diagramas/c3-componentes-backend.md`](../diagramas/c3-componentes-backend.md), revisão das ADRs `0001` a `0014` e sincronização de [`docs/PADROES-DE-PROJETO.md`](../PADROES-DE-PROJETO.md) separando consumidores implementados de extensões futuras (commits `32b413c`, `5b6b919`, `20e8b8d`).
+- **Hardening — BUG-09: Conflito de e-mail entre aluno e orientador (Issue [#261](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/261) / [PR #289](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/289)):**
+  - Criação de `UsuarioRepository.existsByEmailIgnoreCase` e validação unificada em `OrientadorService` e `SolicitacaoService` para retornar HTTP `409 Conflict` em conflitos entre aluno e orientador, com testes unitários e de integração (`OrientadorServiceTest`, `SolicitacaoServiceTest`, `OrientadorControllerIntegrationTest`, `SolicitacaoControllerIntegrationTest`) e atualização dos contratos US02/US04, `README.md` e `docs/relatorio-de-bugs.md` (commits `345d4d5`, `3dae1fd`).
+- **Atualização da Ficha de Métrica M-06 — Cumprimento da Capacidade (Issue [#282](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/282)):**
+  - Consolidação da memória de cálculo da Entrega 9 (`28h/28h`, 100%) e do cumprimento global do semestre em [`docs/metricas/M-06.md`](../metricas/M-06.md) (branch `docs/282-fechamento-metricas`).
+- **Revisões de PRs Realizadas:**
+  - Revisão técnica (`CHANGES_REQUESTED`) e aprovação formal (`APPROVED`) do [PR #258](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/258) (`docs/entregas/release-candidate.md`).
 
 ### 11.2 Eduardo Cardoso Oliveira
 
-- _A preencher._
+- **Planejamento e Condução da Entrega 9 (Issue [#253](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/253) / [PR #258](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/258)):**
+  - Elaboração, acompanhamento e consolidação do documento-mestre da Release Candidate [`docs/entregas/release-candidate.md`](release-candidate.md), estruturando metas, escopo congelado, matriz de rastreabilidade e governança (commits `5526804`, `ee52982`).
+- **Hardening — BUG-21: Timestamp determinístico com Clock no ErrorResponseDTO (Issue [#278](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/278) / [PR #294](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/294)):**
+  - Injeção de `Clock` gerenciado pelo Spring no `GlobalExceptionHandler` e refatoração de `ErrorResponseDTO` para exigir `Instant`;
+  - Adição de testes unitários em `OrientadorControllerTest` e `SolicitacaoControllerTest`, além de teste de integração determinístico com `@TestConfiguration` fixando o relógio institucional em `OrientadorControllerIntegrationTest` (commits `0b52bea`, `ba2e7b5`, `e4dbdcc`).
+- **Hardening — BUG-18: Preservação de rota e parâmetros após o login (Issue [#275](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/275) / [PR #297](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/297)):**
+  - Atualização do `ProtectedRoute.tsx` para passar `state={{ from: location }}` e refatoração do `LoginPage/index.tsx` para preservar caminhos, query parameters (`search`) e hashes, com salvaguarda contra loops em `/login` e redirecionamento seguro da raiz `/` evitando falsos "Acesso Negado";
+  - Adição de testes unitários e de fluxo completo ponta a ponta (`/acompanhar/15` → `/login` → `/acompanhar/15`) no Vitest (`ProtectedRoute.test.tsx` e `Login.test.tsx`) (commits `24c56e2`, `559fdbe`).
+- **Hardening — BUG-14: Filtro por linha de pesquisa com correspondência exata (Issue [#264](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/264) / [PR #270](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/270)):**
+  - Implementação de query estrita no `OrientadorRepository` e testes unitários de repositório em `OrientadorRepositoryTest` garantindo que buscas parciais (ex.: "IA") não retornem linhas não relacionadas (commit `9a84c16`).
+- **Revisões de PRs Realizadas:**
+  - Revisão e aprovação do [PR #293](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/293) (BUG-13: Inativação de orientador com cancelamento em cascata e migration `V9`);
+  - Revisão e aprovação do [PR #296](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/296) (BUG-11: Limites de tamanho nos DTOs de orientador);
+  - Revisão do [PR #301](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/301) (Reconciliação do backlog e board com escopo final do MVP);
+  - Revisão e ajustes do [PR #302](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/302) (Revisão arquitetural, C3 e status de ADRs);
+  - Revisão e aprovação do [PR #271](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/271) (Retrospectiva geral do projeto).
 
 ### 11.3 Marcus Jhuan Epifanio Lima
 
-- _A preencher._
+- **Correção de BUG — Issue [#276](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/276) / PR [#299](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/299):**
+  - Ajuste do carregamento inicial da data limite no componente `GestaoCalendario`, garantindo o preenchimento do prazo do tipo inicialmente selecionado e a atualização da data ao trocar o tipo.
+  - Adição de teste cobrindo o carregamento inicial e a troca de tipo ([commit 4d5b93c](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/commit/4d5b93c)).
+- **Correção de BUG — Issue [#277](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/277) / PR [#300](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/300):**
+  - Normalização dos campos `departamento` e `biografia` quando recebidos como `null` e ajuste do PATCH para enviar somente os campos editáveis do perfil de orientador.
+  - Atualização dos testes de edição do perfil ([commit dfe6373](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/commit/dfe6373)).
+- **Correção de BUG — Issue [#279](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/279) / PR [#300](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/300):**
+  - Vinculação do cadastro de orientador ao e-mail do usuário autenticado no Keycloak, impedindo a edição desse campo no frontend.
+  - Validação no backend para rejeitar o cadastro quando o e-mail informado diverge do e-mail do usuário autenticado, com teste cobrindo essa tentativa ([commit dfe6373](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/commit/dfe6373)).
+- **Revisões de PRs Realizadas:**
+  - Eduardo Cardoso aprovou os PRs [#299](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/299) e [#300](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/300).
 
 ### 11.4 Talles Souza da Cruz
 
-- _A preencher._
+- **Relatório de Bugs e Limitações Conhecidas (Issue [#256](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/256) / [PR #257](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/257)):**
+  - Versionamento de [`docs/relatorio-de-bugs.md`](../relatorio-de-bugs.md) com a triagem final dos bugs (ID, severidade, status, issue e PR), contornos e detalhamento de cada item;
+  - Inclusão da tabela de limitações conhecidas no `README.md` e manutenção do relatório atualizado a cada correção de bug da entrega (commits `7aaf7b1`, `90f3d5d`).
+- **Hardening — BUG-16: Chave `spring.application.name` e codificação do `application.properties` (Issue [#265](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/265) / [PR #268](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/268)):**
+  - Correção da chave inválida `xspring.application.name` e conversão do arquivo para UTF-8, eliminando os comentários com acentuação corrompida (commits `ed201a8`, `2256625`).
+- **Hardening — BUG-12: Ausência de handler genérico de exceções (Issue [#262](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/262) / [PR #290](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/290)):**
+  - Adição dos handlers de `DataIntegrityViolationException` (409) e `Exception` (500) no `GlobalExceptionHandler`, preservando o status original das exceções do próprio Spring e sem expor detalhes internos na resposta;
+  - Testes unitários em `GlobalExceptionHandlerTest`, teste de integração em `OrientadorControllerIntegrationTest` e atualização do contrato `docs/contrato-dados-us04.md` (commits `656b534`, `474a902`, `5fdd0e4`, `f7fae8c`).
+- **Hardening — BUG-13: Orientador desativado continuava listado e operando (Issue [#263](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/263) / [PR #293](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/293)):**
+  - Remoção do orientador inativo do catálogo, bloqueio de novas solicitações e do aceite/recusa por orientador desativado em `OrientadorService` e `SolicitacaoService`, e migration `V9` para cancelar solicitações `PENDENTE` de orientadores já desativados;
+  - Testes unitários, de repositório e de integração escritos antes da correção, atualização dos contratos US02 e US04 e resolução dos conflitos com o PR #289 (commits `43f9417`, `e67eb14`, `3319db7`, `508379c`, `677ed70`).
+- **Hardening — BUG-17: Contador de vagas exibia "—" sem solicitações (Issue [#266](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/266) / [PR #295](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/295)):**
+  - Ajuste do `PainelSolicitacoes` para exibir as vagas disponíveis mesmo quando o orientador ainda não recebeu solicitações, com novos testes no Vitest (commits `5793089`, `cfdf21d`).
+- **Hardening — BUG-11: Limites de tamanho nos DTOs de orientador (Issue [#273](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/273) / [PR #296](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/296)):**
+  - Anotações `@Size` em `OrientadorRequestDTO` e `OrientadorUpdateDTO` alinhadas ao tamanho das colunas do banco, testes de limite em `OrientadorControllerTest` e atualização do contrato `docs/contrato-dados-us02.md` (commits `95a31de`, `ac7893e`, `5d8fcb3`, `8dbb7ed`, `905e390`).
+- **Hardening — BUG-15: Seed V5 pode sobrescrever dados existentes (Issue [#274](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/274) / [PR #298](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/298)):**
+  - Análise do comportamento do Flyway e decisão registrada de manter o bug como limitação conhecida, já que uma nova migration não preveniria nem desfaria o problema;
+  - Criação do `MigracoesFlywayTest`, que executa todas as migrations em banco vazio e verifica o estado deixado pelo seed, e correção da lista de migrations em `docs/ARQUITETURA.md` (commit `8c2a7a9`).
+- **Revisões de PRs Realizadas:**
+  - Revisão e aprovação do [PR #289](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/289) (BUG-09: Conflito de e-mail entre aluno e orientador);
+  - Revisão e aprovação do [PR #291](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/291) (Atualização das GitHub Actions e ruleset);
+  - Revisão e aprovação do [PR #294](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/294) (BUG-21: Timestamp determinístico com Clock);
+  - Revisão do [PR #258](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/258) (Planejamento e condução da Entrega 9);
+  - Revisão e integração dos PRs [#269](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/269) (staging estável), [#271](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/271) (retrospectiva), [#297](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/297) (BUG-18: redirecionamento após o login), [#301](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/301) (backlog e board) e [#303](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/303) (revisão final de riscos).
 
 ### 11.5 Willian Ferreira dos Santos
 
-- _A preencher._
+- **Reconciliação do Backlog e Board com o Escopo Final do MVP (Issue [#255](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/255) / [PR #301](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/301)):**
+  - Conferência do backlog, dos milestones e do board do GitHub Projects em relação ao escopo final do MVP, verificando a situação das histórias US01 a US07 e seus respectivos critérios de aceitação;
+  - Revisão dos critérios de aceitação das US04 e US07, incluindo a adequação da descrição da US06 à implementação por link externo HTTPS, conforme a ADR-0013;
+  - Atualização de `docs/entregas/release-candidate.md`, incluindo a consolidação do backlog final e a rastreabilidade das histórias concluídas e postergadas;
+  - Registro do fechamento da US08 como fora do escopo do MVP, conforme a decisão documentada na seção 10.4 de `docs/entregas/sprint-4.md`.
+
+- **Revisão Final do Registro de Riscos (Issue [#283](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/283) / [PR #303](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/303)):**
+  - Revisão do registro de riscos em `docs/riscos.md`, consolidando a situação final dos riscos R01 a R13 e identificando os riscos residuais da release;
+  - Análise da correspondência entre os riscos registrados, o histórico das entregas, as correções documentadas em `docs/relatorio-de-bugs.md` e as decisões arquiteturais registradas nas ADRs;
+  - Atualização da seção de limitações e riscos residuais em `docs/entregas/release-candidate.md`, mantendo a rastreabilidade entre os riscos e as evidências do projeto.
+
+- **Atualização da Ficha de Métrica M-02 — Densidade de Defeitos Abertos:**
+  - Revisão da ficha `docs/metricas/M-02.md` para consolidar o acompanhamento da métrica na Entrega 9;
+  - Análise da quantidade de Issues abertas com as labels `bug` ou `defeito`, confirmando manualmente no GitHub a inexistência de defeitos em aberto na data do acompanhamento;
+  - Registro da densidade específica da Entrega 9 como não aplicável (N/A), devido à ausência de novos Story Points concluídos no período, e proposta de apresentação do resultado acumulado do MVP considerando as US01 a US07;
+  - Revisão dos critérios de coleta, interpretação e histórico da métrica, diferenciando defeitos em aberto de limitações conhecidas documentadas no relatório de bugs.
+
+- **Revisões de PRs Realizadas:**
+  - Revisão e aprovação do [PR #257](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/257) (Relatório final de bugs e registro de limitações conhecidas).
+  - Revisão e aprovação do [PR #270](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/270) (Correção do filtro de orientadores por linha de pesquisa, substituindo a comparação por substring por igualdade exata, sem diferenciar maiúsculas de minúsculas).
