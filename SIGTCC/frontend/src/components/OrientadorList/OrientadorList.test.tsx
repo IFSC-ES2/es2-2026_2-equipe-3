@@ -17,6 +17,16 @@ const renderOrientadorList = () =>
     </MemoryRouter>,
   );
 
+const selecionarLinhaDePesquisa = async (
+  user: ReturnType<typeof userEvent.setup>,
+  linha: string,
+) => {
+  // Espera a opção ser renderizada: ela só aparece depois que a resposta de
+  // listarOrientadores atualiza linhasDisponiveis (Issue #313).
+  await screen.findByRole("option", { name: linha });
+  await user.selectOptions(screen.getByLabelText("Linha de pesquisa"), linha);
+};
+
 describe("OrientadorList", () => {
   const mockOrientadores: Orientador[] = [
     {
@@ -119,7 +129,7 @@ describe("OrientadorList", () => {
     });
 
     vi.mocked(listarOrientadores).mockResolvedValue([]);
-    await user.selectOptions(screen.getByLabelText("Linha de pesquisa"), "IA");
+    await selecionarLinhaDePesquisa(user, "IA");
 
     await waitFor(() => {
       expect(
@@ -152,7 +162,7 @@ describe("OrientadorList", () => {
     });
 
     vi.mocked(listarOrientadores).mockResolvedValue([]);
-    await user.selectOptions(screen.getByLabelText("Linha de pesquisa"), "IA");
+    await selecionarLinhaDePesquisa(user, "IA");
 
     await waitFor(() => {
       expect(
@@ -213,8 +223,7 @@ describe("OrientadorList", () => {
       });
     });
 
-    const seletor = screen.getByLabelText("Linha de pesquisa");
-    await user.selectOptions(seletor, "IA");
+    await selecionarLinhaDePesquisa(user, "IA");
 
     await waitFor(() => {
       expect(vi.mocked(listarOrientadores)).toHaveBeenLastCalledWith({
@@ -266,17 +275,8 @@ describe("OrientadorList", () => {
 
     renderOrientadorList();
 
-    await waitFor(() => {
-      expect(
-        screen.getByRole("option", { name: "Direito Digital" }),
-      ).toBeInTheDocument();
-    });
-
     vi.mocked(listarOrientadores).mockResolvedValue([]);
-    await user.selectOptions(
-      screen.getByLabelText("Linha de pesquisa"),
-      "Direito Digital",
-    );
+    await selecionarLinhaDePesquisa(user, "Direito Digital");
 
     await waitFor(() => {
       expect(
@@ -308,7 +308,7 @@ describe("OrientadorList", () => {
       ).not.toBeInTheDocument();
     });
 
-    await user.selectOptions(screen.getByLabelText("Linha de pesquisa"), "IA");
+    await selecionarLinhaDePesquisa(user, "IA");
     await user.click(screen.getByLabelText("Somente com vagas disponíveis"));
 
     await waitFor(() => {
@@ -335,8 +335,7 @@ describe("OrientadorList", () => {
       });
     });
 
-    const seletor = screen.getByLabelText("Linha de pesquisa");
-    await user.selectOptions(seletor, "IA");
+    await selecionarLinhaDePesquisa(user, "IA");
 
     const toggleVagas = screen.getByLabelText("Somente com vagas disponíveis");
     await user.click(toggleVagas);
@@ -382,8 +381,8 @@ describe("OrientadorList", () => {
       ).not.toBeInTheDocument();
     });
 
+    await selecionarLinhaDePesquisa(user, "IA");
     const seletor = screen.getByLabelText("Linha de pesquisa");
-    await user.selectOptions(seletor, "IA");
 
     const toggleVagas = screen.getByLabelText("Somente com vagas disponíveis");
     await user.click(toggleVagas);
