@@ -1,7 +1,7 @@
-# Roteiro da Demonstração Final do MVP — SIGTCC (`v1.0.0-rc.1`)
+# Roteiro da Demonstração Final do MVP — SIGTCC (`v1.0.0`)
 
 - **Sistema:** Sistema de Gestão Centralizada de TCC (SIGTCC)
-- **Versão Demonstrada (Tag Oficial):** [`v1.0.0-rc.1`](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/releases/tag/v1.0.0-rc.1) (Release Candidate — Entrega 9)
+- **Versão Demonstrada (Tag Oficial):** [`v1.0.0`](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/releases/tag/v1.0.0) (Versão Final — Entrega 10)
 - **Tempo Estimado da Demonstração:** 10 a 15 minutos
 - **Rastreabilidade:** Issues [#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280) e [#286](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/286)
 
@@ -9,9 +9,9 @@
 
 ## 1. Ambientes e Pré-condição Reprodutível
 
-A demonstração da versão **`v1.0.0-rc.1`** pode ser conduzida tanto no ambiente oficial de _staging_ (exposto com HTTPS fixo via Tailscale Funnel) quanto localmente via Docker Compose:
+A demonstração da versão **`v1.0.0`** pode ser conduzida tanto no ambiente oficial de _staging_ (exposto com HTTPS fixo via Tailscale Funnel) quanto localmente via Docker Compose:
 
-| Serviço             | Ambiente de Staging (`v1.0.0-rc.1`)            | Ambiente Local (`docker compose up`) |
+| Serviço             | Ambiente de Staging (`v1.0.0`)                 | Ambiente Local (`docker compose up`) |
 | :------------------ | :--------------------------------------------- | :----------------------------------- |
 | **Frontend (SPA)**  | `https://sigtcc.cobbler-albacore.ts.net`       | `http://localhost:5173`              |
 | **Backend (API)**   | `https://sigtcc.cobbler-albacore.ts.net:8443`  | `http://localhost:8080`              |
