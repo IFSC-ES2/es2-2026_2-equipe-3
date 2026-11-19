@@ -279,21 +279,21 @@ ISSUES RELACIONADAS: #13 (Épico), #208, #209, #216, #218, #223, #226, #228
 #### Cenários Executados:
 
 1. **Cenário 6.1 — Submissão no Prazo com Link HTTPS (Caminho Feliz):**
-   - **Critério validado:** `#13` (adaptado pela `ADR-0013` em `docs/contrato-dados-us06.md`, decisão D7) e `#216`.
+   - **Critério validado:** `#13`, Cenários 1 e 7 (adaptado pela `ADR-0013` em `docs/contrato-dados-us06.md`, decisão D7) e `#216`.
    - **Passos:** Logado como Aluno, acessar `/minhas-entregas`, selecionar o tipo `PROJETO_TCC`, informar o link `https://drive.google.com/file/d/meu-tcc-v1/view` e submeter.
    - **Resultado Esperado:** Entrega criada com `HTTP 201 Created`, status `SUBMETIDO`, `enviadoEm` preenchido pelo servidor com `Clock` injetado e flag `atrasada: false`.
    - **Cobertura automatizada:** `smoke-test.sh` (bloco 4), `EntregaControllerIntegrationTest.java`, `SubmissaoEntrega.test.tsx`.
    - **Resultado Obtido:** **Aprovado**.
 
 2. **Cenário 6.2 — Submissão com Protocolo Inseguro HTTP (Negativo - 400):**
-   - **Critério validado:** `#13` + `#218` (`ADR-0013`).
+   - **Critério validado:** `#13`, Cenário 2 e `#218` (`ADR-0013`).
    - **Passos:** Tentar enviar submissão informando URL com protocolo HTTP: `http://drive.google.com/arquivo`.
    - **Resultado Esperado:** A validação de URL rejeita a requisição com `HTTP 400 Bad Request` e a mensagem `"A URL do documento deve ser válida e utilizar o protocolo https."`.
    - **Cobertura automatizada:** `smoke-test.sh` (bloco 4), `EntregaControllerIntegrationTest.java`, `SubmissaoEntrega.test.tsx`.
    - **Resultado Obtido:** **Aprovado**.
 
 3. **Cenário 6.3 — Acesso Negado ao Consultar Entrega Alheia (Negativo - 403):**
-   - **Critério validado:** `#13` + `#223` (`docs/contrato-dados-us06.md`).
+   - **Critério validado:** `#14`, Cenário 6 (autorização por vínculo) e `#223` (`docs/contrato-dados-us06.md`).
    - **Passos:** Autenticado como outro usuário não vinculado à entrega (outro aluno ou professor que não é o orientador da entrega), tentar acessar `GET /api/v1/entregas/{id}`.
    - **Resultado Esperado:** A camada de serviço valida a propriedade/vínculo do recurso e bloqueia com `HTTP 403 Forbidden`.
    - **Cobertura automatizada:** `smoke-test.sh` (bloco 5: professor não orientador recebe `403`), `EntregaControllerIntegrationTest.java`, `EntregaServiceTest.java`.
@@ -317,7 +317,7 @@ ISSUES RELACIONADAS: #14 (Épico), #209, #210, #215, #227, #229
 #### Cenários Executados:
 
 1. **Cenário 7.1 — Parecer com Ajustes Necessários e Reenvio do Aluno (Caminho Feliz com Ressalva de UI):**
-   - **Critério validado:** `#14` + `#209`, `#210`, `#215`, `#226` (`docs/contrato-dados-us07.md`).
+   - **Critério validado:** `#14`, Cenário 3, e `#13`, Cenário 6 (`#209`, `#210`, `#215`, `#226`, `docs/contrato-dados-us07.md`).
    - **Passos:** Logado como `professor.orientador@example.com`, acessar `/avaliar-entregas`, selecionar o trabalho do orientando e registrar parecer `AJUSTES_NECESSARIOS` com comentário obrigatório. Em seguida, logar como Aluno em `/minhas-entregas` e reenviar novo link `https://drive.google.com/file/d/meu-tcc-v2/view`.
    - **Resultado Esperado:** Parecer registrado com `HTTP 200 OK`, status da entrega muda para `AJUSTES_NECESSARIOS` e o aluno visualiza o status e reenvia novo link (voltando a `SUBMETIDO`).
    - **Ressalva observada:** Na tela `/minhas-entregas`, o aluno visualiza o status `AJUSTES_NECESSARIOS` e o aviso para reenvio, mas o texto do comentário do orientador (embora retornado pela API) não é exibido no frontend.
@@ -325,21 +325,21 @@ ISSUES RELACIONADAS: #14 (Épico), #209, #210, #215, #227, #229
    - **Resultado Obtido:** **Aprovado com ressalvas**.
 
 2. **Cenário 7.2 — Parecer de Ajustes sem Comentário (Negativo - 422):**
-   - **Critério validado:** `#14` + `#215` (`docs/contrato-dados-us07.md`, decisão D2).
+   - **Critério validado:** `#14`, Cenário 5 e `#215` (`docs/contrato-dados-us07.md`, decisão D2).
    - **Passos:** O orientador submeter parecer `AJUSTES_NECESSARIOS` ou `REPROVADO` deixando o comentário vazio.
    - **Resultado Esperado:** Rejeição com `HTTP 422 Unprocessable Entity` informando que o comentário é obrigatório quando há exigência de ajustes ou reprovação.
    - **Cobertura automatizada:** `smoke-test.sh` (bloco 5), `EntregaParecerIntegrationTest.java`, `AvaliacaoEntrega.test.tsx`.
    - **Resultado Obtido:** **Aprovado**.
 
 3. **Cenário 7.3 — Aprovação Final e Bloqueio de Alterações Posteriores (Caminho Feliz + 409):**
-   - **Critério validado:** `#14` + `#215` + `#226`.
+   - **Critério validado:** `#14`, Cenários 2 e 7, e `#13`, Cenário 5 (`#215`, `#226`).
    - **Passos:** O orientador emitir parecer `APROVADO`. Em seguida, o orientador tentar emitir novo parecer na mesma entrega ou o aluno tentar reenviar link.
    - **Resultado Esperado:** Parecer `APROVADO` encerra o ciclo daquela etapa (`HTTP 200`). Novas tentativas de avaliação ou reenvio retornam `HTTP 409 Conflict`.
    - **Cobertura automatizada:** `smoke-test.sh` (bloco 5: novo parecer após `APROVADO` retorna `409`), `EntregaParecerIntegrationTest.java`, `EntregaServiceTest.java`.
    - **Resultado Obtido:** **Aprovado**.
 
 4. **Cenário 7.4 — Professor Não Vinculado Tenta Avaliar Entrega (Negativo - 403):**
-   - **Critério validado:** `#14` + `#215`.
+   - **Critério validado:** `#14`, Cenário 6 e `#215`.
    - **Passos:** Um docente que não é o orientador daquele aluno tentar disparar `POST /api/v1/entregas/{id}/parecer`.
    - **Resultado Esperado:** Acesso negado com `HTTP 403 Forbidden` e a mensagem `"Somente o orientador vinculado à entrega pode registrar parecer."`.
    - **Cobertura automatizada:** `EntregaParecerIntegrationTest.java` e `EntregaServiceTest.java` (`smoke-test.sh` verifica o bloqueio `403` para aluno tentando registrar parecer e para professor não orientador no `GET`).
