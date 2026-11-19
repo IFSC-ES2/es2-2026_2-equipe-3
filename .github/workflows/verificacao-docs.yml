@@ -34,3 +34,14 @@ jobs:
         run: |
           docker compose -f SIGTCC/docker-compose.yml config -q
           docker compose -f SIGTCC/docker-compose.prod.yml config -q
+
+      - name: Verificar links internos da documentação
+        uses: lycheeverse/lychee-action@v2.0.2
+        with:
+          args: >-
+            --offline
+            --no-progress
+            --include-fragments
+            --exclude-path node_modules
+            './**/*.md'
+          fail: true

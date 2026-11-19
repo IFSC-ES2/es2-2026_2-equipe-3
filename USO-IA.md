@@ -558,3 +558,252 @@ Validação Técnica: Conferência dos resultados das execuções e verificaçã
 Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. As sugestões foram utilizadas como apoio ao planejamento, à implementação, à análise de requisitos, à elaboração de testes e à revisão técnica, sem substituir a tomada de decisões ou a responsabilidade do integrante. Os testes automatizados foram executados localmente para verificar o comportamento das funcionalidades e a consistência das alterações com os contratos de dados e critérios de aceitação do projeto.
 
 O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto, pelas alterações realizadas e pelos artefatos entregues.
+
+---
+
+## Entrega 9 (Release Candidate):
+
+Em conformidade com as diretrizes da disciplina e visando garantir a transparência, rastreabilidade e integridade acadêmica, apresentamos as declarações de uso de Inteligência Artificial generativa referentes à Entrega 9 (Release Candidate - 16/11/2026 a 18/11/2026), organizadas por integrante responsável:
+
+---
+
+### Eduardo Cardoso Oliveira
+
+#### Planejamento e Condução da Entrega 9 (Issue #253 / PR #258)
+
+- **Data:** 16/11/2026 a 17/11/2026
+- **Ferramenta:** Gemini
+- **Artefatos:** `docs/entregas/release-candidate.md`
+- **Aproveitamento:** Apoio na estruturação inicial do documento-mestre da Release Candidate, formatação de tabelas da matriz de rastreabilidade, definição dos critérios de aceitação da entrega e consolidação das metas.
+- **Adaptação/Descarte:** Foram ajustadas manualmente as contagens de story points (congelamento em 29 SP), o escopo congelado de hardening dos 10 bugs selecionados da triagem e alinhamento do branch ruleset para a `entrega-9`.
+- **Validação Técnica:** Verificação de links relativos, formatação com Prettier, revisão com apontamentos da Arquiteta de Software (Damares) e merge do PR #258 na branch `entrega-9`.
+
+#### Hardening — BUG-21: Timestamp determinístico com Clock no ErrorResponseDTO (Issue #278 / PR #294)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude 3.5 Sonnet
+- **Artefatos:** `backend/src/main/java/br/edu/ifsc/gestao_tcc/config/ClockConfig.java`, `backend/src/main/java/br/edu/ifsc/gestao_tcc/dto/ErrorResponseDTO.java`, `backend/src/main/java/br/edu/ifsc/gestao_tcc/exception/GlobalExceptionHandler.java`, `backend/src/test/java/br/edu/ifsc/gestao_tcc/controller/OrientadorControllerTest.java`, `backend/src/test/java/br/edu/ifsc/gestao_tcc/controller/SolicitacaoControllerTest.java` e `backend/src/test/java/br/edu/ifsc/gestao_tcc/integration/OrientadorControllerIntegrationTest.java`
+- **Aproveitamento:** Apoio na identificação da causa raiz do teste instável (timestamp não determinístico gerado com `Instant.now()` dentro do DTO), sugestão de injeção de `Clock` no `GlobalExceptionHandler` e esqueleto da classe `@TestConfiguration` para fixar o relógio (`Clock.fixed(...)`) nos testes de integração.
+- **Adaptação/Descarte:** Refatoração manual de todos os construtores de `ErrorResponseDTO` para exigir `Instant timestamp`, remoção do construtor padrão que chamava `Instant.now()`, injeção do bean de `Clock` no Spring context e atualização dos `MockMvc` assertions para comparar o timestamp exato do mock.
+- **Validação Técnica:** Execução bem-sucedida de `./gradlew test` passando 100% dos testes unitários e de integração (`OrientadorControllerIntegrationTest`), garantindo 0 testes flutuantes; aprovado e integrado no PR #294.
+
+#### Hardening — BUG-18: Preservação de rota e parâmetros após o login (Issue #275 / PR #297)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude 3.5 Sonnet
+- **Artefatos:** `frontend/src/rotas/ProtectedRoute.tsx`, `frontend/src/paginas/LoginPage/index.tsx`, `frontend/src/rotas/ProtectedRoute.test.tsx` e `frontend/src/paginas/LoginPage/Login.test.tsx`
+- **Aproveitamento:** Apoio na formulação da lógica de preservação do `location.state.from` no React Router v6, recuperação de query parameters (`search`) e hash, e sugestão de cenários de teste automatizados para o Vitest.
+- **Adaptação/Descarte:** Correção manual contra loops infinitos de redirecionamento quando a rota de origem é o próprio `/login`, tratamento seguro para evitar "Acesso Negado" espúrio ao logar a partir da raiz `/`, e adaptação dos mocks do `useAuth` e `MemoryRouter` nos testes.
+- **Validação Técnica:** Execução de `npm test` no frontend com 100% de sucesso em 17 testes de rotas e login, incluindo teste simulando o fluxo ponta a ponta (`/acompanhar/15?tab=orientadores#topo` -> `/login` -> redirecionamento com parâmetros preservados); aprovado e integrado no PR #297.
+
+#### Hardening — BUG-14: Filtro por linha de pesquisa com correspondência exata (Issue #264 / PR #270)
+
+- **Data:** 16/11/2026 a 17/11/2026
+- **Ferramenta:** Claude 3.5 Sonnet
+- **Artefatos:** `backend/src/main/java/br/edu/ifsc/gestao_tcc/repository/OrientadorRepository.java` e `backend/src/test/java/br/edu/ifsc/gestao_tcc/repository/OrientadorRepositoryTest.java`
+- **Aproveitamento:** Auxílio na análise da consulta JPQL de filtragem de linhas de pesquisa.
+- **Adaptação/Descarte:** Ajuste manual da cláusula `JOIN` e predicado de igualdade estrita (`= :linhaPesquisa`) no Spring Data JPA para prevenir falsos positivos com substrings em `Set<String> linhasDePesquisa`, além da criação de massa de dados isolada no teste.
+- **Validação Técnica:** Execução local de `./gradlew test --tests OrientadorRepositoryTest` e testes de API com sucesso; aprovado e integrado no PR #270.
+
+#### Revisão Técnica de Pull Requests (PRs #271, #293, #296, #301 e #302)
+
+- **Data:** 17/11/2026 a 18/11/2026
+- **Ferramenta:** Claude 3.5 Sonnet (Antigravity)
+- **Artefatos:** PR #271 (`docs/RETROSPECTIVA.md`), PR #293 (`OrientadorService.java`, migration `V9`), PR #296 (`OrientadorRequestDTO.java`, `docs/contrato-dados-us02.md`), PR #301 (`docs/entregas/release-candidate.md`) e PR #302 (`docs/ARQUITETURA.md`, `docs/PADROES-DE-PROJETO.md`, ADRs e diagramas C4)
+- **Aproveitamento:** Apoio na conferência de contratos de dados e validação de compatibilidade com migrações Flyway.
+- **Adaptação/Descarte:** Análise crítica dos apontamentos fornecidos pela IA, conferência manual contra a árvore do Git e execução dos comandos de teste e build antes de registrar a revisão técnica ou aprovar formalmente no GitHub.
+- **Validação Técnica:** Aprovação formal registrada no GitHub, com checks de CI 100% verdes em todos os PRs revisados.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
+
+---
+
+### Damares do Socorro Gonçalves Gaia
+
+#### Revisão Final do MVP e Retrospectiva Geral (Issue #254 / PR #271)
+
+- **Data:** 16/11/2026 a 18/11/2026
+- **Ferramenta:** Gemini
+- **Artefatos:** `docs/RETROSPECTIVA.md`, `README.md` e `docs/entregas/release-candidate.md`
+- **Aproveitamento:** Estruturação da tabela comparativa "planejado na Inception × efetivamente entregue", organização da retrospectiva consolidada das Sprints 1 a 4 e atualização após o hardening final da Entrega 9.
+- **Adaptação/Descarte:** Conferência linha a linha de cada história (`US01` a `US10`), ADRs (`ADR-0007` a `ADR-0014`), riscos (`R01` a `R13`) e métricas (`M-01` a `M-06`) contra os documentos reais do repositório, removendo referências genéricas e ajustando os números finais.
+- **Validação Técnica:** Revisão de links, formatação Prettier e aprovação formal no PR #271 com todos os checks do CI verdes.
+
+#### Revisão Final de Arquitetura, Diagramas C4, ADRs e Padrões OO (Issue #281 / PR #302)
+
+- **Data:** 17/11/2026 a 18/11/2026
+- **Ferramenta:** Gemini
+- **Artefatos:** `docs/ARQUITETURA.md`, `docs/PADROES-DE-PROJETO.md`, `docs/diagramas/c1-contexto.md`, `docs/diagramas/c2-conteineres.md`, `docs/diagramas/c3-componentes-backend.md` e `docs/adrs/ADR-0001.md` a `ADR-0014.md`
+- **Aproveitamento:** Conferência cruzada entre os pacotes reais do backend/frontend e a documentação arquitetural, criação da visão C3 do backend e revisão das notas de status das ADRs.
+- **Adaptação/Descarte:** Ajuste manual para refletir o túnel Tailscale Funnel no C2, manutenção do acesso HTTP local de desenvolvimento, sincronização com a correção do BUG-13 (`#263`) e separação explícita entre consumidores Observer implementados e extensões futuras em `PADROES-DE-PROJETO.md`.
+- **Validação Técnica:** Formatação com `npx prettier --write`, revisão de equipe e integração no PR #302 com todos os checks do CI verdes.
+
+#### Hardening — BUG-09: Conflito de e-mail entre aluno e orientador (Issue #261 / PR #289)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Gemini
+- **Artefatos:** `SIGTCC/backend/gestao-tcc/src/main/java/br/edu/ifsc/gestao_tcc/repository/UsuarioRepository.java`, `OrientadorService.java`, `SolicitacaoService.java`, `OrientadorServiceTest.java`, `SolicitacaoServiceTest.java`, `OrientadorControllerIntegrationTest.java`, `SolicitacaoControllerIntegrationTest.java`, `docs/contrato-dados-us02.md`, `docs/contrato-dados-us04.md` e `docs/relatorio-de-bugs.md`
+- **Aproveitamento:** Apoio na modelagem da verificação unificada de e-mail em `UsuarioRepository.existsByEmailIgnoreCase`, na geração dos cenários de teste unitário e de integração (retorno HTTP 409) e na revisão dos contratos de dados.
+- **Adaptação/Descarte:** Revisão manual das assinaturas dos serviços e mocks nos testes existentes para preservar o comportamento de reutilização do mesmo aluno/orientador sem regressões, além da atualização manual do `README.md` e `docs/relatorio-de-bugs.md`.
+- **Validação Técnica:** Execução da suíte de testes no backend e verificação dos 5 checks verdes no GitHub Actions do PR #289.
+
+#### Atualização da Ficha de Métrica M-06 — Cumprimento da Capacidade (Issue #282)
+
+- **Data:** 18/11/2026
+- **Ferramenta:** Gemini
+- **Artefatos:** `docs/metricas/M-06.md`
+- **Aproveitamento:** Apoio na consolidação da memória de cálculo da Entrega 9, organização dos dados de commits (`git shortlog`) e PRs por integrante e cálculo do cumprimento acumulado do semestre.
+- **Adaptação/Descarte:** Descarte das alterações sugeridas nas demais fichas (`M-01` a `M-05` e `docs/METRICAS.md`) para restringir o escopo exclusivamente à métrica sob responsabilidade da Arquiteta de Software (`M-06`), além de conferência explícita dos apontamentos de horas e PRs.
+- **Validação Técnica:** Conferência dos comandos `git shortlog -sne origin/main..origin/entrega-9 --no-merges`, consulta à API do GitHub e formatação com Prettier.
+
+#### Revisão Técnica de Pull Request (PR #258)
+
+- **Data:** 16/11/2026 a 17/11/2026
+- **Ferramenta:** Gemini
+- **Artefatos:** PR #258 (`docs/entregas/release-candidate.md`)
+- **Aproveitamento:** Apoio na conferência dos itens obrigatórios do edital da Entrega 9 no `docs/entregas/release-candidate.md`, solicitando a inclusão das seções de testes de aceitação (item 2.5) e preparação para apresentação final (item 2.8), além da atualização de status dos PRs integrados.
+- **Adaptação/Descarte:** Inspeção direta dos commits e diffs no repositório para verificar se todos os apontamentos solicitados (`CHANGES_REQUESTED`) haviam sido aplicados antes de aprovar formalmente o PR no GitHub.
+- **Validação Técnica:** Aprovação formal (`APPROVED`) registrada no PR #258 após verificação das correções aplicadas pelo autor e execução verde dos checks do CI.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
+
+---
+
+### Marcus Jhuan Epifanio Lima
+
+#### Correção de BUGs (#276 e #279)
+
+- **Data:** 16/11/2026 a 18/11/2026
+- **Ferramenta:** Copilot
+- **Artefatos:** `GestaoCalendario` (`index.tsx` e teste), página de cadastro de orientador, tipos TypeScript do frontend, `OrientadorController`, `OrientadorService`, DTOs e testes automatizados do backend.
+- **Aproveitamento:** Utilização da IA como apoio à compreensão dos problemas e à investigação de possíveis causas:
+  - **#276:** auxílio na análise do fluxo de carregamento dos dados do calendário, especialmente na relação entre o tipo selecionado e a respectiva data limite durante a edição.
+  - **#279:** apoio na compreensão da integração entre o usuário autenticado no Keycloak e os dados de orientador, considerando a obtenção do e-mail associado à autenticação e as validações necessárias para impedir alterações indevidas.
+- **Adaptação/Descarte:** As orientações fornecidas pela IA serviram como referência para a compreensão dos fluxos envolvidos nos problemas #276 e #279, considerando as particularidades da arquitetura e dos contratos existentes na aplicação.
+- **Validação Técnica:** Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
+
+---
+
+### Talles Souza da Cruz
+
+#### Relatório de Bugs e Limitações Conhecidas (Issue #256 / PR #257)
+
+- **Data:** 16/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `docs/relatorio-de-bugs.md` e `README.md`
+- **Aproveitamento:** Apoio na consolidação dos bugs triados em tabela (ID, severidade, status, issue e PR), na redação das seções de contorno e detalhamento de cada bug e na estrutura da tabela de limitações conhecidas no README.
+- **Adaptação/Descarte:** Severidades e status revisados manualmente contra as issues abertas no GitHub, descarte de itens que não se reproduziam e ajuste da formatação com Prettier.
+- **Validação Técnica:** `npx prettier --check` sem erros e revisão aprovada no PR #257.
+
+#### Hardening — Chave `spring.application.name` e codificação do `application.properties` (Issue #265 / PR #268)
+
+- **Data:** 16/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `backend/src/main/resources/application.properties` e `README.md`
+- **Aproveitamento:** Identificação da chave inválida (`xspring.application.name`) e dos comentários com acentuação corrompida pela codificação do arquivo.
+- **Adaptação/Descarte:** Correção restrita à chave e à conversão do arquivo para UTF-8, sem as demais alterações de configuração sugeridas pela IA.
+- **Validação Técnica:** `./gradlew build` com sucesso e backend iniciando com o nome correto da aplicação no log; aprovado e integrado no PR #268.
+
+#### Hardening — Ausência de handler genérico de exceções (Issue #262 / PR #290)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `backend/.../exception/GlobalExceptionHandler.java`, `backend/.../exception/GlobalExceptionHandlerTest.java`, `backend/.../integration/OrientadorControllerIntegrationTest.java`, `docs/contrato-dados-us04.md`, `docs/relatorio-de-bugs.md` e `README.md`
+- **Aproveitamento:** Esqueleto dos handlers de `DataIntegrityViolationException` (409) e `Exception` (500) retornando `ErrorResponseDTO`, e sugestão de cenários de teste para cada um.
+- **Adaptação/Descarte:** Preservação do status original das exceções do próprio Spring (ex.: 404 de rota inexistente) em vez de convertê-las em 500, mensagens alinhadas aos contratos de dados e remoção de detalhes internos (stack trace) da resposta.
+- **Validação Técnica:** `./gradlew test` com os novos testes unitários e de integração passando e contrato US04 atualizado; aprovado e integrado no PR #290.
+
+#### Hardening — BUG-13: Orientador desativado continuava listado e operando (Issue #263 / PR #293)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `OrientadorRepository.java`, `OrientadorService.java`, `SolicitacaoService.java`, migration `V9__cancelar_solicitacoes_de_orientadores_inativos.sql`, `OrientadorServiceTest.java`, `SolicitacaoServiceTest.java`, `OrientadorRepositoryTest.java`, testes de integração de orientador e solicitação, `docs/contrato-dados-us02.md`, `docs/contrato-dados-us04.md`, `docs/relatorio-de-bugs.md` e `README.md`
+- **Aproveitamento:** Análise dos pontos em que o orientador inativo ainda aparecia ou operava (listagem, novas solicitações, aceite/recusa), escrita dos testes antes da correção e proposta da migration de saneamento das solicitações pendentes.
+- **Adaptação/Descarte:** Ajuste das regras de negócio e mensagens aos contratos de dados, resolução manual dos conflitos com o PR #289 e correção de um mock ausente que surgiu após o merge.
+- **Validação Técnica:** `./gradlew build` com sucesso (testes unitários e de integração) e CI verde; aprovado e integrado no PR #293.
+
+#### Hardening — Contador de vagas do painel não aparecia sem solicitações (Issue #266 / PR #295)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `frontend/src/paginas/PainelSolicitacoes/index.tsx`, `frontend/src/paginas/PainelSolicitacoes/PainelSolicitacoes.test.tsx`, `docs/relatorio-de-bugs.md` e `README.md`
+- **Aproveitamento:** Identificação da renderização condicional que escondia o contador quando não havia solicitações e sugestão de cenários de teste com lista vazia.
+- **Adaptação/Descarte:** Texto e estilo do contador mantidos no padrão da página e resolução manual de conflito no relatório de bugs.
+- **Validação Técnica:** `npm test`, `npm run lint` e `npm run build` com sucesso, além de conferência visual no painel do professor; aprovado e integrado no PR #295.
+
+#### Hardening — Limites de tamanho nos DTOs de orientador (Issue #273 / PR #296)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `OrientadorRequestDTO.java`, `OrientadorUpdateDTO.java`, `OrientadorControllerTest.java`, `docs/contrato-dados-us02.md`, `docs/relatorio-de-bugs.md` e `README.md`
+- **Aproveitamento:** Levantamento do tamanho das colunas nas migrations para definir as anotações `@Size` e geração dos testes de limite (valor no limite e acima dele).
+- **Adaptação/Descarte:** Limites conferidos manualmente com o schema, mensagens de validação em português e correção da tabela de limitações conhecidas, que havia quebrado no relatório após a resolução de conflitos.
+- **Validação Técnica:** `./gradlew build` e `npx prettier --check` com sucesso e CI verde; aprovado e integrado no PR #296.
+
+#### Hardening — BUG-15: Seed V5 pode sobrescrever dados existentes (Issue #274 / PR #298)
+
+- **Data:** 17/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:** `backend/.../repository/MigracoesFlywayTest.java`, `docs/relatorio-de-bugs.md`, `docs/ARQUITETURA.md` e `README.md`
+- **Aproveitamento:** Análise do comportamento do Flyway (imutabilidade e checksum das migrations) e das alternativas (editar a V5, criar uma V10 ou registrar como limitação), criação do teste que executa todas as migrations em um H2 vazio e redação da justificativa e da descrição do PR.
+- **Adaptação/Descarte:** A decisão de manter o bug como limitação conhecida foi do integrante; foi descartada a criação de uma V10, que não preveniria nem desfaria o problema, e a ADR-0009 não foi alterada. A lista de migrations da `ARQUITETURA.md` foi corrigida para incluir a V9.
+- **Validação Técnica:** `MigracoesFlywayTest` com 3/3 testes passando, `./gradlew build` com sucesso e CI verde; aprovado e integrado no PR #298.
+
+#### Revisão Técnica de Pull Requests (PRs #269, #271, #289, #291, #297, #301 e #303)
+
+- **Data:** 17/11/2026 a 18/11/2026
+- **Ferramenta:** Claude (Claude Opus 5.5)
+- **Artefatos:**
+  - PR #269: `docs/staging.md`, `docs/DEPLOY.md` e `realm-import.json`;
+  - PR #271: `docs/RETROSPECTIVA.md`;
+  - PR #289: `OrientadorService.java`, `SolicitacaoService.java`, `UsuarioRepository.java` e contratos US02/US04;
+  - PR #291: workflows em `.github/workflows/` e `docs/ci.md`;
+  - PR #297: `ProtectedRoute.tsx` e `Login/index.tsx`, com seus testes;
+  - PR #301: `docs/entregas/release-candidate.md`;
+  - PR #303: `docs/riscos.md`.
+- **Aproveitamento:** Apoio na leitura dos diffs, na conferência da consistência com os contratos de dados, o relatório de bugs e o README, e na resolução de conflitos de merge com a `entrega-9`.
+- **Adaptação/Descarte:** Os apontamentos da IA foram analisados criticamente e conferidos manualmente contra o código e a documentação. Foram descartadas as sugestões fora do escopo de cada PR, e os conflitos foram resolvidos manualmente, preservando as alterações dos dois lados.
+- **Validação Técnica:** Execução local dos testes e do build quando o PR alterava código (`./gradlew build` e `npm test`), CI verde e aprovação formal registrada no GitHub antes do merge na `entrega-9`.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.
+
+---
+
+### Willian Ferreira dos Santos
+
+#### Backlog final do MVP e critérios de aceitação das histórias (Issue #255 / PR #301)
+
+- **Data:** 17/11/2026 a 18/11/2026
+- **Ferramenta:** Claude Sonnet 5.5 (Anthropic)
+- **Artefatos:** `docs/entregas/release-candidate.md` (seções 3.5, 4, 4.1 e 7) e critérios de aceitação das issues #11 (US04) e #14 (US07)
+- **Aproveitamento:** Conferência das instruções de execução da issue contra o conteúdo da branch `entrega-9`, apontando divergências; verificação dos critérios de aceitação das US01 a US05 e US07 contra o código e os contratos de dados; proposta de redação dos critérios da US04 e da US07, do texto da subseção 4.1 "Backlog Final do MVP" e da descrição do PR.
+- **Adaptação/Descarte:** As propostas foram conferidas pelo integrante com o estado real das issues, do board e do repositório antes de serem aplicadas. O fechamento da US08 como fora do escopo do MVP segue a seção 10.4 de `docs/entregas/sprint-4.md`, definida pela equipe.
+- **Validação Técnica:** Conferência das referências de issues, PRs e versões com a matriz da seção 8 do `release-candidate.md`, verificação da formatação e revisão do PR #301 por outro integrante.
+
+#### Revisão final do registro de riscos (Issue #283 / PR #303)
+
+- **Data:** 17/11/2026 a 18/11/2026
+- **Ferramenta:** Claude Sonnet 5.5 (Anthropic)
+- **Artefatos:** `docs/riscos.md` (seção 7) e seção de limitações e riscos residuais de `docs/entregas/release-candidate.md`
+- **Aproveitamento:** Proposta de classificação final dos riscos R01 a R13 e dos riscos residuais da release (R02, R04, R07, R09, R11 e R12).
+- **Adaptação/Descarte:** A classificação foi comparada pelo integrante com o histórico das seções 4 a 6 do `riscos.md`, com `docs/relatorio-de-bugs.md` e com as ADRs citadas, e ajustada antes do commit.
+- **Validação Técnica:** Conferência dos números de issues e PRs, verificação da formatação e revisão do PR #303 por outro integrante.
+
+#### Atualização da Métrica M-02 - Densidade de Defeitos Abertos
+
+- **Data:** 18/11/2026.
+- **Ferramenta:** ChatGPT (OpenAI).
+- **Artefatos:** `docs/metricas/M-02.md` e `docs/relatorio-de-bugs.md`.
+- **Aproveitamento:** Apoio na análise da ficha da métrica M-02, na interpretação dos resultados da Entrega 9 e na definição da forma de registrar a quantidade de defeitos em aberto. Auxílio na avaliação da aplicabilidade da fórmula de densidade de defeitos para uma entrega voltada à estabilização do MVP, sem conclusão de novas User Stories pontuadas.
+- **Adaptação/Descarte:** A quantidade de Issues abertas com as labels `bug` ou `defeito` foi consultada e confirmada manualmente pelo integrante no GitHub, resultando em zero defeitos em aberto. A proposta de registro diferenciou o resultado específico da Entrega 9, cuja densidade é não aplicável pela ausência de novos Story Points concluídos, de uma possível visão acumulada do MVP. As informações e os critérios de cálculo foram avaliados pelo integrante antes de sua inclusão na documentação.
+- **Validação Técnica:** Conferência da quantidade de Issues abertas diretamente no GitHub, análise da fórmula e dos critérios de interpretação da métrica e revisão da consistência do histórico de acompanhamento.
+
+#### Validação e Responsabilidade Técnica:
+
+Todo o conteúdo, código, testes e documentação elaborados ou revisados com o apoio da IA foram analisados, compreendidos e validados pelo integrante antes da submissão dos respectivos Pull Requests. O integrante assume total responsabilidade técnica e acadêmica pelas decisões de projeto e pelos artefatos entregues.

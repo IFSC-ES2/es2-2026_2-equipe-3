@@ -1,9 +1,20 @@
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter, Route, Routes } from "react-router-dom";
+import { MemoryRouter, Route, Routes, useLocation } from "react-router-dom";
 import { describe, test, expect, beforeEach } from "vitest";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { AuthProvider } from "./AuthContext";
 import { STORAGE_KEY } from "./authService";
+
+function TelaLoginComState() {
+  const location = useLocation();
+  const state = location.state as { from?: { pathname: string } } | null;
+  return (
+    <div>
+      <span>Tela de login</span>
+      <span data-testid="destino">{state?.from?.pathname ?? "nenhum"}</span>
+    </div>
+  );
+}
 
 function criarTokenFake(roles: string[], email: string): string {
   const header = btoa(JSON.stringify({ alg: "none", typ: "JWT" }));
@@ -62,6 +73,29 @@ describe("ProtectedRoute", () => {
 
     expect(await screen.findByText("Tela de login")).toBeInTheDocument();
     expect(screen.queryByText("Conteúdo protegido")).not.toBeInTheDocument();
+  });
+
+  test("envia a rota original no state do redirecionamento para /login", async () => {
+    render(
+      <MemoryRouter initialEntries={["/area-protegida"]}>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<TelaLoginComState />} />
+            <Route
+              path="/area-protegida"
+              element={
+                <ProtectedRoute>
+                  <div>Conteúdo protegido</div>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </AuthProvider>
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText("Tela de login")).toBeInTheDocument();
+    expect(screen.getByTestId("destino")).toHaveTextContent("/area-protegida");
   });
 
   test("permite o acesso quando o usuário está autenticado e nenhum papel específico é exigido", async () => {

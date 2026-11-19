@@ -3,26 +3,38 @@ package br.edu.ifsc.gestao_tcc.exception;
 import br.edu.ifsc.gestao_tcc.dto.ErroCampoDTO;
 import br.edu.ifsc.gestao_tcc.dto.ErrorResponseDTO;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 
+@Slf4j
 @RestControllerAdvice
+@RequiredArgsConstructor
 public class GlobalExceptionHandler {
+
+    private final Clock clock;
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleResourceNotFoundException(
             ResourceNotFoundException ex, HttpServletRequest request) {
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+            Instant.now(clock),
             HttpStatus.NOT_FOUND.value(),
             "Recurso não encontrado",
             request.getRequestURI(),
@@ -37,6 +49,7 @@ public class GlobalExceptionHandler {
             EmailDuplicadoException ex, HttpServletRequest request) {
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                Instant.now(clock),
                 HttpStatus.CONFLICT.value(),
                 "Conflito de dados",
                 request.getRequestURI(),
@@ -51,6 +64,7 @@ public class GlobalExceptionHandler {
             ConflitoDeEstadoException ex, HttpServletRequest request) {
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                Instant.now(clock),
                 HttpStatus.CONFLICT.value(),
                 "Conflito de dados",
                 request.getRequestURI(),
@@ -65,6 +79,7 @@ public class GlobalExceptionHandler {
             OptimisticLockingFailureException ex, HttpServletRequest request) {
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                Instant.now(clock),
                 HttpStatus.CONFLICT.value(),
                 "Conflito de dados",
                 request.getRequestURI(),
@@ -79,6 +94,7 @@ public class GlobalExceptionHandler {
             RegraDeNegocioException ex, HttpServletRequest request) {
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                Instant.now(clock),
                 HttpStatus.UNPROCESSABLE_CONTENT.value(),
                 "Regra de negócio violada",
                 request.getRequestURI(),
@@ -97,6 +113,7 @@ public class GlobalExceptionHandler {
                 .toList();
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                Instant.now(clock),
                 HttpStatus.BAD_REQUEST.value(),
                 "Erro de validação nos dados enviados",
                 request.getRequestURI(),
@@ -111,6 +128,7 @@ public class GlobalExceptionHandler {
             HttpMessageNotReadableException ex, HttpServletRequest request) {
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                Instant.now(clock),
                 HttpStatus.BAD_REQUEST.value(),
                 "Corpo da requisição inválido ou ilegível",
                 request.getRequestURI(),
@@ -136,6 +154,7 @@ public class GlobalExceptionHandler {
                 : "Valor inválido para o parâmetro '" + nomeParametro + "'.";
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                Instant.now(clock),
                 HttpStatus.BAD_REQUEST.value(),
                 "Parâmetro de requisição inválido",
                 request.getRequestURI(),
@@ -150,6 +169,7 @@ public class GlobalExceptionHandler {
             AcessoNegadoException ex, HttpServletRequest request) {
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                Instant.now(clock),
                 HttpStatus.FORBIDDEN.value(),
                 "Acesso negado",
                 request.getRequestURI(),
@@ -168,6 +188,7 @@ public class GlobalExceptionHandler {
         );
 
         ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                Instant.now(clock),
                 HttpStatus.BAD_REQUEST.value(),
                 "Erro de validação nos dados enviados",
                 request.getRequestURI(),
@@ -175,5 +196,59 @@ public class GlobalExceptionHandler {
         );
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponseDTO> handleDataIntegrityViolationException(
+            DataIntegrityViolationException ex, HttpServletRequest request) {
+
+        log.warn("Violação de integridade em {}: {}",
+                request.getRequestURI(), ex.getMostSpecificCause().getMessage());
+
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                Instant.now(clock),
+                HttpStatus.CONFLICT.value(),
+                "Conflito de dados",
+                request.getRequestURI(),
+                "A operação viola uma restrição de integridade dos dados, como um valor que já está cadastrado."
+        );
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    /**
+     * Último recurso: só é usado quando nenhum handler mais específico se aplica.
+     */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponseDTO> handleException(Exception ex, HttpServletRequest request) {
+
+        if (ex instanceof ErrorResponse respostaDoSpring) {
+            HttpStatusCode status = respostaDoSpring.getStatusCode();
+            String erro = status.value() == HttpStatus.NOT_FOUND.value()
+                    ? "Recurso não encontrado"
+                    : "Requisição inválida";
+
+            ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                    Instant.now(clock),
+                    status.value(),
+                    erro,
+                    request.getRequestURI(),
+                    respostaDoSpring.getBody().getDetail()
+            );
+
+            return ResponseEntity.status(status).body(errorResponse);
+        }
+
+        log.error("Erro inesperado em {}", request.getRequestURI(), ex);
+
+        ErrorResponseDTO errorResponse = ErrorResponseDTO.of(
+                Instant.now(clock),
+                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Erro interno do servidor",
+                request.getRequestURI(),
+                "Ocorreu um erro inesperado. Tente novamente mais tarde."
+        );
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 }

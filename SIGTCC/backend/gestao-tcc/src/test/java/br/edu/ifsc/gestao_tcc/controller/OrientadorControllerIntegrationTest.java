@@ -1,14 +1,22 @@
 package br.edu.ifsc.gestao_tcc.controller;
 
+import br.edu.ifsc.gestao_tcc.model.Aluno;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
 import br.edu.ifsc.gestao_tcc.model.PerfilOrientador;
+import br.edu.ifsc.gestao_tcc.model.SolicitacaoOrientacao;
+import br.edu.ifsc.gestao_tcc.model.StatusSolicitacao;
+import br.edu.ifsc.gestao_tcc.repository.AlunoRepository;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
+import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
@@ -16,11 +24,16 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneOffset;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -33,12 +46,28 @@ class OrientadorControllerIntegrationTest {
     private static final String EMAIL_PROFESSOR_A = "professor.orientador@example.com";
     private static final String EMAIL_PROFESSOR_B = "professor.responsavel@example.com";
     private static final String EMAIL_ALUNO = "aluno@example.com";
+    private static final Instant INSTANTE_FIXO = Instant.parse("2026-11-17T10:00:00Z");
+
+    @TestConfiguration
+    static class TestClockConfig {
+        @Bean
+        @Primary
+        Clock fixedClock() {
+            return Clock.fixed(INSTANTE_FIXO, ZoneOffset.UTC);
+        }
+    }
 
     @Autowired
     private MockMvc mockMvc;
 
     @Autowired
     private OrientadorRepository orientadorRepository;
+
+    @Autowired
+    private AlunoRepository alunoRepository;
+
+    @Autowired
+    private SolicitacaoRepository solicitacaoRepository;
 
     private Orientador professorA;
     private Orientador professorB;
@@ -147,10 +176,61 @@ class OrientadorControllerIntegrationTest {
                 """;
 
         mockMvc.perform(post(URL)
-                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .with(tokenDe("ROLE_PROFESSOR", "novo.orientador@example.com"))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(payload))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    @DisplayName("POST /orientadores - Professor não pode cadastrar orientador com e-mail diferente do JWT")
+    void cadastrar_ProfessorUsandoEmailDeOutro_DeveRetornar403() throws Exception {
+        String emailDoOutro = "outro.orientador@example.com";
+        String payload = """
+                {
+                  "nome": "Orientador de Outro Usuário",
+                  "email": "%s",
+                  "linhasDePesquisa": ["IA"],
+                  "vagasDisponiveis": 2
+                }
+                """.formatted(emailDoOutro);
+
+        mockMvc.perform(post(URL)
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.erro").value("Acesso negado"));
+
+        assertThat(orientadorRepository.existsByEmail(emailDoOutro)).isFalse();
+    }
+
+    @Test
+    @DisplayName("POST /orientadores - E-mail já cadastrado como aluno retorna 409 Conflict com ErrorResponseDTO")
+    void cadastrar_EmailJaCadastradoComoAluno_DeveRetornar409() throws Exception {
+        alunoRepository.saveAndFlush(Aluno.builder()
+                .nome("Aluno Existente")
+                .email(EMAIL_ALUNO)
+                .curso("Análise e Desenvolvimento de Sistemas")
+                .build());
+
+        String payload = """
+                {
+                  "nome": "Orientador Conflitante",
+                  "email": "%s",
+                  "linhasDePesquisa": ["IA"],
+                  "vagasDisponiveis": 2
+                }
+                """.formatted(EMAIL_ALUNO);
+
+        mockMvc.perform(post(URL)
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_ALUNO))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.erro").value("Conflito de dados"))
+                .andExpect(jsonPath("$.detalhes").isString());
     }
 
     @Test
@@ -213,5 +293,113 @@ class OrientadorControllerIntegrationTest {
                 .andExpect(jsonPath("$.detalhes").value("O e-mail do orientador não pode ser alterado."));
 
         assertThat(recarregar(professorA).getEmail()).isEqualTo(EMAIL_PROFESSOR_A);
+    }
+
+    // --- Orientador desativado (issue #263) ---
+
+    @Test
+    @DisplayName("GET /orientadores - Orientador desativado não deve aparecer no catálogo")
+    void listar_NaoDeveRetornarOrientadorDesativado() throws Exception {
+        professorB.setAtivo(false);
+        orientadorRepository.saveAndFlush(professorB);
+
+        mockMvc.perform(get(URL).with(tokenDe("ROLE_ALUNO", EMAIL_ALUNO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.email == '" + EMAIL_PROFESSOR_A + "')]").exists())
+                .andExpect(jsonPath("$[?(@.email == '" + EMAIL_PROFESSOR_B + "')]").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("DELETE /orientadores/{id} - Desativar deve cancelar as solicitações PENDENTE e manter as ACEITA e as vagas")
+    void deletar_DeveCancelarSolicitacoesPendentes() throws Exception {
+        SolicitacaoOrientacao pendente1 = salvarSolicitacao(professorA, "aluno.um@example.com", StatusSolicitacao.PENDENTE);
+        SolicitacaoOrientacao pendente2 = salvarSolicitacao(professorA, "aluno.dois@example.com", StatusSolicitacao.PENDENTE);
+        SolicitacaoOrientacao aceita = salvarSolicitacao(professorA, "aluno.tres@example.com", StatusSolicitacao.ACEITA);
+        SolicitacaoOrientacao deOutroProfessor =
+                salvarSolicitacao(professorB, "aluno.quatro@example.com", StatusSolicitacao.PENDENTE);
+
+        mockMvc.perform(delete(URL + "/" + professorA.getId())
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A)))
+                .andExpect(status().isNoContent());
+
+        assertThat(statusDe(pendente1)).isEqualTo(StatusSolicitacao.CANCELADA);
+        assertThat(statusDe(pendente2)).isEqualTo(StatusSolicitacao.CANCELADA);
+        assertThat(statusDe(aceita)).isEqualTo(StatusSolicitacao.ACEITA);
+        assertThat(statusDe(deOutroProfessor)).isEqualTo(StatusSolicitacao.PENDENTE);
+        assertThat(recarregar(professorA).getPerfil().getVagasDisponiveis()).isEqualTo(3);
+    }
+
+    private SolicitacaoOrientacao salvarSolicitacao(Orientador orientador, String emailAluno, StatusSolicitacao status) {
+        Aluno aluno = alunoRepository.saveAndFlush(Aluno.builder()
+                .nome("Aluno " + emailAluno)
+                .email(emailAluno)
+                .curso("Engenharia")
+                .build());
+        return solicitacaoRepository.saveAndFlush(SolicitacaoOrientacao.builder()
+                .orientador(orientador)
+                .aluno(aluno)
+                .tema("Tema de TCC em Engenharia de Software")
+                .mensagem("Gostaria de desenvolver meu trabalho sob sua orientação.")
+                .status(status)
+                .build());
+    }
+
+    private StatusSolicitacao statusDe(SolicitacaoOrientacao solicitacao) {
+        return solicitacaoRepository.findById(solicitacao.getId()).orElseThrow().getStatus();
+    }
+
+    // --- Handlers genéricos do GlobalExceptionHandler (issue #262) ---
+
+    @Test
+    @DisplayName("POST /orientadores - E-mail já usado por um aluno deve retornar 409 no formato ErrorResponseDTO")
+    void cadastrar_EmailDeAlunoExistente_DeveRetornar409() throws Exception {
+        alunoRepository.saveAndFlush(Aluno.builder()
+                .nome("Aluno Existente")
+                .email("aluno.existente@example.com")
+                .curso("Engenharia")
+                .build());
+
+        String payload = """
+                {
+                  "nome": "Orientador com E-mail de Aluno",
+                  "email": "aluno.existente@example.com",
+                  "linhasDePesquisa": ["IA"],
+                  "vagasDisponiveis": 2
+                }
+                """;
+
+        mockMvc.perform(post(URL)
+                        .with(tokenDe("ROLE_PROFESSOR", "aluno.existente@example.com"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(payload))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.status").value(409))
+                .andExpect(jsonPath("$.erro").value("Conflito de dados"))
+                .andExpect(jsonPath("$.caminho").value(URL))
+                .andExpect(jsonPath("$.detalhes").value(
+                        "Já existe um usuário cadastrado com o e-mail: aluno.existente@example.com"));
+    }
+
+    @Test
+    @DisplayName("PUT /orientadores/{id} - Método não suportado deve manter o 405 no formato ErrorResponseDTO")
+    void metodoNaoSuportado_DeveRetornar405NoFormatoPadrao() throws Exception {
+        mockMvc.perform(put(URL + "/" + professorA.getId())
+                        .with(tokenDe("ROLE_PROFESSOR", EMAIL_PROFESSOR_A))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{}"))
+                .andExpect(status().isMethodNotAllowed())
+                .andExpect(jsonPath("$.status").value(405))
+                .andExpect(jsonPath("$.erro").value("Requisição inválida"))
+                .andExpect(jsonPath("$.caminho").value(URL + "/" + professorA.getId()));
+    }
+
+    @Test
+    @DisplayName("GET /orientadores/{id} - Recurso não encontrado deve usar o Clock injetado pelo Spring no timestamp")
+    void buscarPorId_Inexistente_DeveUsarClockInjetadoNoTimestamp() throws Exception {
+        mockMvc.perform(get(URL + "/999999")
+                        .with(tokenDe("ROLE_ALUNO", EMAIL_ALUNO)))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.status").value(404))
+                .andExpect(jsonPath("$.timestamp").value("2026-11-17T10:00:00Z"));
     }
 }

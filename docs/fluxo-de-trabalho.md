@@ -121,7 +121,7 @@ Closes #[número da issue]
 
 ## 5. Checks Obrigatórios Executados nos Pull Requests (CI/CD)
 
-Cada Pull Request aberto no repositório dispara automaticamente o pipeline de Integração Contínua (CI) orquestrado via GitHub Actions, conforme detalhado no documento [docs/ci.md](cd.md). O merge é bloqueado caso qualquer um desses checks falhe:
+Cada Pull Request aberto no repositório dispara automaticamente o pipeline de Integração Contínua (CI) orquestrado via GitHub Actions, conforme detalhado no documento [docs/ci.md](ci.md). O merge é bloqueado caso qualquer um desses checks falhe:
 
 - **`verificacao-docs.yml`**: Valida a sintaxe, formatação e estrutura dos arquivos Markdown (`.md`).
 - **`verificar-links.yml`**: Executa a varredura rigorosa de links internos e externos em busca de links quebrados ou referências incorretas entre a documentação de planejamento (`BASELINE.md`, `METRICAS.md`) e as fichas de métricas (`M-01.md` a `M-06.md`).

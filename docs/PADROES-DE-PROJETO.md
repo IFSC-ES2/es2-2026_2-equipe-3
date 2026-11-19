@@ -45,6 +45,7 @@ classDiagram
         -SolicitacaoRepository solicitacaoRepository
         -OrientadorRepository orientadorRepository
         -AlunoRepository alunoRepository
+        -UsuarioRepository usuarioRepository
         -ApplicationEventPublisher eventPublisher
         -List~ValidacaoSolicitacaoOrientacao~ validacoes
         +SolicitacaoResponseDTO criarSolicitacao(SolicitacaoRequestDTO dto, String emailAluno, String nomeAluno)
@@ -190,6 +191,7 @@ public class SolicitacaoService {
     private final SolicitacaoRepository solicitacaoRepository;
     private final OrientadorRepository orientadorRepository;
     private final AlunoRepository alunoRepository;
+    private final UsuarioRepository usuarioRepository;
     private final ApplicationEventPublisher eventPublisher;
     private final List<ValidacaoSolicitacaoOrientacao> validacoes;
 
@@ -200,11 +202,16 @@ public class SolicitacaoService {
                         "Orientador com identificador " + dto.getOrientadorId() + " não foi encontrado."));
 
         Aluno aluno = alunoRepository.findByEmail(emailAluno)
-                .orElseGet(() -> alunoRepository.save(Aluno.builder()
-                        .nome(nomeAluno == null || nomeAluno.isBlank() ? emailAluno : nomeAluno.trim())
-                        .email(emailAluno)
-                        .curso(dto.getCurso().trim())
-                        .build()));
+                .orElseGet(() -> {
+                    if (usuarioRepository.existsByEmailIgnoreCase(emailAluno)) {
+                        throw new EmailDuplicadoException("Já existe um usuário cadastrado com o e-mail: " + emailAluno);
+                    }
+                    return alunoRepository.save(Aluno.builder()
+                            .nome(nomeAluno == null || nomeAluno.isBlank() ? emailAluno : nomeAluno.trim())
+                            .email(emailAluno)
+                            .curso(dto.getCurso().trim())
+                            .build());
+                });
 
         validacoes.forEach(validacao -> validacao.validar(dto, aluno, orientador));
 
@@ -268,7 +275,7 @@ Ao transitar para `ACEITA`:
 
 Se essa operação de decremento for acoplada diretamente no fluxo transacional do `SolicitacaoService`, cria-se acoplamento entre domínios distintos e violação do princípio da Responsabilidade Única (SRP).
 
-O padrão **Observer** resolve essa questão publicando o evento de domínio `SolicitacaoStatusChangedEvent` via `ApplicationEventPublisher`. O Spring Boot despacha o evento para o ouvinte cadastrado (`AtualizadorVagasObserver`), mantendo a máquina de estados da solicitação isolada da manipulação das cotas de vagas do orientador.
+O padrão **Observer** resolve essa questão publicando o evento de domínio `SolicitacaoStatusChangedEvent` via `ApplicationEventPublisher` nas transições de status (`ACEITA`, `RECUSADA` e `CANCELADA`, tanto em `SolicitacaoService` quanto no cancelamento em cascata de pendências ao inativar orientador em `OrientadorService.deletar`). O Spring Boot despacha o evento para o ouvinte cadastrado (`AtualizadorVagasObserver`), mantendo a máquina de estados da solicitação isolada da manipulação das cotas de vagas do orientador.
 
 ### 3.2 Diagrama de Classes e Sequência (Observer)
 
@@ -441,6 +448,15 @@ public SolicitacaoResponseDTO atualizarStatus(
 - **Condição de Corrida no Consumo de Vagas (Concorrência):** Em cenários de concorrência (dois aceites simultâneos disputando a última vaga do orientador), apenas `@Transactional` não impede que duas transações leiam o mesmo saldo de vagas antes do _commit_.
   - _Mitigação Adotada:_ Adoção de **bloqueio otimista (_Optimistic Locking_)** na entidade `PerfilOrientador` via anotação `@Version` do Jakarta Persistence (`private Long versao`, suportada pela coluna `versao` introduzida na migração `V8__adicionar_versao_perfil_orientador.sql`). Caso duas transações concorrentes tentem atualizar o mesmo perfil simultaneamente, o Hibernate detecta a divergência de versão no _flush/commit_ e lança `OptimisticLockingFailureException`, convertida pelo `GlobalExceptionHandler` em `HTTP 409 Conflict` (`ErrorResponseDTO`).
 - **Ausência de Notificações Ativas:** Conforme pactuado na governança da Sprint 2 e na [ADR-0007](./adrs/ADR-0007.md), **não foram implementadas notificações ativas** (como disparos externos de e-mail ou mensageria assíncrona). O painel do orientador opera exclusivamente por consulta sob demanda (_pull model_ via `GET /api/v1/solicitacoes/orientador/{id}?status=PENDENTE`), eliminando custos de infraestrutura no MVP.
+
+### 3.7 Consumidores Existentes vs. Extensões Futuras
+
+Para manter fidelidade estrita entre a documentação e o código em execução (`v1.0.0-rc.1`):
+
+| Consumidor                              | Situação no Código                     | Pacote / Classe                                            | Responsabilidade                                                                                                       |
+| :-------------------------------------- | :------------------------------------- | :--------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------- |
+| **`AtualizadorVagasObserver`**          | **Implementado e ativo**               | `br.edu.ifsc.gestao_tcc.observer.AtualizadorVagasObserver` | Decrementa `vagasDisponiveis` em `PerfilOrientador` na mesma transação quando a solicitação transiciona para `ACEITA`. |
+| **Auditoria / Notificações por E-mail** | **Extensão futura (não implementada)** | —                                                          | Possíveis `@EventListener` futuros fora do escopo do MVP.                                                              |
 
 ---
 

@@ -1,7 +1,7 @@
 # Documento de Arquitetura do Sistema (SIGTCC)
 
 - **Sistema:** Sistema de Gestão Centralizada de TCC (SIGTCC)
-- **Marco de Release:** `v0.4.0` (Sprint 4 – Entrega 8)
+- **Marco de Release:** `v1.0.0-rc.1` (Entrega 9 – Release Candidate)
 - **Responsável Técnica:** Damares do Socorro Gonçalves Gaia (Arquiteta de Software)
 - **Data de Consolidação:** Novembro de 2026
 
@@ -9,13 +9,13 @@
 
 ## 1. Visão Geral e Propósito do Documento
 
-Este documento descreve a arquitetura técnica real e efetivamente implementada do **Sistema de Gestão Centralizada de TCC (SIGTCC)** na Sprint 4. Ele estabelece a organização dos módulos, as responsabilidades de cada contêiner, os padrões de comunicação, os trade-offs de engenharia adotados e a rastreabilidade entre as decisões arquiteturais registradas nas [ADRs](adrs/) e o código em execução.
+Este documento descreve a arquitetura técnica real e efetivamente implementada do **Sistema de Gestão Centralizada de TCC (SIGTCC)** na versão candidata `v1.0.0-rc.1` (Entrega 9). Ele estabelece a organização dos módulos, as responsabilidades de cada contêiner, os padrões de comunicação, os trade-offs de engenharia adotados e a rastreabilidade entre as decisões arquiteturais registradas nas [ADRs](adrs/) e o código em execução.
 
 O SIGTCC é concebido como uma aplicação web desacoplada, composta por:
 
 1. Uma **Single-Page Application (SPA)** em React 19.2 com TypeScript;
 2. Uma **API RESTful** em Java 21 com Spring Boot 4.1.1, atuando como Resource Server OAuth2;
-3. Um **Banco de Dados Relacional** MySQL 8.0 com evolução de esquema versionada via Flyway (migrações `V1` a `V8`);
+3. Um **Banco de Dados Relacional** MySQL 8.0 com evolução de esquema versionada via Flyway (migrações `V1` a `V9`);
 4. Um **Provedor de Identidade e Acesso (IAM)** independente em Keycloak 26.8.0.
 
 Todo o ecossistema é orquestrado de forma reproduzível via contêineres Docker Compose.
@@ -65,11 +65,12 @@ flowchart TB
 
 ### 2.2 Visão de Contêineres (C2)
 
-A visão de contêineres apresenta as unidades implantáveis e executáveis em tempo de execução no ambiente Docker:
+A visão de contêineres apresenta as unidades implantáveis e executáveis em tempo de execução no ambiente Docker (tanto em desenvolvimento local com `docker-compose.yml` quanto em _staging_ com `docker-compose.prod.yml` e **Tailscale Funnel**):
 
 ```mermaid
 flowchart TB
     classDef actor fill:#1e40af,stroke:#1d4ed8,stroke-width:2px,color:#ffffff;
+    classDef tunnel fill:#334155,stroke:#1e293b,stroke-width:2px,color:#ffffff;
     classDef front fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff;
     classDef back fill:#0369a1,stroke:#075985,stroke-width:2px,color:#ffffff;
     classDef db fill:#0f766e,stroke:#115e59,stroke-width:2px,color:#ffffff;
@@ -81,9 +82,13 @@ flowchart TB
         professor["<b>Professor / Orientador</b><br/>Navegador Web"]:::actor
     end
 
-    subgraph Docker["Ambiente Docker Compose (Infraestrutura Local)"]
+    subgraph Edge["Exposição Externa (Ambiente de Staging)"]
+        funnel["<b>Tailscale Funnel</b><br/>Proxy Reverso TLS Fixo<br/><i>:443 → :80 | :8443 → :8080 | :10000 → :8081</i>"]:::tunnel
+    end
+
+    subgraph Docker["Ambiente Docker Compose (Dev Local: HTTP | Staging: Nginx :80)"]
         subgraph FrontCont["Camada de Apresentação"]
-            frontend["<b>Frontend SPA</b><br/>React 19.2 + TypeScript + Vite<br/><i>Porta 5173</i>"]:::front
+            frontend["<b>Frontend SPA</b><br/>React 19.2 + TypeScript + Vite / Nginx<br/><i>Dev :5173 | Prod/Staging :80</i>"]:::front
         end
 
         subgraph BackCont["Camada de Serviços e Negócio"]
@@ -91,11 +96,11 @@ flowchart TB
         end
 
         subgraph DbCont["Persistência Relacional"]
-            db[("<b>Banco de Dados MySQL 8.0</b><br/>Migrações Flyway (V1 a V8)<br/><i>Porta 3306</i>")]:::db
+            db[("<b>Banco de Dados MySQL 8.0</b><br/>Migrações Flyway (V1 a V9)<br/><i>Porta 3306</i>")]:::db
         end
 
         subgraph IamCont["Segurança e Identidade"]
-            keycloak["<b>Keycloak 26.8.0 (IAM)</b><br/>Realm sigtcc / JWT RS256<br/><i>Porta 8081</i>"]:::iam
+            keycloak["<b>Keycloak 26.8.0 (IAM)</b><br/>Realm sigtcc / JWT RS256<br/><i>Porta 8081 (interna 8080)</i>"]:::iam
         end
     end
 
@@ -103,11 +108,16 @@ flowchart TB
         nuvem["<b>Plataformas em Nuvem</b><br/>Google Drive / OneDrive / GitHub"]:::cloud
     end
 
-    aluno -->|"Acessa SPA [HTTPS / :5173]"| frontend
-    professor -->|"Acessa SPA [HTTPS / :5173]"| frontend
+    aluno -->|"HTTPS (Staging)"| funnel
+    professor -->|"HTTPS (Staging)"| funnel
+    aluno -.->|"HTTP direto (Dev local :5173)"| frontend
+    professor -.->|"HTTP direto (Dev local :5173)"| frontend
+    funnel -->|"Encaminha tráfego local [HTTP]"| frontend
+    funnel <-->|"Token ROPC [HTTP local]"| keycloak
+    funnel -->|"API REST [HTTP local]"| backend
 
-    frontend <-->|"Login via Direct Access Grant (ROPC) [HTTPS / grant_type=password]"| keycloak
-    frontend -->|"Requisições REST [HTTPS / Bearer JWT]"| backend
+    frontend <-->|"Login via Direct Access Grant (ROPC) [grant_type=password]"| keycloak
+    frontend -->|"Requisições REST [Bearer JWT]"| backend
 
     backend <-->|"Valida JWT localmente via JWKS [/certs]"| keycloak
     backend <-->|"Persistência transacional [TCP / JDBC :3306]"| db
@@ -116,7 +126,11 @@ flowchart TB
     professor -.->|"Acessa link do trabalho submetido [HTTPS]"| nuvem
 ```
 
-> Diagrama detalhado disponível em: [`docs/diagramas/c2-conteineres.md`](diagramas/c2-conteineres.md).
+> **Nota de Ambiente:** Em desenvolvimento local (`docker-compose.yml`), o Tailscale Funnel não é utilizado; o navegador acessa os contêineres diretamente via `localhost` (`:5173` para frontend, `:8080` para backend e `:8081` para Keycloak). O Funnel atua exclusivamente no ambiente de _staging_ (`docker-compose.prod.yml`). Diagrama detalhado disponível em: [`docs/diagramas/c2-conteineres.md`](diagramas/c2-conteineres.md).
+
+### 2.3 Visão de Componentes do Backend (C3)
+
+Para detalhar a organização interna da API REST em Spring Boot (`config`, `controller`, `exception`, `service`, `validation`, `event`, `observer`, `repository` e `model`), foi adicionado o diagrama de componentes C3 em [`docs/diagramas/c3-componentes-backend.md`](diagramas/c3-componentes-backend.md).
 
 ---
 
@@ -128,7 +142,7 @@ flowchart TB
 - **Contêiner:** `gestao_tcc_frontend_dev` (Porta externa `5173`).
 - **Responsabilidades:**
   - Renderizar a interface de usuário reativa, acessível e responsiva.
-  - Implementar o formulário de login reativo próprio (`Login/index.tsx`) integrado ao Keycloak via Direct Access Grant (Resource Owner Password Credentials - ROPC) ([ADR-0014](adrs/ADR-0014.md)).
+  - Implementar o formulário de login reativo próprio (`paginas/Login/index.tsx`) integrado ao Keycloak via Direct Access Grant (Resource Owner Password Credentials - ROPC) ([ADR-0014](adrs/ADR-0014.md)).
   - Gerenciar o estado de autenticação centralizado através do `AuthContext.tsx`.
   - Controlar o acesso a rotas públicas e rotas protegidas por permissão (`ROLE_ALUNO`, `ROLE_PROFESSOR`) através do componente guardião `ProtectedRoute.tsx`.
   - Anexar o token de acesso JWT no cabeçalho `Authorization: Bearer <token>` em todas as requisições destinadas à API REST por meio do cliente HTTP centralizado (`api.ts`), realizando renovação preventiva via `refresh_token` e nova tentativa automática em respostas `401 Unauthorized` (`authService.ts`).
@@ -150,7 +164,8 @@ flowchart TB
     - `service`: Orquestração de regras de negócio e transações gerenciadas (`@Transactional`);
     - `repository`: Interfaces de persistência estendendo `JpaRepository` com consultas especializadas;
     - `model`: Entidades de domínio JPA com integridade relacional estrita;
-    - `config`: Configuração de segurança centralizada sem estado (`STATELESS`), política de CORS unificada e conversão de papéis.
+    - `config`: Configuração de segurança centralizada sem estado (`STATELESS`), política de CORS unificada, `ClockConfig` e conversão de papéis;
+    - `exception`: Tratamento padronizado de exceções de domínio, validação, concorrência e erros genéricos (`GlobalExceptionHandler` com `ErrorResponseDTO` e `Clock` injetado).
   - Aplicar padrões de projeto orientados a objetos ([ADR-0007](adrs/ADR-0007.md)):
     - **Strategy:** Validações desacopladas de elegibilidade de solicitações compostas pela interface `ValidacaoSolicitacaoOrientacao` e suas implementações concretas `ValidacaoVagasDisponiveis`, `ValidacaoOrientadorAtivo` e `ValidacaoSolicitacaoDuplicada`;
     - **Observer:** Disparo e tratamento desacoplado de eventos de mudança de status (`SolicitacaoStatusChangedEvent` consumido por `AtualizadorVagasObserver` para decrementar vagas de forma transacional, protegido contra condições de corrida por bloqueio otimista `@Version` em `PerfilOrientador`).
@@ -170,10 +185,11 @@ flowchart TB
     - `V2__criar_tabelas_aluno_solicitacao.sql`: Criação da tabela `alunos` (herança de `usuarios`) e da tabela `solicitacoes_orientacao` com chaves estrangeiras para `orientadores` e `alunos`;
     - `V3__criar_tabela_turma_tcc.sql`: Criação da tabela `turmas_tcc` vinculando o período letivo ao `professor_responsavel_id`;
     - `V4__criar_tabela_prazos_entrega.sql`: Criação da tabela `prazos_entrega` definindo datas limite por tipo de entrega vinculadas à turma;
-    - `V5__seed_professores_e_turma_vigente.sql`: Carga inicial de dados (seed) de orientadores, perfis, linhas de pesquisa e turma ativa para ambiente de desenvolvimento;
+    - `V5__seed_professores_e_turma_vigente.sql`: Carga inicial de dados (seed) de orientadores, perfis, linhas de pesquisa e turma ativa para ambiente de desenvolvimento. Usa IDs fixos com `ON DUPLICATE KEY UPDATE` e só é segura em banco vazio (limitação BUG-15). Seeds futuros devem usar `INSERT ... SELECT ... WHERE NOT EXISTS` pela chave natural, sem ID fixo;
     - `V6__criar_tabela_entregas.sql`: Criação da tabela `entregas` com `url_documento VARCHAR(2048)`, `tipo`, `status`, flag `atrasada` e constraint única `uk_entrega_aluno_turma_tipo` ([ADR-0013](adrs/ADR-0013.md));
     - `V7__criar_tabela_pareceres.sql`: Criação da tabela `pareceres` vinculada a `entregas` e `orientadores`, preservando o histórico de pareceres (`resultado`, `comentario` e `registrado_em`);
-    - `V8__adicionar_versao_perfil_orientador.sql`: Inclusão da coluna `versao` (`BIGINT NOT NULL DEFAULT 0`) em `perfis_professores` para controle de concorrência otimista (`@Version`) no consumo de vagas.
+    - `V8__adicionar_versao_perfil_orientador.sql`: Inclusão da coluna `versao` (`BIGINT NOT NULL DEFAULT 0`) em `perfis_professores` para controle de concorrência otimista (`@Version`) no consumo de vagas;
+    - `V9__cancelar_solicitacoes_de_orientadores_inativos.sql`: Cancelamento das solicitações `PENDENTE` de orientadores já desativados (BUG-13).
   - Impedir mutações manuais ou não rastreadas de esquema com `hibernate.ddl-auto: validate` (em desenvolvimento e produção).
 
 ### 3.4 Provedor de Identidade (Keycloak IAM)
@@ -195,7 +211,7 @@ A arquitetura foi estruturada para suportar as histórias do escopo priorizado d
 
 | Funcionalidade do MVP                          | História        | Suporte Arquitetural e Decisões Aplicadas                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | :--------------------------------------------- | :-------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Autenticação e Perfis**                      | **US01**        | Delegada ao Keycloak ([ADR-0011](adrs/ADR-0011.md), [ADR-0014](adrs/ADR-0014.md)). O backend valida localmente os tokens JWT como Resource Server ([ADR-0012](adrs/ADR-0012.md)), eliminando custos de desenvolvimento de fluxos manuais de autenticação e mitigando integralmente o risco R06.                                                                                                                                                                                                                                         |
+| **Autenticação e Perfis**                      | **US01**        | Delegada ao Keycloak ([ADR-0011](adrs/ADR-0011.md), [ADR-0014](adrs/ADR-0014.md)). O backend valida localmente os tokens JWT como Resource Server ([ADR-0012](adrs/ADR-0012.md)) e aplica autorização por papel e titularidade na `SecurityConfig` e nos serviços, mitigando o risco R06.                                                                                                                                                                                                                                               |
 | **Cadastro e Edição de Perfil de Orientador**  | **US02**        | Suportada pela hierarquia de entidades JPA (`Usuario` -> `Orientador` -> `PerfilProfessor` -> `LinhaPesquisa`). Operações protegidas com transações declarativas e validações de e-mail institucional único.                                                                                                                                                                                                                                                                                                                            |
 | **Busca e Filtragem de Orientadores**          | **US03**        | Consulta otimizada implementada no repositório (`OrientadorRepository.findByFiltros`), suportando de forma combinada o filtro textual por linha de pesquisa e a restrição booleana por disponibilidade de vagas (`temVagas=true`).                                                                                                                                                                                                                                                                                                      |
 | **Solicitação e Aceite de Orientação (Match)** | **US04**        | Orquestrada com padrões orientados a objetos ([ADR-0007](adrs/ADR-0007.md)). O padrão _Strategy_ avalia as regras de negócio de elegibilidade (vagas, status ativo, ausência de duplicidade), e o padrão _Observer_ garante o decremento transacional de vagas quando o status transiciona para `ACEITA`.                                                                                                                                                                                                                               |
@@ -215,14 +231,14 @@ A arquitetura foi estruturada para suportar as histórias do escopo priorizado d
 
 Durante a evolução do projeto nas Sprints 1, 2 e 3, a equipe revisou decisões iniciais para adequar a solução aos riscos técnicos observados e aos limites de capacidade do semestre:
 
-| Aspecto Arquitetural                               | Arquitetura Planejada Originalmente (Inception / Sprint 1)                                                                                                                                                                           | Arquitetura Efetivamente Implementada (Sprint 4 / Entrega 8)                                                                                                                                                                                                                                                                                                                                                                                                                                       | Justificativa Técnica da Mudança                                                                                                                                                                                                                     |
-| :------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Autenticação e Gestão de Usuários**              | Login customizado desenvolvido no backend (Spring Security puro), com armazenamento de senha em `usuarios.senha` e geração manual de JWT ([`docs/inception.md`](inception.md), [`docs/entregas/sprint-2.md`](entregas/sprint-2.md)). | Adoção do **Keycloak 26.8.0** como Provedor de Identidade independente ([ADR-0011](adrs/ADR-0011.md)), backend como **Resource Server OAuth2** ([ADR-0012](adrs/ADR-0012.md)) e autenticação do frontend via **Direct Access Grant (ROPC)** ([ADR-0014](adrs/ADR-0014.md)).                                                                                                                                                                                                                        | Redução de esforço e eliminação do risco de vulnerabilidades em rotinas manuais de senha e sessão. A coluna `senha` na tabela `usuarios` deixou de ser usada na camada de aplicação (ainda existe fisicamente no `V1` e na entidade `Usuario.java`). |
-| **Fluxo de Autenticação no Frontend**              | Autenticação via Authorization Code + PKCE com redirecionamento externo para tela hospedada no Keycloak ([ADR-0011](adrs/ADR-0011.md)).                                                                                              | **Planejado PKCE (ADR-0011) → Implementado ROPC (ADR-0014)**: Login por formulário próprio via Direct Access Grant (`grant_type=password`), gerenciado por `AuthContext.tsx`, rotas em `ProtectedRoute.tsx` e Bearer token com renovação automática (`refresh_token`) em `api.ts`.                                                                                                                                                                                                                 | Atendimento aos critérios de aceitação da issue #130 (tela de login própria com mensagens de credenciais inválidas em componente React testável), inviabilizados pelo redirecionamento externo do PKCE.                                              |
-| **Papéis de Usuário e Gestão Acadêmica**           | Definição de três papéis de usuário rígidos: `Aluno`, `Professor/Orientador` e `Coordenador de TCC` como tipos fixos de cadastro no banco de dados ([`docs/inception.md`](inception.md)).                                            | Perfis de acesso simplificados para **`ROLE_ALUNO`** e **`ROLE_PROFESSOR`**. Introdução da entidade **`TurmaTCC`** ([ADR-0010](adrs/ADR-0010.md)) para controle dinâmico da coordenação da turma no semestre.                                                                                                                                                                                                                                                                                      | Na dinâmica acadêmica, a coordenação da disciplina é um encargo temporário entre docentes. A modelagem dinâmica de `TurmaTCC` preserva a rastreabilidade histórica de períodos anteriores sem corromper o cadastro vitalício do docente.             |
-| **Submissão de Documentos de TCC**                 | Upload físico de arquivos multipart (PDFs de Projeto, TCC 1 e TCC 2) persistidos em volume de disco do servidor ([`docs/inception.md`](inception.md)).                                                                               | **Submissão por links externos** em plataformas de nuvem colaborativas ou repositórios de código ([ADR-0013](adrs/ADR-0013.md)), validando URLs HTTPS no backend (`@URL(protocol = "https")`) e persistindo nas tabelas `entregas` (`V6`) e `pareceres` (`V7`).                                                                                                                                                                                                                                    | Eliminação da sobrecarga de gerenciar infraestrutura de storage local, quotas de disco e riscos de binários maliciosos, permitindo que a revisão ocorra diretamente com comentários e anotações nativas nas plataformas de nuvem.                    |
-| **Evolução do Esquema do Banco de Dados**          | Criação e atualização automática de tabelas gerenciada pelo Hibernate com `hibernate.ddl-auto: update` (prática inicial da Sprint 1).                                                                                                | Controle formal e incremental de esquema via migrações versionadas do **Flyway** (`V1` a `V8`), com validação estrita em runtime (`hibernate.ddl-auto: validate`) ([ADR-0009](adrs/ADR-0009.md)). Tabelas e evoluções criadas: `V1` (`usuarios`, `orientadores`, `perfis_professores`, `linhas_pesquisa`), `V2` (`alunos`, `solicitacoes_orientacao`), `V3` (`turmas_tcc`), `V4` (`prazos_entrega`), `V5` (seed), `V6` (`entregas`), `V7` (`pareceres`) e `V8` (`versao` em `perfis_professores`). | Prevenção de corrupção silenciosa de dados e inconsistências estruturais entre os ambientes de desenvolvimento da equipe, produção e o pipeline de CI.                                                                                               |
-| **Composição de Regras de Negócio de Solicitação** | Serviços procedurais baseados em encadeamentos de condicionais `if/else` no `SolicitacaoService`.                                                                                                                                    | Aplicação dos padrões comportamentais **Strategy** (validações de elegibilidade independentes) e **Observer** (atualização reativa e transacional de vagas) ([ADR-0007](adrs/ADR-0007.md)).                                                                                                                                                                                                                                                                                                        | Aderência aos princípios SOLID (Aberto/Fechado e Responsabilidade Única), aumentando a testabilidade com testes unitários isolados por estratégia.                                                                                                   |
+| Aspecto Arquitetural                               | Arquitetura Planejada Originalmente (Inception / Sprint 1)                                                                                                                                                                           | Arquitetura Efetivamente Implementada (Sprint 4 / Entrega 8)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Justificativa Técnica da Mudança                                                                                                                                                                                                                     |
+| :------------------------------------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Autenticação e Gestão de Usuários**              | Login customizado desenvolvido no backend (Spring Security puro), com armazenamento de senha em `usuarios.senha` e geração manual de JWT ([`docs/inception.md`](inception.md), [`docs/entregas/sprint-2.md`](entregas/sprint-2.md)). | Adoção do **Keycloak 26.8.0** como Provedor de Identidade independente ([ADR-0011](adrs/ADR-0011.md)), backend como **Resource Server OAuth2** ([ADR-0012](adrs/ADR-0012.md)) e autenticação do frontend via **Direct Access Grant (ROPC)** ([ADR-0014](adrs/ADR-0014.md)).                                                                                                                                                                                                                                                                                     | Redução de esforço e eliminação do risco de vulnerabilidades em rotinas manuais de senha e sessão. A coluna `senha` na tabela `usuarios` deixou de ser usada na camada de aplicação (ainda existe fisicamente no `V1` e na entidade `Usuario.java`). |
+| **Fluxo de Autenticação no Frontend**              | Autenticação via Authorization Code + PKCE com redirecionamento externo para tela hospedada no Keycloak ([ADR-0011](adrs/ADR-0011.md)).                                                                                              | **Planejado PKCE (ADR-0011) → Implementado ROPC (ADR-0014)**: Login por formulário próprio via Direct Access Grant (`grant_type=password`), gerenciado por `AuthContext.tsx`, rotas em `ProtectedRoute.tsx` e Bearer token com renovação automática (`refresh_token`) em `api.ts`.                                                                                                                                                                                                                                                                              | Atendimento aos critérios de aceitação da issue #130 (tela de login própria com mensagens de credenciais inválidas em componente React testável), inviabilizados pelo redirecionamento externo do PKCE.                                              |
+| **Papéis de Usuário e Gestão Acadêmica**           | Definição de três papéis de usuário rígidos: `Aluno`, `Professor/Orientador` e `Coordenador de TCC` como tipos fixos de cadastro no banco de dados ([`docs/inception.md`](inception.md)).                                            | Perfis de acesso simplificados para **`ROLE_ALUNO`** e **`ROLE_PROFESSOR`**. Introdução da entidade **`TurmaTCC`** ([ADR-0010](adrs/ADR-0010.md)) para controle dinâmico da coordenação da turma no semestre.                                                                                                                                                                                                                                                                                                                                                   | Na dinâmica acadêmica, a coordenação da disciplina é um encargo temporário entre docentes. A modelagem dinâmica de `TurmaTCC` preserva a rastreabilidade histórica de períodos anteriores sem corromper o cadastro vitalício do docente.             |
+| **Submissão de Documentos de TCC**                 | Upload físico de arquivos multipart (PDFs de Projeto, TCC 1 e TCC 2) persistidos em volume de disco do servidor ([`docs/inception.md`](inception.md)).                                                                               | **Submissão por links externos** em plataformas de nuvem colaborativas ou repositórios de código ([ADR-0013](adrs/ADR-0013.md)), validando URLs HTTPS no backend (`@URL(protocol = "https")`) e persistindo nas tabelas `entregas` (`V6`) e `pareceres` (`V7`).                                                                                                                                                                                                                                                                                                 | Eliminação da sobrecarga de gerenciar infraestrutura de storage local, quotas de disco e riscos de binários maliciosos, permitindo que a revisão ocorra diretamente com comentários e anotações nativas nas plataformas de nuvem.                    |
+| **Evolução do Esquema do Banco de Dados**          | Criação e atualização automática de tabelas gerenciada pelo Hibernate com `hibernate.ddl-auto: update` (prática inicial da Sprint 1).                                                                                                | Controle formal e incremental de esquema via migrações versionadas do **Flyway** (`V1` a `V9`), com validação estrita em runtime (`hibernate.ddl-auto: validate`) ([ADR-0009](adrs/ADR-0009.md)). Tabelas e evoluções criadas: `V1` (`usuarios`, `orientadores`, `perfis_professores`, `linhas_pesquisa`), `V2` (`alunos`, `solicitacoes_orientacao`), `V3` (`turmas_tcc`), `V4` (`prazos_entrega`), `V5` (seed), `V6` (`entregas`), `V7` (`pareceres`) `V8` (`versao` em `perfis_professores`) e `V9` (cancelamento de solicitações de orientadores inativos). | Prevenção de corrupção silenciosa de dados e inconsistências estruturais entre os ambientes de desenvolvimento da equipe, produção e o pipeline de CI.                                                                                               |
+| **Composição de Regras de Negócio de Solicitação** | Serviços procedurais baseados em encadeamentos de condicionais `if/else` no `SolicitacaoService`.                                                                                                                                    | Aplicação dos padrões comportamentais **Strategy** (validações de elegibilidade independentes) e **Observer** (atualização reativa e transacional de vagas) ([ADR-0007](adrs/ADR-0007.md)).                                                                                                                                                                                                                                                                                                                                                                     | Aderência aos princípios SOLID (Aberto/Fechado e Responsabilidade Única), aumentando a testabilidade com testes unitários isolados por estratégia.                                                                                                   |
 
 ---
 
@@ -246,3 +262,5 @@ Todas as escolhas estruturais do projeto estão registradas e justificadas forma
 | [`ADR-0012`](adrs/ADR-0012.md) | Backend como Resource Server OAuth2 com Validação Local de JWT                                     | Aprovada | Backend / Segurança  |
 | [`ADR-0013`](adrs/ADR-0013.md) | Adoção de Submissão por Link Externo em Substituição ao Upload Físico                              | Aprovada | Backend / Frontend   |
 | [`ADR-0014`](adrs/ADR-0014.md) | Autenticação do Frontend via Direct Access Grant (Resource Owner Password Credentials) do Keycloak | Aprovada | Frontend / IAM       |
+
+> **Nota sobre a Entrega 9 (Release Candidate):** A Entrega 9 teve foco exclusivo em consolidação e _hardening_ (correções de bugs, testes de aceitação e estabilização do _staging_ com Tailscale Funnel documentada em [`docs/staging.md`](staging.md)), sem alterações arquiteturais estruturais que demandassem uma nova ADR além das 14 decisões vigentes.

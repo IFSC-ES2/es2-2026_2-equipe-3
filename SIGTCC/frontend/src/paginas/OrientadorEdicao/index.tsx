@@ -6,9 +6,11 @@ import { obterOrientador } from "../../utils/orientadorService.ts";
 import { obterPerfilProfessor } from "../../utils/professorService.ts";
 import { OrientadorForm } from "../../components/OrientadorForm";
 import { PageShell } from "../OrientadorCadastro";
+import { useAuth } from "../../auth/useAuth";
 
 export function OrientadorEdicaoPage() {
   const navigate = useNavigate();
+  const { sessao } = useAuth();
   const [orientador, setOrientador] = useState<Orientador | null>(null);
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
@@ -70,6 +72,7 @@ export function OrientadorEdicaoPage() {
     <PageShell active="perfil" mensagem={mensagem} sucesso={sucesso}>
       {orientador && (
         <OrientadorForm
+          emailAutenticado={sessao?.email ?? ""}
           orientador={orientador}
           onSucesso={(atualizado) => {
             setOrientador(atualizado);

@@ -9,8 +9,13 @@ import br.edu.ifsc.gestao_tcc.exception.RegraDeNegocioException;
 import br.edu.ifsc.gestao_tcc.exception.ResourceNotFoundException;
 import br.edu.ifsc.gestao_tcc.model.LinhaPesquisa;
 import br.edu.ifsc.gestao_tcc.model.Orientador;
+import br.edu.ifsc.gestao_tcc.event.SolicitacaoStatusChangedEvent;
 import br.edu.ifsc.gestao_tcc.model.PerfilOrientador;
+import br.edu.ifsc.gestao_tcc.model.SolicitacaoOrientacao;
+import br.edu.ifsc.gestao_tcc.model.StatusSolicitacao;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
+import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
+import br.edu.ifsc.gestao_tcc.repository.UsuarioRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,6 +23,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +40,15 @@ class OrientadorServiceTest {
     @Mock
     private OrientadorRepository orientadorRepository;
 
+    @Mock
+    private SolicitacaoRepository solicitacaoRepository;
+
+    @Mock
+    private ApplicationEventPublisher eventPublisher;
+
+    @Mock
+    private UsuarioRepository usuarioRepository;
+
     @InjectMocks
     private OrientadorService orientadorService;
 
@@ -48,14 +63,14 @@ class OrientadorServiceTest {
         requestDTO.setBiografia("Professor Doutor");
         requestDTO.setLinhasDePesquisa(List.of("IA", "Redes"));
 
-        when(orientadorRepository.existsByEmail(requestDTO.getEmail())).thenReturn(false);
+        when(usuarioRepository.existsByEmailIgnoreCase(requestDTO.getEmail())).thenReturn(false);
         when(orientadorRepository.save(any(Orientador.class))).thenAnswer(invocation -> {
             Orientador o = invocation.getArgument(0);
             o.setId(1L);
             return o;
         });
 
-        Orientador salvo = orientadorService.cadastrar(requestDTO);
+        Orientador salvo = orientadorService.cadastrar("JOAO@IFSC.EDU.BR", requestDTO);
 
         assertNotNull(salvo);
         assertEquals(1L, salvo.getId());
@@ -64,22 +79,35 @@ class OrientadorServiceTest {
         assertEquals(3, salvo.getPerfil().getVagasDisponiveis());
         assertEquals(2, salvo.getPerfil().getLinhasPesquisa().size());
 
-        verify(orientadorRepository, times(1)).existsByEmail(anyString());
+        verify(usuarioRepository, times(1)).existsByEmailIgnoreCase(anyString());
         verify(orientadorRepository, times(1)).save(any(Orientador.class));
     }
 
     @Test
-    @DisplayName("Deve lançar EmailDuplicadoException quando e-mail já existir no cadastro")
+    @DisplayName("Deve lançar EmailDuplicadoException quando e-mail já existir na tabela usuarios (orientador ou aluno)")
     void cadastrar_DeveLancarEmailDuplicadoException_QuandoEmailJaExiste() {
         OrientadorRequestDTO requestDTO = new OrientadorRequestDTO();
         requestDTO.setEmail("joao@ifsc.edu.br");
 
-        when(orientadorRepository.existsByEmail(requestDTO.getEmail())).thenReturn(true);
+        when(usuarioRepository.existsByEmailIgnoreCase(requestDTO.getEmail())).thenReturn(true);
 
-        assertThrows(EmailDuplicadoException.class, () -> orientadorService.cadastrar(requestDTO));
+        assertThrows(EmailDuplicadoException.class,
+                () -> orientadorService.cadastrar(requestDTO.getEmail(), requestDTO));
 
-        verify(orientadorRepository, times(1)).existsByEmail(anyString());
+        verify(usuarioRepository, times(1)).existsByEmailIgnoreCase(anyString());
         verify(orientadorRepository, never()).save(any(Orientador.class));
+    }
+
+    @Test
+    @DisplayName("Deve negar o cadastro quando o e-mail informado difere do e-mail autenticado")
+    void cadastrar_DeveNegar_QuandoEmailDivergeDoUsuarioAutenticado() {
+        OrientadorRequestDTO requestDTO = new OrientadorRequestDTO();
+        requestDTO.setEmail("outro@ifsc.edu.br");
+
+        assertThrows(AcessoNegadoException.class,
+                () -> orientadorService.cadastrar(EMAIL_DONO, requestDTO));
+
+        verifyNoInteractions(usuarioRepository, orientadorRepository);
     }
 
     @Test
@@ -246,6 +274,45 @@ class OrientadorServiceTest {
 
         Orientador orientadorSalvo = captor.getValue();
         assertFalse(orientadorSalvo.getAtivo()); // Valida a exclusão lógica
+    }
+
+    @Test
+    @DisplayName("Ao desativar, deve cancelar as solicitações PENDENTE e publicar um evento por solicitação")
+    void deletar_DeveCancelarSolicitacoesPendentes_EPublicarEventos() {
+        Long id = 1L;
+        Orientador orientador = criarOrientadorMock(id, "João");
+        SolicitacaoOrientacao pendente1 = SolicitacaoOrientacao.builder()
+                .id(10L).orientador(orientador).status(StatusSolicitacao.PENDENTE).build();
+        SolicitacaoOrientacao pendente2 = SolicitacaoOrientacao.builder()
+                .id(11L).orientador(orientador).status(StatusSolicitacao.PENDENTE).build();
+
+        when(orientadorRepository.findById(id)).thenReturn(Optional.of(orientador));
+        when(solicitacaoRepository.findByOrientadorIdAndStatusOrderByCriadoEmDesc(id, StatusSolicitacao.PENDENTE))
+                .thenReturn(List.of(pendente1, pendente2));
+
+        orientadorService.deletar(id, EMAIL_DONO);
+
+        assertFalse(orientador.getAtivo());
+        assertEquals(StatusSolicitacao.CANCELADA, pendente1.getStatus());
+        assertEquals(StatusSolicitacao.CANCELADA, pendente2.getStatus());
+
+        ArgumentCaptor<SolicitacaoStatusChangedEvent> eventos =
+                ArgumentCaptor.forClass(SolicitacaoStatusChangedEvent.class);
+        verify(eventPublisher, times(2)).publishEvent(eventos.capture());
+        assertTrue(eventos.getAllValues().stream().allMatch(evento ->
+                evento.statusAnterior() == StatusSolicitacao.PENDENTE
+                        && evento.statusNovo() == StatusSolicitacao.CANCELADA));
+    }
+
+    @Test
+    @DisplayName("Ao desativar outro orientador, não deve cancelar solicitações nem publicar eventos")
+    void deletar_NaoDeveCancelarSolicitacoes_QuandoUsuarioNaoEhDono() {
+        Long id = 1L;
+        when(orientadorRepository.findById(id)).thenReturn(Optional.of(criarOrientadorMock(id, "João")));
+
+        assertThrows(AcessoNegadoException.class, () -> orientadorService.deletar(id, EMAIL_OUTRO));
+
+        verifyNoInteractions(solicitacaoRepository, eventPublisher);
     }
 
     @Test

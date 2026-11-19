@@ -9,6 +9,7 @@ import br.edu.ifsc.gestao_tcc.model.*;
 import br.edu.ifsc.gestao_tcc.repository.AlunoRepository;
 import br.edu.ifsc.gestao_tcc.repository.OrientadorRepository;
 import br.edu.ifsc.gestao_tcc.repository.SolicitacaoRepository;
+import br.edu.ifsc.gestao_tcc.repository.UsuarioRepository;
 import br.edu.ifsc.gestao_tcc.validation.ValidacaoSolicitacaoOrientacao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -42,6 +43,8 @@ class SolicitacaoServiceTest {
     @Mock
     private AlunoRepository alunoRepository;
     @Mock
+    private UsuarioRepository usuarioRepository;
+    @Mock
     private ApplicationEventPublisher eventPublisher;
     @Mock
     private ValidacaoSolicitacaoOrientacao validacaoMock;
@@ -54,6 +57,7 @@ class SolicitacaoServiceTest {
                 solicitacaoRepository,
                 orientadorRepository,
                 alunoRepository,
+                usuarioRepository,
                 eventPublisher,
                 List.of(validacaoMock)
         );
@@ -145,6 +149,23 @@ class SolicitacaoServiceTest {
         assertThrows(AcessoNegadoException.class,
                 () -> solicitacaoService.criarSolicitacao(requestDTO, " ", NOME_TOKEN));
         verifyNoInteractions(alunoRepository, solicitacaoRepository);
+    }
+
+    @Test
+    @DisplayName("Deve lançar EmailDuplicadoException quando o e-mail do token já pertencer a outro usuário (orientador)")
+    void criarSolicitacao_EmailJaCadastradoNaTabelaUsuarios_DeveLancarEmailDuplicado() {
+        SolicitacaoRequestDTO requestDTO = criarRequestDTO();
+        Orientador orientador = criarOrientadorMock(1L, 2);
+
+        when(orientadorRepository.findById(1L)).thenReturn(Optional.of(orientador));
+        when(alunoRepository.findByEmail(EMAIL_ORIENTADOR)).thenReturn(Optional.empty());
+        when(usuarioRepository.existsByEmailIgnoreCase(EMAIL_ORIENTADOR)).thenReturn(true);
+
+        assertThrows(EmailDuplicadoException.class,
+                () -> solicitacaoService.criarSolicitacao(requestDTO, EMAIL_ORIENTADOR, "Professor"));
+
+        verify(alunoRepository, never()).save(any(Aluno.class));
+        verify(solicitacaoRepository, never()).save(any(SolicitacaoOrientacao.class));
     }
 
     @Test
@@ -288,6 +309,26 @@ class SolicitacaoServiceTest {
         assertThrows(VagasIndisponiveisException.class,
                 () -> solicitacaoService.atualizarStatus(100L, request, EMAIL_ORIENTADOR));
         verify(solicitacaoRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("Deve lançar OrientadorInativoException ao aceitar solicitação de orientador inativo, sem consumir vaga")
+    void atualizarStatus_ParaAceitaComOrientadorInativo_DeveLancarExcecao() {
+        Orientador orientador = criarOrientadorMock(1L, 2);
+        orientador.setAtivo(false);
+        SolicitacaoOrientacao solicitacao = criarSolicitacaoMock(100L, StatusSolicitacao.PENDENTE, orientador);
+        AtualizaStatusRequest request = new AtualizaStatusRequest(StatusSolicitacao.ACEITA, null);
+
+        when(solicitacaoRepository.findById(100L)).thenReturn(Optional.of(solicitacao));
+
+        OrientadorInativoException exception = assertThrows(OrientadorInativoException.class,
+                () -> solicitacaoService.atualizarStatus(100L, request, EMAIL_ORIENTADOR));
+
+        assertEquals("O orientador está inativo e não pode aceitar solicitações.", exception.getMessage());
+        assertEquals(StatusSolicitacao.PENDENTE, solicitacao.getStatus());
+        assertEquals(2, orientador.getPerfil().getVagasDisponiveis());
+        verify(solicitacaoRepository, never()).save(any());
+        verify(eventPublisher, never()).publishEvent(any());
     }
 
     @Test
