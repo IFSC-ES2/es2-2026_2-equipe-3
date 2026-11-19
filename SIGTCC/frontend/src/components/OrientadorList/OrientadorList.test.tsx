@@ -21,8 +21,6 @@ const selecionarLinhaDePesquisa = async (
   user: ReturnType<typeof userEvent.setup>,
   linha: string,
 ) => {
-  // Espera a opção ser renderizada: ela só aparece depois que a resposta de
-  // listarOrientadores atualiza linhasDisponiveis (Issue #313).
   await screen.findByRole("option", { name: linha });
   await user.selectOptions(screen.getByLabelText("Linha de pesquisa"), linha);
 };
