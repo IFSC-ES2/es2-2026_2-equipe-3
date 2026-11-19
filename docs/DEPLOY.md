@@ -152,11 +152,11 @@ tailscale funnel status
 
 O `status` deve listar as três URLs da seção 3.1 apontando para `localhost:80`, `localhost:8080` e `localhost:8081`.
 
-3. **Subir o stack na tag oficial (`v1.0.0-rc.1`) com o banco zerado:**
+3. **Subir o stack na tag oficial (`v1.0.0`) com o banco zerado:**
 
 ```bash
 git fetch --tags
-git checkout v1.0.0-rc.1
+git checkout v1.0.0
 cd SIGTCC
 docker compose -f docker-compose.prod.yml --env-file .env down -v
 docker compose -f docker-compose.prod.yml --env-file .env up -d --build
@@ -195,7 +195,7 @@ docker compose -f docker-compose.prod.yml --env-file .env down -v
 
 ```bash
 git checkout <tag-ou-sha-estavel-anterior>
-# Exemplo: git checkout v1.0.0-rc.1 (ou a release anterior, v0.4.0)
+# Exemplo: git checkout v1.0.0-rc.1 (release anterior à v1.0.0)
 ```
 
 3. **Reconstruir as imagens e subir o ambiente estabilizado:**

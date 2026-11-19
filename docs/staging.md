@@ -69,7 +69,7 @@ Conforme o Critério 3 da Issue #260, o ambiente deve subir a partir da tag ofic
 
 ```bash
 git fetch --tags
-git checkout v1.0.0-rc.1
+git checkout v1.0.0
 ```
 
 Suba a aplicação com Docker Compose a partir de `SIGTCC/`:
@@ -93,7 +93,7 @@ KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000 API_URL=https://sigtcc
 
 ## 5. Credenciais de Teste e Cenário de Demonstração (Issues #280 e #286)
 
-> **Roteiro Completo da Demonstração (`v1.0.0-rc.1`):** O passo a passo completo dos 8 blocos da demonstração (usuário, rota, dados inseridos e resultado esperado em cada etapa), bem como as limitações residuais e o guia de defesa técnica, está documentado em **[`docs/ROTEIRO-DEMONSTRACAO.md`](ROTEIRO-DEMONSTRACAO.md)**.
+> **Roteiro Completo da Demonstração (`v1.0.0`):** O passo a passo completo dos 8 blocos da demonstração (usuário, rota, dados inseridos e resultado esperado em cada etapa), bem como as limitações residuais e o guia de defesa técnica, está documentado em **[`docs/ROTEIRO-DEMONSTRACAO.md`](ROTEIRO-DEMONSTRACAO.md)**.
 
 Os usuários de teste pré-cadastrados no realm (`sigtcc`) para homologação, avaliação pelo professor e demonstração são:
 

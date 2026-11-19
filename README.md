@@ -1,8 +1,8 @@
 # Sistema de Gestão Centralizada de TCC
 
-O **SIGTCC** é uma aplicação Web que centraliza o fluxo inicial do Trabalho de Conclusão de Curso. Ela reúne o catálogo de orientadores, a solicitação e o aceite de orientação, o calendário de prazos da turma e a submissão e avaliação das entregas do TCC. A versão candidata atual é a **`v1.0.0-rc.1`** (Entrega 9).
+O **SIGTCC** é uma aplicação Web que centraliza o fluxo inicial do Trabalho de Conclusão de Curso. Ela reúne o catálogo de orientadores, a solicitação e o aceite de orientação, o calendário de prazos da turma e a submissão e avaliação das entregas do TCC. A versão atual é a **`v1.0.0`** (Entrega 10).
 
-## MVP entregue — v1.0.0-rc.1
+## MVP entregue — v1.0.0
 
 **Funcionalidades incluídas** (US01 a US07, 29 SP, 100% do [`BASELINE.md`](docs/BASELINE.md)):
 
@@ -28,7 +28,7 @@ O **SIGTCC** é uma aplicação Web que centraliza o fluxo inicial do Trabalho d
 
 ## Acesso rápido
 
-**Ambiente de _staging_** (URLs fixas com HTTPS até a defesa; detalhes na seção [12.1](#121-ambiente-de-staging-oficial-urls-fixas-até-a-defesa)):
+**Ambiente de _staging_** (URLs fixas com HTTPS até a defesa; detalhes na seção [13.1](#131-ambiente-de-staging-oficial-urls-fixas-até-a-defesa)):
 
 | Serviço             | URL                                                                                          |
 | :------------------ | :------------------------------------------------------------------------------------------- |
@@ -318,7 +318,7 @@ Todas as rotas exigem o cabeçalho `Authorization: Bearer <token>`. Especificaç
 - **[Relatório de Bugs](docs/relatorio-de-bugs.md):** Triagem final dos 22 achados da revisão estática ([#256](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/256)), com o status de cada bug, as issues e os PRs relacionados.
 - **[Planejamento e Condução da Release Candidate](docs/entregas/release-candidate.md):** Metas, escopo congelado, cronograma, backlog final, matriz de rastreabilidade, Pull Requests e contribuições individuais da Entrega 9 ([#253](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/253)).
 - **[Guia de Deploy e Staging](docs/DEPLOY.md) e [Staging estável](docs/staging.md):** URLs fixas via Tailscale Funnel, restrição de `webOrigins` no Keycloak, procedimento de reinício e _rollback_ ([#260](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/260) e [#284](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/284)).
-- **[Roteiro da Demonstração Final do MVP](docs/ROTEIRO-DEMONSTRACAO.md):** Roteiro estruturado passo a passo da versão `v1.0.0-rc.1` (login → catálogo e filtro → solicitação → aceite → prazos → submissão por link → parecer → reenvio após ajustes), usuários e dados de cada passo, limitações residuais e guia de defesa técnica ([#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280) e [#286](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/286)).
+- **[Roteiro da Demonstração Final do MVP](docs/ROTEIRO-DEMONSTRACAO.md):** Roteiro estruturado passo a passo da versão `v1.0.0` (login → catálogo e filtro → solicitação → aceite → prazos → submissão por link → parecer → reenvio após ajustes), usuários e dados de cada passo, limitações residuais e guia de defesa técnica ([#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280) e [#286](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/286)).
 - **[Testes de Aceitação do MVP](docs/ACEITACAO.md):** Definição, execução e registro dos resultados dos casos de teste de aceitação `AT-01` a `AT-07` cobrindo as histórias centrais US01 a US07 (cenários positivos e negativos de segurança e regras de negócio), com `AT-01` a `AT-06` aprovados e `AT-07` aprovado com ressalvas ([#267](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/267), [#312](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/312)).
 
 ### 11.1. Limitações Conhecidas
@@ -336,9 +336,22 @@ Nenhum defeito conhecido impede a demonstração do MVP. Detalhes, passos de rep
 | :----- | :--------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | BUG-15 | Média      | O seed `V5` usa IDs fixos e pode sobrescrever dados de bancos criados antes dele. Não afeta bancos novos (verificado por teste); decisão registrada na issue `#274`. |
 
-## 12. Ambiente de Staging e Execução
+## 12. Entrega 10: Versão Final (`v1.0.0`)
 
-### 12.1. Ambiente de Staging Oficial (URLs Fixas até a Defesa)
+- **Release:** [`v1.0.0`](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/releases/tag/v1.0.0), publicada a partir da `main` ([#319](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/319)).
+
+A `v1.0.0` consolida a `v1.0.0-rc.1` sem mudanças de escopo: as funcionalidades são as mesmas descritas na seção "MVP entregue — v1.0.0", no início deste README. Os ajustes finais da Entrega 10 foram:
+
+- **Testes de aceitação:** correção de rotas, códigos HTTP e evidências em [`docs/ACEITACAO.md`](docs/ACEITACAO.md) ([#312](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/312), PR [#315](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/315)).
+- **Teste instável no frontend:** o `OrientadorList.test.tsx` passa a esperar as opções do filtro serem renderizadas antes de selecioná-las ([#313](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/313), PR [#316](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/316)).
+- **Resultado final da Entrega 9:** registrado em [`docs/entregas/release-candidate.md`](docs/entregas/release-candidate.md) ([#314](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/314), PR [#317](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/pull/317)).
+- **Referências de versão:** README, [`docs/DEPLOY.md`](docs/DEPLOY.md), [`docs/staging.md`](docs/staging.md) e [`docs/ROTEIRO-DEMONSTRACAO.md`](docs/ROTEIRO-DEMONSTRACAO.md) apontam para a `v1.0.0`; as menções históricas à `v1.0.0-rc.1` foram mantidas ([#318](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/318)).
+- **Integração e release:** integração da `entrega-10` à `main` e publicação da release `v1.0.0` ([#319](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/319)).
+- **Staging da apresentação:** implantação da `v1.0.0` no _staging_ e preparação do cenário da demonstração ([#320](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/320)).
+
+## 13. Ambiente de Staging e Execução
+
+### 13.1. Ambiente de Staging Oficial (URLs Fixas até a Defesa)
 
 O ambiente de _staging_ está publicado e acessível publicamente via URLs fixas com HTTPS para avaliação contínua até a apresentação final e defesa técnica:
 
@@ -348,7 +361,7 @@ O ambiente de _staging_ está publicado e acessível publicamente via URLs fixas
 
 > Para detalhes de configuração, procedimentos operacionais de reinício, responsável pela disponibilidade e script de verificação automatizada (_smoke test_), consulte [`docs/staging.md`](docs/staging.md).
 
-### 12.2. Como executar o aplicativo localmente
+### 13.2. Como executar o aplicativo localmente
 
 O projeto pode ser executado inteiramente com Docker Compose (opção A) ou com o banco e o Keycloak no Docker e o backend e o frontend direto na máquina (opção B).
 
@@ -436,7 +449,7 @@ npm run dev
 
 4. Acesse [http://localhost:5173](http://localhost:5173) e faça login com um dos usuários de teste.
 
-### 12.3. Dados, Usuários e Cenário de Demonstração (Reprodutível)
+### 13.3. Dados, Usuários e Cenário de Demonstração (Reprodutível)
 
 Ao subir o ambiente do zero (`docker compose up`), a migração Flyway `V5__seed_professores_e_turma_vigente.sql` cria os dois orientadores base e a turma vigente `2026/2`. Para popular de forma reprodutível e idempotente as **linhas de pesquisa** dos orientadores e os **três prazos oficiais da turma vigente** (`PROJETO_TCC`, `TCC1` e `TCC2`), execute a partir da raiz do repositório:
 
@@ -484,7 +497,7 @@ Para recriar o ambiente do zero, apagando também os volumes do banco e do Keycl
 docker compose down -v
 ```
 
-## 13. Como executar os testes unitários
+## 14. Como executar os testes unitários
 
 O projeto possui suítes de testes isoladas para as camadas de frontend e backend. Certifique-se de abrir o terminal e navegar para a pasta correspondente antes de executar os comandos.
 
