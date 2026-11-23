@@ -647,3 +647,26 @@ Os riscos classificados como residuais estão relacionados na seção 7.5 e fora
 ### 7.6 Replicação nas limitações da release
 
 Os riscos residuais acima foram replicados na seção "Limitações conhecidas e riscos residuais" de [`docs/entregas/release-candidate.md`](entregas/release-candidate.md).
+
+## 8. Atualização do R10 após a Release: Migração do Staging para a Azure (20/11/2026)
+
+O risco residual de `R10` registrado na seção 7.5 ("o staging roda na máquina de um integrante") se concretizou como limitação operacional: o ambiente só ficava no ar enquanto o computador do responsável permanecia ligado. Para a apresentação final (Entrega 10) e a defesa técnica (Entrega 11), o host foi migrado para uma máquina virtual dedicada.
+
+### 8.1 Ação tomada
+
+- **Novo host:** VM `sigtcc-vm` na Microsoft Azure (assinatura _Azure for Students_), região `chilecentral`, tamanho `Standard_B2als_v2` (2 vCPUs, 4 GiB) com Ubuntu 24.04 LTS e swap de 4 GiB.
+- **Exposição:** mantido o Tailscale Funnel. A VM assumiu o nome `sigtcc` no _tailnet_, preservando as URLs `https://sigtcc.cobbler-albacore.ts.net` (`:8443` e `:10000`) sem alterar o `.env`, o `realm-import.json` ou a tag `v1.0.0`.
+- **Superfície de ataque:** o NSG da Azure libera apenas a porta `22` (SSH com chave). MySQL (`3306`) e as portas internas dos contêineres não ficam acessíveis pela internet.
+- **Resiliência a reinícios:** Docker Engine habilitado no boot, contêineres com `restart: always` e rotas do Funnel persistentes (`--bg`).
+- **Validação:** `smoke-test.sh` executado contra as URLs públicas servidas pela VM, com 22 verificações bem-sucedidas. Procedimento completo em [`docs/DEPLOY.md`](DEPLOY.md) (seção 3.2) e [`docs/staging.md`](staging.md).
+
+### 8.2 Reavaliação
+
+|   ID    | Exposição residual após a migração                                                                                                     | Efeito observável                             | Contorno / ação futura                                                                                                      |
+| :-----: | :------------------------------------------------------------------------------------------------------------------------------------- | :-------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------- |
+| **R10** | A VM é paga com o crédito de US$ 100 do _Azure for Students_ (~US$ 44/mês), com término previsto no início de 02/2027.                 | O ambiente sai do ar quando o crédito acabar. | Alerta de orçamento no _Cost Management_; recriar a VM com o guia da `DEPLOY.md` em outra conta ou provedor, se necessário. |
+| **R10** | A assinatura estudantil restringe as regiões (`francecentral`, `chilecentral`, `southafricanorth`, `northcentralus`, `canadacentral`). | Recriação da VM limitada a essas regiões.     | Escolher região permitida com o tamanho `B2als_v2` disponível.                                                              |
+| **R10** | O domínio `cobbler-albacore.ts.net` continua vinculado à conta Tailscale de um integrante.                                             | A VM depende do _tailnet_ desse integrante.   | Manter a VM registrada como `sigtcc`; restringir por ACL o acesso da VM aos demais dispositivos do _tailnet_.               |
+
+- **Probabilidade de indisponibilidade:** Média (2) → **Baixa (1)**, pois a disponibilidade deixou de depender de um computador pessoal.
+- **Responsável pelo Acompanhamento:** VM na Azure (`Talles Souza`); _tailnet_ e domínio (`Eduardo Cardoso`).

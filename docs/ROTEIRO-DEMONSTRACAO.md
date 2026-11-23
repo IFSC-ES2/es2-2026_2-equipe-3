@@ -175,7 +175,7 @@ Durante a apresentação final, a equipe destacará de forma transparente os seg
 4. **Autenticação Frontend via Direct Access Grant ([ADR-0014](adrs/ADR-0014.md), Risco `R09`):**
    - Adotado no MVP para viabilizar o formulário de login próprio em React com testes automatizados de componente (`#130`), com token armazenado em `sessionStorage` e renovação automática via `refresh_token`. Para produção corporativa, recomenda-se migrar para Authorization Code + PKCE.
 5. **Infraestrutura de Staging e Seed `V5` (`BUG-15`, Risco `R13`):**
-   - O ambiente de _staging_ roda via **Tailscale Funnel** com URLs HTTPS fixas hospedadas em máquina da equipe ([`docs/staging.md`](staging.md)), dependendo de o host estar ligado.
+   - O ambiente de _staging_ roda 24 horas por dia em uma **VM dedicada na Microsoft Azure** (assinatura _Azure for Students_), exposta pelo **Tailscale Funnel** com URLs HTTPS fixas ([`docs/staging.md`](staging.md)). A disponibilidade depende do crédito estudantil, com término previsto para o início de fevereiro de 2027.
    - A migração `V5` utiliza IDs fixos (`1` e `2`), sendo 100% segura em bancos recém-criados (comprovado por `MigracoesFlywayTest`), mantida inalterada para preservar o checksum do Flyway ([ADR-0009](adrs/ADR-0009.md)).
 
 ---
