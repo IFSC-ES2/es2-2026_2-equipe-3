@@ -753,6 +753,16 @@ Todo o conteúdo, código, testes e documentação elaborados ou revisados com o
 - **Adaptação/Descarte:** A decisão de manter o bug como limitação conhecida foi do integrante; foi descartada a criação de uma V10, que não preveniria nem desfaria o problema, e a ADR-0009 não foi alterada. A lista de migrations da `ARQUITETURA.md` foi corrigida para incluir a V9.
 - **Validação Técnica:** `MigracoesFlywayTest` com 3/3 testes passando, `./gradlew build` com sucesso e CI verde; aprovado e integrado no PR #298.
 
+#### Migração do ambiente de staging para a Microsoft Azure
+
+- **Data:** 19/11/2026 a 20/11/2026
+- **Ferramenta:** Claude Opus 5.5 (Anthropic)
+- **Artefatos:** VM `sigtcc-vm` na Azure (configuração operacional, fora do repositório), `docs/staging.md`, `docs/DEPLOY.md`, `docs/riscos.md` (seção 8) e `docs/ROTEIRO-DEMONSTRACAO.md`
+- **Aproveitamento:** Comparação de opções gratuitas de hospedagem compatíveis com o stack do `docker-compose.prod.yml` (MySQL, Keycloak, Spring Boot e Nginx); passo a passo de criação da VM no _Azure for Students_ e de configuração do Ubuntu (swap, Docker Engine e Tailscale); diagnóstico dos erros de disponibilidade de tamanho e da política de regiões permitidas (`RequestDisallowedByAzure`); proposta de migração mantendo o mesmo nome de host no _tailnet_ para preservar as URLs do Tailscale Funnel; e redação das atualizações da documentação de staging, deploy e riscos.
+- **Adaptação/Descarte:** As opções Oracle Cloud Always Free (cadastro exigiu CNPJ) e as VMs gratuitas de 1 GiB da Azure (memória insuficiente para o stack) foram descartadas. A região e o tamanho da VM foram escolhidos pelo integrante entre as regiões permitidas pela assinatura, considerando custo e latência. As senhas do `.env` foram definidas manualmente pelo integrante e não constam na documentação.
+- **Validação Técnica:** Build do stack na tag `v1.0.0` com as migrations `V1` a `V9` aplicadas pelo Flyway, `db` e `keycloak` em estado `healthy`, rotas do Tailscale Funnel conferidas com `tailscale funnel status` e execução do `smoke-test.sh` contra as URLs públicas com 22 verificações bem-sucedidas.
+
+
 #### Revisão Técnica de Pull Requests (PRs #269, #271, #289, #291, #297, #301 e #303)
 
 - **Data:** 17/11/2026 a 18/11/2026

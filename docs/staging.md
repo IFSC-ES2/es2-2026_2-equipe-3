@@ -1,6 +1,8 @@
 # Ambiente de Staging Estável (Issues #220 e #260)
 
-Staging roda o mesmo stack de produção (`SIGTCC/docker-compose.prod.yml`: MySQL, Keycloak, backend Spring Boot e frontend React) em uma máquina da equipe, exposto por URLs públicas e fixas através do **Tailscale Funnel**. O ambiente permanece no ar para avaliação contínua até a apresentação final (Entrega 10) e a defesa técnica (Entrega 11).
+Staging roda o mesmo stack de produção (`SIGTCC/docker-compose.prod.yml`: MySQL, Keycloak, backend Spring Boot e frontend React) em uma **máquina virtual dedicada na Microsoft Azure**, exposto por URLs públicas e fixas através do **Tailscale Funnel**. O ambiente permanece no ar 24 horas por dia para avaliação contínua até a apresentação final (Entrega 10) e a defesa técnica (Entrega 11).
+
+> **Migração em 20/11/2026:** o staging deixou de rodar na máquina pessoal de um integrante e passou a rodar na VM descrita na seção 3. As URLs públicas, o `realm-import.json` e a tag `v1.0.0` não mudaram, pois o novo host assumiu o mesmo nome (`sigtcc`) no _tailnet_.
 
 ## 1. URLs Fixas do Ambiente
 
@@ -17,10 +19,22 @@ O client `sigtcc-frontend` em `SIGTCC/keycloak/realm-import.json` **não utiliza
 - `https://sigtcc.cobbler-albacore.ts.net` (ambiente de staging oficial)
 - `http://localhost:5173` e `http://localhost` (desenvolvimento local)
 
-## 3. Responsável pela Disponibilidade
+## 3. Infraestrutura e Responsáveis
 
-- **Responsável:** Eduardo Cardoso (Equipe 3)
-- **Período de disponibilidade garantida:** Até a conclusão da Entrega 10 (Apresentação Final) e Entrega 11 (Defesa Técnica).
+| Item                      | Valor                                                                                          |
+| :------------------------ | :--------------------------------------------------------------------------------------------- |
+| **Provedor**              | Microsoft Azure (assinatura _Azure for Students_, crédito de US$ 100)                          |
+| **Região**                | Chile Central (`chilecentral`)                                                                 |
+| **Máquina virtual**       | `sigtcc-vm`, tamanho `Standard_B2als_v2` (2 vCPUs, 4 GiB de RAM) + swap de 4 GiB               |
+| **Sistema operacional**   | Ubuntu Server 24.04 LTS (x64), Docker Engine e Docker Compose v2                               |
+| **Disco**                 | SSD Standard de 30 GiB                                                                         |
+| **Acesso administrativo** | SSH (porta `22`) com chave privada, usuário `azureuser`                                        |
+| **Exposição pública**     | Somente via Tailscale Funnel (portas `443`, `8443` e `10000`); demais portas bloqueadas no NSG |
+| **Custo estimado**        | ~US$ 44/mês (VM + disco + IP público), coberto pelo crédito estudantil                         |
+
+- **Responsável pela VM na Azure:** Talles Souza (Equipe 3)
+- **Responsável pelo _tailnet_ e domínio `cobbler-albacore.ts.net`:** Eduardo Cardoso (Equipe 3)
+- **Período de disponibilidade garantida:** Até a conclusão da Entrega 10 (Apresentação Final) e Entrega 11 (Defesa Técnica). O crédito estudantil cobre a VM até aproximadamente o início de fevereiro de 2027.
 
 ## 4. Procedimento de Configuração e Reinício
 
@@ -47,7 +61,13 @@ APP_CORS_ALLOWED_ORIGINS=https://sigtcc.cobbler-albacore.ts.net
 
 ### Passo 2: Garantir os Túneis do Tailscale Funnel
 
-Certifique-se de que o **Tailscale** e o **Docker Desktop** estão abertos e conectados.
+Conecte-se à VM por SSH (a chave privada fica com o responsável pela VM):
+
+```powershell
+ssh -i "$env:USERPROFILE\Downloads\sigtcc-vm_key.pem" azureuser@<IP_PUBLICO_DA_VM>
+```
+
+Na VM, o Docker Engine e o Tailscale iniciam automaticamente com o sistema, os contêineres usam `restart: always` e as rotas do Funnel criadas com `--bg` persistem após reinícios. Em operação normal, nenhum passo manual é necessário após um _reboot_.
 
 Verifique o status do Funnel:
 
@@ -58,9 +78,9 @@ tailscale funnel status
 Caso as rotas precisem ser reativadas em segundo plano:
 
 ```bash
-tailscale funnel --bg --yes 80
-tailscale funnel --bg --yes --https=8443 8080
-tailscale funnel --bg --yes --https=10000 8081
+sudo tailscale funnel --bg --yes 80
+sudo tailscale funnel --bg --yes --https=8443 8080
+sudo tailscale funnel --bg --yes --https=10000 8081
 ```
 
 ### Passo 3: Checkout da Tag e Subida do Stack
@@ -83,7 +103,7 @@ _(Caso tenha havido alterações no `realm-import.json`, execute `docker compose
 
 ### Passo 4: Validação com Smoke Test (Atenção à Execução Única)
 
-A partir da raiz do repositório (usando Git Bash no Windows ou terminal Linux/macOS):
+A partir da raiz do repositório na VM (`~/es2-2026_2-equipe-3`):
 
 ```bash
 KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000 API_URL=https://sigtcc.cobbler-albacore.ts.net:8443 bash SIGTCC/scripts/smoke-test.sh
@@ -126,13 +146,13 @@ bash SIGTCC/scripts/seed-demo.sh
 O script configura e valida automaticamente (18 verificações):
 
 1. **Orientadores ativos com linhas de pesquisa e vagas (`GET /api/v1/orientadores`):**
-   - `Professor Orientador` (`professor.orientador@example.com`, depto `DAELN`, `3` vagas): linhas `Engenharia de Software`, `Arquitetura de Sistemas` e `Qualidade de Software`.
-   - `Professor Responsável pela Turma` (`professor.responsavel@example.com`, depto `DAELN`, `3` vagas): linhas `Inteligência Artificial`, `Ciência de Dados` e `Engenharia de Software`.
+    - `Professor Orientador` (`professor.orientador@example.com`, depto `DAELN`, `3` vagas): linhas `Engenharia de Software`, `Arquitetura de Sistemas` e `Qualidade de Software`.
+    - `Professor Responsável pela Turma` (`professor.responsavel@example.com`, depto `DAELN`, `3` vagas): linhas `Inteligência Artificial`, `Ciência de Dados` e `Engenharia de Software`.
 2. **Turma vigente (`2026/2`):** confirmada com `responsavelTurma: true` para `professor.responsavel@example.com` (`GET /api/v1/professores/me`).
 3. **Prazos da turma vigente (`GET /api/v1/prazos`):**
-   - `PROJETO_TCC`: data limite em `+30 dias`
-   - `TCC1`: data limite em `+60 dias`
-   - `TCC2`: data limite em `+90 dias`
+    - `PROJETO_TCC`: data limite em `+30 dias`
+    - `TCC1`: data limite em `+60 dias`
+    - `TCC2`: data limite em `+90 dias`
 
 Caso seja necessário **zerar completamente o banco de _staging_** (por exemplo, após a execução do `smoke-test.sh` ou de testes exploratórios) para deixar o ambiente limpo para a demonstração final:
 
@@ -149,11 +169,17 @@ bash SIGTCC/scripts/seed-demo.sh
 ## 6. Histórico de Execução e Validação
 
 - **19/11/2026 — Preparação para a Apresentação Final (`v1.0.0`):**
-  - **Smoke test (`SIGTCC/scripts/smoke-test.sh`):** Executado contra os endpoints HTTPS do Tailscale Funnel (`https://sigtcc.cobbler-albacore.ts.net:8443` e `:10000`) com banco recém-criado, totalizando **22 verificações bem-sucedidas** (3 autenticações de papéis de usuários + 19 verificações de regras de negócio, concorrência e proteção de endpoints).
-  - **Cenário limpo de demonstração (`SIGTCC/scripts/seed-demo.sh`):** Após novo reset completo dos volumes (`down -v && up -d`), o script foi executado sem `--validar-roteiro`, concluindo **18 de 18 verificações com sucesso** (login dos 3 perfis no Keycloak, 2 orientadores configurados com 3 vagas disponíveis, turma vigente `2026/2` e prazos `PROJETO_TCC`, `TCC1` e `TCC2` cadastrados, sem solicitações ou entregas prévias do aluno de teste).
+    - **Smoke test (`SIGTCC/scripts/smoke-test.sh`):** Executado contra os endpoints HTTPS do Tailscale Funnel (`https://sigtcc.cobbler-albacore.ts.net:8443` e `:10000`) com banco recém-criado, totalizando **22 verificações bem-sucedidas** (3 autenticações de papéis de usuários + 19 verificações de regras de negócio, concorrência e proteção de endpoints).
+    - **Cenário limpo de demonstração (`SIGTCC/scripts/seed-demo.sh`):** Após novo reset completo dos volumes (`down -v && up -d`), o script foi executado sem `--validar-roteiro`, concluindo **18 de 18 verificações com sucesso** (login dos 3 perfis no Keycloak, 2 orientadores configurados com 3 vagas disponíveis, turma vigente `2026/2` e prazos `PROJETO_TCC`, `TCC1` e `TCC2` cadastrados, sem solicitações ou entregas prévias do aluno de teste).
+
+- **20/11/2026 — Migração para a VM na Azure (`v1.0.0`):**
+    - Stack construído na VM `sigtcc-vm` a partir da tag `v1.0.0`; o Flyway aplicou as migrations `V1` a `V9` e `db` e `keycloak` ficaram `healthy`.
+    - **Smoke test (`SIGTCC/scripts/smoke-test.sh`):** executado contra as mesmas URLs HTTPS do Tailscale Funnel, agora servidas pela VM, com **22 verificações bem-sucedidas**.
 
 ## 7. Limitações Conhecidas
 
 - **Importação do Realm Condicionada a Volume Vazio:** O Keycloak só executa o `--import-realm` quando o volume `keycloak_data` está vazio. Qualquer modificação no arquivo `SIGTCC/keycloak/realm-import.json` exige recriar os volumes (`docker compose -f docker-compose.prod.yml down -v`).
-- **Disponibilidade Dependente do Anfitrião:** O ambiente não roda em servidor em nuvem dedicado; depende de o computador do responsável permanecer ligado, sem suspensão de energia, com o Docker Desktop ativo e o cliente Tailscale conectado.
-- **Associação de Domínio do Tailscale Funnel:** As URLs públicas fixas (`*.cobbler-albacore.ts.net`) estão vinculadas à conta do Tailscale do integrante responsável pela hospedagem.
+- **Disponibilidade Dependente do Crédito Estudantil:** A VM é paga com o crédito de US$ 100 do _Azure for Students_ (~US$ 44/mês). Quando o crédito acabar (previsão: início de fevereiro de 2027), a assinatura é desativada e o ambiente sai do ar, sem cobrança adicional. O saldo é acompanhado pelo _Education Hub_ e por um alerta de orçamento no _Cost Management_.
+- **Restrição de Regiões da Assinatura Estudantil:** A política `Allowed resource deployment regions` da assinatura só permite criar recursos em `francecentral`, `chilecentral`, `southafricanorth`, `northcentralus` e `canadacentral`. Recriar a VM exige escolher uma dessas regiões.
+- **Memória Limitada:** Com 4 GiB de RAM, o build das imagens depende do swap de 4 GiB configurado na VM; rebuilds completos (`--build`) levam de 5 a 10 minutos.
+- **Associação de Domínio do Tailscale Funnel:** As URLs públicas fixas (`*.cobbler-albacore.ts.net`) estão vinculadas à conta do Tailscale do integrante responsável pelo _tailnet_. A VM precisa permanecer registrada nesse _tailnet_ com o nome `sigtcc`.
