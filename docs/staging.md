@@ -146,13 +146,13 @@ bash SIGTCC/scripts/seed-demo.sh
 O script configura e valida automaticamente (18 verificações):
 
 1. **Orientadores ativos com linhas de pesquisa e vagas (`GET /api/v1/orientadores`):**
-    - `Professor Orientador` (`professor.orientador@example.com`, depto `DAELN`, `3` vagas): linhas `Engenharia de Software`, `Arquitetura de Sistemas` e `Qualidade de Software`.
-    - `Professor Responsável pela Turma` (`professor.responsavel@example.com`, depto `DAELN`, `3` vagas): linhas `Inteligência Artificial`, `Ciência de Dados` e `Engenharia de Software`.
+   - `Professor Orientador` (`professor.orientador@example.com`, depto `DAELN`, `3` vagas): linhas `Engenharia de Software`, `Arquitetura de Sistemas` e `Qualidade de Software`.
+   - `Professor Responsável pela Turma` (`professor.responsavel@example.com`, depto `DAELN`, `3` vagas): linhas `Inteligência Artificial`, `Ciência de Dados` e `Engenharia de Software`.
 2. **Turma vigente (`2026/2`):** confirmada com `responsavelTurma: true` para `professor.responsavel@example.com` (`GET /api/v1/professores/me`).
 3. **Prazos da turma vigente (`GET /api/v1/prazos`):**
-    - `PROJETO_TCC`: data limite em `+30 dias`
-    - `TCC1`: data limite em `+60 dias`
-    - `TCC2`: data limite em `+90 dias`
+   - `PROJETO_TCC`: data limite em `+30 dias`
+   - `TCC1`: data limite em `+60 dias`
+   - `TCC2`: data limite em `+90 dias`
 
 Caso seja necessário **zerar completamente o banco de _staging_** (por exemplo, após a execução do `smoke-test.sh` ou de testes exploratórios) para deixar o ambiente limpo para a demonstração final:
 
@@ -169,12 +169,12 @@ bash SIGTCC/scripts/seed-demo.sh
 ## 6. Histórico de Execução e Validação
 
 - **19/11/2026 — Preparação para a Apresentação Final (`v1.0.0`):**
-    - **Smoke test (`SIGTCC/scripts/smoke-test.sh`):** Executado contra os endpoints HTTPS do Tailscale Funnel (`https://sigtcc.cobbler-albacore.ts.net:8443` e `:10000`) com banco recém-criado, totalizando **22 verificações bem-sucedidas** (3 autenticações de papéis de usuários + 19 verificações de regras de negócio, concorrência e proteção de endpoints).
-    - **Cenário limpo de demonstração (`SIGTCC/scripts/seed-demo.sh`):** Após novo reset completo dos volumes (`down -v && up -d`), o script foi executado sem `--validar-roteiro`, concluindo **18 de 18 verificações com sucesso** (login dos 3 perfis no Keycloak, 2 orientadores configurados com 3 vagas disponíveis, turma vigente `2026/2` e prazos `PROJETO_TCC`, `TCC1` e `TCC2` cadastrados, sem solicitações ou entregas prévias do aluno de teste).
+  - **Smoke test (`SIGTCC/scripts/smoke-test.sh`):** Executado contra os endpoints HTTPS do Tailscale Funnel (`https://sigtcc.cobbler-albacore.ts.net:8443` e `:10000`) com banco recém-criado, totalizando **22 verificações bem-sucedidas** (3 autenticações de papéis de usuários + 19 verificações de regras de negócio, concorrência e proteção de endpoints).
+  - **Cenário limpo de demonstração (`SIGTCC/scripts/seed-demo.sh`):** Após novo reset completo dos volumes (`down -v && up -d`), o script foi executado sem `--validar-roteiro`, concluindo **18 de 18 verificações com sucesso** (login dos 3 perfis no Keycloak, 2 orientadores configurados com 3 vagas disponíveis, turma vigente `2026/2` e prazos `PROJETO_TCC`, `TCC1` e `TCC2` cadastrados, sem solicitações ou entregas prévias do aluno de teste).
 
 - **20/11/2026 — Migração para a VM na Azure (`v1.0.0`):**
-    - Stack construído na VM `sigtcc-vm` a partir da tag `v1.0.0`; o Flyway aplicou as migrations `V1` a `V9` e `db` e `keycloak` ficaram `healthy`.
-    - **Smoke test (`SIGTCC/scripts/smoke-test.sh`):** executado contra as mesmas URLs HTTPS do Tailscale Funnel, agora servidas pela VM, com **22 verificações bem-sucedidas**.
+  - Stack construído na VM `sigtcc-vm` a partir da tag `v1.0.0`; o Flyway aplicou as migrations `V1` a `V9` e `db` e `keycloak` ficaram `healthy`.
+  - **Smoke test (`SIGTCC/scripts/smoke-test.sh`):** executado contra as mesmas URLs HTTPS do Tailscale Funnel, agora servidas pela VM, com **22 verificações bem-sucedidas**.
 
 ## 7. Limitações Conhecidas
 

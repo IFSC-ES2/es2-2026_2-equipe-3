@@ -762,7 +762,6 @@ Todo o conteúdo, código, testes e documentação elaborados ou revisados com o
 - **Adaptação/Descarte:** As opções Oracle Cloud Always Free (cadastro exigiu CNPJ) e as VMs gratuitas de 1 GiB da Azure (memória insuficiente para o stack) foram descartadas. A região e o tamanho da VM foram escolhidos pelo integrante entre as regiões permitidas pela assinatura, considerando custo e latência. As senhas do `.env` foram definidas manualmente pelo integrante e não constam na documentação.
 - **Validação Técnica:** Build do stack na tag `v1.0.0` com as migrations `V1` a `V9` aplicadas pelo Flyway, `db` e `keycloak` em estado `healthy`, rotas do Tailscale Funnel conferidas com `tailscale funnel status` e execução do `smoke-test.sh` contra as URLs públicas com 22 verificações bem-sucedidas.
 
-
 #### Revisão Técnica de Pull Requests (PRs #269, #271, #289, #291, #297, #301 e #303)
 
 - **Data:** 17/11/2026 a 18/11/2026
