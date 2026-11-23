@@ -12,7 +12,7 @@ Certifique-se de ter instalado na máquina:
 - **Docker** (24+) e **Docker Compose** (v2)
 - **Node.js** (versão 20+) e **npm** _(opcional, apenas caso deseje rodar o frontend fora do Docker)_
 - **JDK 21** _(opcional, apenas caso deseje rodar o backend fora do Docker)_
-- **Tailscale** ([cliente Tailscale](https://tailscale.com/download)) com o **Funnel** habilitado no _tailnet_ _(necessário apenas na máquina anfitriã do ambiente de staging)_
+- **Tailscale** ([cliente Tailscale](https://tailscale.com/download)) com o **Funnel** habilitado no _tailnet_ _(necessário apenas na VM de staging na Azure; ver seção 3.2)_
 
 ### 1.1. Configuração das Variáveis de Ambiente
 
@@ -115,7 +115,7 @@ O Keycloak importa automaticamente o arquivo `SIGTCC/keycloak/realm-import.json`
 
 ## 3. Ambiente de Staging (Validação Externa via Tailscale Funnel)
 
-O ambiente de _staging_ utiliza o arquivo `SIGTCC/docker-compose.prod.yml` (com builds multi-stage otimizados: JRE 21 para o backend e Nginx na porta `80` para o frontend) aliado ao **Tailscale Funnel** para expor a aplicação por **URLs públicas e fixas com HTTPS** durante as avaliações da equipe e banca (conforme a Issue #260).
+O ambiente de _staging_ utiliza o arquivo `SIGTCC/docker-compose.prod.yml` (com builds multi-stage otimizados: JRE 21 para o backend e Nginx na porta `80` para o frontend) aliado ao **Tailscale Funnel** para expor a aplicação por **URLs públicas e fixas com HTTPS** durante as avaliações da equipe e banca (conforme a Issue #260). O stack roda 24 horas por dia em uma VM dedicada na Microsoft Azure (seção 3.2).
 
 > **Documento Oficial de Staging:** Para o passo a passo operacional completo, credenciais de teste, procedimento de reinício e histórico de homologação, consulte **[`docs/staging.md`](staging.md)**.
 
@@ -127,7 +127,65 @@ O ambiente de _staging_ utiliza o arquivo `SIGTCC/docker-compose.prod.yml` (com 
 | **Backend (API)**   | `https://sigtcc.cobbler-albacore.ts.net:8443`  | `8080`      |
 | **Keycloak (Auth)** | `https://sigtcc.cobbler-albacore.ts.net:10000` | `8081`      |
 
-### 3.2. Passo a Passo para Subir o Staging Fixo
+### 3.2. Provisionamento da VM na Azure (Host do Staging)
+
+Desde 20/11/2026, o _staging_ roda em uma máquina virtual dedicada na Microsoft Azure (assinatura _Azure for Students_), e não mais na máquina de um integrante. Os passos abaixo recriam o host do zero; a configuração atual está registrada na seção 3 de [`docs/staging.md`](staging.md).
+
+1. **Ativar o _Azure for Students_** em `azure.microsoft.com/free/students` com o e-mail institucional (`@aluno.ifsc.edu.br`). Não é exigido cartão de crédito; o crédito é de US$ 100.
+2. **Conferir as regiões permitidas:** no portal, _Política → Atribuições → Allowed resource deployment regions → Parâmetros_. Na assinatura atual: `francecentral`, `chilecentral`, `southafricanorth`, `northcentralus` e `canadacentral`. Criar recursos fora dessa lista falha com `RequestDisallowedByAzure`.
+3. **Criar a VM** em _Máquinas virtuais → Criar → Máquina virtual do Azure_ (não usar a oferta _Free account virtual machine_, limitada a 1 GiB de RAM):
+
+| Campo                      | Valor                                                      |
+| :------------------------- | :--------------------------------------------------------- |
+| Grupo de recursos          | `sigtcc-rg`                                                |
+| Nome                       | `sigtcc-vm`                                                |
+| Região                     | `Chile Central` (ou outra região permitida com o tamanho)  |
+| Opções de disponibilidade  | Nenhuma redundância de infraestrutura necessária           |
+| Imagem                     | Ubuntu Server 24.04 LTS – x64 Gen2                         |
+| Tamanho                    | `Standard_B2als_v2` (2 vCPUs, 4 GiB)                       |
+| Autenticação               | Chave pública SSH, usuário `azureuser`, novo par de chaves |
+| Portas de entrada públicas | Somente SSH (`22`)                                         |
+| Disco do SO                | SSD Standard                                               |
+| Desligamento automático    | **Desabilitado**                                           |
+
+4. **Conectar por SSH** a partir do Windows (PowerShell), após restringir a permissão da chave baixada:
+
+```powershell
+icacls "$env:USERPROFILE\Downloads\sigtcc-vm_key.pem" /inheritance:r /grant:r "$($env:USERNAME):R"
+ssh -i "$env:USERPROFILE\Downloads\sigtcc-vm_key.pem" azureuser@<IP_PUBLICO_DA_VM>
+```
+
+5. **Preparar a VM** (swap de 4 GiB, necessário para o build com 4 GiB de RAM, e Docker Engine). Caso o espelho `azure.archive.ubuntu.com` fique indisponível, troque-o pelo `archive.ubuntu.com`:
+
+```bash
+sudo fallocate -l 4G /swapfile && sudo chmod 600 /swapfile
+sudo mkswap /swapfile && sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+sudo sed -i 's|http://azure.archive.ubuntu.com/ubuntu|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list.d/ubuntu.sources
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y git curl jq
+curl -fsSL https://get.docker.com | sudo sh
+sudo usermod -aG docker azureuser
+sudo systemctl enable docker
+```
+
+6. **Registrar a VM no _tailnet_** do responsável pelo domínio `cobbler-albacore.ts.net` (o login pelo link exibido é feito com a conta dele):
+
+```bash
+curl -fsSL https://tailscale.com/install.sh | sh
+sudo tailscale up --hostname=sigtcc-azure
+```
+
+No painel do Tailscale (_Machines_), remova o host anterior chamado `sigtcc` e renomeie `sigtcc-azure` para `sigtcc`. Assim as URLs da seção 3.1 passam a apontar para a VM sem nenhuma alteração no `.env` ou no `realm-import.json`.
+
+7. **Clonar o repositório** e seguir a seção 3.3 a partir do passo 1:
+
+```bash
+git clone https://github.com/IFSC-ES2/es2-2026_2-equipe-3.git
+cd es2-2026_2-equipe-3
+```
+
+### 3.3. Passo a Passo para Subir o Staging Fixo
 
 1. **Criar o `SIGTCC/.env` a partir do `.env.example`** e substituir o bloco de _staging_ pelas URLs fixas. As demais variáveis (banco, Keycloak e domínios sugeridos) seguem a tabela da seção 1.2; no _staging_, troque as senhas de exemplo por valores próprios.
 
@@ -144,9 +202,9 @@ APP_CORS_ALLOWED_ORIGINS=https://sigtcc.cobbler-albacore.ts.net
 2. **Ativar os túneis do Tailscale Funnel** para as três portas locais e conferir o mapeamento:
 
 ```bash
-tailscale funnel --bg --yes 80
-tailscale funnel --bg --yes --https=8443 8080
-tailscale funnel --bg --yes --https=10000 8081
+sudo tailscale funnel --bg --yes 80
+sudo tailscale funnel --bg --yes --https=8443 8080
+sudo tailscale funnel --bg --yes --https=10000 8081
 tailscale funnel status
 ```
 
@@ -163,7 +221,7 @@ docker compose -f docker-compose.prod.yml --env-file .env up -d --build
 docker compose -f docker-compose.prod.yml --env-file .env ps
 ```
 
-Aguarde até que `db`, `keycloak` e `backend` apareçam como `healthy`. No primeiro start, o backend aplica as migrations `V1` a `V9` do Flyway e o Keycloak importa o realm `sigtcc`.
+Aguarde até que `db` e `keycloak` apareçam como `healthy` e `backend` e `frontend` como `Up` (estes dois não possuem _healthcheck_ no Compose). No primeiro start, o backend aplica as migrations `V1` a `V9` do Flyway e o Keycloak importa o realm `sigtcc`.
 
 4. **Validar com o Smoke Test Automatizado** (a partir da raiz do repositório):
 
@@ -173,7 +231,7 @@ KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000 API_URL=https://sigtcc
 
 > **Atenção:** O `smoke-test.sh` cadastra dados reais (uma solicitação aceita e um prazo de entrega) e não deve ser executado sobre um banco já populado com dados de demonstração. Execute-o uma única vez, logo após o `down -v` do passo 3.
 
-5. **Preparar os dados de demonstração** conforme [`docs/staging.md`](staging.md) (issue [#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280)). Para reiniciar o ambiente sem perder os dados (por exemplo, após reiniciar a máquina anfitriã), use o procedimento de reinício descrito no mesmo documento, sem `down -v`.
+5. **Preparar os dados de demonstração** conforme [`docs/staging.md`](staging.md) (issue [#280](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/280)). Para reiniciar o ambiente sem perder os dados (por exemplo, após reiniciar a VM), use o procedimento de reinício descrito no mesmo documento, sem `down -v`.
 
 ---
 
@@ -205,7 +263,7 @@ cd SIGTCC
 docker compose -f docker-compose.prod.yml --env-file .env up -d --build
 ```
 
-4. **Revalidar o ambiente** com o _smoke test_ (seção 3.2, passo 4) e preparar novamente os dados de demonstração.
+4. **Revalidar o ambiente** com o _smoke test_ (seção 3.3, passo 4) e preparar novamente os dados de demonstração.
 
 > **Sobre as Imagens do GHCR no Rollback:** O arquivo `SIGTCC/docker-compose.prod.yml` usa a diretiva `build:` porque as URLs do _staging_ (`VITE_API_URL` e `VITE_KEYCLOAK_URL`) são gravadas no _bundle_ do frontend durante o build. As imagens publicadas no GitHub Container Registry (`ghcr.io/ifsc-es2/sigtcc-backend:<sha>` e `ghcr.io/ifsc-es2/sigtcc-frontend:<sha>`) são geradas pelo CI sem essas URLs; usá-las exigiria trocar `build:` por `image: ghcr.io/...` e reconstruir o frontend com as URLs fixas. Por isso, no fluxo padrão de _staging_ o rollback é feito com `git checkout <tag>` seguido de `docker compose up -d --build`.
 
@@ -215,4 +273,5 @@ docker compose -f docker-compose.prod.yml --env-file .env up -d --build
 
 - **Importação Inicial do Realm (`realm-import.json`):** O Keycloak só executa o `--import-realm` quando o volume `keycloak_data` está vazio. Caso o arquivo `realm-import.json` seja atualizado no repositório, é necessário remover o volume do Keycloak (`docker compose -f docker-compose.prod.yml down -v`) ou aplicar a alteração pelo console administrativo.
 - **Web Origins Restrito no Keycloak (Issue #260):** O arquivo `SIGTCC/keycloak/realm-import.json` não utiliza mais o curinga `*`, estando restrito estritamente a `https://sigtcc.cobbler-albacore.ts.net` e origens locais de desenvolvimento (`localhost`).
-- **Disponibilidade Dependente da Máquina Anfitriã:** O ambiente de staging utiliza túnel fixo via Tailscale Funnel hospedado na máquina de um integrante da equipe. A disponibilidade do ambiente depende do computador anfitrião permanecer ligado, conectado à internet e com o Docker em execução. Detalhes completos e procedimento de reinício em [`docs/staging.md`](staging.md).
+- **Disponibilidade Dependente do Crédito Estudantil:** O ambiente de staging roda em uma VM na Azure paga com o crédito de US$ 100 do _Azure for Students_ (~US$ 44/mês, previsão de término no início de fevereiro de 2027). Ao fim do crédito, a assinatura é desativada e o ambiente sai do ar, sem cobrança adicional. Docker, contêineres (`restart: always`) e túneis do Funnel (`--bg`) voltam automaticamente após reinícios da VM. Detalhes completos e procedimento de reinício em [`docs/staging.md`](staging.md).
+- **Regiões Restritas da Assinatura Estudantil:** A VM só pode ser recriada nas regiões permitidas pela política da assinatura (seção 3.2, passo 2).
