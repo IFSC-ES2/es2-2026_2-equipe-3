@@ -1,9 +1,9 @@
 # Testes de Aceitação do MVP — SIGTCC (`v1.0.0-rc.1`)
 
 - **Sistema:** Sistema de Gestão Centralizada de TCC (SIGTCC)
-- **Marco de Entrega:** Entrega 9 — Release Candidate (RC)
-- **Versão:** [`v1.0.0-rc.1`](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/releases/tag/v1.0.0-rc.1)
-- **Rastreabilidade:** Atendimento ao Item 2.5 e 5 do Edital da Entrega 9 e à Issue [#267](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/267).
+- **Marco de Entrega:** Entrega 9 / Entrega 10 — Release Candidate e Apresentação Final
+- **Versão:** [`v1.0.0-rc.1`](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/releases/tag/v1.0.0-rc.1) (base da `v1.0.0`)
+- **Rastreabilidade:** Issues [#267](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/267) e [#312](https://github.com/IFSC-ES2/es2-2026_2-equipe-3/issues/312).
 
 ---
 
@@ -15,14 +15,14 @@ Os testes foram desenhados para validar a aderência do sistema aos critérios d
 
 1. **Fluxos Principais (Caminho Feliz):** Execução bem-sucedida das jornadas de alunos e professores;
 2. **Cenários Negativos de Segurança e Autorização:** Tentativas de acesso não autenticado (`HTTP 401 Unauthorized`) e operações proibidas por perfil (`HTTP 403 Forbidden`);
-3. **Cenários Negativos de Regra de Negócio e Validação de Dados:** Rejeição de links inseguros (`HTTP 400 Bad Request`), conflitos de concorrência ou unicidade (`HTTP 409 Conflict`) e violações semânticas de negócio (`HTTP 422 Unprocessable Entity`);
-4. **Dupla Abordagem de Validação:** Execução manual orientada à interface do usuário (UI) combinada com execução automatizada por meio de testes de integração (Spring Boot MockMvc, Vitest) e o script executável de homologação ponta a ponta [`SIGTCC/scripts/smoke-test.sh`](../SIGTCC/scripts/smoke-test.sh).
+3. **Cenários Negativos de Regra de Negócio e Validação de Dados:** Rejeição de campos/URLs inválidas (`HTTP 400 Bad Request`), conflitos de concorrência ou unicidade (`HTTP 409 Conflict`) e violações semânticas de negócio (`HTTP 422 Unprocessable Entity`);
+4. **Dupla Abordagem de Validação:** Execução manual orientada à interface do usuário (UI) combinada com testes automatizados (Spring Boot MockMvc, Vitest) e o script [`SIGTCC/scripts/smoke-test.sh`](../SIGTCC/scripts/smoke-test.sh).
 
 ---
 
 ## 2. Ambientes de Teste e Usuários Homologados
 
-Os testes foram homologados tanto no ambiente de **_staging_** (acessível externamente via Tailscale Funnel com HTTPS fixo) quanto em ambiente **local reproduzível** via Docker Compose:
+Os testes foram executados no ambiente de **_staging_** (acessível externamente via Tailscale Funnel com HTTPS fixo) e validados também em ambiente **local** via Docker Compose:
 
 - **Frontend SPA:** `https://sigtcc.cobbler-albacore.ts.net` (local: `http://localhost:5173`)
 - **Backend API REST:** `https://sigtcc.cobbler-albacore.ts.net:8443` (local: `http://localhost:8080`)
@@ -40,15 +40,15 @@ Os testes foram homologados tanto no ambiente de **_staging_** (acessível exter
 
 ## 3. Matriz Resumo dos Casos de Teste de Aceitação
 
-|    ID     | Funcionalidade / História                                         |   Tipo de Execução    | Cobertura Automatizada                                                                                                                                          | Status Final |
-| :-------: | :---------------------------------------------------------------- | :-------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------- | :----------: |
-| **AT-01** | **US01 — Autenticação, Sessão e RBAC via Keycloak**               | Manual e Automatizada | `smoke-test.sh` (passos 1 a 3), `Login.test.tsx`, `ProtectedRoute.test.tsx`, `SecurityConfigTest.java`                                                          | **Aprovado** |
-| **AT-02** | **US02 — Perfil do Orientador e Vagas Disponíveis**               | Manual e Automatizada | `smoke-test.sh` (passo 4), `OrientadorControllerIntegrationTest.java`, `OrientadorEdicao.test.tsx`                                                              | **Aprovado** |
-| **AT-03** | **US03 — Catálogo e Busca Combinada de Orientadores**             | Manual e Automatizada | `OrientadorRepositoryTest.java`, `Orientadores.test.tsx`                                                                                                        | **Aprovado** |
-| **AT-04** | **US04 — Solicitação e Aceite de Orientação (Strategy/Observer)** | Manual e Automatizada | `smoke-test.sh` (passos 5 a 8), `SolicitacaoControllerIntegrationTest.java`, `AtualizadorVagasObserverTest.java`, `SolicitacaoConcorrenciaIntegrationTest.java` | **Aprovado** |
-| **AT-05** | **US05 — Calendário de Prazos de Entrega da Turma**               | Manual e Automatizada | `smoke-test.sh` (passos 9 a 11), `PrazoEntregaControllerIntegrationTest.java`, `GestaoCalendario.test.tsx`                                                      | **Aprovado** |
-| **AT-06** | **US06 — Submissão de Entregas do TCC por Link HTTPS**            | Manual e Automatizada | `smoke-test.sh` (passos 12 a 16), `EntregaControllerIntegrationTest.java`, `SubmissaoEntrega.test.tsx`                                                          | **Aprovado** |
-| **AT-07** | **US07 — Avaliação e Parecer de Entregas pelo Orientador**        | Manual e Automatizada | `smoke-test.sh` (passos 17 a 22), `EntregaParecerIntegrationTest.java`, `AvaliacaoEntrega.test.tsx`                                                             | **Aprovado** |
+|    ID     | Funcionalidade / História                                         |   Tipo de Execução    | Cobertura Automatizada                                                                                                                                                                    |        Status Final        |
+| :-------: | :---------------------------------------------------------------- | :-------------------: | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------: |
+| **AT-01** | **US01 — Autenticação, Sessão e RBAC via Keycloak**               | Manual e Automatizada | `smoke-test.sh` (bloco 1 e 2), `Login.test.tsx`, `ProtectedRoute.test.tsx`, `SecurityConfigTest.java`                                                                                     |        **Aprovado**        |
+| **AT-02** | **US02 — Perfil do Orientador e Vagas Disponíveis**               | Manual e Automatizada | `OrientadorControllerTest.java`, `OrientadorControllerIntegrationTest.java`, `OrientadorServiceTest.java`, `OrientadorEdicao.test.tsx`                                                    |        **Aprovado**        |
+| **AT-03** | **US03 — Catálogo e Busca Combinada de Orientadores**             | Manual e Automatizada | `OrientadorRepositoryTest.java`, `Orientadores.test.tsx`                                                                                                                                  |        **Aprovado**        |
+| **AT-04** | **US04 — Solicitação e Aceite de Orientação (Strategy/Observer)** | Manual e Automatizada | `smoke-test.sh` (bloco 3), `SolicitacaoControllerIntegrationTest.java`, `AtualizadorVagasObserverTest.java`, `SolicitacaoConcorrenciaIntegrationTest.java`, `PainelSolicitacoes.test.tsx` |        **Aprovado**        |
+| **AT-05** | **US05 — Calendário de Prazos de Entrega da Turma**               | Manual e Automatizada | `smoke-test.sh` (bloco 3), `PrazoEntregaControllerIntegrationTest.java`, `PrazoEntregaServiceTest.java`, `GestaoCalendario.test.tsx`                                                      |        **Aprovado**        |
+| **AT-06** | **US06 — Submissão de Entregas do TCC por Link HTTPS**            | Manual e Automatizada | `smoke-test.sh` (blocos 4 e 5), `EntregaControllerIntegrationTest.java`, `EntregaServiceTest.java`, `SubmissaoEntrega.test.tsx`                                                           |        **Aprovado**        |
+| **AT-07** | **US07 — Avaliação e Parecer de Entregas pelo Orientador**        | Manual e Automatizada | `smoke-test.sh` (blocos 5 e 6), `EntregaParecerIntegrationTest.java`, `EntregaServiceTest.java`, `AvaliacaoEntrega.test.tsx`                                                              | **Aprovado com ressalvas** |
 
 ---
 
@@ -62,33 +62,39 @@ ISSUES RELACIONADAS: #8 (Épico), #127, #128, #129, #130, #131, #143, #144, #275
 ========================================================================================
 ```
 
-- **Objetivo:** Verificar a autenticação de usuários contra o Keycloak via Direct Access Grant (ROPC), propagação e armazenamento seguro do token JWT no frontend (`sessionStorage`), controle de rotas protegidas por papel (`ROLE_ALUNO` vs. `ROLE_PROFESSOR`) e preservação de rota de destino após o login.
-- **Tipo de Execução:** Manual (Interface Web) e Automatizada (`smoke-test.sh`, `Login.test.tsx`, `ProtectedRoute.test.tsx`, `SecurityConfigTest.java`).
+- **Objetivo:** Verificar a autenticação de usuários contra o Keycloak via Direct Access Grant (ROPC), armazenamento do token JWT no frontend (`sessionStorage`), controle de rotas protegidas por papel (`ROLE_ALUNO` vs. `ROLE_PROFESSOR`) e preservação de rota de destino após o login.
 - **Pré-condições:** Contêineres de Keycloak, Backend e Frontend em execução; realm `sigtcc` importado com os 3 usuários de teste.
 
 #### Cenários Executados:
 
 1. **Cenário 1.1 — Login com Sucesso por Papel (Caminho Feliz):**
-   - **Passos:** Acessar `/login`, informar `aluno@example.com` / `aluno123` e submeter. Em seguida, deslogar e logar com `professor.orientador@example.com` / `professor123`.
-   - **Resultado Esperado:** Autenticação concluída (`HTTP 200`), token armazenado e menu ajustado dinamicamente: para Aluno são exibidos "Catálogo" e "Minhas Entregas"; para Professor são exibidos "Catálogo", "Painel de Solicitações", "Avaliar Entregas" e "Meu Perfil".
-   - **Resultado Obtido:** **Aprovado**. Menus e permissões renderizados conforme a role do JWT.
+   - **Critério validado:** `#8`, Cenários 1, 3 e 4.
+   - **Passos:** Acessar `/login`, informar `aluno@example.com` / `aluno123` e submeter. Em seguida, deslogar e logar com `professor.orientador@example.com` / `professor123` e `professor.responsavel@example.com` / `professor123`.
+   - **Resultado Esperado:** Autenticação concluída (`HTTP 200`), redirecionamento para `/orientadores` (aluno) ou `/painel-orientador` (professor), com exibição da aba `"Gestão da Turma/Calendário"` apenas para o professor responsável pela turma vigente.
+   - **Cobertura automatizada:** `smoke-test.sh` (bloco 1: login dos 3 perfis), `Login.test.tsx`, `PainelSolicitacoes.test.tsx`.
+   - **Resultado Obtido:** **Aprovado**.
 
 2. **Cenário 1.2 — Credenciais Inválidas (Negativo - 401):**
+   - **Critério validado:** `#8`, Cenário 2.
    - **Passos:** Acessar `/login`, informar `aluno@example.com` com senha incorreta `senhaInvalida999`.
-   - **Resultado Esperado:** O Keycloak recusa a emissão de token (`HTTP 401 Unauthorized`). O frontend captura a falha e exibe mensagem amigável de erro na tela de login, sem expor stacktrace.
-   - **Resultado Obtido:** **Aprovado**. Mensagem "Credenciais inválidas" exibida na interface.
+   - **Resultado Esperado:** O Keycloak recusa a emissão de token (`HTTP 401 Unauthorized`). O frontend exibe mensagem de erro na tela de login, sem expor stacktrace.
+   - **Cobertura automatizada:** `Login.test.tsx` e `authService.test.ts`.
+   - **Resultado Obtido:** **Aprovado**.
 
-3. **Cenário 1.3 — Acesso a Rota Não Autorizada (Negativo - 403):**
-   - **Passos:** Autenticado como Aluno (`aluno@example.com`), tentar navegar diretamente via barra de endereços para `/gestao-calendario` ou disparar `GET /api/v1/prazos/configuracoes`.
-   - **Resultado Esperado:** Acesso bloqueado pelo componente de rotas com tela de "Acesso Negado" e resposta da API com `HTTP 403 Forbidden`.
-   - **Resultado Obtido:** **Aprovado**. Componente `ProtectedRoute` barrou a rota e exibiu a view de Acesso Negado.
+3. **Cenário 1.3 — Acesso a Rota e Recurso Não Autorizados (Negativo - 403):**
+   - **Critério validado:** `#8`, Cenários 3 e 4; `#12`, Cenário 2.
+   - **Passos:** Autenticado como Aluno (`aluno@example.com`), tentar navegar diretamente para `/painel-orientador` (onde fica a aba `"Gestão da Turma/Calendário"`). Na API, como aluno ou professor não responsável, tentar alterar prazos em `POST /api/v1/prazos` ou `PATCH /api/v1/prazos/{id}`.
+   - **Resultado Esperado:** Acesso bloqueado pelo componente `ProtectedRoute` com tela de `"Acesso Negado"` no frontend e resposta `HTTP 403 Forbidden` no backend.
+   - **Cobertura automatizada:** `ProtectedRoute.test.tsx`, `AcessoNegado.test.tsx`, `SecurityConfigTest.java`, `PrazoEntregaControllerIntegrationTest.java`.
+   - **Resultado Obtido:** **Aprovado**.
 
 4. **Cenário 1.4 — Preservação de Rota e Parâmetros pós-login (BUG-18 / PR #297):**
+   - **Critério validado:** `#8`, Cenário 5 e `#275` (BUG-18).
    - **Passos:** Sem sessão ativa, tentar acessar `/acompanhar/15?tab=orientadores#topo`.
-   - **Resultado Esperado:** Redirecionamento para `/login`. Ao informar as credenciais com sucesso, o sistema redireciona automaticamente de volta para `/acompanhar/15?tab=orientadores#topo` com rota, query parameters e hash íntegros.
-   - **Resultado Obtido:** **Aprovado**. Validado no Vitest e manualmente.
+   - **Resultado Esperado:** Redirecionamento para `/login`. Ao autenticar com sucesso, redireciona automaticamente de volta para `/acompanhar/15?tab=orientadores#topo` com rota, query parameters e hash preservados.
+   - **Cobertura automatizada:** `ProtectedRoute.test.tsx` e `Login.test.tsx`.
+   - **Resultado Obtido:** **Aprovado**.
 
-- **Evidências de Teste:** Testes de componente `Login.test.tsx` e `ProtectedRoute.test.tsx` (17/17 passando); verificações 1, 2 e 3 de `smoke-test.sh` (tokens obtidos com sucesso).
 - **Status do Caso:** **Aprovado**.
 
 ---
@@ -97,32 +103,36 @@ ISSUES RELACIONADAS: #8 (Épico), #127, #128, #129, #130, #131, #143, #144, #275
 ========================================================================================
 CASO DE TESTE: AT-02
 HISTÓRIA / REQUISITO: US02 — Cadastro e Perfil de Orientador e Controle de Vagas (5 SP)
-ISSUES RELACIONADAS: #9 (Épico), #36 a #43, #48 a #53, #273 (BUG-11), #277/#279
+ISSUES RELACIONADAS: #9 (Épico), #36 a #43, #48 a #53, #273 (BUG-11), #277, #279
 ========================================================================================
 ```
 
-- **Objetivo:** Verificar a persistência, consulta e edição de perfil de docente, limite de caracteres nos campos de cadastro, vinculação do e-mail ao JWT autenticado e gestão do contador de vagas disponíveis.
-- **Tipo de Execução:** Manual (UI) e Automatizada (`OrientadorControllerIntegrationTest.java`, `OrientadorServiceTest.java`, `OrientadorEdicao.test.tsx`).
+- **Objetivo:** Verificar a persistência, consulta e edição de perfil de docente, limites de tamanho nos campos de cadastro, vinculação do e-mail ao JWT autenticado e gestão de vagas disponíveis.
 - **Pré-condições:** Banco inicial carregado com migração `V5` (professores com `id=1` e `id=2`).
 
 #### Cenários Executados:
 
 1. **Cenário 2.1 — Consulta e Atualização do Próprio Perfil (Caminho Feliz):**
-   - **Passos:** Logado como `professor.orientador@example.com`, acessar "Meu Perfil" (`/orientador/editar`), alterar a biografia para _"Docente permanente com foco em Arquitetura de Software"_ e salvar.
-   - **Resultado Esperado:** Dados atualizados com `HTTP 200 OK`. O sistema vincula a alteração ao e-mail contido no token JWT ([ADR-0012](adrs/ADR-0012.md)).
-   - **Resultado Obtido:** **Aprovado**. Perfil gravado e refletido imediatamente na tela.
-
-2. **Cenário 2.2 — Violação de Limites de Tamanho nos DTOs (Negativo - 400 - BUG-11):**
-   - **Passos:** Enviar requisição de edição com campo `nome` contendo mais de 255 caracteres ou campo `biografia` vazio/espaços.
-   - **Resultado Esperado:** Validação estrita via `@Size(max = 255)` e `@NotBlank` rejeita a requisição retornando `HTTP 400 Bad Request` com lista detalhada de erros no `ErrorResponseDTO`.
-   - **Resultado Obtido:** **Aprovado**. Validado em 9 testes unitários em `OrientadorControllerTest`.
-
-3. **Cenário 2.3 — Tentativa de Modificar Perfil de Outro Docente (Negativo - 403):**
-   - **Passos:** Autenticado como Professor `ID 1`, disparar `PUT /api/v1/orientadores/2` tentando alterar os dados do Professor `ID 2`.
-   - **Resultado Esperado:** A camada de serviço valida a titularidade do recurso e rejeita a operação com `HTTP 403 Forbidden` (_"Você não possui permissão para alterar o perfil de outro professor."_).
+   - **Critério validado:** `#9`, Cenário 1.
+   - **Passos:** Logado como `professor.orientador@example.com`, acessar `"Meu Perfil"` em `/perfil-editar`, alterar a biografia para _"Docente permanente com foco em Arquitetura de Software"_ e salvar.
+   - **Resultado Esperado:** Dados atualizados com `HTTP 200 OK` (`PATCH /api/v1/orientadores/1`).
+   - **Cobertura automatizada:** `OrientadorControllerIntegrationTest.java` e `OrientadorEdicao.test.tsx`.
    - **Resultado Obtido:** **Aprovado**.
 
-- **Evidências de Teste:** `OrientadorControllerIntegrationTest.java` (passando), `OrientadorEdicao.test.tsx` (passando), verificação 4 do `smoke-test.sh`.
+2. **Cenário 2.2 — Violação de Limites de Tamanho nos DTOs (Negativo - 400 - BUG-11):**
+   - **Critério validado:** `#9`, Cenário 2 e `#273` (BUG-11).
+   - **Passos:** Enviar requisição com `nome` fora do intervalo de 3 a 100 caracteres, `biografia` (campo opcional) acima de 500 caracteres ou `vagasDisponiveis` negativo.
+   - **Resultado Esperado:** As validações `@Size(min = 3, max = 100)` em `nome`, `@Size(max = 500)` em `biografia` e `@Min(0)` em `vagasDisponiveis` rejeitam a requisição com `HTTP 400 Bad Request` no `ErrorResponseDTO`.
+   - **Cobertura automatizada:** `OrientadorControllerTest.java`.
+   - **Resultado Obtido:** **Aprovado**.
+
+3. **Cenário 2.3 — Tentativa de Modificar Perfil de Outro Docente (Negativo - 403):**
+   - **Critério validado:** `#9` + `#200`/`#204` (BUG-02 / BUG-06).
+   - **Passos:** Autenticado como Professor `ID 1`, disparar `PATCH /api/v1/orientadores/2` tentando alterar os dados do Professor `ID 2`.
+   - **Resultado Esperado:** A camada de serviço valida a titularidade do recurso e rejeita a operação com `HTTP 403 Forbidden` e a mensagem `"Você só pode alterar o seu próprio cadastro de orientador."`.
+   - **Cobertura automatizada:** `OrientadorServiceTest.java` e `OrientadorControllerIntegrationTest.java`.
+   - **Resultado Obtido:** **Aprovado**.
+
 - **Status do Caso:** **Aprovado**.
 
 ---
@@ -135,28 +145,32 @@ ISSUES RELACIONADAS: #10 (Épico), #133, #134, #135, #136, #264 (BUG-14)
 ========================================================================================
 ```
 
-- **Objetivo:** Validar a consulta pública/autenticada da vitrine de orientadores, filtro por linha de pesquisa com correspondência exata case-insensitive e filtro booleano por disponibilidade de vagas.
-- **Tipo de Execução:** Manual (UI) e Automatizada (`OrientadorRepositoryTest.java`, `Orientadores.test.tsx`).
+- **Objetivo:** Validar a consulta da vitrine de orientadores, filtro por linha de pesquisa com correspondência exata case-insensitive, filtro por disponibilidade de vagas, estado vazio e limpeza de filtros.
 - **Pré-condições:** Pelo menos 2 orientadores cadastrados com linhas de pesquisa distintas (ex.: `Arquitetura de Sistemas` e `Inteligência Artificial`).
 
 #### Cenários Executados:
 
 1. **Cenário 3.1 — Filtro Exato por Linha de Pesquisa (BUG-14 / PR #270):**
-   - **Passos:** Acessar a tela de orientadores (`/orientadores`). No campo de busca, digitar `"Arquitetura de Sistemas"` e aplicar o filtro. Em seguida, testar com variações de maiúsculas/minúsculas (`"arquitetura de sistemas"`).
-   - **Resultado Esperado:** Apenas orientadores que contenham exatamente essa linha de pesquisa são listados (`Professor Orientador` - ID 1). Não devem ocorrer falsos positivos por correspondência parcial de palavras soltas.
-   - **Resultado Obtido:** **Aprovado**. Query JPQL estrita no repositório retornou exatamente os docentes compatíveis.
+   - **Critério validado:** `#10`, Cenários 1 e 3; `#264` (BUG-14).
+   - **Passos:** Acessar `/orientadores`, selecionar `"Arquitetura de Sistemas"` no filtro de linha de pesquisa e aplicar. Testar também com variação de maiúsculas/minúsculas.
+   - **Resultado Esperado:** Apenas orientadores que contenham exatamente essa linha de pesquisa são listados (`Professor Orientador` - ID 1), sem falsos positivos por substring.
+   - **Cobertura automatizada:** `OrientadorRepositoryTest.java` e `Orientadores.test.tsx`.
+   - **Resultado Obtido:** **Aprovado**.
 
 2. **Cenário 3.2 — Filtro por Vagas Disponíveis:**
+   - **Critério validado:** `#10`, Cenários 2 e 3.
    - **Passos:** Marcar a opção `"Somente com vagas disponíveis"`.
    - **Resultado Esperado:** Orientadores com `vagasDisponiveis > 0` são exibidos; docentes com vagas zeradas são ocultados.
+   - **Cobertura automatizada:** `OrientadorRepositoryTest.java` e `Orientadores.test.tsx`.
    - **Resultado Obtido:** **Aprovado**.
 
-3. **Cenário 3.3 — Busca sem Resultados (Estado Vazio):**
-   - **Passos:** Digitar uma linha de pesquisa inexistente, ex.: `"Computação Quântica Aplicada"`.
-   - **Resultado Esperado:** A interface apresenta estado vazio amigável (_"Nenhum orientador encontrado para os filtros selecionados"_) e botão para limpar os filtros.
+3. **Cenário 3.3 — Busca sem Resultados e Limpeza de Filtros (Estado Vazio):**
+   - **Critério validado:** `#10`, Cenários 4 e 5.
+   - **Passos:** Selecionar/buscar uma linha sem correspondência e, em seguida, acionar `"Limpar filtros"`.
+   - **Resultado Esperado:** A interface apresenta o estado vazio sem erro e, ao limpar os filtros, restaura a listagem completa.
+   - **Cobertura automatizada:** `Orientadores.test.tsx` e `OrientadorList.test.tsx`.
    - **Resultado Obtido:** **Aprovado**.
 
-- **Evidências de Teste:** `OrientadorRepositoryTest.java` (passando), `Orientadores.test.tsx` (passando).
 - **Status do Caso:** **Aprovado**.
 
 ---
@@ -170,32 +184,38 @@ ISSUES RELACIONADAS: #11 (Épico), #79 a #99, #206 (Concorrência R07), #263 (BU
 ```
 
 - **Objetivo:** Validar o envio de propostas de orientação por alunos, aplicação das regras de elegibilidade via padrão **Strategy**, transição de status para `ACEITA` ou `RECUSADA` com justificativa obrigatória, decremento atômico de vagas via padrão **Observer** e proteção contra concorrência via bloqueio otimista (`@Version`).
-- **Tipo de Execução:** Manual (UI) e Automatizada (`SolicitacaoControllerIntegrationTest.java`, `AtualizadorVagasObserverTest.java`, `SolicitacaoConcorrenciaIntegrationTest.java`, `PainelSolicitacoes.test.tsx`).
 - **Pré-condições:** Orientador ativo com 3 vagas cadastradas; aluno autenticado.
 
 #### Cenários Executados:
 
 1. **Cenário 4.1 — Envio e Aceite de Solicitação com Decremento de Vagas (Caminho Feliz):**
-   - **Passos:** Logado como `aluno@example.com`, enviar solicitação para o orientador ID 1 com tema e mensagem. Em seguida, logar como `professor.orientador@example.com`, acessar `/painel-solicitacoes` e clicar em **"Aceitar"**.
-   - **Resultado Esperado:** Solicitação criada com status `PENDENTE` (`HTTP 201`). Ao aceitar (`HTTP 200`), o evento `SolicitacaoStatusChangedEvent` é publicado e o `AtualizadorVagasObserver` decrementa imediatamente as vagas de 3 para 2 dentro da mesma transação de banco.
-   - **Resultado Obtido:** **Aprovado**. Vagas atualizadas para 2 na interface e no banco de dados (verificações 5 a 8 do `smoke-test.sh`).
+   - **Critério validado:** `#11`, Cenários 1, 6 e 7.
+   - **Passos:** Logado como `aluno@example.com`, enviar solicitação para o orientador ID 1 com curso, tema e mensagem. Em seguida, logar como `professor.orientador@example.com`, acessar `/painel-orientador` e clicar em **"Aceitar"**.
+   - **Resultado Esperado:** Solicitação criada com status `PENDENTE` (`HTTP 201`). Ao aceitar (`HTTP 200`), o evento `SolicitacaoStatusChangedEvent` é publicado e o `AtualizadorVagasObserver` decrementa as vagas de 3 para 2 dentro da mesma transação.
+   - **Cobertura automatizada:** `smoke-test.sh` (bloco 3: criação e aceite), `SolicitacaoControllerIntegrationTest.java`, `AtualizadorVagasObserverTest.java`, `PainelSolicitacoes.test.tsx`.
+   - **Resultado Obtido:** **Aprovado**.
 
-2. **Cenário 4.2 — Recusa sem Justificativa (Negativo - 422):**
-   - **Passos:** No painel do orientador, acionar a recusa de uma solicitação com campo `justificativa` em branco ou ausente.
-   - **Resultado Esperado:** Rejeição com `HTTP 422 Unprocessable Entity` com a mensagem: _"A justificativa é obrigatória para recusar a solicitação."_
-   - **Resultado Obtido:** **Aprovado**. Validação de negócio executada sem efeitos colaterais nas vagas.
+2. **Cenário 4.2 — Recusa sem Justificativa (Negativo - 400):**
+   - **Critério validado:** `#11`, Cenário 10.
+   - **Passos:** No painel do orientador (`/painel-orientador`), acionar a recusa de uma solicitação com campo `justificativa` ausente ou em branco.
+   - **Resultado Esperado:** Rejeição com `HTTP 400 Bad Request` e mensagem `"A justificativa é obrigatória para recusar a solicitação."`.
+   - **Cobertura automatizada:** `SolicitacaoControllerTest.java` e `SolicitacaoControllerIntegrationTest.java`.
+   - **Resultado Obtido:** **Aprovado**.
 
-3. **Cenário 4.3 — Solicitação Duplicada (Negativo - 409 - Strategy):**
-   - **Passos:** O mesmo aluno submeter uma nova solicitação para um orientador para o qual já possui solicitação `PENDENTE` ou `ACEITA`.
-   - **Resultado Esperado:** A estratégia `ValidacaoSolicitacaoDuplicada` intercepta o envio e retorna `HTTP 409 Conflict`.
+3. **Cenário 4.3 — Solicitação Duplicada Pendente (Negativo - 409 - Strategy):**
+   - **Critério validado:** `#11`, Cenário 4.
+   - **Passos:** O mesmo aluno submeter uma nova solicitação para um orientador para o qual já possui solicitação com status `PENDENTE`.
+   - **Resultado Esperado:** A estratégia `ValidacaoSolicitacaoDuplicada` intercepta o envio e retorna `HTTP 409 Conflict` com a mensagem `"Você possui uma solicitação pendente para este orientador."`.
+   - **Cobertura automatizada:** `ValidacaoSolicitacaoDuplicadaTest.java` e `SolicitacaoControllerIntegrationTest.java`.
    - **Resultado Obtido:** **Aprovado**.
 
 4. **Cenário 4.4 — Concorrência na Última Vaga (Negativo - 409 - Bloqueio Otimista):**
+   - **Critério validado:** `#11`, Cenário 8 e `#206` (R07).
    - **Passos:** Orientador com 1 vaga restante receber duas requisições simultâneas de aceite.
    - **Resultado Esperado:** Uma requisição obtém sucesso (`HTTP 200`) e a concorrente recebe `HTTP 409 Conflict` via `OptimisticLockingFailureException` (`@Version` na tabela `perfis_professores`, migração `V8`).
-   - **Resultado Obtido:** **Aprovado**. Comprovado por `SolicitacaoConcorrenciaIntegrationTest.java`.
+   - **Cobertura automatizada:** `SolicitacaoConcorrenciaIntegrationTest.java`.
+   - **Resultado Obtido:** **Aprovado**.
 
-- **Evidências de Teste:** `SolicitacaoControllerIntegrationTest.java` (passando), `AtualizadorVagasObserverTest.java` (passando), `SolicitacaoConcorrenciaIntegrationTest.java` (passando).
 - **Status do Caso:** **Aprovado**.
 
 ---
@@ -208,33 +228,39 @@ ISSUES RELACIONADAS: #12 (Épico), #137 a #142, #145 a #158, #276 (BUG-20)
 ========================================================================================
 ```
 
-- **Objetivo:** Verificar a gestão de etapas e datas limites (`PROJETO_TCC`, `TCC1`, `TCC2`), identificação do professor responsável pela turma vigente, contagem regressiva e validações temporais.
-- **Tipo de Execução:** Manual (UI) e Automatizada (`PrazoEntregaControllerIntegrationTest.java`, `GestaoCalendario.test.tsx`).
+- **Objetivo:** Verificar o cadastro/edição de prazos (`PROJETO_TCC`, `TCC1`, `TCC2`), restrição ao professor responsável pela turma vigente, contagem regressiva e validações temporais.
 - **Pré-condições:** Turma vigente `2026/2` vinculada ao professor responsável (`ID 2`).
 
 #### Cenários Executados:
 
-1. **Cenário 5.1 — Consulta Pública/Geral dos Prazos da Turma (Caminho Feliz):**
-   - **Passos:** Qualquer usuário autenticado (aluno ou professor) consulta os prazos através de `GET /api/v1/prazos`.
-   - **Resultado Esperado:** Retorno da lista de prazos ordenados cronologicamente com tipo de etapa, data limite e contagem regressiva em dias.
-   - **Resultado Obtido:** **Aprovado**. Componente de contagem regressiva exibido no catálogo de orientadores e no painel de entregas.
-
-2. **Cenário 5.2 — Atualização de Prazo pelo Professor Responsável (Caminho Feliz):**
-   - **Passos:** Autenticado como `professor.responsavel@example.com`, acessar `/gestao-calendario`, selecionar a etapa `PROJETO_TCC` e atualizar a data limite para uma data futura válida.
-   - **Resultado Esperado:** Atualização concluída com `HTTP 200 OK`.
-   - **Resultado Obtido:** **Aprovado** (verificação 10 do `smoke-test.sh`).
-
-3. **Cenário 5.3 — Professor Não Responsável Tenta Alterar Prazo (Negativo - 403):**
-   - **Passos:** Autenticado como `professor.orientador@example.com` (que não é o responsável pela turma), tentar disparar `POST` ou `PATCH` em `/api/v1/prazos`.
-   - **Resultado Esperado:** O backend identifica `responsavelTurma: false` e bloqueia a requisição com `HTTP 403 Forbidden`.
-   - **Resultado Obtido:** **Aprovado** (verificação 11 do `smoke-test.sh`).
-
-4. **Cenário 5.4 — Data Limite no Passado (Negativo - 400):**
-   - **Passos:** Enviar atualização de prazo informando uma data anterior ao dia atual (ex.: `2025-01-01`).
-   - **Resultado Esperado:** Rejeição com `HTTP 400 Bad Request` informando que a data limite deve estar no futuro.
+1. **Cenário 5.1 — Consulta dos Prazos da Turma (Caminho Feliz):**
+   - **Critério validado:** `#12`, Cenários 1, 3 e 6 (via `docs/contrato-dados-us05.md`).
+   - **Passos:** Usuário autenticado (aluno ou professor) consulta os prazos através de `GET /api/v1/prazos` e visualiza a contagem regressiva na UI.
+   - **Resultado Esperado:** Retorno dos prazos ordenados cronologicamente com `tipo`, `dataLimite` e `diasRestantes`.
+   - **Cobertura automatizada:** `PrazoEntregaControllerIntegrationTest.java`, `PainelPrazos.test.tsx`, `prazoEntregaService.test.ts`.
    - **Resultado Obtido:** **Aprovado**.
 
-- **Evidências de Teste:** `PrazoEntregaControllerIntegrationTest.java` (passando), `GestaoCalendario.test.tsx` (passando).
+2. **Cenário 5.2 — Atualização de Prazo pelo Professor Responsável (Caminho Feliz):**
+   - **Critério validado:** `#12`, Cenário 4.
+   - **Passos:** Autenticado como `professor.responsavel@example.com`, acessar `/painel-orientador`, abrir a aba `"Gestão da Turma/Calendário"`, selecionar a etapa e atualizar a data limite para uma data futura válida.
+   - **Resultado Esperado:** Atualização concluída com `HTTP 200 OK` (`PATCH /api/v1/prazos/{id}`).
+   - **Cobertura automatizada:** `PrazoEntregaControllerIntegrationTest.java` e `GestaoCalendario.test.tsx` (`smoke-test.sh` cobre o `POST /api/v1/prazos` no bloco 3).
+   - **Resultado Obtido:** **Aprovado**.
+
+3. **Cenário 5.3 — Professor Não Responsável Tenta Alterar Prazo (Negativo - 403):**
+   - **Critério validado:** `#12`, Cenário 2.
+   - **Passos:** Autenticado como `professor.orientador@example.com` (que não é o responsável pela turma), tentar disparar `POST` ou `PATCH` em `/api/v1/prazos`.
+   - **Resultado Esperado:** O backend bloqueia a requisição com `HTTP 403 Forbidden`.
+   - **Cobertura automatizada:** `PrazoEntregaControllerIntegrationTest.java` e `PrazoEntregaServiceTest.java`.
+   - **Resultado Obtido:** **Aprovado**.
+
+4. **Cenário 5.4 — Data Limite no Passado (Negativo - 400):**
+   - **Critério validado:** `#12`, Cenário 5 (`docs/contrato-dados-us05.md`, seção 8).
+   - **Passos:** Enviar atualização de prazo informando uma data anterior ao dia atual (ex.: `2025-01-01`).
+   - **Resultado Esperado:** Rejeição com `HTTP 400 Bad Request` informando que a data limite deve estar no futuro.
+   - **Cobertura automatizada:** `PrazoEntregaControllerIntegrationTest.java` e `PrazoEntregaServiceTest.java`.
+   - **Resultado Obtido:** **Aprovado**.
+
 - **Status do Caso:** **Aprovado**.
 
 ---
@@ -247,28 +273,32 @@ ISSUES RELACIONADAS: #13 (Épico), #208, #209, #216, #218, #223, #226, #228
 ========================================================================================
 ```
 
-- **Objetivo:** Validar o envio de trabalhos pelos alunos por meio de link externo, exigência mandatória de protocolo seguro HTTPS ([ADR-0013](adrs/ADR-0013.md)), cálculo automático da flag de atraso com base no prazo da turma e consulta de histórico próprio.
-- **Tipo de Execução:** Manual (UI) e Automatizada (`EntregaControllerIntegrationTest.java`, `SubmissaoEntrega.test.tsx`).
+- **Objetivo:** Validar o envio de trabalhos pelos alunos por meio de link externo HTTPS ([ADR-0013](adrs/ADR-0013.md)), cálculo automático da flag de atraso com base no prazo da turma e consulta de histórico próprio.
 - **Pré-condições:** Aluno com solicitação `ACEITA` por um orientador e etapa vigente configurada (`PROJETO_TCC`).
 
 #### Cenários Executados:
 
 1. **Cenário 6.1 — Submissão no Prazo com Link HTTPS (Caminho Feliz):**
+   - **Critério validado:** `#13`, Cenários 1 e 7 (adaptado pela `ADR-0013` em `docs/contrato-dados-us06.md`, decisão D7) e `#216`.
    - **Passos:** Logado como Aluno, acessar `/minhas-entregas`, selecionar o tipo `PROJETO_TCC`, informar o link `https://drive.google.com/file/d/meu-tcc-v1/view` e submeter.
-   - **Resultado Esperado:** Entrega criada com `HTTP 201 Created`, status `SUBMETIDO`, `enviadoEm` preenchido pelo servidor com `Clock` injetado, orientador associado automaticamente e flag `atrasada: false`.
-   - **Resultado Obtido:** **Aprovado** (verificações 12 e 13 do `smoke-test.sh`).
-
-2. **Cenário 6.2 — Submissão com Protocolo Inseguro HTTP (Negativo - 400):**
-   - **Passos:** Tentar enviar submissão informando URL com protocolo inseguro: `http://meusite.com/tcc.pdf`.
-   - **Resultado Esperado:** A anotação `@URL(protocol = "https")` intercepta a requisição e retorna `HTTP 400 Bad Request` (_"O link de submissão deve utilizar obrigatoriamente o protocolo HTTPS."_).
-   - **Resultado Obtido:** **Aprovado** (verificação 14 do `smoke-test.sh`).
-
-3. **Cenário 6.3 — Aluno Tenta Consultar Entregas de Outro Aluno (Negativo - 403):**
-   - **Passos:** Autenticado com Aluno A, tentar acessar `GET /api/v1/entregas/{id}` correspondente à entrega do Aluno B.
-   - **Resultado Esperado:** A camada de serviço valida a propriedade do recurso e bloqueia com `HTTP 403 Forbidden`.
+   - **Resultado Esperado:** Entrega criada com `HTTP 201 Created`, status `SUBMETIDO`, `enviadoEm` preenchido pelo servidor com `Clock` injetado e flag `atrasada: false`.
+   - **Cobertura automatizada:** `smoke-test.sh` (bloco 4), `EntregaControllerIntegrationTest.java`, `SubmissaoEntrega.test.tsx`.
    - **Resultado Obtido:** **Aprovado**.
 
-- **Evidências de Teste:** `EntregaControllerIntegrationTest.java` (passando), `SubmissaoEntrega.test.tsx` (passando).
+2. **Cenário 6.2 — Submissão com Protocolo Inseguro HTTP (Negativo - 400):**
+   - **Critério validado:** `#13`, Cenário 2 e `#218` (`ADR-0013`).
+   - **Passos:** Tentar enviar submissão informando URL com protocolo HTTP: `http://drive.google.com/arquivo`.
+   - **Resultado Esperado:** A validação de URL rejeita a requisição com `HTTP 400 Bad Request` e a mensagem `"A URL do documento deve ser válida e utilizar o protocolo https."`.
+   - **Cobertura automatizada:** `smoke-test.sh` (bloco 4), `EntregaControllerIntegrationTest.java`, `SubmissaoEntrega.test.tsx`.
+   - **Resultado Obtido:** **Aprovado**.
+
+3. **Cenário 6.3 — Acesso Negado ao Consultar Entrega Alheia (Negativo - 403):**
+   - **Critério validado:** `#14`, Cenário 6 (autorização por vínculo) e `#223` (`docs/contrato-dados-us06.md`).
+   - **Passos:** Autenticado como outro usuário não vinculado à entrega (outro aluno ou professor que não é o orientador da entrega), tentar acessar `GET /api/v1/entregas/{id}`.
+   - **Resultado Esperado:** A camada de serviço valida a propriedade/vínculo do recurso e bloqueia com `HTTP 403 Forbidden`.
+   - **Cobertura automatizada:** `smoke-test.sh` (bloco 5: professor não orientador recebe `403`), `EntregaControllerIntegrationTest.java`, `EntregaServiceTest.java`.
+   - **Resultado Obtido:** **Aprovado**.
+
 - **Status do Caso:** **Aprovado**.
 
 ---
@@ -282,33 +312,40 @@ ISSUES RELACIONADAS: #14 (Épico), #209, #210, #215, #227, #229
 ```
 
 - **Objetivo:** Verificar a consulta das entregas dos orientandos vinculados, emissão de parecer (`APROVADO`, `REPROVADO` ou `AJUSTES_NECESSARIOS`), comentário obrigatório em ajustes/reprovação, controle de concorrência com trava pessimista (`PESSIMISTIC_WRITE`) e reenvio de novo link pelo aluno.
-- **Tipo de Execução:** Manual (UI) e Automatizada (`EntregaParecerIntegrationTest.java`, `AvaliacaoEntrega.test.tsx`).
 - **Pré-condições:** Entrega submetida pelo aluno com status `SUBMETIDO`.
 
 #### Cenários Executados:
 
-1. **Cenário 7.1 — Parecer com Ajustes Necessários e Reenvio do Aluno (Caminho Feliz):**
-   - **Passos:** Logado como `professor.orientador@example.com`, acessar `/avaliar-entregas`, selecionar o trabalho do orientando e registrar parecer `AJUSTES_NECESSARIOS` com comentário obrigatório. Em seguida, logar como Aluno, visualizar o parecer e reenviar novo link `https://drive.google.com/file/d/meu-tcc-v2/view`.
-   - **Resultado Esperado:** Parecer registrado com `HTTP 200 OK`, status da entrega muda para `AJUSTES_NECESSARIOS`. Ao reenviar, a entrega volta para `SUBMETIDO` e o novo link substitui o anterior.
-   - **Resultado Obtido:** **Aprovado** (verificações 17 a 20 do `smoke-test.sh`).
+1. **Cenário 7.1 — Parecer com Ajustes Necessários e Reenvio do Aluno (Caminho Feliz com Ressalva de UI):**
+   - **Critério validado:** `#14`, Cenário 3, e `#13`, Cenário 6 (`#209`, `#210`, `#215`, `#226`, `docs/contrato-dados-us07.md`).
+   - **Passos:** Logado como `professor.orientador@example.com`, acessar `/avaliar-entregas`, selecionar o trabalho do orientando e registrar parecer `AJUSTES_NECESSARIOS` com comentário obrigatório. Em seguida, logar como Aluno em `/minhas-entregas` e reenviar novo link `https://drive.google.com/file/d/meu-tcc-v2/view`.
+   - **Resultado Esperado:** Parecer registrado com `HTTP 200 OK`, status da entrega muda para `AJUSTES_NECESSARIOS` e o aluno visualiza o status e reenvia novo link (voltando a `SUBMETIDO`).
+   - **Ressalva observada:** Na tela `/minhas-entregas`, o aluno visualiza o status `AJUSTES_NECESSARIOS` e o aviso para reenvio, mas o texto do comentário do orientador (embora retornado pela API) não é exibido no frontend.
+   - **Cobertura automatizada:** `EntregaParecerIntegrationTest.java`, `EntregaServiceTest.java`, `AvaliacaoEntrega.test.tsx`, `SubmissaoEntrega.test.tsx`. (O fluxo completo de ajustes e reenvio pela UI foi validado também manualmente).
+   - **Resultado Obtido:** **Aprovado com ressalvas**.
 
 2. **Cenário 7.2 — Parecer de Ajustes sem Comentário (Negativo - 422):**
+   - **Critério validado:** `#14`, Cenário 5 e `#215` (`docs/contrato-dados-us07.md`, decisão D2).
    - **Passos:** O orientador submeter parecer `AJUSTES_NECESSARIOS` ou `REPROVADO` deixando o comentário vazio.
    - **Resultado Esperado:** Rejeição com `HTTP 422 Unprocessable Entity` informando que o comentário é obrigatório quando há exigência de ajustes ou reprovação.
-   - **Resultado Obtido:** **Aprovado** (verificação 19 do `smoke-test.sh`).
-
-3. **Cenário 7.3 — Aprovação Final e Bloqueio de Alterações Posteriores (Caminho Feliz + 409):**
-   - **Passos:** O orientador emitir parecer `APROVADO`. Em seguida, o orientador tentar emitir novo parecer na mesma entrega ou o aluno tentar reenviar link.
-   - **Resultado Esperado:** Parecer `APROVADO` encerra o ciclo daquela etapa (`HTTP 200`). Novas tentativas de submissão ou avaliação retornam `HTTP 409 Conflict`.
-   - **Resultado Obtido:** **Aprovado** (verificações 21 e 22 do `smoke-test.sh`).
-
-4. **Cenário 7.4 — Professor Não Vinculado Tenta Avaliar Entrega (Negativo - 403):**
-   - **Passos:** Um docente que não é o orientador daquele aluno tentar disparar `POST /api/v1/entregas/{id}/parecer`.
-   - **Resultado Esperado:** Acesso negado com `HTTP 403 Forbidden` (_"Apenas o orientador responsável pode avaliar esta entrega."_).
+   - **Cobertura automatizada:** `smoke-test.sh` (bloco 5), `EntregaParecerIntegrationTest.java`, `AvaliacaoEntrega.test.tsx`.
    - **Resultado Obtido:** **Aprovado**.
 
-- **Evidências de Teste:** `EntregaParecerIntegrationTest.java` (passando), `AvaliacaoEntrega.test.tsx` (passando).
-- **Status do Caso:** **Aprovado**.
+3. **Cenário 7.3 — Aprovação Final e Bloqueio de Alterações Posteriores (Caminho Feliz + 409):**
+   - **Critério validado:** `#14`, Cenários 2 e 7, e `#13`, Cenário 5 (`#215`, `#226`).
+   - **Passos:** O orientador emitir parecer `APROVADO`. Em seguida, o orientador tentar emitir novo parecer na mesma entrega ou o aluno tentar reenviar link.
+   - **Resultado Esperado:** Parecer `APROVADO` encerra o ciclo daquela etapa (`HTTP 200`). Novas tentativas de avaliação ou reenvio retornam `HTTP 409 Conflict`.
+   - **Cobertura automatizada:** `smoke-test.sh` (bloco 5: novo parecer após `APROVADO` retorna `409`), `EntregaParecerIntegrationTest.java`, `EntregaServiceTest.java`.
+   - **Resultado Obtido:** **Aprovado**.
+
+4. **Cenário 7.4 — Professor Não Vinculado Tenta Avaliar Entrega (Negativo - 403):**
+   - **Critério validado:** `#14`, Cenário 6 e `#215`.
+   - **Passos:** Um docente que não é o orientador daquele aluno tentar disparar `POST /api/v1/entregas/{id}/parecer`.
+   - **Resultado Esperado:** Acesso negado com `HTTP 403 Forbidden` e a mensagem `"Somente o orientador vinculado à entrega pode registrar parecer."`.
+   - **Cobertura automatizada:** `EntregaParecerIntegrationTest.java` e `EntregaServiceTest.java` (`smoke-test.sh` verifica o bloqueio `403` para aluno tentando registrar parecer e para professor não orientador no `GET`).
+   - **Resultado Obtido:** **Aprovado**.
+
+- **Status do Caso:** **Aprovado com ressalvas** (ressalva no Cenário 7.1 quanto à exibição do texto do comentário na tela `/minhas-entregas`).
 
 ---
 
@@ -316,54 +353,65 @@ ISSUES RELACIONADAS: #14 (Épico), #209, #210, #215, #227, #229
 
 ### 5.1. Execução do Script de Smoke Test (`SIGTCC/scripts/smoke-test.sh`)
 
-O script de homologação oficial executou **22 verificações automatizadas de ponta a ponta** contra os contêineres e a infraestrutura de staging, validando todos os casos de teste:
+- **Data de execução:** `19/11/2026`
+- **Ambiente:** _Staging_ (`API_URL=https://sigtcc.cobbler-albacore.ts.net:8443`, `KEYCLOAK_URL=https://sigtcc.cobbler-albacore.ts.net:10000`) com banco recém-criado (`down -v && up -d`).
 
 ```text
-=======================================================
-   SIGTCC — Execução Oficial de Smoke Test (Entrega 9)
-=======================================================
-[OK] 01. Login Aluno (ROPC) -> Token JWT emitido (ROLE_ALUNO)
-[OK] 02. Login Professor Orientador (ROPC) -> Token JWT emitido (ROLE_PROFESSOR)
-[OK] 03. Login Professor Responsavel (ROPC) -> Token JWT emitido (ROLE_PROFESSOR)
-[OK] 04. Consulta de perfil do orientador ID 1 (GET /api/v1/orientadores/1)
-[OK] 05. Aluno envia solicitacao de orientacao -> 201 Created (ID gerado)
-[OK] 06. Orientador lista solicitacoes recebidas -> Solicitacao pendente encontrada
-[OK] 07. Orientador aceita solicitacao -> 200 OK (status ACEITA)
-[OK] 08. Observer decrementa vagas do orientador -> Vagas reduzidas de 3 para 2
-[OK] 09. Consulta de prazos de entrega -> Lista ordenada obtida (200 OK)
-[OK] 10. Professor responsavel atualiza prazo -> 200 OK
-[OK] 11. Professor comum tenta alterar prazo -> Bloqueado com 403 Forbidden
-[OK] 12. Aluno consulta etapas liberadas para entrega -> PROJETO_TCC disponivel
-[OK] 13. Aluno submete entrega com link HTTPS -> 201 Created (SUBMETIDO)
-[OK] 14. Aluno tenta submeter link HTTP inseguro -> Rejeitado com 400 Bad Request
-[OK] 15. Orientador consulta submissoes de seus orientandos -> Entrega listada
-[OK] 16. Outro aluno tenta consultar entrega alheia -> Bloqueado com 403 Forbidden
-[OK] 17. Orientador emite parecer AJUSTES_NECESSARIOS com comentario -> 200 OK
-[OK] 18. Aluno consulta status da entrega -> Atualizado para AJUSTES_NECESSARIOS
-[OK] 19. Orientador tenta emitir parecer de ajuste sem comentario -> 422 Unprocessable Entity
-[OK] 20. Aluno reenvia link revisado HTTPS -> 200 OK (retorna para SUBMETIDO)
-[OK] 21. Orientador emite parecer final APROVADO -> 200 OK
-[OK] 22. Tentativa de reenvio apos aprovacao definitiva -> Bloqueada com 409 Conflict
+Smoke test -> API: https://sigtcc.cobbler-albacore.ts.net:8443 | Keycloak: https://sigtcc.cobbler-albacore.ts.net:10000
 
-Resultado: 22 de 22 verificações APROVADAS (100% de sucesso).
+1) Login via Keycloak
+  OK    login do aluno
+  OK    login do orientador
+  OK    login do responsável
+
+2) Backend aceita o token e protege as rotas
+  OK    sem token a API recusa (HTTP 401)
+  OK    com token a API responde (HTTP 200)
+
+3) Dados de apoio (solicitação aceita e prazo)
+  OK    aluno cria solicitação (HTTP 201)
+  OK    aluno lê a solicitação de volta do banco (HTTP 200)
+  OK    acentos preservados na ida e volta (MySQL)
+  OK    orientador aceita a solicitação (HTTP 200)
+  OK    professor responsável cadastra o prazo (HTTP 201)
+
+4) Entrega por link (ADR-0013)
+  OK    link http:// é rejeitado (HTTP 400)
+  OK    link https:// é aceito (HTTP 201)
+  OK    status inicial é SUBMETIDO
+
+5) Avaliação do orientador
+  OK    aluno não pode registrar parecer (HTTP 403)
+  OK    professor que não é o orientador não vê a entrega (HTTP 403)
+  OK    orientador lista as entregas dos orientandos (HTTP 200)
+  OK    a entrega enviada aparece na lista
+  OK    ajustes sem comentário são rejeitados (HTTP 422)
+  OK    orientador aprova a entrega (HTTP 200)
+  OK    novo parecer após APROVADO é bloqueado (HTTP 409)
+
+6) Aluno acompanha o resultado
+  OK    aluno lista suas entregas (HTTP 200)
+  OK    status refletido para o aluno
+
+Smoke test concluído: 22 verificações passaram.
 ```
 
 ### 5.2. Suíte de Testes Unitários e de Integração do Backend (Gradle)
 
-- **Comando de Execução:** `./gradlew test`
-- **Resultados:** 100% dos testes aprovados, cobrindo controladores MockMvc, serviços, repositórios Data JPA, observadores síncronos e validações Strategy.
-- **Relatório JaCoCo:** Cobertura de linhas do backend superior a **90%** (meta da métrica M-01: ≥ 80%).
+- **Comando de Execução:** `./gradlew test` (em `SIGTCC/backend/gestao-tcc`)
+- **Resultados:** **402 testes** executados em **43 arquivos** de relatório (`0` falhas, `0` erros, `0` ignorados).
+- **Cobertura (M-01):** Registrada em [`docs/metricas/M-01.md`](metricas/M-01.md) com **97,78%** de cobertura de linhas (`662/677`) e **88,07%** de branches (`192/218`), acima da meta de **≥ 80%**.
 
 ### 5.3. Suíte de Testes de Componentes e Rotas do Frontend (Vitest)
 
-- **Comando de Execução:** `npm test`
-- **Resultados:** 100% dos testes de componentes React aprovados com React Testing Library, cobrindo formulários, interceptação de erros da API, autenticação e proteção de rotas com preservação de estado.
-- **Cobertura Vitest:** Superior a **80%** de linhas (meta da métrica M-01: ≥ 70%).
+- **Comando de Execução:** `npm test -- --run` (em `SIGTCC/frontend`)
+- **Resultados:** **149 testes** aprovados em **22 arquivos** (`149 passed`).
+- **Cobertura (M-01):** Registrada em [`docs/metricas/M-01.md`](metricas/M-01.md) com **80,99%** de linhas (`80,67%` statements, `83,71%` functions, `74,09%` branches), atendendo à meta da métrica M-01 de **≥ 80%**.
 
 ---
 
 ## 6. Conclusão e Parecer de Aceitação
 
-Com base na execução sistemática dos casos de teste **AT-01 a AT-07**, na validação integral dos cenários de autorização e de regras de negócio, e na comprovação automatizada via suítes de teste de CI e `smoke-test.sh`, declara-se que:
+Com base na execução dos casos de teste **AT-01 a AT-07** e na comprovação automatizada via suítes do Gradle, Vitest e `smoke-test.sh`:
 
-> **O Produto Mínimo Viável (MVP) do SIGTCC na versão `v1.0.0-rc.1` (Release Candidate) cumpre integralmente todos os critérios de aceitação estabelecidos para as histórias US01 a US07, estando APROVADO para a homologação final e apresentação perante a banca avaliadora.**
+> **Os casos AT-01 a AT-06 foram Aprovados e o caso AT-07 foi Aprovado com ressalvas (o aluno visualiza o status `AJUSTES_NECESSARIOS` e reenvia a entrega em `/minhas-entregas`, mas o texto do comentário do parecer não é exibido na interface). O MVP do SIGTCC atende aos critérios de aceitação estabelecidos para US01 a US07 e está apto para a demonstração final.**
